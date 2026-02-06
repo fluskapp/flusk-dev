@@ -1,0 +1,27 @@
+{
+  "name": "@flusk/business-logic",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@flusk/entities": "workspace:*",
+    "@flusk/types": "workspace:*",
+    "@sinclair/typebox": "^0.34.48"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

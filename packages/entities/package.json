@@ -1,0 +1,32 @@
+{
+  "name": "@flusk/entities",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./base": {
+      "types": "./dist/base.entity.d.ts",
+      "import": "./dist/base.entity.js"
+    },
+    "./llm-call": {
+      "types": "./dist/llm-call.entity.d.ts",
+      "import": "./dist/llm-call.entity.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.48"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

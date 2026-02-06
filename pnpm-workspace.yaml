@@ -1,0 +1,4 @@
+packages:
+  - 'packages/*'
+  # Exclude execution package (has build errors, not needed - using server-minimal.ts)
+  - '!packages/execution'

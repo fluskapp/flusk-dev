@@ -1,0 +1,20 @@
+{
+  "name": "@flusk/tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Flusk platform integration and E2E tests",
+  "scripts": {
+    "test": "node --test e2e/**/*.test.ts",
+    "test:watch": "node --test --watch e2e/**/*.test.ts"
+  },
+  "dependencies": {
+    "@flusk/execution": "workspace:*",
+    "@flusk/sdk": "workspace:*",
+    "openai": "^4.77.3"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "@types/node": "^22.10.5"
+  }
+}

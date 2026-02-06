@@ -1,0 +1,29 @@
+{
+  "name": "flusk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r build",
+    "clean": "pnpm -r clean",
+    "dev": "pnpm -r dev",
+    "start": "tsx server-minimal.ts",
+    "start:watch": "tsx watch server-minimal.ts",
+    "example": "cd examples && pnpm start",
+    "test:e2e": "cd tests && pnpm test",
+    "vercel-build": "pnpm build",
+    "flusk": "node packages/cli/dist/bin/flusk.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@vercel/node": "^3.0.0",
+    "glob": "^11.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.0"
+  },
+  "dependencies": {
+    "pnpm": "^10.28.2",
+    "fastify": "^5.0.0",
+    "@fastify/cors": "^10.0.0"
+  }
+}

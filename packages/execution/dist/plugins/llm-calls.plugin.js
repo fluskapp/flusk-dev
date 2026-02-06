@@ -1,0 +1,31 @@
+import fp from 'fastify-plugin';
+import { llmCallsRoutes } from '../routes/llm-calls.route.js';
+/**
+ * LLM Calls Plugin
+ * Encapsulates all LLM call routes with Fastify plugin pattern
+ *
+ * Uses plugin encapsulation to:
+ * - Isolate route registration
+ * - Enable route-level decorators
+ * - Support plugin composition
+ *
+ * @param fastify - Fastify instance
+ * @param opts - Plugin options with optional prefix
+ */
+async function llmCallsPlugin(fastify, opts) {
+    // Register routes under the plugin scope
+    // Default prefix: /llm-calls (can be overridden via opts.prefix)
+    await fastify.register(llmCallsRoutes, {
+        prefix: opts.prefix || '/llm-calls'
+    });
+}
+/**
+ * Export as Fastify plugin
+ * Use fp() to avoid plugin encapsulation where needed
+ * (allows decorators to be accessible in parent scope)
+ */
+export default fp(llmCallsPlugin, {
+    name: 'llm-calls-plugin',
+    fastify: '5.x'
+});
+//# sourceMappingURL=llm-calls.plugin.js.map

@@ -1,0 +1,1 @@
+{"version":3,"file":"business-logic.generator.d.ts","sourceRoot":"","sources":["../../../src/generators/business-logic.generator.ts"],"names":[],"mappings":"AAAA;;;GAGG;AAOH,MAAM,WAAW,eAAe;IAC9B,IAAI,EAAE,MAAM,CAAC;IACb,OAAO,EAAE,MAAM,CAAC;CACjB;AAED,wBAAsB,qBAAqB,CACzC,UAAU,EAAE,MAAM,EAClB,UAAU,EAAE,MAAM,GACjB,OAAO,CAAC,eAAe,EAAE,CAAC,CAkB5B"}

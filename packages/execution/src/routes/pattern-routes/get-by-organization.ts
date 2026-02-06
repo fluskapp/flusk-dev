@@ -1,0 +1,58 @@
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { Type } from '@sinclair/typebox';
+import * as PatternRepository from '@flusk/resources/repositories/pattern';
+import { PatternResponseSchema } from './schemas.js';
+
+/**
+ * GET /patterns/by-organization/:orgId
+ * List patterns for a specific organization
+ * Convenience endpoint for common use case
+ */
+export function registerGetByOrganization(fastify: FastifyInstance): void {
+  fastify.get(
+    '/by-organization/:orgId',
+    {
+      schema: {
+        params: Type.Object({
+          orgId: Type.String({ format: 'uuid' })
+        }),
+        querystring: Type.Object({
+          minOccurrences: Type.Optional(Type.Integer({ minimum: 1 })),
+          minTotalCost: Type.Optional(Type.Number({ minimum: 0 })),
+          sortBy: Type.Optional(Type.Union([
+            Type.Literal('occurrences'),
+            Type.Literal('totalCost'),
+            Type.Literal('lastSeen')
+          ])),
+          limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 1000 })),
+          offset: Type.Optional(Type.Integer({ minimum: 0 }))
+        }),
+        response: {
+          200: Type.Object({
+            patterns: Type.Array(PatternResponseSchema),
+            total: Type.Integer({ minimum: 0 })
+          })
+        },
+        tags: ['Patterns'],
+        description: 'Get patterns for an organization with filters'
+      }
+    },
+    async (request: FastifyRequest<{ Params: { orgId: string } }>, reply: FastifyReply) => {
+      const { orgId } = request.params;
+      const query = request.query as {
+        minOccurrences?: number;
+        minTotalCost?: number;
+        sortBy?: 'occurrences' | 'totalCost' | 'lastSeen';
+        limit?: number;
+        offset?: number;
+      };
+
+      const patterns = await PatternRepository.findByOrganization(orgId, query);
+
+      return reply.code(200).send({
+        patterns,
+        total: patterns.length
+      });
+    }
+  );
+}

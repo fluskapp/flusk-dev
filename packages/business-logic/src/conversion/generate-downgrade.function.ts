@@ -1,0 +1,134 @@
+/**
+ * Input for generateDowngrade function
+ */
+export interface GenerateDowngradeInput {
+  provider: string;
+  model: string;
+  occurrenceCount: number;
+  avgCost: number;
+}
+
+/**
+ * Downgrade configuration output
+ */
+export interface DowngradeConfig {
+  fromModel: string;
+  toModel: string;
+  estimatedQualityLoss: number;
+}
+
+/**
+ * Output from generateDowngrade function
+ */
+export interface GenerateDowngradeOutput {
+  config: DowngradeConfig;
+  estimatedSavings: number;
+}
+
+/**
+ * Model downgrade mapping
+ * Maps expensive models to cheaper alternatives with quality loss estimates
+ */
+const DOWNGRADE_MAP: Record<string, Record<string, { toModel: string; qualityLoss: number; costReduction: number }>> = {
+  openai: {
+    'gpt-4': {
+      toModel: 'gpt-4o-mini',
+      qualityLoss: 0.15,
+      costReduction: 0.95 // ~95% cost reduction
+    },
+    'gpt-4-turbo': {
+      toModel: 'gpt-4o-mini',
+      qualityLoss: 0.10,
+      costReduction: 0.90
+    },
+    'gpt-4o': {
+      toModel: 'gpt-4o-mini',
+      qualityLoss: 0.05,
+      costReduction: 0.85
+    },
+    'gpt-3.5-turbo': {
+      toModel: 'gpt-4o-mini',
+      qualityLoss: 0.02,
+      costReduction: 0.70
+    }
+  },
+  anthropic: {
+    'claude-3-opus': {
+      toModel: 'claude-3-haiku',
+      qualityLoss: 0.20,
+      costReduction: 0.95
+    },
+    'claude-3.5-sonnet': {
+      toModel: 'claude-3-haiku',
+      qualityLoss: 0.10,
+      costReduction: 0.90
+    }
+  },
+  cohere: {
+    'command': {
+      toModel: 'command-light',
+      qualityLoss: 0.15,
+      costReduction: 0.70
+    }
+  }
+};
+
+/**
+ * Generate model downgrade suggestion for a pattern
+ *
+ * Pure function that identifies cheaper model alternatives and estimates
+ * savings and quality impact. Returns null if no downgrade is available.
+ *
+ * @param input - Pattern metadata (provider, model, occurrence count, avg cost)
+ * @returns Downgrade config and estimated monthly savings, or null if no downgrade
+ *
+ * @example
+ * ```ts
+ * generateDowngrade({
+ *   provider: 'openai',
+ *   model: 'gpt-4',
+ *   occurrenceCount: 100,
+ *   avgCost: 0.06
+ * })
+ * // => {
+ * //   config: {
+ * //     fromModel: 'gpt-4',
+ * //     toModel: 'gpt-4o-mini',
+ * //     estimatedQualityLoss: 0.15
+ * //   },
+ * //   estimatedSavings: 171.00
+ * // }
+ * ```
+ */
+export function generateDowngrade(input: GenerateDowngradeInput): GenerateDowngradeOutput | null {
+  const providerKey = input.provider.toLowerCase();
+
+  // Check if provider exists in downgrade map
+  if (!(providerKey in DOWNGRADE_MAP)) {
+    return null;
+  }
+
+  const providerMap = DOWNGRADE_MAP[providerKey];
+
+  // Check if model has a downgrade option
+  if (!(input.model in providerMap)) {
+    return null;
+  }
+
+  const downgrade = providerMap[input.model];
+
+  // Calculate estimated savings
+  // Assume pattern repeats at current rate for 30 days
+  const callsPerMonth = input.occurrenceCount * 30;
+  const costSavingsPerCall = input.avgCost * downgrade.costReduction;
+  const estimatedSavings = callsPerMonth * costSavingsPerCall;
+
+  return {
+    config: {
+      fromModel: input.model,
+      toModel: downgrade.toModel,
+      estimatedQualityLoss: downgrade.qualityLoss
+    },
+    estimatedSavings: Math.round(estimatedSavings * 100) / 100 // Round to 2 decimals
+  };
+}

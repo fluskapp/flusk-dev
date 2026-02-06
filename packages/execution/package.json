@@ -1,0 +1,46 @@
+{
+  "name": "@flusk/execution",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Fastify routes, plugins, and hooks for Flusk platform",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./routes/*": {
+      "import": "./dist/routes/*.js",
+      "types": "./dist/routes/*.d.ts"
+    },
+    "./plugins/*": {
+      "import": "./dist/plugins/*.js",
+      "types": "./dist/plugins/*.d.ts"
+    },
+    "./hooks/*": {
+      "import": "./dist/hooks/*.js",
+      "types": "./dist/hooks/*.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@flusk/entities": "workspace:*",
+    "@flusk/types": "workspace:*",
+    "@flusk/resources": "workspace:*",
+    "@flusk/business-logic": "workspace:*",
+    "fastify": "^5.0.0",
+    "@fastify/type-provider-typebox": "^5.0.0",
+    "@fastify/cors": "^10.0.0",
+    "@sinclair/typebox": "^0.32.0",
+    "fastify-plugin": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  }
+}

@@ -1,0 +1,44 @@
+# Development files
+*.log
+*.md
+.env.local
+.env.development
+.DS_Store
+
+# Tests
+**/__tests__/
+**/*.test.ts
+**/*.spec.ts
+tests/
+coverage/
+
+# Examples
+examples/
+
+# Documentation
+docs/
+*.md
+!DEPLOYMENT.md
+
+# Build artifacts (will be rebuilt)
+dist/
+build/
+.turbo/
+
+# Dependencies (handled by Vercel)
+node_modules/
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+tmp/
+temp/
+*.tmp

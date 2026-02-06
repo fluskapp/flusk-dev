@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "packages/execution/src/vercel-adapter.ts",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "packages/*/dist/**",
+          "node_modules/**"
+        ]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/v1/(.*)",
+      "dest": "/packages/execution/src/vercel-adapter.ts"
+    },
+    {
+      "src": "/health",
+      "dest": "/packages/execution/src/vercel-adapter.ts"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/packages/execution/src/vercel-adapter.ts"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "packages/execution/src/vercel-adapter.ts": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  }
+}

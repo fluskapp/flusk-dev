@@ -1,0 +1,29 @@
+{
+  "name": "@flusk/types",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./llm-call": {
+      "types": "./dist/llm-call.types.d.ts",
+      "import": "./dist/llm-call.types.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "dev": "tsc --watch"
+  },
+  "dependencies": {
+    "@flusk/entities": "workspace:*",
+    "@sinclair/typebox": "^0.34.48"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}
