@@ -1,0 +1,38 @@
+import { describe, it, expect } from 'vitest';
+import { hashPrompt } from './hash-prompt.function.js';
+
+describe('hashPrompt', () => {
+  it('produces a 64-char hex string', () => {
+    const { promptHash } = hashPrompt({ promptText: 'Hello', modelName: 'gpt-4' });
+    expect(promptHash).toHaveLength(64);
+    expect(promptHash).toMatch(/^[0-9a-f]{64}$/);
+  });
+
+  it('is deterministic', () => {
+    const a = hashPrompt({ promptText: 'Hello', modelName: 'gpt-4' });
+    const b = hashPrompt({ promptText: 'Hello', modelName: 'gpt-4' });
+    expect(a.promptHash).toBe(b.promptHash);
+  });
+
+  it('differs for different prompts', () => {
+    const a = hashPrompt({ promptText: 'Hello', modelName: 'gpt-4' });
+    const b = hashPrompt({ promptText: 'World', modelName: 'gpt-4' });
+    expect(a.promptHash).not.toBe(b.promptHash);
+  });
+
+  it('differs for different models', () => {
+    const a = hashPrompt({ promptText: 'Hello', modelName: 'gpt-4' });
+    const b = hashPrompt({ promptText: 'Hello', modelName: 'gpt-3.5-turbo' });
+    expect(a.promptHash).not.toBe(b.promptHash);
+  });
+
+  it('handles empty prompt', () => {
+    const { promptHash } = hashPrompt({ promptText: '', modelName: 'gpt-4' });
+    expect(promptHash).toHaveLength(64);
+  });
+
+  it('handles unicode', () => {
+    const { promptHash } = hashPrompt({ promptText: '你好世界🌍', modelName: 'gpt-4' });
+    expect(promptHash).toHaveLength(64);
+  });
+});

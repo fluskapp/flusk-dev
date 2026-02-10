@@ -1,0 +1,39 @@
+import { describe, it, expect } from 'vitest';
+import { validateTokens } from './validate-tokens.function.js';
+
+describe('validateTokens', () => {
+  it('valid when within GPT-4 limit (8192)', () => {
+    expect(validateTokens({
+      tokenUsage: { input: 4000, output: 2000, total: 6000 },
+      modelName: 'gpt-4',
+    }).isValid).toBe(true);
+  });
+
+  it('valid at exact limit', () => {
+    expect(validateTokens({
+      tokenUsage: { input: 4000, output: 4192, total: 8192 },
+      modelName: 'gpt-4',
+    }).isValid).toBe(true);
+  });
+
+  it('invalid when exceeding limit', () => {
+    expect(validateTokens({
+      tokenUsage: { input: 5000, output: 4000, total: 9000 },
+      modelName: 'gpt-4',
+    }).isValid).toBe(false);
+  });
+
+  it('invalid for unknown model', () => {
+    expect(validateTokens({
+      tokenUsage: { input: 100, output: 100, total: 200 },
+      modelName: 'unknown-model',
+    }).isValid).toBe(false);
+  });
+
+  it('valid for Claude with large context', () => {
+    expect(validateTokens({
+      tokenUsage: { input: 100000, output: 50000, total: 150000 },
+      modelName: 'claude-3-opus',
+    }).isValid).toBe(true);
+  });
+});

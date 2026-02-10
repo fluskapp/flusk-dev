@@ -1,0 +1,69 @@
+import { describe, it, expect } from 'vitest';
+import { calculateCost } from './calculate-cost.function.js';
+
+describe('calculateCost', () => {
+  it('calculates GPT-4 cost correctly', () => {
+    const result = calculateCost({
+      providerName: 'openai',
+      modelName: 'gpt-4',
+      tokenUsage: { input: 1000, output: 500, total: 1500 },
+    });
+    // input: 1000/1M * 30 = 0.03, output: 500/1M * 60 = 0.03
+    expect(result.costUsd).toBeCloseTo(0.06, 6);
+  });
+
+  it('calculates GPT-4o-mini cost correctly', () => {
+    const result = calculateCost({
+      providerName: 'openai',
+      modelName: 'gpt-4o-mini',
+      tokenUsage: { input: 1_000_000, output: 1_000_000, total: 2_000_000 },
+    });
+    expect(result.costUsd).toBeCloseTo(0.75, 6);
+  });
+
+  it('calculates Anthropic Claude cost', () => {
+    const result = calculateCost({
+      providerName: 'anthropic',
+      modelName: 'claude-3-opus',
+      tokenUsage: { input: 1000, output: 1000, total: 2000 },
+    });
+    // 1000/1M * 15 + 1000/1M * 75 = 0.015 + 0.075
+    expect(result.costUsd).toBeCloseTo(0.09, 6);
+  });
+
+  it('returns 0 for unknown provider', () => {
+    const result = calculateCost({
+      providerName: 'unknown',
+      modelName: 'gpt-4',
+      tokenUsage: { input: 1000, output: 500, total: 1500 },
+    });
+    expect(result.costUsd).toBe(0);
+  });
+
+  it('returns 0 for unknown model', () => {
+    const result = calculateCost({
+      providerName: 'openai',
+      modelName: 'gpt-99',
+      tokenUsage: { input: 1000, output: 500, total: 1500 },
+    });
+    expect(result.costUsd).toBe(0);
+  });
+
+  it('is case-insensitive for provider', () => {
+    const result = calculateCost({
+      providerName: 'OpenAI',
+      modelName: 'gpt-4',
+      tokenUsage: { input: 1000, output: 500, total: 1500 },
+    });
+    expect(result.costUsd).toBeCloseTo(0.06, 6);
+  });
+
+  it('returns 0 cost for 0 tokens', () => {
+    const result = calculateCost({
+      providerName: 'openai',
+      modelName: 'gpt-4',
+      tokenUsage: { input: 0, output: 0, total: 0 },
+    });
+    expect(result.costUsd).toBe(0);
+  });
+});

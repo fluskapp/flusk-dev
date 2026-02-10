@@ -1,0 +1,56 @@
+import { describe, it, expect } from 'vitest';
+import { calculateSavings } from './calculate-savings.function.js';
+import type { PatternEntity } from '@flusk/entities';
+
+function makePattern(overrides: Partial<PatternEntity> = {}): PatternEntity {
+  return {
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    organizationId: crypto.randomUUID(),
+    promptHash: 'a'.padEnd(64, '0'),
+    occurrenceCount: 100,
+    firstSeenAt: new Date().toISOString(),
+    lastSeenAt: new Date().toISOString(),
+    samplePrompts: ['test'],
+    avgCost: 0.05,
+    totalCost: 5.0,
+    ...overrides,
+  };
+}
+
+describe('calculateSavings', () => {
+  it('calculates positive savings for high-frequency pattern', () => {
+    const { estimate } = calculateSavings({ pattern: makePattern() });
+    expect(estimate.potentialSavings).toBeGreaterThan(0);
+    expect(estimate.savingsPercentage).toBeGreaterThan(0);
+  });
+
+  it('recommends HIGH_PRIORITY_CACHE for 100+ occurrences and $10+ cost', () => {
+    const { estimate } = calculateSavings({
+      pattern: makePattern({ occurrenceCount: 100, totalCost: 10 }),
+    });
+    expect(estimate.recommendedAction).toBe('HIGH_PRIORITY_CACHE');
+  });
+
+  it('recommends MONITOR for low frequency', () => {
+    const { estimate } = calculateSavings({
+      pattern: makePattern({ occurrenceCount: 5, totalCost: 0.5 }),
+    });
+    expect(estimate.recommendedAction).toBe('MONITOR');
+  });
+
+  it('calculates ROI based on $100 implementation cost', () => {
+    const { estimate } = calculateSavings({
+      pattern: makePattern({ totalCost: 200, avgCost: 2, occurrenceCount: 100 }),
+    });
+    expect(estimate.roi).toBeGreaterThan(1);
+  });
+
+  it('respects custom cacheCostPerCall', () => {
+    const pattern = makePattern();
+    const a = calculateSavings({ pattern, cacheCostPerCall: 0.0001 });
+    const b = calculateSavings({ pattern, cacheCostPerCall: 0.01 });
+    expect(a.estimate.potentialSavings).toBeGreaterThan(b.estimate.potentialSavings);
+  });
+});

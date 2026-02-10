@@ -1,0 +1,74 @@
+import { describe, it, expect } from 'vitest';
+import { detectDuplicates } from './detect-duplicates.function.js';
+import type { LLMCallEntity } from '@flusk/entities';
+
+function makeCall(overrides: Partial<LLMCallEntity> = {}): LLMCallEntity {
+  return {
+    id: crypto.randomUUID(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    provider: 'openai',
+    model: 'gpt-4',
+    prompt: 'What is 2+2?',
+    promptHash: 'abc123'.padEnd(64, '0'),
+    tokens: { input: 100, output: 50, total: 150 },
+    cost: 0.01,
+    response: '4',
+    cached: false,
+    consentGiven: true,
+    consentPurpose: 'optimization',
+    ...overrides,
+  };
+}
+
+describe('detectDuplicates', () => {
+  it('returns empty groups for no calls', () => {
+    const { groups } = detectDuplicates({ calls: [] });
+    expect(groups).toHaveLength(0);
+  });
+
+  it('returns empty groups for unique calls', () => {
+    const calls = [
+      makeCall({ promptHash: 'a'.padEnd(64, '0') }),
+      makeCall({ promptHash: 'b'.padEnd(64, '0') }),
+    ];
+    const { groups } = detectDuplicates({ calls });
+    expect(groups).toHaveLength(0);
+  });
+
+  it('groups duplicate calls', () => {
+    const hash = 'x'.padEnd(64, '0');
+    const calls = [
+      makeCall({ promptHash: hash, cost: 0.05 }),
+      makeCall({ promptHash: hash, cost: 0.05 }),
+      makeCall({ promptHash: hash, cost: 0.05 }),
+    ];
+    const { groups } = detectDuplicates({ calls });
+    expect(groups).toHaveLength(1);
+    expect(groups[0].occurrenceCount).toBe(3);
+    expect(groups[0].totalCost).toBeCloseTo(0.15);
+    expect(groups[0].avgCost).toBeCloseTo(0.05);
+  });
+
+  it('sorts groups by total cost descending', () => {
+    const hashA = 'a'.padEnd(64, '0');
+    const hashB = 'b'.padEnd(64, '0');
+    const calls = [
+      makeCall({ promptHash: hashA, cost: 0.01 }),
+      makeCall({ promptHash: hashA, cost: 0.01 }),
+      makeCall({ promptHash: hashB, cost: 1.0 }),
+      makeCall({ promptHash: hashB, cost: 1.0 }),
+    ];
+    const { groups } = detectDuplicates({ calls });
+    expect(groups[0].promptHash).toBe(hashB);
+  });
+
+  it('limits sample prompts to 5', () => {
+    const hash = 'z'.padEnd(64, '0');
+    const calls = Array.from({ length: 10 }, (_, i) =>
+      makeCall({ promptHash: hash, prompt: `prompt ${i}` })
+    );
+    const { groups } = detectDuplicates({ calls });
+    expect(groups[0].samplePrompts.length).toBeLessThanOrEqual(5);
+  });
+});
