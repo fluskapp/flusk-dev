@@ -1,0 +1,69 @@
+/**
+ * Generate Test Command
+ * CLI command to generate comprehensive test files
+ */
+
+import { Command } from 'commander';
+import chalk from 'chalk';
+import path from 'path';
+import { generateTest } from '../generators/test.generator.js';
+
+export const generateTestCommand = new Command('g:test')
+  .description('Generate comprehensive test file for a source file')
+  .argument('<target-file>', 'Path to the source file to generate tests for')
+  .option('-t, --type <type>', 'Test type (unit|integration|repository|auto)', 'auto')
+  .option('-o, --output-dir <dir>', 'Output directory for test file')
+  .option('--force', 'Overwrite existing test file')
+  .action(async (targetFile: string, options) => {
+    try {
+      console.log(chalk.blue('🧪 Generating test file...'));
+      console.log();
+
+      // Resolve target file path
+      const resolvedTargetFile = path.resolve(process.cwd(), targetFile);
+
+      // Generate test
+      const results = await generateTest({
+        targetFile: resolvedTargetFile,
+        testType: options.type,
+        outputDir: options.outputDir ? path.resolve(process.cwd(), options.outputDir) : undefined,
+      });
+
+      // Display results
+      for (const result of results) {
+        if (result.created) {
+          console.log(chalk.green('✅ Created:'), result.filePath);
+        }
+      }
+
+      console.log();
+      console.log(chalk.green('✨ Test file generated successfully!'));
+      console.log();
+
+      // Display next steps
+      console.log(chalk.cyan('📝 Next steps:'));
+      console.log(chalk.white('   1. Review the generated test file'));
+      console.log(chalk.white('   2. Update test cases with actual test data'));
+      console.log(chalk.white('   3. Run tests with: pnpm test'));
+      console.log();
+
+      // Display usage examples
+      console.log(chalk.cyan('💡 Test coverage includes:'));
+      console.log(chalk.white('   - Happy path scenarios'));
+      console.log(chalk.white('   - Error handling'));
+      console.log(chalk.white('   - Input validation'));
+      console.log(chalk.white('   - Edge cases'));
+      console.log();
+
+      console.log(chalk.cyan('📚 Additional options:'));
+      console.log(chalk.white('   flusk g:test src/services/user.service.ts --type unit'));
+      console.log(chalk.white('   flusk g:test src/routes/auth.ts --type integration'));
+      console.log(chalk.white('   flusk g:test src/repositories/user.repository.ts --type repository'));
+      console.log(chalk.white('   flusk g:test src/utils/helpers.ts --output-dir tests/unit'));
+      console.log();
+
+    } catch (error) {
+      console.error(chalk.red('❌ Error generating test:'), error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+  });

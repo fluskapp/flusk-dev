@@ -1,0 +1,27 @@
+import { Command } from 'commander';
+import chalk from 'chalk';
+import { generatePlugin } from '../generators/plugin.generator.js';
+
+export const generatePluginCommand = new Command('g:plugin')
+  .description('Generate a Fastify plugin with encapsulation')
+  .argument('<name>', 'Plugin name (e.g., rate-limiter)')
+  .action(async (name: string) => {
+    console.log(chalk.blue(`\n🔧 Generating plugin: ${name}...\n`));
+
+    try {
+      const results = await generatePlugin(name);
+
+      for (const result of results) {
+        console.log(chalk.green(`✅ ${result.path}`));
+      }
+
+      console.log(chalk.green('\n✨ Plugin generated successfully!\n'));
+      console.log(chalk.cyan('📋 Usage example:\n'));
+      console.log(chalk.white('  import { ' + name.split('-').map((w, i) => i === 0 ? w : w.charAt(0).toUpperCase() + w.slice(1)).join('') + 'Plugin } from \'./plugins/' + name + '.plugin.js\';'));
+      console.log(chalk.white('  await fastify.register(' + name.split('-').map((w, i) => i === 0 ? w : w.charAt(0).toUpperCase() + w.slice(1)).join('') + 'Plugin);\n'));
+    } catch (error) {
+      console.error(chalk.red('\n❌ Failed to generate plugin:'));
+      console.error(chalk.red(`   ${(error as Error).message}\n`));
+      process.exit(1);
+    }
+  });

@@ -1,0 +1,301 @@
+/**
+ * UI Utilities Tests and Usage Examples
+ */
+
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
+import {
+  colors,
+  ui,
+  icons,
+  formatSuccess,
+  formatError,
+  formatWarning,
+  formatInfo,
+  formatTip,
+  formatErrorWithFix,
+  formatValidationError,
+  header,
+  separator,
+  indent,
+  formatTree,
+  formatStepProgress,
+  formatNextSteps,
+  stripColors,
+  shouldDisableColors,
+} from './ui.js';
+
+describe('UI Utilities', () => {
+  describe('Brand Colors', () => {
+    it('should have correct brand color values', () => {
+      assert.strictEqual(colors.primary, '#0066CC');
+      assert.strictEqual(colors.success, '#00CC66');
+      assert.strictEqual(colors.warning, '#FFAA00');
+      assert.strictEqual(colors.error, '#CC0000');
+    });
+  });
+
+  describe('Icons', () => {
+    it('should have status icons', () => {
+      assert.strictEqual(icons.success, '✅');
+      assert.strictEqual(icons.error, '❌');
+      assert.strictEqual(icons.warning, '⚠️');
+      assert.strictEqual(icons.tip, '💡');
+    });
+  });
+
+  describe('Message Formatters', () => {
+    it('should format success message', () => {
+      const result = formatSuccess('Operation completed');
+      assert.ok(result.includes('✅'));
+      assert.ok(result.includes('Operation completed'));
+    });
+
+    it('should format error message', () => {
+      const result = formatError('Operation failed');
+      assert.ok(result.includes('❌'));
+      assert.ok(result.includes('Operation failed'));
+    });
+
+    it('should format warning message', () => {
+      const result = formatWarning('Deprecated feature');
+      assert.ok(result.includes('⚠️'));
+      assert.ok(result.includes('Deprecated feature'));
+    });
+
+    it('should format info message', () => {
+      const result = formatInfo('Starting process');
+      assert.ok(result.includes('ℹ️'));
+      assert.ok(result.includes('Starting process'));
+    });
+
+    it('should format tip message', () => {
+      const result = formatTip('Run flusk migrate');
+      assert.ok(result.includes('💡'));
+      assert.ok(result.includes('Run flusk migrate'));
+    });
+  });
+
+  describe('Error Formatting', () => {
+    it('should format error with fix command', () => {
+      const result = formatErrorWithFix(
+        'DATABASE_URL not found',
+        'cp .env.example .env',
+        'Then edit .env'
+      );
+
+      assert.ok(result.includes('Error: DATABASE_URL not found'));
+      assert.ok(result.includes('Fix: cp .env.example .env'));
+      assert.ok(result.includes('Then edit .env'));
+    });
+
+    it('should format validation error', () => {
+      const result = formatValidationError(
+        'user.entity.ts',
+        12,
+        'Missing import',
+        'Add import statement'
+      );
+
+      assert.ok(result.includes('VALIDATION ERROR'));
+      assert.ok(result.includes('user.entity.ts'));
+      assert.ok(result.includes('Line 12'));
+      assert.ok(result.includes('Fix: Add import statement'));
+    });
+  });
+
+  describe('Layout Helpers', () => {
+    it('should create header with separator', () => {
+      const result = header('Test Header');
+      assert.ok(result.includes('Test Header'));
+      assert.ok(result.includes('━'));
+    });
+
+    it('should create header with icon', () => {
+      const result = header('Test Header', '🔧');
+      assert.ok(result.includes('🔧'));
+      assert.ok(result.includes('Test Header'));
+    });
+
+    it('should create separator', () => {
+      const result = separator(20);
+      assert.strictEqual(result.replace(/\u001b\[[0-9;]*m/g, ''), '━'.repeat(20));
+    });
+
+    it('should indent text', () => {
+      const result = indent('Test', 2);
+      assert.ok(result.startsWith('    ')); // 2 levels = 4 spaces
+    });
+
+    it('should indent multiline text', () => {
+      const result = indent('Line 1\nLine 2', 1);
+      assert.ok(result.includes('  Line 1'));
+      assert.ok(result.includes('  Line 2'));
+    });
+  });
+
+  describe('Progress Display', () => {
+    it('should format tree structure', () => {
+      const result = formatTree('user.entity.ts', [
+        { path: 'types/user.types.ts', status: 'success' },
+        { path: 'resources/user.repository.ts', status: 'error' },
+        { path: 'business-logic/validate-user.ts', status: 'pending' },
+      ]);
+
+      assert.ok(result.includes('user.entity.ts'));
+      assert.ok(result.includes('├─'));
+      assert.ok(result.includes('└─'));
+      assert.ok(result.includes('✅'));
+      assert.ok(result.includes('❌'));
+      assert.ok(result.includes('⏳'));
+    });
+
+    it('should format step progress', () => {
+      const result = formatStepProgress([
+        { label: 'PostgreSQL', status: 'success', detail: 'localhost:5432' },
+        { label: 'Redis', status: 'pending' },
+      ]);
+
+      assert.ok(result.includes('PostgreSQL'));
+      assert.ok(result.includes('localhost:5432'));
+      assert.ok(result.includes('Redis'));
+      assert.ok(result.includes('✅'));
+      assert.ok(result.includes('⏳'));
+    });
+  });
+
+  describe('Next Steps', () => {
+    it('should format next steps section', () => {
+      const result = formatNextSteps([
+        'flusk migrate    # Update database',
+        'flusk test       # Run tests',
+      ]);
+
+      assert.ok(result.includes('Next steps'));
+      assert.ok(result.includes('💡'));
+      assert.ok(result.includes('flusk migrate'));
+      assert.ok(result.includes('flusk test'));
+    });
+  });
+
+  describe('Accessibility', () => {
+    it('should strip ANSI color codes', () => {
+      const colored = ui.success('Test');
+      const stripped = stripColors(colored);
+      assert.strictEqual(stripped, 'Test');
+    });
+
+    it('should detect NO_COLOR environment', () => {
+      const original = process.env.NO_COLOR;
+
+      process.env.NO_COLOR = '1';
+      assert.strictEqual(shouldDisableColors(), true);
+
+      delete process.env.NO_COLOR;
+      // Note: chalk.level depends on terminal capabilities
+      // So we just verify the function runs without error
+      shouldDisableColors();
+
+      // Restore
+      if (original) {
+        process.env.NO_COLOR = original;
+      } else {
+        delete process.env.NO_COLOR;
+      }
+    });
+  });
+});
+
+// ============================================================================
+// Visual Examples (run with: node --import=tsx src/utils/ui.test.ts)
+// ============================================================================
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  console.log('\n' + header('UI Utilities - Visual Examples', icons.tool));
+  console.log('');
+
+  // Example 1: Success messages
+  console.log(header('Example 1: Success Messages', icons.success));
+  console.log('');
+  console.log(formatSuccess('Migration completed successfully'));
+  console.log(formatSuccess('4 files generated'));
+  console.log('');
+
+  // Example 2: Error with fix
+  console.log(header('Example 2: Error with Fix Suggestion', icons.error));
+  console.log('');
+  console.log(
+    formatErrorWithFix(
+      'DATABASE_URL not found in .env',
+      'cp .env.example .env',
+      'Then edit .env and add your database URL'
+    )
+  );
+  console.log('');
+
+  // Example 3: File tree
+  console.log(header('Example 3: Generated Files Tree', icons.package));
+  console.log('');
+  console.log(
+    formatTree('user.entity.ts', [
+      { path: 'types/user.types.ts', status: 'success' },
+      { path: 'resources/user.repository.ts', status: 'success' },
+      { path: 'business-logic/validate-user.ts', status: 'success' },
+      { path: 'execution/routes/user.routes.ts', status: 'success' },
+    ])
+  );
+  console.log('');
+
+  // Example 4: Step-by-step progress
+  console.log(header('Example 4: Infrastructure Startup', icons.docker));
+  console.log('');
+  console.log(
+    formatStepProgress([
+      { label: 'PostgreSQL 16', status: 'success', detail: 'localhost:5432' },
+      { label: 'Redis 7', status: 'success', detail: 'localhost:6379' },
+      { label: 'Adminer (DB UI)', status: 'success', detail: 'http://localhost:8080' },
+      { label: 'RedisInsight', status: 'success', detail: 'http://localhost:8001' },
+    ])
+  );
+  console.log('');
+  console.log(formatSuccess('Infrastructure started successfully!'));
+  console.log('');
+
+  // Example 5: Next steps
+  console.log(
+    formatNextSteps([
+      'flusk migrate             # Update database schema',
+      'flusk create:entity       # Create your first entity',
+    ])
+  );
+  console.log('');
+
+  // Example 6: Warnings
+  console.log(header('Example 6: Warnings', icons.warning));
+  console.log('');
+  console.log(formatWarning('Entity "User" already exists in database'));
+  console.log(formatTip('Use --force flag to overwrite existing entity'));
+  console.log('');
+
+  // Example 7: Complete command output
+  console.log(separator());
+  console.log('');
+  console.log(header('Example 7: Complete Command Output', icons.launch));
+  console.log('');
+  console.log(ui.info('🔧 Generating code from user.entity.ts'));
+  console.log('');
+  console.log('Processing entity schema...');
+  console.log(indent(formatSuccess('packages/types/src/user.types.ts'), 1));
+  console.log(indent(formatSuccess('packages/resources/src/user.repository.ts'), 1));
+  console.log(indent(formatSuccess('packages/business-logic/src/validate-user.ts'), 1));
+  console.log(indent(formatSuccess('packages/execution/src/routes/user.routes.ts'), 1));
+  console.log('');
+  console.log(formatSuccess('✨ Code generation complete! (4 files created)'));
+  console.log(
+    formatNextSteps([
+      'flusk migrate             # Update database',
+      'flusk g:test user.repository.ts  # Generate tests',
+    ])
+  );
+  console.log('');
+}

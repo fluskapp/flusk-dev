@@ -1,0 +1,27 @@
+import { Command } from 'commander';
+import chalk from 'chalk';
+import { generateMiddleware } from '../generators/middleware.generator.js';
+
+export const generateMiddlewareCommand = new Command('g:middleware')
+  .description('Generate a Fastify middleware function')
+  .argument('<name>', 'Middleware name (e.g., auth-check)')
+  .action(async (name: string) => {
+    console.log(chalk.blue(`\n🔧 Generating middleware: ${name}...\n`));
+
+    try {
+      const results = await generateMiddleware(name);
+
+      for (const result of results) {
+        console.log(chalk.green(`✅ ${result.path}`));
+      }
+
+      console.log(chalk.green('\n✨ Middleware generated successfully!\n'));
+      console.log(chalk.cyan('📋 Usage example:\n'));
+      console.log(chalk.white('  import { ' + name.split('-').map((w, i) => i === 0 ? w : w.charAt(0).toUpperCase() + w.slice(1)).join('') + 'Middleware } from \'./middleware/' + name + '.middleware.js\';'));
+      console.log(chalk.white('  fastify.addHook(\'preHandler\', ' + name.split('-').map((w, i) => i === 0 ? w : w.charAt(0).toUpperCase() + w.slice(1)).join('') + 'Middleware());\n'));
+    } catch (error) {
+      console.error(chalk.red('\n❌ Failed to generate middleware:'));
+      console.error(chalk.red(`   ${(error as Error).message}\n`));
+      process.exit(1);
+    }
+  });
