@@ -2,16 +2,11 @@
   "name": "@flusk/types",
   "version": "0.1.0",
   "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
-    "./llm-call": {
-      "types": "./dist/llm-call.types.d.ts",
-      "import": "./dist/llm-call.types.js"
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
     }
   },
   "scripts": {

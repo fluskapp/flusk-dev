@@ -3,24 +3,11 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Fastify routes, plugins, and hooks for Flusk platform",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./src/index.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./routes/*": {
-      "import": "./dist/routes/*.js",
-      "types": "./dist/routes/*.d.ts"
-    },
-    "./plugins/*": {
-      "import": "./dist/plugins/*.js",
-      "types": "./dist/plugins/*.d.ts"
-    },
-    "./hooks/*": {
-      "import": "./dist/hooks/*.js",
-      "types": "./dist/hooks/*.d.ts"
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
     }
   },
   "scripts": {

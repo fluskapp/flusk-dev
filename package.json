@@ -6,24 +6,39 @@
   "scripts": {
     "build": "pnpm -r build",
     "clean": "pnpm -r clean",
-    "dev": "pnpm -r dev",
-    "start": "tsx server-minimal.ts",
-    "start:watch": "tsx watch server-minimal.ts",
+    "dev": "tsx watch server.ts",
+    "start": "tsx server.ts",
+    "start:minimal": "tsx server-minimal.ts",
+    "db:up": "docker compose up -d postgres redis",
+    "db:down": "docker compose down",
+    "db:migrate": "tsx scripts/migrate.ts",
     "example": "cd examples && pnpm start",
+    "test": "vitest run",
+    "test:unit": "vitest run packages",
+    "test:integration": "vitest run tests/integration",
     "test:e2e": "cd tests && pnpm test",
     "vercel-build": "pnpm build",
     "flusk": "node packages/cli/dist/bin/flusk.js"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",
+    "@types/pg": "^8.16.0",
     "@vercel/node": "^3.0.0",
     "glob": "^11.0.0",
     "tsx": "^4.21.0",
-    "typescript": "^5.7.0"
+    "typescript": "^5.7.0",
+    "vitest": "^4.0.18"
   },
   "dependencies": {
-    "pnpm": "^10.28.2",
+    "@fastify/cors": "^10.0.0",
+    "@flusk/business-logic": "workspace:*",
+    "@flusk/entities": "workspace:*",
+    "@flusk/execution": "workspace:*",
+    "@flusk/resources": "workspace:*",
+    "@flusk/types": "workspace:*",
     "fastify": "^5.0.0",
-    "@fastify/cors": "^10.0.0"
+    "ioredis": "^5.3.2",
+    "pg": "^8.11.3",
+    "pnpm": "^10.28.2"
   }
 }

@@ -1,3 +1,6 @@
+// Database pool
+export { getPool, closePool } from './db/pool.js';
+
 // Repository exports
 export * as LLMCallRepository from './repositories/llm-call.repository.js';
 export * as PatternRepository from './repositories/pattern.repository.js';
