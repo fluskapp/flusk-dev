@@ -1,0 +1,15 @@
+import type { FastifyInstance } from 'fastify';
+import { registerSearchSimilar } from './search-similar.js';
+import { registerBackfillEmbeddings } from './backfill-embeddings.js';
+
+/**
+ * Similarity search routes
+ * POST /similar — find semantically similar prompts
+ * POST /backfill-embeddings — generate embeddings for existing calls
+ */
+export async function similarityRoutes(
+  fastify: FastifyInstance
+): Promise<void> {
+  registerSearchSimilar(fastify);
+  registerBackfillEmbeddings(fastify);
+}

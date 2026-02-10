@@ -6,6 +6,7 @@ import { healthRoutes } from './routes/health.routes.js';
 import { llmCallsRoutes } from './routes/llm-calls.route.js';
 import { patternRoutes } from './routes/pattern.routes.js';
 import gdprRoutes from './routes/gdpr.routes.js';
+import { similarityRoutes } from './routes/similarity.routes.js';
 
 export interface CreateAppOptions {
   logger?: boolean;
@@ -61,6 +62,7 @@ export async function createApp(
       await api.register(llmCallsRoutes, { prefix: '/llm-calls' });
       await api.register(patternRoutes, { prefix: '/patterns' });
       await api.register(gdprRoutes);
+      await api.register(similarityRoutes, { prefix: '/similarity' });
     },
     { prefix: '/api/v1' }
   );

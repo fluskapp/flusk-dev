@@ -1,0 +1,58 @@
+/**
+ * OpenAI Embedding Client
+ * Generates text embeddings using text-embedding-3-small
+ */
+
+const EMBEDDING_URL = 'https://api.openai.com/v1/embeddings';
+const MODEL = 'text-embedding-3-small';
+const DIMENSIONS = 1536;
+const MAX_INPUT_CHARS = 8000;
+
+export interface EmbeddingResult {
+  embedding: number[];
+  model: string;
+  dimensions: number;
+}
+
+/**
+ * Generate embedding for a single text using OpenAI API
+ * Truncates input to MAX_INPUT_CHARS to stay within token limits
+ */
+export async function generateEmbedding(
+  text: string
+): Promise<EmbeddingResult> {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY is required for embeddings');
+  }
+
+  const truncated = text.slice(0, MAX_INPUT_CHARS);
+
+  const response = await fetch(EMBEDDING_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      input: truncated,
+      model: MODEL,
+      dimensions: DIMENSIONS,
+    }),
+  });
+
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`OpenAI embedding failed: ${response.status} - ${err}`);
+  }
+
+  const data = (await response.json()) as {
+    data: Array<{ embedding: number[] }>;
+  };
+
+  return {
+    embedding: data.data[0].embedding,
+    model: MODEL,
+    dimensions: DIMENSIONS,
+  };
+}

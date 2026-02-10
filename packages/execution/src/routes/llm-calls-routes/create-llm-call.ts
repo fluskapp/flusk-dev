@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import * as LLMCallRepository from '@flusk/resources/repositories/llm-call';
+import { scheduleEmbedding } from '../../hooks/embedding.hook.js';
 import {
   hashPromptHook,
   checkCacheHook,
@@ -44,6 +45,9 @@ export function registerCreateLLMCall(fastify: FastifyInstance): void {
 
       // Create database record
       const created = await LLMCallRepository.create(llmCallData);
+
+      // Generate embedding async (non-blocking)
+      scheduleEmbedding(created.id, created.prompt);
 
       return reply.code(201).send(created);
     }

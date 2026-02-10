@@ -1,0 +1,82 @@
+/**
+ * Group LLM calls by semantic similarity using pre-computed embeddings
+ * Works alongside exact-hash detection for near-duplicate discovery
+ */
+
+export interface SimilarCallInput {
+  id: string;
+  prompt: string;
+  model: string;
+  cost: number;
+  createdAt: string;
+  embedding: number[];
+}
+
+export interface SimilarGroup {
+  centroidId: string;
+  calls: SimilarCallInput[];
+  totalCost: number;
+  avgSimilarity: number;
+}
+
+/**
+ * Cosine similarity between two vectors
+ */
+function cosineSimilarity(a: number[], b: number[]): number {
+  let dot = 0;
+  let normA = 0;
+  let normB = 0;
+  for (let i = 0; i < a.length; i++) {
+    dot += a[i] * b[i];
+    normA += a[i] * a[i];
+    normB += b[i] * b[i];
+  }
+  return dot / (Math.sqrt(normA) * Math.sqrt(normB));
+}
+
+/**
+ * Detect groups of semantically similar prompts
+ * Uses greedy clustering with cosine similarity threshold
+ *
+ * @param calls - LLM calls with embeddings
+ * @param threshold - Similarity threshold (default 0.95 for near-duplicates)
+ * @returns Groups of similar calls
+ */
+export function detectSimilarGroups(
+  calls: SimilarCallInput[],
+  threshold: number = 0.95
+): SimilarGroup[] {
+  const assigned = new Set<number>();
+  const groups: SimilarGroup[] = [];
+
+  for (let i = 0; i < calls.length; i++) {
+    if (assigned.has(i)) continue;
+
+    const group: SimilarCallInput[] = [calls[i]];
+    assigned.add(i);
+    let simSum = 0;
+    let simCount = 0;
+
+    for (let j = i + 1; j < calls.length; j++) {
+      if (assigned.has(j)) continue;
+      const sim = cosineSimilarity(calls[i].embedding, calls[j].embedding);
+      if (sim >= threshold) {
+        group.push(calls[j]);
+        assigned.add(j);
+        simSum += sim;
+        simCount++;
+      }
+    }
+
+    if (group.length >= 2) {
+      groups.push({
+        centroidId: calls[i].id,
+        calls: group,
+        totalCost: group.reduce((s, c) => s + c.cost, 0),
+        avgSimilarity: simCount > 0 ? simSum / simCount : 1,
+      });
+    }
+  }
+
+  return groups.sort((a, b) => b.totalCost - a.totalCost);
+}
