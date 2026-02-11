@@ -13,6 +13,7 @@ import { generateTestCommand } from '../src/commands/generate-test.js';
 import { validateSchemaCommand } from '../src/commands/validate-schema.js';
 import { validateStructureCommand } from '../src/commands/validate-structure.js';
 import { validateConfigCommand } from '../src/commands/validate-config.js';
+import { generateFeatureCommand } from '../src/commands/generate-feature.js';
 
 const program = new Command();
 
@@ -33,5 +34,8 @@ program.addCommand(generateTestCommand);
 program.addCommand(validateSchemaCommand);
 program.addCommand(validateStructureCommand);
 program.addCommand(validateConfigCommand);
+
+// Feature scaffolding: flusk feature <name>
+program.addCommand(generateFeatureCommand);
 
 program.parse(process.argv);
