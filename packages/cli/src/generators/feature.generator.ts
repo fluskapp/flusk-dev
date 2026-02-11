@@ -24,29 +24,42 @@ export interface FeatureResult {
   files: { path: string; action: 'created' | 'updated' }[];
 }
 
+export interface FeatureOptions {
+  skipEntity?: boolean;
+  skipRoutes?: boolean;
+  skipTests?: boolean;
+  skipMigration?: boolean;
+}
+
 /**
  * Generate a complete feature across all packages
  */
 export async function generateFeature(
-  entityName: string
+  entityName: string,
+  options: FeatureOptions = {}
 ): Promise<FeatureResult> {
   const root = process.cwd();
   const entityPath = resolve(root, `packages/entities/src/${entityName}.entity.ts`);
   const result: FeatureResult = { files: [] };
 
   // 1. Create entity schema if it doesn't exist
-  if (!existsSync(entityPath)) {
+  if (!options.skipEntity && !existsSync(entityPath)) {
     await createEntityStub(entityName, root);
     result.files.push({ path: `packages/entities/src/${entityName}.entity.ts`, action: 'created' });
   }
 
   // 2. Generate types
-  await generateTypes(entityPath, entityName);
-  result.files.push({ path: `packages/types/src/${entityName}.types.ts`, action: 'created' });
+  if (!options.skipEntity) {
+    await generateTypes(entityPath, entityName);
+    result.files.push({ path: `packages/types/src/${entityName}.types.ts`, action: 'created' });
+  }
 
   // 3. Generate resources (repo + migration)
   const resourceResults = await generateResources(entityPath, entityName);
-  for (const r of resourceResults) {
+  const filteredResources = options.skipMigration
+    ? resourceResults.filter(r => !r.path.includes('migrations'))
+    : resourceResults;
+  for (const r of filteredResources) {
     result.files.push({ path: r.path, action: 'created' });
   }
 
@@ -57,21 +70,26 @@ export async function generateFeature(
   }
 
   // 5. Generate execution layer
-  const execResults = await generateExecution(entityPath, entityName);
-  for (const r of execResults) {
-    result.files.push({ path: r.path, action: 'created' });
+  if (!options.skipRoutes) {
+    const execResults = await generateExecution(entityPath, entityName);
+    for (const r of execResults) {
+      result.files.push({ path: r.path, action: 'created' });
+    }
   }
 
   // 6. Generate test file
-  const testResult = await generateFeatureTest(entityName, root);
-  result.files.push({ path: testResult.path, action: 'created' });
+  if (!options.skipTests) {
+    const testResult = await generateFeatureTest(entityName, root);
+    result.files.push({ path: testResult.path, action: 'created' });
+  }
 
   // 7. Update barrel exports
-  await updateEntitiesBarrel(entityName, root);
-  result.files.push({ path: 'packages/entities/src/index.ts', action: 'updated' });
-
-  await updateTypesBarrel(entityName, root);
-  result.files.push({ path: 'packages/types/src/index.ts', action: 'updated' });
+  if (!options.skipEntity) {
+    await updateEntitiesBarrel(entityName, root);
+    result.files.push({ path: 'packages/entities/src/index.ts', action: 'updated' });
+    await updateTypesBarrel(entityName, root);
+    result.files.push({ path: 'packages/types/src/index.ts', action: 'updated' });
+  }
 
   await updateResourcesBarrel(entityName, root);
   result.files.push({ path: 'packages/resources/src/index.ts', action: 'updated' });
@@ -80,8 +98,10 @@ export async function generateFeature(
   result.files.push({ path: 'packages/business-logic/src/index.ts', action: 'updated' });
 
   // 8. Register routes in app.ts
-  await updateAppRegistration(entityName, root);
-  result.files.push({ path: 'packages/execution/src/app.ts', action: 'updated' });
+  if (!options.skipRoutes) {
+    await updateAppRegistration(entityName, root);
+    result.files.push({ path: 'packages/execution/src/app.ts', action: 'updated' });
+  }
 
   return result;
 }

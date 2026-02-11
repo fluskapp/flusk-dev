@@ -14,6 +14,10 @@ import { validateSchemaCommand } from '../src/commands/validate-schema.js';
 import { validateStructureCommand } from '../src/commands/validate-structure.js';
 import { validateConfigCommand } from '../src/commands/validate-config.js';
 import { generateFeatureCommand } from '../src/commands/generate-feature.js';
+import { generatePackageCommand } from '../src/commands/generate-package.js';
+import { validateCommand } from '../src/commands/validate.js';
+import { generateMigrationCommand } from '../src/commands/generate-migration.js';
+import { generateRouteCommand } from '../src/commands/generate-route.js';
 
 const program = new Command();
 
@@ -37,5 +41,11 @@ program.addCommand(validateConfigCommand);
 
 // Feature scaffolding: flusk feature <name>
 program.addCommand(generateFeatureCommand);
+
+// New commands
+program.addCommand(generatePackageCommand);
+program.addCommand(validateCommand);
+program.addCommand(generateMigrationCommand);
+program.addCommand(generateRouteCommand);
 
 program.parse(process.argv);

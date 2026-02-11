@@ -11,6 +11,10 @@ export const generateFeatureCommand = new Command('feature')
   .description('Scaffold a complete feature across all packages')
   .argument('<name>', 'Feature name in kebab-case (e.g., billing-plan)')
   .option('--dry-run', 'Show what would be generated without writing files')
+  .option('--skip-entity', 'Skip entity/types generation')
+  .option('--skip-routes', 'Skip routes/plugin/hooks generation')
+  .option('--skip-tests', 'Skip test file generation')
+  .option('--skip-migration', 'Skip SQL migration generation')
   .action(async (name: string, options) => {
     // Validate name format
     if (!/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(name)) {
@@ -42,7 +46,12 @@ export const generateFeatureCommand = new Command('feature')
     }
 
     try {
-      const result = await generateFeature(name);
+      const result = await generateFeature(name, {
+        skipEntity: options.skipEntity,
+        skipRoutes: options.skipRoutes,
+        skipTests: options.skipTests,
+        skipMigration: options.skipMigration,
+      });
 
       for (const f of result.files) {
         const icon = f.action === 'created' ? '✅' : '📝';

@@ -1,0 +1,31 @@
+/**
+ * CLI command: flusk validate
+ * Enforces project conventions across the codebase
+ */
+
+import { Command } from 'commander';
+import chalk from 'chalk';
+import { runValidation } from '../validators/run-validation.js';
+
+export const validateCommand = new Command('validate')
+  .description('Enforce project conventions across the codebase')
+  .option('--fix', 'Attempt to auto-fix violations (where possible)')
+  .action(async (_options) => {
+    console.log(chalk.blue('\n🔍 Validating project conventions...\n'));
+
+    const violations = await runValidation(process.cwd());
+
+    if (violations.length === 0) {
+      console.log(chalk.green('✅ No violations found!\n'));
+      process.exit(0);
+    }
+
+    for (const v of violations) {
+      const loc = v.line ? `${v.file}:${v.line}` : v.file;
+      console.log(chalk.red(`  ✗ [${v.rule}] ${loc}`));
+      console.log(chalk.dim(`    ${v.message}`));
+    }
+
+    console.log(chalk.red(`\n❌ ${violations.length} violation(s) found\n`));
+    process.exit(1);
+  });

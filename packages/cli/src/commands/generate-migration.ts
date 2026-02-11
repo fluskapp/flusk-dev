@@ -1,0 +1,50 @@
+/**
+ * CLI command: flusk migrate <name>
+ * Creates a new SQL migration file
+ */
+
+import { Command } from 'commander';
+import chalk from 'chalk';
+import { resolve } from 'node:path';
+import { readdir, writeFile, mkdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { getMigrationNumber, toTableName } from '../generators/utils.js';
+
+export const generateMigrationCommand = new Command('migrate-new')
+  .description('Create a new SQL migration file')
+  .argument('<name>', 'Migration name in kebab-case (e.g., add-billing)')
+  .action(async (name: string) => {
+    if (!/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(name)) {
+      console.error(chalk.red('Error: Name must be kebab-case'));
+      process.exit(1);
+    }
+
+    const root = process.cwd();
+    const dir = resolve(root, 'packages/resources/src/migrations');
+
+    if (!existsSync(dir)) {
+      await mkdir(dir, { recursive: true });
+    }
+
+    const existing = await readdir(dir);
+    const num = getMigrationNumber(existing);
+    const tableName = toTableName(name);
+    const fileName = `${num}_${tableName}.sql`;
+    const filePath = resolve(dir, fileName);
+
+    const timestamp = new Date().toISOString();
+    const content = `-- Migration: ${fileName}
+-- Created: ${timestamp}
+-- Description: TODO
+
+CREATE TABLE IF NOT EXISTS ${tableName} (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  -- TODO: Add columns
+);
+`;
+
+    await writeFile(filePath, content, 'utf-8');
+    console.log(chalk.green(`\n✅ Created: packages/resources/src/migrations/${fileName}\n`));
+  });

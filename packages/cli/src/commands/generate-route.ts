@@ -1,0 +1,41 @@
+/**
+ * CLI command: flusk route <name>
+ * Creates a standalone route without full feature scaffolding
+ */
+
+import { Command } from 'commander';
+import chalk from 'chalk';
+import { generateStandaloneRoute } from '../generators/route.generator.js';
+
+export const generateRouteCommand = new Command('route')
+  .description('Create a standalone route (no entity/repo/business-logic)')
+  .argument('<name>', 'Route name in kebab-case (e.g., webhook)')
+  .option('--prefix <prefix>', 'URL prefix (default: /<name>s)')
+  .option('--dry-run', 'Show what would be generated without writing files')
+  .action(async (name: string, options) => {
+    if (!/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(name)) {
+      console.error(chalk.red('Error: Name must be kebab-case'));
+      process.exit(1);
+    }
+
+    const prefix = options.prefix || `/${name}s`;
+    console.log(chalk.blue(`\n🛣️  Creating route: ${name} (prefix: ${prefix})\n`));
+
+    if (options.dryRun) {
+      console.log(chalk.cyan(`  📄 packages/execution/src/routes/${name}-routes/index.ts`));
+      console.log(chalk.cyan(`  📄 packages/execution/src/routes/${name}-routes/${name}.ts`));
+      console.log(chalk.yellow('  + app.ts registration'));
+      return;
+    }
+
+    try {
+      const result = await generateStandaloneRoute(name, prefix);
+      for (const f of result.files) {
+        console.log(chalk.green(`  ✅ ${f}`));
+      }
+      console.log(chalk.green('\n✨ Route created!\n'));
+    } catch (error) {
+      console.error(chalk.red(`\n❌ Failed: ${error}`));
+      process.exit(1);
+    }
+  });

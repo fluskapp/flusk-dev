@@ -122,10 +122,48 @@ pnpm test              # Run all tests (vitest)
 pnpm dev               # Dev server with hot reload
 pnpm build             # Build all packages
 pnpm db:migrate        # Run migrations
-pnpm tsx packages/cli/bin/flusk.ts feature <name>   # Scaffold feature
-pnpm tsx packages/cli/bin/flusk.ts g <name>.entity.ts  # Regenerate from entity
-pnpm tsx packages/cli/bin/flusk.ts validate:schema  # Validate schemas
-pnpm tsx packages/cli/bin/flusk.ts validate:structure # Check project structure
+```
+
+## CLI Commands (use `pnpm tsx packages/cli/bin/flusk.ts <command>`)
+
+### `flusk feature <name>` — Full feature scaffolding
+Generates entity, types, business-logic, repository, migration, routes, plugin, hooks, tests, barrel exports, and app.ts registration.
+```bash
+flusk feature billing-plan
+flusk feature billing-plan --skip-entity --skip-tests  # partial scaffolding
+flusk feature billing-plan --dry-run                   # preview only
+```
+Skip flags: `--skip-entity`, `--skip-routes`, `--skip-tests`, `--skip-migration`
+
+### `flusk package <name>` — Create a new monorepo package
+Creates `packages/<name>/` with package.json, tsconfig, barrel export, config, README.
+```bash
+flusk package analytics
+```
+
+### `flusk validate` — Enforce project conventions
+Checks: max 100 lines, no deep imports, no default exports, kebab-case filenames.
+```bash
+flusk validate
+```
+
+### `flusk migrate-new <name>` — Create a new SQL migration
+Auto-numbers and creates migration in `packages/resources/src/migrations/`.
+```bash
+flusk migrate-new add-billing-tables
+```
+
+### `flusk route <name>` — Standalone route (no entity/repo)
+Creates route directory with handler and registers in app.ts.
+```bash
+flusk route webhook --prefix /webhooks
+```
+
+### Legacy validation commands
+```bash
+flusk validate:schema     # Validate TypeBox entity schemas
+flusk validate:structure  # Check project structure
+flusk validate:config     # Validate config files
 ```
 
 ## Testing
