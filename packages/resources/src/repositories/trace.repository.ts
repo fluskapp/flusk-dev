@@ -1,3 +1,6 @@
+/**
+ * Trace Repository — CRUD for distributed trace records.
+ */
 import { getPool } from '../db/pool.js';
 import { TraceEntity } from '@flusk/entities';
 

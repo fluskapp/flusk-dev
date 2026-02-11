@@ -1,3 +1,6 @@
+/**
+ * Span Repository — CRUD for trace spans (individual steps within traces).
+ */
 import { getPool } from '../db/pool.js';
 import { SpanEntity } from '@flusk/entities';
 

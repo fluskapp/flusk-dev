@@ -1,3 +1,6 @@
+/**
+ * Optimization Repository — CRUD for generated code optimization suggestions.
+ */
 import { getPool } from '../db/pool.js';
 import type { OptimizationEntity } from '@flusk/entities';
 

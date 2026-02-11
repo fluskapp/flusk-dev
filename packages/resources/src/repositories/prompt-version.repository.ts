@@ -1,3 +1,6 @@
+/**
+ * Prompt Version Repository — CRUD for immutable prompt versions with metrics tracking.
+ */
 import { getPool } from '../db/pool.js';
 import type { PromptVersionEntity } from '@flusk/entities';
 

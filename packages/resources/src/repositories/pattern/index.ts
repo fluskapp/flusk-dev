@@ -1,3 +1,7 @@
+/**
+ * Pattern Repository — CRUD for detected repetitive prompt patterns.
+ */
+
 export { create } from './create.js';
 export { findById } from './find-by-id.js';
 export { findMany } from './find-many.js';

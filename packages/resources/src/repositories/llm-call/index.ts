@@ -1,3 +1,8 @@
+/**
+ * LLM Call Repository — CRUD operations for tracked LLM API calls.
+ * Uses PostgreSQL with pgvector for embedding-based similarity search.
+ */
+
 export { create } from './create.js';
 export { findById } from './find-by-id.js';
 export { findByPromptHash } from './find-by-prompt-hash.js';

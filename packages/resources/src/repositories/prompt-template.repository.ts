@@ -1,3 +1,6 @@
+/**
+ * Prompt Template Repository — CRUD for prompt templates with variable placeholders.
+ */
 import { getPool } from '../db/pool.js';
 import type { PromptTemplateEntity } from '@flusk/entities';
 
