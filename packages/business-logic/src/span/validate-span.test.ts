@@ -1,0 +1,36 @@
+import { describe, it, expect } from 'vitest';
+import { validateSpan } from './validate-span.function.js';
+
+describe('validateSpan', () => {
+  it('returns valid for a well-formed entity', () => {
+    const result = validateSpan({
+      traceId: '123e4567-e89b-12d3-a456-426614174000',
+      name: 'llm-call-1',
+      type: 'llm',
+      status: 'running',
+      startedAt: new Date().toISOString(),
+    });
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it('returns errors for an empty entity', () => {
+    const result = validateSpan({});
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('traceId is required');
+    expect(result.errors).toContain('name is required');
+    expect(result.errors).toContain('type is required');
+    expect(result.errors).toContain('status is required');
+    expect(result.errors).toContain('startedAt is required');
+  });
+
+  it('rejects invalid type', () => {
+    const result = validateSpan({
+      traceId: '123e4567-e89b-12d3-a456-426614174000',
+      name: 'test', type: 'invalid' as any,
+      status: 'running', startedAt: new Date().toISOString(),
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('type must be llm, tool, retrieval, or chain');
+  });
+});

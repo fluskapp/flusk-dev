@@ -25,3 +25,7 @@ export * from './encryption/decrypt.js';
 
 // Audit exports (SOC2)
 export * from './audit/audit-log.repository.js';
+
+export * as TraceRepository from './repositories/trace.repository.js';
+
+export * as SpanRepository from './repositories/span.repository.js';

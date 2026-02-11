@@ -1,0 +1,54 @@
+import { describe, it, expect } from 'vitest';
+import { aggregateTraceStats } from './aggregate-trace-stats.function.js';
+import { SpanEntity } from '@flusk/types';
+
+function makeSpan(overrides: Partial<SpanEntity> = {}): SpanEntity {
+  return {
+    id: 'span-1', traceId: 'trace-1', parentSpanId: null,
+    type: 'llm', name: 'test', input: null, output: null,
+    cost: 0.01, tokens: 100, latencyMs: 500, status: 'completed',
+    startedAt: '2026-01-01T00:00:00Z', completedAt: '2026-01-01T00:00:01Z',
+    createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:01Z',
+    ...overrides,
+  };
+}
+
+describe('aggregateTraceStats', () => {
+  it('aggregates stats from completed spans', () => {
+    const spans = [
+      makeSpan({ cost: 0.05, tokens: 200, latencyMs: 1000 }),
+      makeSpan({ cost: 0.03, tokens: 150, latencyMs: 800 }),
+    ];
+    const stats = aggregateTraceStats(spans);
+    expect(stats.totalCost).toBeCloseTo(0.08);
+    expect(stats.totalTokens).toBe(350);
+    expect(stats.totalLatencyMs).toBe(1800);
+    expect(stats.callCount).toBe(2);
+  });
+
+  it('skips running spans', () => {
+    const spans = [
+      makeSpan({ status: 'running', cost: 0.05, tokens: 100 }),
+      makeSpan({ cost: 0.01, tokens: 50, latencyMs: 200 }),
+    ];
+    const stats = aggregateTraceStats(spans);
+    expect(stats.totalCost).toBeCloseTo(0.01);
+    expect(stats.totalTokens).toBe(50);
+    expect(stats.callCount).toBe(1);
+  });
+
+  it('only counts llm spans in callCount', () => {
+    const spans = [
+      makeSpan({ type: 'llm' }),
+      makeSpan({ type: 'tool' }),
+      makeSpan({ type: 'retrieval' }),
+    ];
+    const stats = aggregateTraceStats(spans);
+    expect(stats.callCount).toBe(1);
+  });
+
+  it('returns zeros for empty spans', () => {
+    const stats = aggregateTraceStats([]);
+    expect(stats).toEqual({ totalCost: 0, totalTokens: 0, totalLatencyMs: 0, callCount: 0 });
+  });
+});

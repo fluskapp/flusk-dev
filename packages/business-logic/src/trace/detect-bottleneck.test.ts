@@ -1,0 +1,42 @@
+import { describe, it, expect } from 'vitest';
+import { detectBottleneck } from './detect-bottleneck.function.js';
+import { SpanEntity } from '@flusk/types';
+
+function makeSpan(overrides: Partial<SpanEntity> = {}): SpanEntity {
+  return {
+    id: 'span-1', traceId: 'trace-1', parentSpanId: null,
+    type: 'llm', name: 'test', input: null, output: null,
+    cost: 0.01, tokens: 100, latencyMs: 500, status: 'completed',
+    startedAt: '2026-01-01T00:00:00Z', completedAt: '2026-01-01T00:00:01Z',
+    createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:01Z',
+    ...overrides,
+  };
+}
+
+describe('detectBottleneck', () => {
+  it('finds slowest and most expensive span', () => {
+    const spans = [
+      makeSpan({ id: 'a', latencyMs: 100, cost: 0.50, name: 'fast-expensive' }),
+      makeSpan({ id: 'b', latencyMs: 5000, cost: 0.01, name: 'slow-cheap' }),
+      makeSpan({ id: 'c', latencyMs: 200, cost: 0.02, name: 'mid' }),
+    ];
+    const result = detectBottleneck(spans);
+    expect(result.slowest?.id).toBe('b');
+    expect(result.mostExpensive?.id).toBe('a');
+  });
+
+  it('returns null for empty spans', () => {
+    const result = detectBottleneck([]);
+    expect(result.slowest).toBeNull();
+    expect(result.mostExpensive).toBeNull();
+  });
+
+  it('ignores running spans', () => {
+    const spans = [
+      makeSpan({ id: 'a', status: 'running', latencyMs: 9999 }),
+      makeSpan({ id: 'b', latencyMs: 100, cost: 0.01 }),
+    ];
+    const result = detectBottleneck(spans);
+    expect(result.slowest?.id).toBe('b');
+  });
+});

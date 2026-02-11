@@ -82,3 +82,25 @@ export {
   RoutingDecisionInsertSchema,
   RoutingDecisionQuerySchema,
 } from './routing-decision.types.js';
+
+export {
+  type TraceEntity as TraceEntityType,
+  type TraceInsert,
+  type TraceUpdate,
+  type TraceQuery,
+  TraceEntityJSONSchema,
+  TraceInsertSchema,
+  TraceUpdateSchema,
+  TraceQuerySchema
+} from './trace.types.js';
+
+export {
+  type SpanEntity as SpanEntityType,
+  type SpanInsert,
+  type SpanUpdate,
+  type SpanQuery,
+  SpanEntityJSONSchema,
+  SpanInsertSchema,
+  SpanUpdateSchema,
+  SpanQuerySchema
+} from './span.types.js';

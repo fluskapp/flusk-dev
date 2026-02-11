@@ -16,3 +16,9 @@ import * as conversion from './conversion/index.js';
 import * as routing from './routing/index.js';
 
 export { llmCall, pattern, conversion, routing };
+
+import * as trace from './trace/index.js';
+export { trace };
+
+import * as span from './span/index.js';
+export { span };

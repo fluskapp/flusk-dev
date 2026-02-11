@@ -1,0 +1,23 @@
+import { SpanEntity } from '@flusk/types';
+
+export interface TraceStats {
+  totalCost: number;
+  totalTokens: number;
+  totalLatencyMs: number;
+  callCount: number;
+}
+
+/**
+ * Aggregate stats from completed spans in a trace
+ * Pure function — no I/O
+ */
+export function aggregateTraceStats(spans: SpanEntity[]): TraceStats {
+  const completedSpans = spans.filter((s) => s.status === 'completed');
+
+  return {
+    totalCost: completedSpans.reduce((sum, s) => sum + s.cost, 0),
+    totalTokens: completedSpans.reduce((sum, s) => sum + s.tokens, 0),
+    totalLatencyMs: completedSpans.reduce((sum, s) => sum + s.latencyMs, 0),
+    callCount: completedSpans.filter((s) => s.type === 'llm').length,
+  };
+}

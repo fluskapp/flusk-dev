@@ -11,7 +11,9 @@
     "./repositories/pattern": "./src/repositories/pattern/index.ts",
     "./repositories/conversion": "./src/repositories/conversion/index.ts",
     "./cache/redis.client": "./src/cache/redis.client.ts",
-    "./clients/*": "./src/clients/*.ts"
+    "./clients/*": "./src/clients/*.ts",
+    "./repositories/trace": "./src/repositories/trace.repository.ts",
+    "./repositories/span": "./src/repositories/span.repository.ts"
   },
   "scripts": {
     "build": "tsc",

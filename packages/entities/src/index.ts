@@ -45,3 +45,15 @@ export {
   RoutingDecisionEntitySchema,
   type RoutingDecisionEntity
 } from './routing-decision.entity.js';
+
+// Trace entity exports
+export {
+  TraceEntitySchema,
+  type TraceEntity
+} from './trace.entity.js';
+
+// Span entity exports
+export {
+  SpanEntitySchema,
+  type SpanEntity
+} from './span.entity.js';

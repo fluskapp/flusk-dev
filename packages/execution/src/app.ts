@@ -10,6 +10,8 @@ import { similarityRoutes } from './routes/similarity.routes.js';
 import { costEventsRoutes } from './routes/cost-events.routes.js';
 import { routingRulesRoutes } from './routes/routing-rules-routes/index.js';
 import { routingRoutes } from './routes/routing-routes/index.js';
+import { traceRoutes } from './routes/trace.routes.js';
+import { spanRoutes } from './routes/span.routes.js';
 
 export interface CreateAppOptions {
   logger?: boolean;
@@ -69,6 +71,8 @@ export async function createApp(
       await api.register(costEventsRoutes, { prefix: '/events/costs' });
       await api.register(routingRulesRoutes, { prefix: '/routing-rules' });
       await api.register(routingRoutes, { prefix: '/route' });
+      await api.register(traceRoutes, { prefix: '/traces' });
+      await api.register(spanRoutes, { prefix: '/spans' });
     },
     { prefix: '/api/v1' }
   );

@@ -1,0 +1,29 @@
+import { SpanEntity } from '@flusk/types';
+
+const VALID_TYPES = ['llm', 'tool', 'retrieval', 'chain'] as const;
+const VALID_STATUSES = ['running', 'completed', 'failed'] as const;
+
+/**
+ * Validate span data — pure function, no I/O
+ */
+export function validateSpan(
+  entity: Partial<SpanEntity>
+): { valid: boolean; errors: string[] } {
+  const errors: string[] = [];
+
+  if (!entity.traceId) errors.push('traceId is required');
+  if (!entity.name) errors.push('name is required');
+  if (!entity.type) {
+    errors.push('type is required');
+  } else if (!VALID_TYPES.includes(entity.type as any)) {
+    errors.push('type must be llm, tool, retrieval, or chain');
+  }
+  if (!entity.status) {
+    errors.push('status is required');
+  } else if (!VALID_STATUSES.includes(entity.status as any)) {
+    errors.push('status must be running, completed, or failed');
+  }
+  if (!entity.startedAt) errors.push('startedAt is required');
+
+  return { valid: errors.length === 0, errors };
+}
