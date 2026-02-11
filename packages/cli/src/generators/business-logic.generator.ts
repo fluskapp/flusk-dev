@@ -6,7 +6,7 @@
 import { resolve } from 'node:path';
 import { writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { toPascalCase, toKebabCase } from './utils.js';
+import { toPascalCase } from './utils.js';
 
 export interface GeneratorResult {
   path: string;

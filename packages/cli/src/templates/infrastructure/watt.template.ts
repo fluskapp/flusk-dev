@@ -12,7 +12,7 @@ export interface WattTemplateOptions {
  * Generate watt.json template for Platformatic Watt configuration
  */
 export function generateWattTemplate(options: WattTemplateOptions): string {
-  const { projectName, port = 3000 } = options;
+  const { projectName: _projectName, port: _port = 3000 } = options;
 
   // Return JSON string directly (not a TS object) since this will be written as JSON
   return JSON.stringify({
@@ -56,7 +56,7 @@ export function generateWattTemplate(options: WattTemplateOptions): string {
  * Generate watt.service.json template for the main service
  */
 export function generateWattServiceTemplate(options: WattTemplateOptions): string {
-  const { projectName } = options;
+  const { projectName: _projectName } = options;
 
   return JSON.stringify({
     "$schema": "https://platformatic.dev/schemas/v3.37.0/service",

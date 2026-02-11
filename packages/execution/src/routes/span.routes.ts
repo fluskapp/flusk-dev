@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { SpanEntitySchema } from '@flusk/entities';
-import * as SpanRepository from '@flusk/resources/repositories/span';
+import { SpanRepository } from '@flusk/resources';
 
 const CreateBody = Type.Object({
   traceId: Type.String({ format: 'uuid' }),

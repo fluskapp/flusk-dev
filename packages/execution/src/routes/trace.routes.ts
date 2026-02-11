@@ -1,8 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { TraceEntitySchema } from '@flusk/entities';
-import * as TraceRepository from '@flusk/resources/repositories/trace';
-import * as SpanRepository from '@flusk/resources/repositories/span';
+import { TraceRepository, SpanRepository } from '@flusk/resources';
 import { trace as traceBL } from '@flusk/business-logic';
 
 const CreateBody = Type.Object({

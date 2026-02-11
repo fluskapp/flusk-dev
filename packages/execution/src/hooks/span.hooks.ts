@@ -10,8 +10,8 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
  * Add business logic hooks here
  */
 export async function validateSpanHook(
-  request: FastifyRequest,
-  reply: FastifyReply
+  _request: FastifyRequest,
+  _reply: FastifyReply
 ): Promise<void> {
   // TODO: Add validation logic
   // Example:
@@ -26,8 +26,8 @@ export async function validateSpanHook(
  * Add post-processing logic here
  */
 export async function transformSpanHook(
-  request: FastifyRequest,
-  reply: FastifyReply,
+  _request: FastifyRequest,
+  _reply: FastifyReply,
   payload: any
 ): Promise<any> {
   // TODO: Add transformation logic

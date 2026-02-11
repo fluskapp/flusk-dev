@@ -6,7 +6,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { ConversionEntitySchema } from '@flusk/entities';
-import * as ConversionRepository from '@flusk/resources/repositories/conversion';
+import { ConversionRepository } from '@flusk/resources';
 
 /**
  * Request schema for creating Conversion

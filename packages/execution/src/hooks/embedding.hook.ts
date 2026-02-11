@@ -1,5 +1,5 @@
-import { generateEmbedding } from '@flusk/resources/clients/openai-embedding.client';
-import * as LLMCallRepository from '@flusk/resources/repositories/llm-call';
+import { OpenAIEmbeddingClient } from '@flusk/resources';
+import { LLMCallRepository } from '@flusk/resources';
 
 /**
  * Generate and store embedding for a newly created LLM call
@@ -11,7 +11,7 @@ import * as LLMCallRepository from '@flusk/resources/repositories/llm-call';
 export function scheduleEmbedding(callId: string, prompt: string): void {
   if (!process.env.OPENAI_API_KEY) return;
 
-  generateEmbedding(prompt)
+  OpenAIEmbeddingClient.generateEmbedding(prompt)
     .then((result) => LLMCallRepository.updateEmbedding(callId, result.embedding))
     .catch((err) => {
       console.error(`Embedding failed for ${callId}:`, err.message);

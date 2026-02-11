@@ -108,7 +108,7 @@ export const initCommand = new Command('init')
           await execAsync('git --version');
           await execAsync('git init', { cwd: targetDir });
           console.log(chalk.green('✅ Initialized git repository'));
-        } catch (error) {
+        } catch (_error) {
           console.log(chalk.yellow('⚠️  Git not found, skipping git initialization'));
         }
       } else {
@@ -122,7 +122,7 @@ export const initCommand = new Command('init')
           console.log(chalk.cyan('\n📦 Installing dependencies (this may take a minute)...'));
           await execAsync('pnpm install', { cwd: targetDir });
           console.log(chalk.green('✅ Installed dependencies'));
-        } catch (error) {
+        } catch (_error) {
           if ((error as any).code === 'ENOENT') {
             console.log(chalk.yellow('⚠️  pnpm not found, skipping dependency installation'));
             console.log(chalk.yellow('   Install pnpm globally: npm install -g pnpm'));
@@ -148,7 +148,7 @@ export const initCommand = new Command('init')
       console.log(chalk.gray('  flusk g <entity>       Generate code from entity'));
       console.log();
 
-    } catch (error) {
+    } catch (_error) {
       console.error(chalk.red('\n❌ Failed to initialize project:'));
       console.error(chalk.red(`   ${(error as Error).message}`));
 
@@ -159,7 +159,7 @@ export const initCommand = new Command('init')
           await rm(targetDir, { recursive: true, force: true });
           console.log(chalk.yellow('🧹 Cleaned up partial project directory'));
         }
-      } catch (cleanupError) {
+      } catch (_cleanupError) {
         console.error(chalk.yellow('⚠️  Failed to cleanup directory'));
       }
 

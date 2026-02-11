@@ -19,6 +19,7 @@ async function conversionPlugin(
   fastify.log.info('Conversion plugin registered');
 }
 
+// eslint-disable-next-line no-restricted-syntax -- fastify-plugin requires default export
 export default fp(conversionPlugin, {
   name: 'conversion-plugin'
 });

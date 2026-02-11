@@ -28,6 +28,7 @@ async function ${entityName.replace(/-/g, '')}Plugin(
   fastify.log.info('${pascalName} plugin registered');
 }
 
+// eslint-disable-next-line no-restricted-syntax -- fastify-plugin requires default export
 export default fp(${entityName.replace(/-/g, '')}Plugin, {
   name: '${entityName}-plugin'
 });

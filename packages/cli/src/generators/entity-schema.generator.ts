@@ -67,8 +67,6 @@ function generateFieldDefinition(field: FieldDefinition): string {
  */
 export function generateEntitySchemaContent(definition: EntityDefinition): string {
   const { name: entityName, fields } = definition;
-  const kebabName = toKebabCase(entityName);
-
   // Generate field definitions
   const fieldDefinitions = fields.map(field => {
     const fieldDef = generateFieldDefinition(field);

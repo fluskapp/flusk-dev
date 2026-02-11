@@ -16,7 +16,7 @@ export function generateRoutesTemplate(entityName: string): string {
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { ${pascalName}EntitySchema } from '@flusk/entities';
-import * as ${pascalName}Repository from '@flusk/resources/repositories/${entityName}';
+import { ${pascalName}Repository } from '@flusk/resources';
 
 /**
  * Request schema for creating ${pascalName}

@@ -6,7 +6,7 @@
 import { resolve } from 'node:path';
 import { writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { toPascalCase, toCamelCase } from './utils.js';
+import { toPascalCase } from './utils.js';
 
 export interface GeneratorResult {
   path: string;
@@ -31,8 +31,7 @@ export async function generateTypes(
  */
 
 import { Type, Static } from '@sinclair/typebox';
-import { ${pascalName}EntitySchema } from '@flusk/entities/${entityName}';
-import { BaseEntitySchema } from '@flusk/entities/base';
+import { ${pascalName}EntitySchema, BaseEntitySchema } from '@flusk/entities';
 
 /**
  * TypeScript type for ${pascalName}Entity

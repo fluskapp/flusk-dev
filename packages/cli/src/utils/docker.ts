@@ -43,7 +43,7 @@ export async function checkDocker(): Promise<DockerCheckResult> {
     // Check if Docker Compose is available
     await execa('docker', ['compose', 'version']);
     result.composeAvailable = true;
-  } catch (error) {
+  } catch (_error) {
     // Docker not installed or not running
   }
 
@@ -134,13 +134,13 @@ export async function getServicesStatus(
           health: mapHealth(data.Health),
           ports: parsePorts(data.Publishers || []),
         });
-      } catch (error) {
+      } catch (_error) {
         // Skip invalid JSON lines
       }
     }
 
     return services;
-  } catch (error) {
+  } catch (_error) {
     return [];
   }
 }

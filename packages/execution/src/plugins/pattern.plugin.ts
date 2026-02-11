@@ -19,6 +19,7 @@ async function patternPlugin(
   fastify.log.info('Pattern plugin registered');
 }
 
+// eslint-disable-next-line no-restricted-syntax -- fastify-plugin requires default export
 export default fp(patternPlugin, {
   name: 'pattern-plugin'
 });

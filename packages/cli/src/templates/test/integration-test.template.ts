@@ -13,7 +13,7 @@ export interface IntegrationTestTemplateOptions {
 }
 
 export function generateIntegrationTestTemplate(options: IntegrationTestTemplateOptions): string {
-  const { fileName, importPath, endpoint, method = 'GET', hasDatabase = false, hasExternalApi = false } = options;
+  const { fileName, importPath: _importPath, endpoint, method = 'GET', hasDatabase = false, hasExternalApi = false } = options;
 
   const databaseSetup = hasDatabase ? `
   beforeEach(async () => {

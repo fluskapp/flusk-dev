@@ -30,6 +30,7 @@ async function llmCallsPlugin(
  * Use fp() to avoid plugin encapsulation where needed
  * (allows decorators to be accessible in parent scope)
  */
+// eslint-disable-next-line no-restricted-syntax -- fastify-plugin requires default export
 export default fp(llmCallsPlugin, {
   name: 'llm-calls-plugin',
   fastify: '5.x'

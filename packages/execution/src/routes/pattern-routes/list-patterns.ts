@@ -1,6 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Type } from '@sinclair/typebox';
-import * as PatternRepository from '@flusk/resources/repositories/pattern';
+import { PatternRepository } from '@flusk/resources';
 import { PatternResponseSchema, PatternQuerySchema } from './schemas.js';
 
 /**

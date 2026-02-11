@@ -11,7 +11,7 @@ export interface RepositoryTestTemplateOptions {
 }
 
 export function generateRepositoryTestTemplate(options: RepositoryTestTemplateOptions): string {
-  const { fileName, importPath, className, entityName } = options;
+  const { fileName: _fileName, importPath, className, entityName } = options;
 
   return `import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest';
 import { ${className} } from '${importPath}';

@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Type } from '@sinclair/typebox';
-import * as LLMCallRepository from '@flusk/resources/repositories/llm-call';
-import { generateEmbedding } from '@flusk/resources/clients/openai-embedding.client';
+import { LLMCallRepository } from '@flusk/resources';
+import { OpenAIEmbeddingClient } from '@flusk/resources';
 
 /**
  * POST /backfill-embeddings — generate missing embeddings
@@ -35,7 +35,7 @@ export function registerBackfillEmbeddings(fastify: FastifyInstance): void {
 
       for (const call of calls) {
         try {
-          const { embedding } = await generateEmbedding(call.prompt);
+          const { embedding } = await OpenAIEmbeddingClient.generateEmbedding(call.prompt);
           await LLMCallRepository.updateEmbedding(call.id, embedding);
           processed++;
         } catch {

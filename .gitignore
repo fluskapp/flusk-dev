@@ -182,3 +182,4 @@ docker-compose.local.yml
 .claude/
 .claude/
 test-final/
+node_modules

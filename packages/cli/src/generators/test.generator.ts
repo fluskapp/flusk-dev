@@ -114,7 +114,6 @@ function determineTestType(analysis: FileAnalysis, explicitType?: string): 'unit
  * Generate import path from file path
  */
 function generateImportPath(targetFile: string, testFile: string): string {
-  const targetDir = path.dirname(targetFile);
   const testDir = path.dirname(testFile);
   const relativePath = path.relative(testDir, targetFile);
 
@@ -177,7 +176,7 @@ export async function generateTest(options: TestGeneratorOptions): Promise<Gener
   try {
     // Verify target file exists
     await fs.access(targetFile);
-  } catch (error) {
+  } catch (_error) {
     throw new Error(`Target file not found: ${targetFile}`);
   }
 

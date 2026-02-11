@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Type } from '@sinclair/typebox';
-import * as LLMCallRepository from '@flusk/resources/repositories/llm-call';
-import { generateEmbedding } from '@flusk/resources/clients/openai-embedding.client';
+import { LLMCallRepository } from '@flusk/resources';
+import { OpenAIEmbeddingClient } from '@flusk/resources';
 
 const DEFAULT_THRESHOLD = Number(process.env.VECTOR_SIMILARITY_THRESHOLD) || 0.95;
 const DEFAULT_LIMIT = 20;
@@ -45,7 +45,7 @@ export function registerSearchSimilar(fastify: FastifyInstance): void {
         limit?: number;
       };
 
-      const { embedding } = await generateEmbedding(prompt);
+      const { embedding } = await OpenAIEmbeddingClient.generateEmbedding(prompt);
       const similar = await LLMCallRepository.findSimilar(
         embedding,
         threshold ?? DEFAULT_THRESHOLD,

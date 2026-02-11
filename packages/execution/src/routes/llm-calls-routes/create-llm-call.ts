@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import * as LLMCallRepository from '@flusk/resources/repositories/llm-call';
+import { LLMCallRepository } from '@flusk/resources';
 import { scheduleEmbedding } from '../../hooks/embedding.hook.js';
 import { costEventBus } from '../../events/cost-event-bus.js';
 import {

@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { PatternEntitySchema } from '@flusk/entities';
-import * as PatternRepository from '@flusk/resources/repositories/pattern';
+import { PatternRepository } from '@flusk/resources';
 
 const PatternResponseSchema = PatternEntitySchema;
 

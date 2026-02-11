@@ -10,8 +10,8 @@ import type { FastifyRequest, FastifyReply } from 'fastify';
  * Add business logic hooks here
  */
 export async function validateConversionHook(
-  request: FastifyRequest,
-  reply: FastifyReply
+  _request: FastifyRequest,
+  _reply: FastifyReply
 ): Promise<void> {
   // TODO: Add validation logic
   // Example:

@@ -4,9 +4,9 @@
  */
 
 import { resolve } from 'node:path';
-import { readFile, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { toPascalCase, toCamelCase, toKebabCase } from './utils.js';
+import { toPascalCase } from './utils.js';
 import { generateTypes } from './types.generator.js';
 import { generateResources } from './resources.generator.js';
 import { generateBusinessLogic } from './business-logic.generator.js';
@@ -41,7 +41,7 @@ export async function generateFeature(
   }
 
   // 2. Generate types
-  const typesResult = await generateTypes(entityPath, entityName);
+  await generateTypes(entityPath, entityName);
   result.files.push({ path: `packages/types/src/${entityName}.types.ts`, action: 'created' });
 
   // 3. Generate resources (repo + migration)

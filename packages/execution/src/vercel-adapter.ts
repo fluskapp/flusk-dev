@@ -58,6 +58,7 @@ async function getApp(): Promise<FastifyInstance> {
  * Converts Vercel request/response to Fastify format.
  * Handles both warm and cold starts efficiently.
  */
+// eslint-disable-next-line no-restricted-syntax -- Vercel requires default export
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse

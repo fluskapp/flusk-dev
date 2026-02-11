@@ -1,6 +1,6 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Type } from '@sinclair/typebox';
-import * as LLMCallRepository from '@flusk/resources/repositories/llm-call';
+import { LLMCallRepository } from '@flusk/resources';
 import { LLMCallResponseSchema } from './schemas.js';
 
 /**

@@ -19,6 +19,7 @@ async function tracePlugin(
   fastify.log.info('Trace plugin registered');
 }
 
+// eslint-disable-next-line no-restricted-syntax -- fastify-plugin requires default export
 export default fp(tracePlugin, {
   name: 'trace-plugin'
 });

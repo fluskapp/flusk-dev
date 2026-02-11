@@ -1,6 +1,6 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { llmCall } from '@flusk/business-logic';
-import * as RedisClient from '@flusk/resources/cache/redis.client';
+import { RedisClient } from '@flusk/resources';
 
 const { hashPrompt, calculateCost } = llmCall;
 

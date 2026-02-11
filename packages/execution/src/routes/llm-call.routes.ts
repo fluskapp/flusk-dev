@@ -6,7 +6,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { LLMCallEntitySchema } from '@flusk/entities';
-import * as LLMCallRepository from '@flusk/resources/repositories/llm-call';
+import { LLMCallRepository } from '@flusk/resources';
 
 /**
  * Request schema for creating LLMCall

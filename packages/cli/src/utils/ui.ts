@@ -405,7 +405,7 @@ export async function withSpinner<T>(
  * Useful for NO_COLOR environment or file output
  */
 export function stripColors(text: string): string {
-  // eslint-disable-next-line no-control-regex
+   
   return text.replace(/\u001b\[[0-9;]*m/g, '');
 }
 
