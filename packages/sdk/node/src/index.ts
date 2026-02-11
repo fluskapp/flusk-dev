@@ -1,5 +1,5 @@
 export { FluskClient } from './client.js'
-export type { FluskClientConfig, LLMCallData, ConversionSuggestion, RouteOptions, RouteResult } from './client.js'
+export type { FluskClientConfig, LLMCallData, ConversionSuggestion, OptimizationSuggestion, RouteOptions, RouteResult } from './client.js'
 
 export { wrapOpenAI } from './wrappers/openai.js'
 export { wrapAnthropic } from './wrappers/anthropic.js'

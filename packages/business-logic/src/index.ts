@@ -22,3 +22,6 @@ export { trace };
 
 import * as span from './span/index.js';
 export { span };
+
+import * as optimization from './optimization/index.js';
+export { optimization };

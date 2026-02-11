@@ -31,6 +31,20 @@ export interface ConversionSuggestion {
   updatedAt: string
 }
 
+export interface OptimizationSuggestion {
+  id: string
+  organizationId: string
+  type: 'cache-config' | 'model-swap' | 'prompt-dedup' | 'batch-merge'
+  title: string
+  description: string
+  estimatedSavingsPerMonth: number
+  generatedCode: string
+  language: 'typescript' | 'python' | 'json'
+  status: 'suggested' | 'applied' | 'dismissed'
+  sourcePatternId: string | null
+  createdAt: string
+}
+
 export interface RouteOptions {
   ruleId: string
   prompt: string
@@ -95,6 +109,46 @@ export class FluskClient {
     }
 
     return response.json() as Promise<ConversionSuggestion[]>
+  }
+
+  /**
+   * Get optimization suggestions for the organization
+   */
+  async getOptimizations(): Promise<OptimizationSuggestion[]> {
+    const response = await fetch(`${this.baseUrl}/api/v1/optimizations/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.apiKey}`,
+      },
+      body: JSON.stringify({}),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Failed to get optimizations: ${response.status} ${errorText}`)
+    }
+
+    return response.json() as Promise<OptimizationSuggestion[]>
+  }
+
+  /**
+   * Get generated code for a specific optimization
+   */
+  async getOptimizationCode(id: string): Promise<{ code: string; language: string }> {
+    const response = await fetch(`${this.baseUrl}/api/v1/optimizations/${id}/code`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${this.apiKey}`,
+      },
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Failed to get optimization code: ${response.status} ${errorText}`)
+    }
+
+    return response.json() as Promise<{ code: string; language: string }>
   }
 
   /**

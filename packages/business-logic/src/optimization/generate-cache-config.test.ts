@@ -1,0 +1,51 @@
+import { describe, it, expect } from 'vitest';
+import { generateCacheConfig, computeTtl } from './generate-cache-config.function.js';
+import type { CachePatternInput } from './generate-cache-config.function.js';
+
+describe('generateCacheConfig', () => {
+  const patterns: CachePatternInput[] = [
+    { callSignature: 'sig1', frequency: 50, avgLatencyMs: 200, model: 'gpt-4' },
+    { callSignature: 'sig2', frequency: 30, avgLatencyMs: 150, model: 'gpt-4' },
+  ];
+
+  it('generates valid TypeScript code', () => {
+    const code = generateCacheConfig(patterns);
+    expect(code).toContain('import');
+    expect(code).toContain('buildCacheKey');
+    expect(code).toContain('cachedLLMCall');
+    expect(code).toContain('CACHE_TTL');
+  });
+
+  it('includes pattern count in comments', () => {
+    const code = generateCacheConfig(patterns);
+    expect(code).toContain('2 detected duplicate pattern(s)');
+  });
+
+  it('generates syntactically valid code (no unmatched braces)', () => {
+    const code = generateCacheConfig(patterns);
+    const opens = (code.match(/{/g) || []).length;
+    const closes = (code.match(/}/g) || []).length;
+    expect(opens).toBe(closes);
+  });
+});
+
+describe('computeTtl', () => {
+  it('returns 86400 for high frequency patterns', () => {
+    const patterns = [{ callSignature: 'a', frequency: 200, avgLatencyMs: 100, model: 'gpt-4' }];
+    expect(computeTtl(patterns)).toBe(86400);
+  });
+
+  it('returns 3600 for medium frequency', () => {
+    const patterns = [{ callSignature: 'a', frequency: 50, avgLatencyMs: 100, model: 'gpt-4' }];
+    expect(computeTtl(patterns)).toBe(3600);
+  });
+
+  it('returns 900 for low frequency', () => {
+    const patterns = [{ callSignature: 'a', frequency: 5, avgLatencyMs: 100, model: 'gpt-4' }];
+    expect(computeTtl(patterns)).toBe(900);
+  });
+
+  it('returns 3600 for empty patterns', () => {
+    expect(computeTtl([])).toBe(3600);
+  });
+});

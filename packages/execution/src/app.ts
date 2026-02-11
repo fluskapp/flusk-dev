@@ -12,6 +12,7 @@ import { routingRulesRoutes } from './routes/routing-rules-routes/index.js';
 import { routingRoutes } from './routes/routing-routes/index.js';
 import { traceRoutes } from './routes/trace.routes.js';
 import { spanRoutes } from './routes/span.routes.js';
+import { optimizationRoutes } from './routes/optimization.routes.js';
 
 export interface CreateAppOptions {
   logger?: boolean;
@@ -73,6 +74,7 @@ export async function createApp(
       await api.register(routingRoutes, { prefix: '/route' });
       await api.register(traceRoutes, { prefix: '/traces' });
       await api.register(spanRoutes, { prefix: '/spans' });
+      await api.register(optimizationRoutes, { prefix: '/optimizations' });
     },
     { prefix: '/api/v1' }
   );

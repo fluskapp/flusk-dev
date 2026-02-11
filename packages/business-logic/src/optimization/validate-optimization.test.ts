@@ -1,0 +1,61 @@
+import { describe, it, expect } from 'vitest';
+import { validateOptimization } from './validate-optimization.function.js';
+
+describe('validateOptimization', () => {
+  it('returns valid for complete input', () => {
+    const result = validateOptimization({
+      organizationId: '123e4567-e89b-12d3-a456-426614174000',
+      type: 'cache-config',
+      title: 'Cache duplicate calls',
+      generatedCode: 'const x = 1;',
+      language: 'typescript',
+      status: 'suggested',
+    });
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it('returns errors for missing required fields', () => {
+    const result = validateOptimization({});
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('organizationId is required');
+    expect(result.errors).toContain('type is required');
+    expect(result.errors).toContain('title is required');
+    expect(result.errors).toContain('generatedCode is required');
+  });
+
+  it('rejects invalid type', () => {
+    const result = validateOptimization({
+      organizationId: 'id',
+      type: 'invalid',
+      title: 'x',
+      generatedCode: 'x',
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors[0]).toContain('type must be one of');
+  });
+
+  it('rejects invalid language', () => {
+    const result = validateOptimization({
+      organizationId: 'id',
+      type: 'cache-config',
+      title: 'x',
+      generatedCode: 'x',
+      language: 'rust',
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors[0]).toContain('language must be one of');
+  });
+
+  it('rejects invalid status', () => {
+    const result = validateOptimization({
+      organizationId: 'id',
+      type: 'model-swap',
+      title: 'x',
+      generatedCode: 'x',
+      status: 'unknown',
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors[0]).toContain('status must be one of');
+  });
+});

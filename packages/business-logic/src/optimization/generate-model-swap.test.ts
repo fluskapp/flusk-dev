@@ -1,0 +1,38 @@
+import { describe, it, expect } from 'vitest';
+import { generateModelSwap } from './generate-model-swap.function.js';
+
+describe('generateModelSwap', () => {
+  const input = {
+    originalModel: 'gpt-4',
+    suggestedModel: 'gpt-3.5-turbo',
+    qualityScore: 95,
+    costReductionPercent: 90,
+    promptCategory: 'simple-qa',
+  };
+
+  it('generates valid TypeScript code', () => {
+    const code = generateModelSwap(input);
+    expect(code).toContain('import');
+    expect(code).toContain('optimizedCall');
+    expect(code).toContain('directSwap');
+  });
+
+  it('includes model names in comments', () => {
+    const code = generateModelSwap(input);
+    expect(code).toContain('gpt-4');
+    expect(code).toContain('gpt-3.5-turbo');
+  });
+
+  it('includes quality and cost info', () => {
+    const code = generateModelSwap(input);
+    expect(code).toContain('95%');
+    expect(code).toContain('90%');
+  });
+
+  it('has balanced braces', () => {
+    const code = generateModelSwap(input);
+    const opens = (code.match(/{/g) || []).length;
+    const closes = (code.match(/}/g) || []).length;
+    expect(opens).toBe(closes);
+  });
+});

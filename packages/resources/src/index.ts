@@ -30,3 +30,5 @@ export * from './audit/audit-log.repository.js';
 export * as TraceRepository from './repositories/trace.repository.js';
 
 export * as SpanRepository from './repositories/span.repository.js';
+
+export * as OptimizationRepository from './repositories/optimization.repository.js';

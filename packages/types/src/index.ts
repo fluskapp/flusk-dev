@@ -104,3 +104,14 @@ export {
   SpanUpdateSchema,
   SpanQuerySchema
 } from './span.types.js';
+
+export {
+  type OptimizationEntity as OptimizationEntityType,
+  type OptimizationInsert,
+  type OptimizationUpdate,
+  type OptimizationQuery,
+  OptimizationEntityJSONSchema,
+  OptimizationInsertSchema,
+  OptimizationUpdateSchema,
+  OptimizationQuerySchema
+} from './optimization.types.js';

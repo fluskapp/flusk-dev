@@ -1,0 +1,29 @@
+import { describe, it, expect } from 'vitest';
+import { generatePromptDedup } from './generate-prompt-dedup.function.js';
+
+describe('generatePromptDedup', () => {
+  const input = {
+    samplePrompts: ['What is AI?', 'what is ai?', 'What is AI'],
+    similarityThreshold: 0.95,
+    model: 'gpt-4',
+  };
+
+  it('generates valid TypeScript code', () => {
+    const code = generatePromptDedup(input);
+    expect(code).toContain('normalizePrompt');
+    expect(code).toContain('hashPrompt');
+    expect(code).toContain('dedupLLMCall');
+  });
+
+  it('includes threshold in comments', () => {
+    const code = generatePromptDedup(input);
+    expect(code).toContain('0.95');
+  });
+
+  it('has balanced braces', () => {
+    const code = generatePromptDedup(input);
+    const opens = (code.match(/{/g) || []).length;
+    const closes = (code.match(/}/g) || []).length;
+    expect(opens).toBe(closes);
+  });
+});

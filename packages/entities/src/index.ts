@@ -57,3 +57,9 @@ export {
   SpanEntitySchema,
   type SpanEntity
 } from './span.entity.js';
+
+// Optimization entity exports
+export {
+  OptimizationEntitySchema,
+  type OptimizationEntity
+} from './optimization.entity.js';
