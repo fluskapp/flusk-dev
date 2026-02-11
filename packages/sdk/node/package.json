@@ -1,7 +1,7 @@
 {
   "name": "@flusk/sdk",
-  "version": "0.1.0",
-  "description": "Flusk SDK for Node.js - AI agent instrumentation and LLM API optimization",
+  "version": "0.2.0",
+  "description": "Flusk SDK for Node.js — programmatic API access (routing, optimizations, prompts, tracing)",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,38 +11,15 @@
       "import": "./dist/index.js"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [
-    "flusk",
-    "llm",
-    "openai",
-    "anthropic",
-    "instrumentation",
-    "optimization"
-  ],
-  "peerDependencies": {
-    "openai": "^4.0.0",
-    "@anthropic-ai/sdk": "^0.20.0"
-  },
-  "peerDependenciesMeta": {
-    "openai": {
-      "optional": true
-    },
-    "@anthropic-ai/sdk": {
-      "optional": true
-    }
-  },
+  "keywords": ["flusk", "llm", "optimization", "routing", "prompts"],
   "devDependencies": {
-    "@anthropic-ai/sdk": "^0.20.0",
     "@types/node": "^22.0.0",
-    "openai": "^4.0.0",
     "typescript": "^5.7.0"
   }
 }

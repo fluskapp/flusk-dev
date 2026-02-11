@@ -15,6 +15,7 @@ import { spanRoutes } from './routes/span.routes.js';
 import { optimizationRoutes } from './routes/optimization.routes.js';
 import { prompttemplateRoutes } from './routes/prompt-template-routes/index.js';
 import { promptversionRoutes } from './routes/prompt-version-routes/index.js';
+import { otlpRoutes } from './routes/otlp-routes/index.js';
 
 export interface CreateAppOptions {
   logger?: boolean;
@@ -63,6 +64,9 @@ export async function createApp(
     const { authMiddleware } = await import('./middleware/auth.middleware.js');
     app.addHook('onRequest', authMiddleware);
   }
+
+  // OTLP ingestion (no auth — uses x-flusk-api-key header)
+  await app.register(otlpRoutes, { prefix: '/v1' });
 
   // Feature routes under /api/v1
   await app.register(

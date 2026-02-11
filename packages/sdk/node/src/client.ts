@@ -3,20 +3,6 @@ export interface FluskClientConfig {
   baseUrl?: string
 }
 
-export interface LLMCallData {
-  organizationId?: string
-  provider: 'openai' | 'anthropic' | 'other'
-  model: string
-  prompt: string
-  response: string
-  promptTokens: number
-  completionTokens: number
-  totalTokens: number
-  cost?: number
-  latencyMs: number
-  metadata?: Record<string, unknown>
-}
-
 export interface ConversionSuggestion {
   id: string
   organizationId: string
@@ -66,25 +52,6 @@ export class FluskClient {
   constructor(config: FluskClientConfig) {
     this.apiKey = config.apiKey
     this.baseUrl = config.baseUrl || 'https://api.flusk.ai'
-  }
-
-  /**
-   * Track an LLM API call for analysis and optimization
-   */
-  async track(llmCall: LLMCallData): Promise<void> {
-    const response = await fetch(`${this.baseUrl}/api/v1/llm-calls`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify(llmCall),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`Failed to track LLM call: ${response.status} ${errorText}`)
-    }
   }
 
   /**

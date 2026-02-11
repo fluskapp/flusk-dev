@@ -1,8 +1,6 @@
 export { FluskClient } from './client.js'
-export type { FluskClientConfig, LLMCallData, ConversionSuggestion, OptimizationSuggestion, RouteOptions, RouteResult } from './client.js'
+export type { FluskClientConfig, ConversionSuggestion, OptimizationSuggestion, RouteOptions, RouteResult } from './client.js'
 
-export { wrapOpenAI } from './wrappers/openai.js'
-export { wrapAnthropic } from './wrappers/anthropic.js'
 export { route } from './routing.js'
 export type { RouteOptions as RouteRequestOptions, RouteResult as RouteResponse } from './routing.js'
 

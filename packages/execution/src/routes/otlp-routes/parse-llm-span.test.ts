@@ -1,0 +1,71 @@
+import { describe, it, expect } from 'vitest';
+import { isGenAiSpan, parseLlmSpan } from './parse-llm-span.js';
+import type { OtlpSpan } from './types.js';
+
+function makeSpan(overrides: Partial<OtlpSpan> = {}): OtlpSpan {
+  return {
+    traceId: 'abc123',
+    spanId: 'span456',
+    name: 'chat',
+    kind: 3,
+    startTimeUnixNano: '1000000000000000',
+    endTimeUnixNano: '1000000500000000',
+    attributes: [
+      { key: 'gen_ai.system', value: { stringValue: 'openai' } },
+      { key: 'gen_ai.request.model', value: { stringValue: 'gpt-4' } },
+      { key: 'gen_ai.response.model', value: { stringValue: 'gpt-4-0613' } },
+      { key: 'gen_ai.usage.input_tokens', value: { intValue: '50' } },
+      { key: 'gen_ai.usage.output_tokens', value: { intValue: '20' } },
+      { key: 'gen_ai.prompt', value: { stringValue: 'Hello world' } },
+      { key: 'gen_ai.completion', value: { stringValue: 'Hi there!' } },
+    ],
+    ...overrides,
+  };
+}
+
+describe('isGenAiSpan', () => {
+  it('returns true for spans with gen_ai attributes', () => {
+    expect(isGenAiSpan(makeSpan())).toBe(true);
+  });
+
+  it('returns false for spans without gen_ai attributes', () => {
+    const span = makeSpan({ attributes: [{ key: 'http.method', value: { stringValue: 'GET' } }] });
+    expect(isGenAiSpan(span)).toBe(false);
+  });
+});
+
+describe('parseLlmSpan', () => {
+  it('extracts model, tokens, and content from GenAI span', () => {
+    const result = parseLlmSpan(makeSpan());
+    expect(result.provider).toBe('openai');
+    expect(result.model).toBe('gpt-4-0613');
+    expect(result.promptTokens).toBe(50);
+    expect(result.completionTokens).toBe(20);
+    expect(result.totalTokens).toBe(70);
+    expect(result.prompt).toBe('Hello world');
+    expect(result.response).toBe('Hi there!');
+    expect(result.latencyMs).toBe(500);
+  });
+
+  it('detects anthropic provider from model name', () => {
+    const span = makeSpan({
+      attributes: [
+        { key: 'gen_ai.request.model', value: { stringValue: 'claude-3-opus' } },
+        { key: 'gen_ai.usage.input_tokens', value: { intValue: '10' } },
+        { key: 'gen_ai.usage.output_tokens', value: { intValue: '5' } },
+      ],
+    });
+    expect(parseLlmSpan(span).provider).toBe('anthropic');
+  });
+
+  it('falls back to "other" for unknown providers', () => {
+    const span = makeSpan({
+      attributes: [
+        { key: 'gen_ai.request.model', value: { stringValue: 'llama-3' } },
+        { key: 'gen_ai.usage.input_tokens', value: { intValue: '0' } },
+        { key: 'gen_ai.usage.output_tokens', value: { intValue: '0' } },
+      ],
+    });
+    expect(parseLlmSpan(span).provider).toBe('other');
+  });
+});

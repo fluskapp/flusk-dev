@@ -1,0 +1,25 @@
+/**
+ * Extract attribute values from OTel span attributes
+ */
+import type { OtlpAttribute } from './types.js';
+
+export function getAttr(attrs: OtlpAttribute[], key: string): string | number | boolean | undefined {
+  const attr = attrs.find((a) => a.key === key);
+  if (!attr) return undefined;
+  const v = attr.value;
+  if (v.stringValue !== undefined) return v.stringValue;
+  if (v.intValue !== undefined) return parseInt(v.intValue, 10);
+  if (v.doubleValue !== undefined) return v.doubleValue;
+  if (v.boolValue !== undefined) return v.boolValue;
+  return undefined;
+}
+
+export function getStringAttr(attrs: OtlpAttribute[], key: string): string {
+  const val = getAttr(attrs, key);
+  return typeof val === 'string' ? val : '';
+}
+
+export function getNumAttr(attrs: OtlpAttribute[], key: string): number {
+  const val = getAttr(attrs, key);
+  return typeof val === 'number' ? val : 0;
+}
