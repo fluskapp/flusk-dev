@@ -27,7 +27,7 @@ packages/
 
 ## Adding a New Feature (Step-by-Step)
 
-### Option A: Use the generator (recommended)
+### ⚠️ ALWAYS use the generator first
 
 ```bash
 # From project root:
@@ -39,7 +39,18 @@ pnpm tsx packages/cli/bin/flusk.ts feature billing-plan
 
 This creates all files across all packages and wires them together (entity, types, business-logic, repository, migration, routes, plugin, hooks, test, barrel exports, app.ts registration).
 
-### Option B: Manual (follow this order)
+**Why this matters:** Manual file creation leads to inconsistent patterns (naming, barrel exports, missing files). The generator ensures every feature follows the same structure. Only create files manually for edge cases that genuinely don't fit the generator pattern (e.g., entities that don't extend BaseEntitySchema, or domain-specific type variants like Upsert instead of Insert/Update).
+
+**After generating:** Customize the stubs — the generator creates TODO-filled templates. Edit entities to add real fields, implement business logic, and flesh out repository queries. If routes need to be split into multiple files for the 100-line rule, create a `<name>-routes/` directory.
+
+### Generator known gaps (as of 2026-02)
+
+- Repository template creates a single file with its own pool — real repos should use the shared `getPool()` from `../db/pool.js`
+- Route template is a single file — complex features may need a directory with split handlers
+- No support for entities that don't extend BaseEntitySchema (e.g., immutable records without updatedAt)
+- Generated barrel updaters append but don't check for existing exports
+
+### Option B: Manual (follow this order — only if generator doesn't fit)
 
 1. **Entity** — `packages/entities/src/<name>.entity.ts`
    - Define TypeBox schema extending `BaseEntitySchema`

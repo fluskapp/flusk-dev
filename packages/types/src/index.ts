@@ -53,8 +53,9 @@ export {
   ConversionQuerySchema
 } from './conversion.types.js';
 
+// Routing types
 export {
-  type RoutingRuleEntity as RoutingRuleEntityType,
+  type RoutingRuleEntity,
   type RoutingRuleInsert,
   type RoutingRuleUpdate,
   type RoutingRuleQuery,
@@ -65,7 +66,7 @@ export {
 } from './routing-rule.types.js';
 
 export {
-  type ModelPerformanceEntity as ModelPerformanceEntityType,
+  type ModelPerformanceEntity,
   type ModelPerformanceUpsert,
   type ModelPerformanceQuery,
   ModelPerformanceEntityJSONSchema,
@@ -74,7 +75,7 @@ export {
 } from './model-performance.types.js';
 
 export {
-  type RoutingDecisionEntity as RoutingDecisionEntityType,
+  type RoutingDecisionEntity,
   type RoutingDecisionInsert,
   type RoutingDecisionQuery,
   RoutingDecisionEntityJSONSchema,
