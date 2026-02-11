@@ -1,0 +1,63 @@
+import { describe, it, expect, afterAll } from 'vitest'
+import { costEventBus } from '../events/cost-event-bus.js'
+
+describe('costEventBus', () => {
+  const listeners: Array<(...args: unknown[]) => void> = []
+
+  afterAll(() => {
+    listeners.forEach((l) => costEventBus.off('cost', l))
+  })
+
+  it('emits call.tracked events to subscribers', async () => {
+    const received: unknown[] = []
+    const listener = (event: unknown) => received.push(event)
+    listeners.push(listener)
+    costEventBus.on('cost', listener)
+
+    costEventBus.emit('cost', {
+      type: 'call.tracked',
+      data: {
+        id: 'test-1',
+        provider: 'openai',
+        model: 'gpt-4',
+        cost: 0.03,
+        totalTokens: 1000,
+        timestamp: new Date().toISOString(),
+      },
+    })
+
+    expect(received).toHaveLength(1)
+    expect((received[0] as any).type).toBe('call.tracked')
+    expect((received[0] as any).data.id).toBe('test-1')
+  })
+
+  it('supports multiple subscribers', () => {
+    let count = 0
+    const l1 = () => { count++ }
+    const l2 = () => { count++ }
+    listeners.push(l1, l2)
+    costEventBus.on('cost', l1)
+    costEventBus.on('cost', l2)
+
+    costEventBus.emit('cost', {
+      type: 'cost.update',
+      data: { timestamp: new Date().toISOString() },
+    })
+
+    expect(count).toBe(2)
+  })
+
+  it('removes listeners on off()', () => {
+    let called = false
+    const listener = () => { called = true }
+    costEventBus.on('cost', listener)
+    costEventBus.off('cost', listener)
+
+    costEventBus.emit('cost', {
+      type: 'call.tracked',
+      data: { timestamp: new Date().toISOString() },
+    })
+
+    expect(called).toBe(false)
+  })
+})

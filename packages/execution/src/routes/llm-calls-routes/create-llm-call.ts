@@ -1,6 +1,7 @@
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import * as LLMCallRepository from '@flusk/resources/repositories/llm-call';
 import { scheduleEmbedding } from '../../hooks/embedding.hook.js';
+import { costEventBus } from '../../events/cost-event-bus.js';
 import {
   hashPromptHook,
   checkCacheHook,
@@ -48,6 +49,19 @@ export function registerCreateLLMCall(fastify: FastifyInstance): void {
 
       // Generate embedding async (non-blocking)
       scheduleEmbedding(created.id, created.prompt);
+
+      // Emit real-time cost event
+      costEventBus.emit('cost', {
+        type: 'call.tracked',
+        data: {
+          id: created.id,
+          provider: created.provider,
+          model: created.model,
+          cost: created.cost,
+          totalTokens: created.totalTokens,
+          timestamp: new Date().toISOString(),
+        },
+      });
 
       return reply.code(201).send(created);
     }
