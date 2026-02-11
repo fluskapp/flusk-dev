@@ -1,0 +1,52 @@
+/**
+ * Compare two prompt version metrics to determine which is better
+ * Weighted score: quality * 0.6 + cost_savings * 0.3 + latency * 0.1
+ */
+
+export interface VersionMetrics {
+  avgQuality: number;
+  avgLatencyMs: number;
+  avgCost: number;
+  sampleCount: number;
+}
+
+export interface CompareResult {
+  winner: 'a' | 'b' | 'tie';
+  scoreA: number;
+  scoreB: number;
+}
+
+/**
+ * Compute weighted score for a version relative to a baseline
+ */
+function computeScore(
+  metrics: VersionMetrics,
+  baseline: VersionMetrics
+): number {
+  const quality = metrics.avgQuality;
+  const costSavings = baseline.avgCost > 0
+    ? 1 - (metrics.avgCost / baseline.avgCost)
+    : 0;
+  const latencyScore = baseline.avgLatencyMs > 0
+    ? 1 - (metrics.avgLatencyMs / baseline.avgLatencyMs)
+    : 0;
+
+  return quality * 0.6 + costSavings * 0.3 + latencyScore * 0.1;
+}
+
+/**
+ * Compare two versions and return which is better
+ */
+export function compareVersions(
+  a: VersionMetrics,
+  b: VersionMetrics
+): CompareResult {
+  const scoreA = computeScore(a, b);
+  const scoreB = computeScore(b, a);
+
+  const winner = Math.abs(scoreA - scoreB) < 0.001
+    ? 'tie' as const
+    : scoreA > scoreB ? 'a' as const : 'b' as const;
+
+  return { winner, scoreA, scoreB };
+}

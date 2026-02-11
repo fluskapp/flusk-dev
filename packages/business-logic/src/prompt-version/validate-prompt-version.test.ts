@@ -1,0 +1,28 @@
+import { describe, it, expect } from 'vitest';
+import { validatePromptVersion } from './validate-prompt-version.function.js';
+
+describe('validatePromptVersion', () => {
+  it('returns valid for well-formed input', () => {
+    const result = validatePromptVersion({
+      templateId: '123e4567-e89b-12d3-a456-426614174000',
+      content: 'Hello {{name}}',
+      status: 'draft',
+    });
+    expect(result.valid).toBe(true);
+  });
+
+  it('returns errors for empty entity', () => {
+    const result = validatePromptVersion({});
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('templateId is required');
+    expect(result.errors).toContain('content is required');
+  });
+
+  it('rejects invalid status', () => {
+    const result = validatePromptVersion({
+      templateId: 'abc', content: 'test', status: 'invalid',
+    });
+    expect(result.valid).toBe(false);
+    expect(result.errors[0]).toContain('status must be one of');
+  });
+});

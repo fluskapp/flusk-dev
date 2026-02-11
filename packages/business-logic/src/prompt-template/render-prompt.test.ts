@@ -1,0 +1,49 @@
+import { describe, it, expect } from 'vitest';
+import { renderPrompt } from './render-prompt.function.js';
+
+describe('renderPrompt', () => {
+  it('replaces all variables', () => {
+    const result = renderPrompt(
+      'Hello {{name}}, your query: {{query}}',
+      { name: 'Alice', query: 'what is AI?' }
+    );
+    expect(result.rendered).toBe('Hello Alice, your query: what is AI?');
+    expect(result.missingVariables).toHaveLength(0);
+    expect(result.extraVariables).toHaveLength(0);
+  });
+
+  it('reports missing variables and keeps placeholders', () => {
+    const result = renderPrompt(
+      'Hello {{name}}, context: {{context}}',
+      { name: 'Bob' }
+    );
+    expect(result.rendered).toBe('Hello Bob, context: {{context}}');
+    expect(result.missingVariables).toEqual(['context']);
+  });
+
+  it('reports extra variables with declared list', () => {
+    const result = renderPrompt(
+      'Hello {{name}}',
+      { name: 'Alice', unused: 'val' },
+      ['name']
+    );
+    expect(result.rendered).toBe('Hello Alice');
+    expect(result.extraVariables).toEqual(['unused']);
+  });
+
+  it('handles empty content', () => {
+    const result = renderPrompt('', { foo: 'bar' });
+    expect(result.rendered).toBe('');
+  });
+
+  it('handles no variables in template', () => {
+    const result = renderPrompt('Static prompt', {});
+    expect(result.rendered).toBe('Static prompt');
+    expect(result.missingVariables).toHaveLength(0);
+  });
+
+  it('handles duplicate variable references', () => {
+    const result = renderPrompt('{{x}} and {{x}}', { x: 'hi' });
+    expect(result.rendered).toBe('hi and hi');
+  });
+});

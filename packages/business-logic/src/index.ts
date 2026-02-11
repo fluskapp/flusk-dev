@@ -25,3 +25,9 @@ export { span };
 
 import * as optimization from './optimization/index.js';
 export { optimization };
+
+import * as promptTemplate from './prompt-template/index.js';
+export { promptTemplate };
+
+import * as promptVersion from './prompt-version/index.js';
+export { promptVersion };

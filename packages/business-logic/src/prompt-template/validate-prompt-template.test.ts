@@ -1,0 +1,27 @@
+import { describe, it, expect } from 'vitest';
+import { validatePromptTemplate } from './validate-prompt-template.function.js';
+
+describe('validatePromptTemplate', () => {
+  it('returns valid for a well-formed entity', () => {
+    const result = validatePromptTemplate({
+      name: 'Test Template',
+      organizationId: '123e4567-e89b-12d3-a456-426614174000',
+      variables: ['query', 'context'],
+    });
+    expect(result.valid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it('returns errors for an empty entity', () => {
+    const result = validatePromptTemplate({});
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('name is required');
+    expect(result.errors).toContain('organizationId is required');
+  });
+
+  it('rejects empty name', () => {
+    const result = validatePromptTemplate({ name: '  ', organizationId: 'abc' });
+    expect(result.valid).toBe(false);
+    expect(result.errors).toContain('name is required');
+  });
+});

@@ -1,117 +1,64 @@
 /**
- * @flusk/types
- *
- * TypeScript types and JSON Schema exports generated from entity definitions.
- * This package bridges the gap between TypeBox schemas and runtime consumers.
+ * @flusk/types — TypeScript types and JSON Schema exports from entity definitions.
  */
 
 export {
-  // Types
-  type LLMCallEntity,
-  type TokenUsage,
-  type BaseEntity,
-  type LLMCallInsert,
-  type LLMCallUpdate,
-  type LLMCallQuery,
-
-  // JSON Schemas
-  LLMCallEntityJSONSchema,
-  TokenUsageJSONSchema,
-  LLMCallInsertSchema,
-  LLMCallUpdateSchema,
-  LLMCallQuerySchema
+  type LLMCallEntity, type TokenUsage, type BaseEntity,
+  type LLMCallInsert, type LLMCallUpdate, type LLMCallQuery,
+  LLMCallEntityJSONSchema, TokenUsageJSONSchema,
+  LLMCallInsertSchema, LLMCallUpdateSchema, LLMCallQuerySchema
 } from './llm-call.types.js';
 
 export {
-  // Pattern Types
-  type PatternEntity,
-  type PatternInsert,
-  type PatternUpdate,
-  type PatternQuery,
-
-  // Pattern JSON Schemas
-  PatternEntityJSONSchema,
-  PatternInsertSchema,
-  PatternUpdateSchema,
-  PatternQuerySchema
+  type PatternEntity, type PatternInsert, type PatternUpdate, type PatternQuery,
+  PatternEntityJSONSchema, PatternInsertSchema, PatternUpdateSchema, PatternQuerySchema
 } from './pattern.types.js';
 
 export {
-  // Conversion Types
-  type ConversionEntity,
-  type ConversionType,
-  type ConversionStatus,
-  type ConversionConfig,
-  type ConversionInsert,
-  type ConversionUpdate,
-  type ConversionQuery,
-
-  // Conversion JSON Schemas
-  ConversionEntityJSONSchema,
-  ConversionInsertSchema,
-  ConversionUpdateSchema,
-  ConversionQuerySchema
+  type ConversionEntity, type ConversionType, type ConversionStatus, type ConversionConfig,
+  type ConversionInsert, type ConversionUpdate, type ConversionQuery,
+  ConversionEntityJSONSchema, ConversionInsertSchema, ConversionUpdateSchema, ConversionQuerySchema
 } from './conversion.types.js';
 
-// Routing types
 export {
-  type RoutingRuleEntity,
-  type RoutingRuleInsert,
-  type RoutingRuleUpdate,
-  type RoutingRuleQuery,
-  RoutingRuleEntityJSONSchema,
-  RoutingRuleInsertSchema,
-  RoutingRuleUpdateSchema,
-  RoutingRuleQuerySchema,
+  type RoutingRuleEntity, type RoutingRuleInsert, type RoutingRuleUpdate, type RoutingRuleQuery,
+  RoutingRuleEntityJSONSchema, RoutingRuleInsertSchema, RoutingRuleUpdateSchema, RoutingRuleQuerySchema,
 } from './routing-rule.types.js';
 
 export {
-  type ModelPerformanceEntity,
-  type ModelPerformanceUpsert,
-  type ModelPerformanceQuery,
-  ModelPerformanceEntityJSONSchema,
-  ModelPerformanceUpsertSchema,
-  ModelPerformanceQuerySchema,
+  type ModelPerformanceEntity, type ModelPerformanceUpsert, type ModelPerformanceQuery,
+  ModelPerformanceEntityJSONSchema, ModelPerformanceUpsertSchema, ModelPerformanceQuerySchema,
 } from './model-performance.types.js';
 
 export {
-  type RoutingDecisionEntity,
-  type RoutingDecisionInsert,
-  type RoutingDecisionQuery,
-  RoutingDecisionEntityJSONSchema,
-  RoutingDecisionInsertSchema,
-  RoutingDecisionQuerySchema,
+  type RoutingDecisionEntity, type RoutingDecisionInsert, type RoutingDecisionQuery,
+  RoutingDecisionEntityJSONSchema, RoutingDecisionInsertSchema, RoutingDecisionQuerySchema,
 } from './routing-decision.types.js';
 
 export {
-  type TraceEntity as TraceEntityType,
-  type TraceInsert,
-  type TraceUpdate,
-  type TraceQuery,
-  TraceEntityJSONSchema,
-  TraceInsertSchema,
-  TraceUpdateSchema,
-  TraceQuerySchema
+  type TraceEntity as TraceEntityType, type TraceInsert, type TraceUpdate, type TraceQuery,
+  TraceEntityJSONSchema, TraceInsertSchema, TraceUpdateSchema, TraceQuerySchema
 } from './trace.types.js';
 
 export {
-  type SpanEntity as SpanEntityType,
-  type SpanInsert,
-  type SpanUpdate,
-  type SpanQuery,
-  SpanEntityJSONSchema,
-  SpanInsertSchema,
-  SpanUpdateSchema,
-  SpanQuerySchema
+  type SpanEntity as SpanEntityType, type SpanInsert, type SpanUpdate, type SpanQuery,
+  SpanEntityJSONSchema, SpanInsertSchema, SpanUpdateSchema, SpanQuerySchema
 } from './span.types.js';
 
 export {
   type OptimizationEntity as OptimizationEntityType,
-  type OptimizationInsert,
-  type OptimizationUpdate,
-  type OptimizationQuery,
-  OptimizationEntityJSONSchema,
-  OptimizationInsertSchema,
-  OptimizationUpdateSchema,
-  OptimizationQuerySchema
+  type OptimizationInsert, type OptimizationUpdate, type OptimizationQuery,
+  OptimizationEntityJSONSchema, OptimizationInsertSchema, OptimizationUpdateSchema, OptimizationQuerySchema
 } from './optimization.types.js';
+
+export {
+  type PromptTemplateEntity as PromptTemplateEntityType,
+  type PromptTemplateInsert, type PromptTemplateUpdate, type PromptTemplateQuery,
+  PromptTemplateEntityJSONSchema, PromptTemplateInsertSchema, PromptTemplateUpdateSchema, PromptTemplateQuerySchema
+} from './prompt-template.types.js';
+
+export {
+  type PromptVersionEntity as PromptVersionEntityType,
+  type PromptVersionInsert, type PromptVersionUpdate, type PromptVersionQuery,
+  PromptVersionEntityJSONSchema, PromptVersionInsertSchema, PromptVersionUpdateSchema, PromptVersionQuerySchema
+} from './prompt-version.types.js';

@@ -1,0 +1,8 @@
+import type { FastifyInstance } from 'fastify';
+import { promptVersionCrudRoutes } from './crud.routes.js';
+import { promptVersionActionRoutes } from './action.routes.js';
+
+export async function promptversionRoutes(fastify: FastifyInstance): Promise<void> {
+  await fastify.register(promptVersionCrudRoutes);
+  await fastify.register(promptVersionActionRoutes);
+}

@@ -13,6 +13,8 @@ import { routingRoutes } from './routes/routing-routes/index.js';
 import { traceRoutes } from './routes/trace.routes.js';
 import { spanRoutes } from './routes/span.routes.js';
 import { optimizationRoutes } from './routes/optimization.routes.js';
+import { prompttemplateRoutes } from './routes/prompt-template-routes/index.js';
+import { promptversionRoutes } from './routes/prompt-version-routes/index.js';
 
 export interface CreateAppOptions {
   logger?: boolean;
@@ -75,6 +77,8 @@ export async function createApp(
       await api.register(traceRoutes, { prefix: '/traces' });
       await api.register(spanRoutes, { prefix: '/spans' });
       await api.register(optimizationRoutes, { prefix: '/optimizations' });
+      await api.register(prompttemplateRoutes, { prefix: '/prompt-templates' });
+      await api.register(promptversionRoutes, { prefix: '/prompt-versions' });
     },
     { prefix: '/api/v1' }
   );

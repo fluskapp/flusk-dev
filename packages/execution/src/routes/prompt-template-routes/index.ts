@@ -1,0 +1,8 @@
+import type { FastifyInstance } from 'fastify';
+import { promptTemplateCrudRoutes } from './crud.routes.js';
+import { promptTemplateActionRoutes } from './action.routes.js';
+
+export async function prompttemplateRoutes(fastify: FastifyInstance): Promise<void> {
+  await fastify.register(promptTemplateCrudRoutes);
+  await fastify.register(promptTemplateActionRoutes);
+}

@@ -1,0 +1,39 @@
+import { describe, it, expect } from 'vitest';
+import { selectABVariant } from './select-ab-variant.function.js';
+
+describe('selectABVariant', () => {
+  const active = 'active-id';
+  const candidate = 'candidate-id';
+
+  it('selects candidate when random is below traffic percent', () => {
+    const result = selectABVariant(active, candidate, 30, 0.1); // 10 < 30
+    expect(result.selectedVersionId).toBe(candidate);
+    expect(result.isCandidate).toBe(true);
+  });
+
+  it('selects active when random is above traffic percent', () => {
+    const result = selectABVariant(active, candidate, 30, 0.5); // 50 > 30
+    expect(result.selectedVersionId).toBe(active);
+    expect(result.isCandidate).toBe(false);
+  });
+
+  it('always selects candidate at 100%', () => {
+    const result = selectABVariant(active, candidate, 100, 0.99);
+    expect(result.selectedVersionId).toBe(candidate);
+  });
+
+  it('always selects active at 0%', () => {
+    const result = selectABVariant(active, candidate, 0, 0.01);
+    expect(result.selectedVersionId).toBe(active);
+  });
+
+  it('clamps negative traffic percent', () => {
+    const result = selectABVariant(active, candidate, -10, 0.5);
+    expect(result.selectedVersionId).toBe(active);
+  });
+
+  it('clamps traffic percent above 100', () => {
+    const result = selectABVariant(active, candidate, 150, 0.99);
+    expect(result.selectedVersionId).toBe(candidate);
+  });
+});

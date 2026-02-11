@@ -63,3 +63,17 @@ export {
   OptimizationEntitySchema,
   type OptimizationEntity
 } from './optimization.entity.js';
+
+// PromptTemplate entity exports
+export {
+  PromptTemplateEntitySchema,
+  type PromptTemplateEntity
+} from './prompt-template.entity.js';
+
+// PromptVersion entity exports
+export {
+  PromptVersionEntitySchema,
+  PromptVersionMetricsSchema,
+  type PromptVersionEntity,
+  type PromptVersionMetrics
+} from './prompt-version.entity.js';

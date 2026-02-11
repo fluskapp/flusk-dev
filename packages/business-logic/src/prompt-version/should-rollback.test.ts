@@ -1,0 +1,33 @@
+import { describe, it, expect } from 'vitest';
+import { shouldRollback } from './should-rollback.function.js';
+
+describe('shouldRollback', () => {
+  const previous = { avgQuality: 0.9, avgLatencyMs: 100, avgCost: 0.01, sampleCount: 50 };
+
+  it('recommends rollback when quality drops significantly', () => {
+    const current = { avgQuality: 0.7, avgLatencyMs: 80, avgCost: 0.005, sampleCount: 20 };
+    const result = shouldRollback(current, previous);
+    expect(result.shouldRollback).toBe(true);
+    expect(result.qualityDrop).toBeGreaterThan(0.1);
+  });
+
+  it('does not rollback when quality is acceptable', () => {
+    const current = { avgQuality: 0.85, avgLatencyMs: 90, avgCost: 0.008, sampleCount: 20 };
+    const result = shouldRollback(current, previous);
+    expect(result.shouldRollback).toBe(false);
+  });
+
+  it('does not rollback with insufficient samples', () => {
+    const current = { avgQuality: 0.5, avgLatencyMs: 200, avgCost: 0.05, sampleCount: 3 };
+    const result = shouldRollback(current, previous);
+    expect(result.shouldRollback).toBe(false);
+    expect(result.reason).toContain('Insufficient samples');
+  });
+
+  it('respects custom threshold', () => {
+    const current = { avgQuality: 0.85, avgLatencyMs: 90, avgCost: 0.008, sampleCount: 20 };
+    // ~5.5% drop, use 5% threshold
+    const result = shouldRollback(current, previous, 0.05);
+    expect(result.shouldRollback).toBe(true);
+  });
+});

@@ -152,6 +152,47 @@ export class FluskClient {
   }
 
   /**
+   * Render a prompt template with variables (uses A/B test variant selection)
+   */
+  async renderPrompt(
+    templateId: string,
+    variables: Record<string, string>,
+    abTest?: { candidateVersionId: string; trafficPercent: number }
+  ): Promise<{ rendered: string; versionId: string; isCandidate?: boolean }> {
+    if (abTest) {
+      const response = await fetch(`${this.baseUrl}/api/v1/prompt-templates/${templateId}/ab-test`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.apiKey}` },
+        body: JSON.stringify({ ...abTest, variables }),
+      })
+      if (!response.ok) throw new Error(`renderPrompt failed: ${response.status} ${await response.text()}`)
+      return response.json() as any
+    }
+    const response = await fetch(`${this.baseUrl}/api/v1/prompt-templates/${templateId}/render`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify({ variables }),
+    })
+    if (!response.ok) throw new Error(`renderPrompt failed: ${response.status} ${await response.text()}`)
+    return response.json() as any
+  }
+
+  /**
+   * Report metrics for a prompt version after a call
+   */
+  async reportPromptMetrics(
+    versionId: string,
+    metrics: { quality: number; latencyMs: number; cost: number }
+  ): Promise<void> {
+    const response = await fetch(`${this.baseUrl}/api/v1/prompt-versions/${versionId}/metrics`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.apiKey}` },
+      body: JSON.stringify(metrics),
+    })
+    if (!response.ok) throw new Error(`reportPromptMetrics failed: ${response.status} ${await response.text()}`)
+  }
+
+  /**
    * Ask Flusk which model to use for a given prompt (opt-in routing)
    */
   async route(options: RouteOptions): Promise<RouteResult> {

@@ -32,3 +32,7 @@ export * as TraceRepository from './repositories/trace.repository.js';
 export * as SpanRepository from './repositories/span.repository.js';
 
 export * as OptimizationRepository from './repositories/optimization.repository.js';
+
+export * as PromptTemplateRepository from './repositories/prompt-template.repository.js';
+
+export * as PromptVersionRepository from './repositories/prompt-version.repository.js';

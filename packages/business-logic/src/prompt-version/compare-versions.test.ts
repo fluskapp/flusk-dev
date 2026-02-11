@@ -1,0 +1,31 @@
+import { describe, it, expect } from 'vitest';
+import { compareVersions } from './compare-versions.function.js';
+
+describe('compareVersions', () => {
+  it('picks higher quality version', () => {
+    const a = { avgQuality: 0.9, avgLatencyMs: 100, avgCost: 0.01, sampleCount: 50 };
+    const b = { avgQuality: 0.7, avgLatencyMs: 100, avgCost: 0.01, sampleCount: 50 };
+    const result = compareVersions(a, b);
+    expect(result.winner).toBe('a');
+  });
+
+  it('factors in cost savings', () => {
+    const a = { avgQuality: 0.8, avgLatencyMs: 100, avgCost: 0.005, sampleCount: 50 };
+    const b = { avgQuality: 0.8, avgLatencyMs: 100, avgCost: 0.02, sampleCount: 50 };
+    const result = compareVersions(a, b);
+    expect(result.winner).toBe('a');
+  });
+
+  it('returns tie for identical metrics', () => {
+    const m = { avgQuality: 0.8, avgLatencyMs: 100, avgCost: 0.01, sampleCount: 50 };
+    const result = compareVersions(m, m);
+    expect(result.winner).toBe('tie');
+  });
+
+  it('handles zero cost baseline', () => {
+    const a = { avgQuality: 0.8, avgLatencyMs: 100, avgCost: 0, sampleCount: 50 };
+    const b = { avgQuality: 0.7, avgLatencyMs: 100, avgCost: 0, sampleCount: 50 };
+    const result = compareVersions(a, b);
+    expect(result.winner).toBe('a');
+  });
+});
