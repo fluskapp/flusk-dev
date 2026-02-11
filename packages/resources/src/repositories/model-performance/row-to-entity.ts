@@ -1,0 +1,14 @@
+import type { ModelPerformanceEntity } from '@flusk/entities';
+
+export function rowToEntity(row: Record<string, unknown>): ModelPerformanceEntity {
+  return {
+    id: row.id as string,
+    model: row.model as string,
+    promptCategory: row.prompt_category as string,
+    avgQuality: Number(row.avg_quality),
+    avgLatencyMs: Number(row.avg_latency_ms),
+    avgCostPer1kTokens: Number(row.avg_cost_per_1k_tokens),
+    sampleCount: Number(row.sample_count),
+    updatedAt: (row.updated_at as Date).toISOString(),
+  };
+}

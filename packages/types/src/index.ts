@@ -52,3 +52,32 @@ export {
   ConversionUpdateSchema,
   ConversionQuerySchema
 } from './conversion.types.js';
+
+export {
+  type RoutingRuleEntity as RoutingRuleEntityType,
+  type RoutingRuleInsert,
+  type RoutingRuleUpdate,
+  type RoutingRuleQuery,
+  RoutingRuleEntityJSONSchema,
+  RoutingRuleInsertSchema,
+  RoutingRuleUpdateSchema,
+  RoutingRuleQuerySchema,
+} from './routing-rule.types.js';
+
+export {
+  type ModelPerformanceEntity as ModelPerformanceEntityType,
+  type ModelPerformanceUpsert,
+  type ModelPerformanceQuery,
+  ModelPerformanceEntityJSONSchema,
+  ModelPerformanceUpsertSchema,
+  ModelPerformanceQuerySchema,
+} from './model-performance.types.js';
+
+export {
+  type RoutingDecisionEntity as RoutingDecisionEntityType,
+  type RoutingDecisionInsert,
+  type RoutingDecisionQuery,
+  RoutingDecisionEntityJSONSchema,
+  RoutingDecisionInsertSchema,
+  RoutingDecisionQuerySchema,
+} from './routing-decision.types.js';

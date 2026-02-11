@@ -1,0 +1,39 @@
+import { describe, it, expect } from 'vitest';
+import { classifyComplexity } from './classify-complexity.function.js';
+
+describe('classifyComplexity', () => {
+  it('classifies short simple prompts as simple', () => {
+    const result = classifyComplexity({
+      prompt: 'Translate this to French: Hello world',
+      tokenCount: 20,
+    });
+    expect(result.level).toBe('simple');
+    expect(result.score).toBeLessThan(0.3);
+  });
+
+  it('classifies medium prompts as medium', () => {
+    const result = classifyComplexity({
+      prompt: 'Analyze the following article and explain the key points. What are the main arguments presented here?',
+      tokenCount: 800,
+    });
+    expect(result.level).toBe('medium');
+  });
+
+  it('classifies complex prompts as complex', () => {
+    const result = classifyComplexity({
+      prompt:
+        'Analyze and compare the trade-off between these two architectures. ' +
+        'Evaluate the pros and cons of each. Design a hybrid solution. ' +
+        'Explain why one might be better. Consider multi-step implications.',
+      tokenCount: 3000,
+    });
+    expect(result.level).toBe('complex');
+    expect(result.score).toBeGreaterThanOrEqual(0.6);
+  });
+
+  it('clamps score between 0 and 1', () => {
+    const result = classifyComplexity({ prompt: 'Hi', tokenCount: 1 });
+    expect(result.score).toBeGreaterThanOrEqual(0);
+    expect(result.score).toBeLessThanOrEqual(1);
+  });
+});

@@ -20,82 +20,32 @@ export interface ModelPricing {
  */
 export const PRICING_TABLE: Record<string, ModelPricing> = {
   // OpenAI models
-  'openai/gpt-4': {
-    provider: 'openai',
-    model: 'gpt-4',
-    inputPricePerMToken: 30.0,
-    outputPricePerMToken: 60.0,
-  },
-  'openai/gpt-4-turbo': {
-    provider: 'openai',
-    model: 'gpt-4-turbo',
-    inputPricePerMToken: 10.0,
-    outputPricePerMToken: 30.0,
-  },
-  'openai/gpt-3.5-turbo': {
-    provider: 'openai',
-    model: 'gpt-3.5-turbo',
-    inputPricePerMToken: 0.5,
-    outputPricePerMToken: 1.5,
-  },
-  'openai/gpt-4o': {
-    provider: 'openai',
-    model: 'gpt-4o',
-    inputPricePerMToken: 5.0,
-    outputPricePerMToken: 15.0,
-  },
-  'openai/gpt-4o-mini': {
-    provider: 'openai',
-    model: 'gpt-4o-mini',
-    inputPricePerMToken: 0.15,
-    outputPricePerMToken: 0.6,
-  },
+  'openai/gpt-4': { provider: 'openai', model: 'gpt-4', inputPricePerMToken: 30.0, outputPricePerMToken: 60.0 },
+  'openai/gpt-4-turbo': { provider: 'openai', model: 'gpt-4-turbo', inputPricePerMToken: 10.0, outputPricePerMToken: 30.0 },
+  'openai/gpt-3.5-turbo': { provider: 'openai', model: 'gpt-3.5-turbo', inputPricePerMToken: 0.5, outputPricePerMToken: 1.5 },
+  'openai/gpt-4o': { provider: 'openai', model: 'gpt-4o', inputPricePerMToken: 2.5, outputPricePerMToken: 10.0 },
+  'openai/gpt-4o-mini': { provider: 'openai', model: 'gpt-4o-mini', inputPricePerMToken: 0.15, outputPricePerMToken: 0.6 },
+  'openai/gpt-4.5': { provider: 'openai', model: 'gpt-4.5', inputPricePerMToken: 75.0, outputPricePerMToken: 150.0 },
+  'openai/o3-mini': { provider: 'openai', model: 'o3-mini', inputPricePerMToken: 1.1, outputPricePerMToken: 4.4 },
 
   // Anthropic models
-  'anthropic/claude-3-opus': {
-    provider: 'anthropic',
-    model: 'claude-3-opus',
-    inputPricePerMToken: 15.0,
-    outputPricePerMToken: 75.0,
-  },
-  'anthropic/claude-3-sonnet': {
-    provider: 'anthropic',
-    model: 'claude-3-sonnet',
-    inputPricePerMToken: 3.0,
-    outputPricePerMToken: 15.0,
-  },
-  'anthropic/claude-3-haiku': {
-    provider: 'anthropic',
-    model: 'claude-3-haiku',
-    inputPricePerMToken: 0.25,
-    outputPricePerMToken: 1.25,
-  },
+  'anthropic/claude-3-opus': { provider: 'anthropic', model: 'claude-3-opus', inputPricePerMToken: 15.0, outputPricePerMToken: 75.0 },
+  'anthropic/claude-3-sonnet': { provider: 'anthropic', model: 'claude-3-sonnet', inputPricePerMToken: 3.0, outputPricePerMToken: 15.0 },
+  'anthropic/claude-3-haiku': { provider: 'anthropic', model: 'claude-3-haiku', inputPricePerMToken: 0.25, outputPricePerMToken: 1.25 },
+  'anthropic/claude-4-opus': { provider: 'anthropic', model: 'claude-4-opus', inputPricePerMToken: 15.0, outputPricePerMToken: 75.0 },
+  'anthropic/claude-4-sonnet': { provider: 'anthropic', model: 'claude-4-sonnet', inputPricePerMToken: 3.0, outputPricePerMToken: 15.0 },
+  'anthropic/claude-4-haiku': { provider: 'anthropic', model: 'claude-4-haiku', inputPricePerMToken: 0.5, outputPricePerMToken: 2.5 },
+
+  // Google models
+  'google/gemini-2.5-pro': { provider: 'google', model: 'gemini-2.5-pro', inputPricePerMToken: 1.25, outputPricePerMToken: 10.0 },
+  'google/gemini-2.5-flash': { provider: 'google', model: 'gemini-2.5-flash', inputPricePerMToken: 0.15, outputPricePerMToken: 0.6 },
+  'google/gemini-2.0-flash': { provider: 'google', model: 'gemini-2.0-flash', inputPricePerMToken: 0.1, outputPricePerMToken: 0.4 },
 
   // Cohere models
-  'cohere/command': {
-    provider: 'cohere',
-    model: 'command',
-    inputPricePerMToken: 1.0,
-    outputPricePerMToken: 2.0,
-  },
-  'cohere/command-light': {
-    provider: 'cohere',
-    model: 'command-light',
-    inputPricePerMToken: 0.3,
-    outputPricePerMToken: 0.6,
-  },
-  'cohere/command-r': {
-    provider: 'cohere',
-    model: 'command-r',
-    inputPricePerMToken: 0.5,
-    outputPricePerMToken: 1.5,
-  },
-  'cohere/command-r-plus': {
-    provider: 'cohere',
-    model: 'command-r-plus',
-    inputPricePerMToken: 3.0,
-    outputPricePerMToken: 15.0,
-  },
+  'cohere/command': { provider: 'cohere', model: 'command', inputPricePerMToken: 1.0, outputPricePerMToken: 2.0 },
+  'cohere/command-light': { provider: 'cohere', model: 'command-light', inputPricePerMToken: 0.3, outputPricePerMToken: 0.6 },
+  'cohere/command-r': { provider: 'cohere', model: 'command-r', inputPricePerMToken: 0.5, outputPricePerMToken: 1.5 },
+  'cohere/command-r-plus': { provider: 'cohere', model: 'command-r-plus', inputPricePerMToken: 3.0, outputPricePerMToken: 15.0 },
 };
 
 /**

@@ -8,6 +8,8 @@ import { patternRoutes } from './routes/pattern.routes.js';
 import gdprRoutes from './routes/gdpr.routes.js';
 import { similarityRoutes } from './routes/similarity.routes.js';
 import { costEventsRoutes } from './routes/cost-events.routes.js';
+import { routingRulesRoutes } from './routes/routing-rules-routes/index.js';
+import { routingRoutes } from './routes/routing-routes/index.js';
 
 export interface CreateAppOptions {
   logger?: boolean;
@@ -65,6 +67,8 @@ export async function createApp(
       await api.register(gdprRoutes);
       await api.register(similarityRoutes, { prefix: '/similarity' });
       await api.register(costEventsRoutes, { prefix: '/events/costs' });
+      await api.register(routingRulesRoutes, { prefix: '/routing-rules' });
+      await api.register(routingRoutes, { prefix: '/route' });
     },
     { prefix: '/api/v1' }
   );

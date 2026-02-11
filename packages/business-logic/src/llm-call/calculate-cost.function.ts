@@ -2,24 +2,36 @@ import type { TokenUsage } from '@flusk/entities';
 
 /**
  * Pricing table for LLM providers (USD per 1M tokens)
- * Updated as of January 2025
+ * Updated as of February 2026
  */
 const PRICING = {
   openai: {
     'gpt-4': { input: 30.0, output: 60.0 },
     'gpt-4-turbo': { input: 10.0, output: 30.0 },
-    'gpt-4o': { input: 5.0, output: 15.0 },
+    'gpt-4o': { input: 2.5, output: 10.0 },
     'gpt-4o-mini': { input: 0.15, output: 0.6 },
+    'gpt-4.5': { input: 75.0, output: 150.0 },
     'gpt-3.5-turbo': { input: 0.5, output: 1.5 },
+    'o3-mini': { input: 1.1, output: 4.4 },
   },
   anthropic: {
     'claude-3-opus': { input: 15.0, output: 75.0 },
     'claude-3.5-sonnet': { input: 3.0, output: 15.0 },
     'claude-3-haiku': { input: 0.25, output: 1.25 },
+    'claude-4-opus': { input: 15.0, output: 75.0 },
+    'claude-4-sonnet': { input: 3.0, output: 15.0 },
+    'claude-4-haiku': { input: 0.5, output: 2.5 },
+  },
+  google: {
+    'gemini-2.5-pro': { input: 1.25, output: 10.0 },
+    'gemini-2.5-flash': { input: 0.15, output: 0.6 },
+    'gemini-2.0-flash': { input: 0.1, output: 0.4 },
   },
   cohere: {
     'command': { input: 1.0, output: 2.0 },
     'command-light': { input: 0.3, output: 0.6 },
+    'command-r': { input: 0.5, output: 1.5 },
+    'command-r-plus': { input: 3.0, output: 15.0 },
   },
 } as const;
 

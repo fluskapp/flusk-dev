@@ -13,5 +13,6 @@
 import * as llmCall from './llm-call/index.js';
 import * as pattern from './pattern/index.js';
 import * as conversion from './conversion/index.js';
+import * as routing from './routing/index.js';
 
-export { llmCall, pattern, conversion };
+export { llmCall, pattern, conversion, routing };

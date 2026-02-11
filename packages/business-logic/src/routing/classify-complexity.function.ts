@@ -1,0 +1,62 @@
+/**
+ * Classify prompt complexity using heuristics
+ * Pure function — no I/O
+ */
+
+export type ComplexityLevel = 'simple' | 'medium' | 'complex';
+
+export interface ClassifyComplexityInput {
+  prompt: string;
+  tokenCount: number;
+}
+
+export interface ClassifyComplexityOutput {
+  level: ComplexityLevel;
+  score: number; // 0-1
+}
+
+const COMPLEX_KEYWORDS = [
+  'analyze', 'compare', 'evaluate', 'synthesize', 'design',
+  'architect', 'optimize', 'debug', 'refactor', 'explain why',
+  'multi-step', 'trade-off', 'pros and cons',
+];
+
+const SIMPLE_KEYWORDS = [
+  'translate', 'summarize', 'list', 'extract', 'classify',
+  'format', 'convert', 'yes or no', 'true or false',
+];
+
+/**
+ * Classify prompt complexity based on token count and keyword analysis
+ */
+export function classifyComplexity(
+  input: ClassifyComplexityInput
+): ClassifyComplexityOutput {
+  const lower = input.prompt.toLowerCase();
+  let score = 0;
+
+  // Token count factor (0-0.4)
+  if (input.tokenCount > 2000) score += 0.4;
+  else if (input.tokenCount > 500) score += 0.2;
+  else score += 0.05;
+
+  // Complex keyword factor (0-0.4)
+  const complexHits = COMPLEX_KEYWORDS.filter((k) => lower.includes(k)).length;
+  score += Math.min(complexHits * 0.1, 0.4);
+
+  // Simple keyword penalty (-0.2)
+  const simpleHits = SIMPLE_KEYWORDS.filter((k) => lower.includes(k)).length;
+  score -= Math.min(simpleHits * 0.1, 0.2);
+
+  // Question mark / multi-sentence factor (0-0.2)
+  const sentences = input.prompt.split(/[.!?]+/).filter(Boolean).length;
+  if (sentences > 5) score += 0.2;
+  else if (sentences > 2) score += 0.1;
+
+  score = Math.max(0, Math.min(1, score));
+
+  const level: ComplexityLevel =
+    score >= 0.6 ? 'complex' : score >= 0.3 ? 'medium' : 'simple';
+
+  return { level, score };
+}

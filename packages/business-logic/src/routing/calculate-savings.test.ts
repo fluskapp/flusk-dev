@@ -1,0 +1,33 @@
+import { describe, it, expect } from 'vitest';
+import { calculateSavings } from './calculate-savings.function.js';
+
+describe('calculateSavings', () => {
+  it('calculates savings when routing to cheaper model', () => {
+    const result = calculateSavings({
+      originalCostPer1kTokens: 0.01,
+      routedCostPer1kTokens: 0.0004,
+      totalTokens: 1000,
+    });
+    expect(result.costSaved).toBeCloseTo(0.0096, 4);
+    expect(result.savingsPercent).toBeGreaterThan(90);
+  });
+
+  it('returns zero savings when same model', () => {
+    const result = calculateSavings({
+      originalCostPer1kTokens: 0.01,
+      routedCostPer1kTokens: 0.01,
+      totalTokens: 1000,
+    });
+    expect(result.costSaved).toBe(0);
+    expect(result.savingsPercent).toBe(0);
+  });
+
+  it('handles negative savings (A/B test scenario)', () => {
+    const result = calculateSavings({
+      originalCostPer1kTokens: 0.001,
+      routedCostPer1kTokens: 0.01,
+      totalTokens: 1000,
+    });
+    expect(result.costSaved).toBeLessThan(0);
+  });
+});

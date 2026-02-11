@@ -31,6 +31,20 @@ export interface ConversionSuggestion {
   updatedAt: string
 }
 
+export interface RouteOptions {
+  ruleId: string
+  prompt: string
+  tokenCount: number
+  originalModel: string
+}
+
+export interface RouteResult {
+  selectedModel: string
+  reason: string
+  complexity: string
+  expectedQuality: number
+}
+
 export class FluskClient {
   private readonly apiKey: string
   private readonly baseUrl: string
@@ -81,5 +95,26 @@ export class FluskClient {
     }
 
     return response.json() as Promise<ConversionSuggestion[]>
+  }
+
+  /**
+   * Ask Flusk which model to use for a given prompt (opt-in routing)
+   */
+  async route(options: RouteOptions): Promise<RouteResult> {
+    const response = await fetch(`${this.baseUrl}/api/v1/route`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${this.apiKey}`,
+      },
+      body: JSON.stringify(options),
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`Routing failed: ${response.status} ${errorText}`)
+    }
+
+    return response.json() as Promise<RouteResult>
   }
 }

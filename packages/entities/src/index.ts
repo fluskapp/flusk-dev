@@ -29,3 +29,19 @@ export {
   DowngradeConfigSchema,
   RemoveConfigSchema
 } from './conversion.entity.js';
+
+// Routing entity exports
+export {
+  RoutingRuleEntitySchema,
+  type RoutingRuleEntity
+} from './routing-rule.entity.js';
+
+export {
+  ModelPerformanceEntitySchema,
+  type ModelPerformanceEntity
+} from './model-performance.entity.js';
+
+export {
+  RoutingDecisionEntitySchema,
+  type RoutingDecisionEntity
+} from './routing-decision.entity.js';

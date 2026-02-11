@@ -6,6 +6,11 @@ export * as LLMCallRepository from './repositories/llm-call.repository.js';
 export * as PatternRepository from './repositories/pattern.repository.js';
 export * as ConversionRepository from './repositories/conversion.repository.js';
 
+// Routing repository exports
+export * as RoutingRuleRepository from './repositories/routing-rule/index.js';
+export * as ModelPerformanceRepository from './repositories/model-performance/index.js';
+export * as RoutingDecisionRepository from './repositories/routing-decision/index.js';
+
 // Cache exports
 export * as RedisClient from './cache/redis.client.js';
 

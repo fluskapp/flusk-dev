@@ -1,0 +1,41 @@
+import { describe, it, expect } from 'vitest';
+import { shouldABTest } from './should-ab-test.function.js';
+
+describe('shouldABTest', () => {
+  it('tests when insufficient data', () => {
+    const result = shouldABTest({ callCount: 1, sampleCount: 2 });
+    expect(result.shouldTest).toBe(true);
+    expect(result.reason).toBe('insufficient-data');
+  });
+
+  it('tests on periodic schedule', () => {
+    const result = shouldABTest({ callCount: 20, sampleCount: 10 });
+    expect(result.shouldTest).toBe(true);
+    expect(result.reason).toBe('periodic-test');
+  });
+
+  it('skips when not scheduled', () => {
+    const result = shouldABTest({ callCount: 7, sampleCount: 10 });
+    expect(result.shouldTest).toBe(false);
+    expect(result.reason).toBe('not-scheduled');
+  });
+
+  it('stops testing when sufficient samples', () => {
+    const result = shouldABTest({
+      callCount: 20,
+      sampleCount: 100,
+      maxSamples: 100,
+    });
+    expect(result.shouldTest).toBe(false);
+    expect(result.reason).toBe('sufficient-samples');
+  });
+
+  it('respects custom frequency', () => {
+    const result = shouldABTest({
+      callCount: 10,
+      sampleCount: 10,
+      testFrequency: 10,
+    });
+    expect(result.shouldTest).toBe(true);
+  });
+});
