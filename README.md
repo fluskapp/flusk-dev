@@ -32,27 +32,76 @@ Flusk tracks every LLM API call via OpenTelemetry auto-instrumentation — **zer
 
 ## 🚀 Quick Start
 
+### 1. Start the Flusk server
+
 ```bash
 git clone https://github.com/AdirBenYossef/flusk.git
 cd flusk && cp .env.example .env
-docker compose up       # PostgreSQL + Redis + Flusk on :3000
+docker compose up -d    # PostgreSQL + Redis + Jaeger + Flusk on :3000
 ```
 
-Then in **your** app:
+Verify it's running:
+```bash
+curl http://localhost:3000/health        # → { "status": "ok" }
+curl http://localhost:3000/docs          # → Swagger UI
+```
+
+### 2. Instrument your app (zero code changes)
 
 ```bash
 npm install @flusk/otel
 ```
 
+Set environment variables:
+```bash
+export FLUSK_ENDPOINT=http://localhost:3000
+export FLUSK_API_KEY=your_api_key        # optional for local dev
+export FLUSK_PROJECT_NAME=my-app         # optional, default: "default"
+```
+
+Start your app with the OTel flag:
+```bash
+node --import @flusk/otel ./index.js
+```
+
+Or add to `package.json`:
 ```json
 { "scripts": { "start": "node --import @flusk/otel ./index.js" } }
 ```
 
+That's it — **every OpenAI, Anthropic, and Bedrock call is now tracked automatically.**
+
+### 3. View your data
+
 ```bash
-FLUSK_ENDPOINT=http://localhost:3000 npm start
+# Terminal dashboard
+pnpm tsx packages/cli/bin/flusk.ts dashboard
+
+# Or use Swagger API
+open http://localhost:3000/docs
+
+# Or view raw traces in Jaeger
+open http://localhost:16686
 ```
 
-**Done.** Your LLM calls are now tracked. No wrappers. No SDK imports. Just OTel.
+### 4. Environment variables reference
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `FLUSK_ENDPOINT` | ✅ | `https://otel.flusk.dev` | Flusk server URL |
+| `FLUSK_API_KEY` | No | — | API key for authenticated traces |
+| `FLUSK_PROJECT_NAME` | No | `default` | Project name for grouping |
+| `FLUSK_CAPTURE_CONTENT` | No | `true` | Capture prompt/response content |
+
+### 5. Supported providers (auto-detected)
+
+| Provider | Package | Instrumentation |
+|----------|---------|-----------------|
+| OpenAI | `openai` | `@opentelemetry/instrumentation-openai` |
+| Anthropic | `@anthropic-ai/sdk` | `@traceloop/instrumentation-anthropic` |
+| AWS Bedrock | `@aws-sdk/client-bedrock-runtime` | `@traceloop/instrumentation-bedrock` |
+
+> **Adding a new provider?** `pnpm tsx packages/cli/bin/flusk.ts g:provider <name>` scaffolds pricing, span config, and tests.
 
 ## ✨ Features
 
