@@ -11,6 +11,6 @@ export function registerGetPerformance(fastify: FastifyInstance): void {
     },
   }, async (request) => {
     const { promptCategory } = request.query as { promptCategory?: string };
-    return ModelPerformanceRepository.findByCategory(promptCategory);
+    return ModelPerformanceRepository.findByCategory(fastify.pg.pool, promptCategory);
   });
 }

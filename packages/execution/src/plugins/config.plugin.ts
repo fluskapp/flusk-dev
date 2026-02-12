@@ -1,0 +1,24 @@
+/**
+ * Config plugin — validates environment variables using @fastify/env + TypeBox.
+ * Must be registered first so app.config is available to all other plugins.
+ */
+import fp from 'fastify-plugin';
+import fastifyEnv from '@fastify/env';
+import { Type } from '@sinclair/typebox';
+
+const schema = Type.Object({
+  DATABASE_URL: Type.String(),
+  REDIS_URL: Type.String({ default: 'redis://localhost:6379' }),
+  PORT: Type.Number({ default: 3000 }),
+  HOST: Type.String({ default: '0.0.0.0' }),
+  LOG_LEVEL: Type.String({ default: 'info' }),
+  FLUSK_API_KEY: Type.String({ default: '' }),
+  NODE_ENV: Type.String({ default: 'development' }),
+});
+
+export const plugin = fp(async (app) => {
+  await app.register(fastifyEnv, {
+    schema: Type.Strict(schema),
+    dotenv: true,
+  });
+}, { name: 'flusk-config' });

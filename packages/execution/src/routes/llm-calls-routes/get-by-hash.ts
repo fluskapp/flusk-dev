@@ -29,7 +29,7 @@ export function registerGetByHash(fastify: FastifyInstance): void {
     async (request: FastifyRequest<{ Params: { hash: string } }>, reply: FastifyReply) => {
       const { hash } = request.params;
 
-      const llmCall = await LLMCallRepository.findByPromptHash(hash);
+      const llmCall = await LLMCallRepository.findByPromptHash(fastify.pg.pool, hash);
 
       if (!llmCall) {
         return reply.code(404).send({ error: 'No cached response found for this hash' });

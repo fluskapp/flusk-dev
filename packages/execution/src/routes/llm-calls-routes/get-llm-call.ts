@@ -28,7 +28,7 @@ export function registerGetLLMCall(fastify: FastifyInstance): void {
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const { id } = request.params;
 
-      const llmCall = await LLMCallRepository.findById(id);
+      const llmCall = await LLMCallRepository.findById(fastify.pg.pool, id);
 
       if (!llmCall) {
         return reply.code(404).send({ error: 'LLM call not found' });

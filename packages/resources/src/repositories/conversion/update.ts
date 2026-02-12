@@ -1,25 +1,23 @@
+import type { Pool } from 'pg';
 import { ConversionEntity } from '@flusk/entities';
-import { getPool } from './pool.js';
 import { rowToEntity } from './row-to-entity.js';
 import { findById } from './find-by-id.js';
 
 /**
  * Update conversion record
+ * @param pool - PostgreSQL connection pool
  * @param id - UUID of the conversion to update
  * @param data - Partial data to update
- * @returns Updated conversion entity or null if not found
  */
 export async function update(
+  pool: Pool,
   id: string,
   data: Partial<Omit<ConversionEntity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<ConversionEntity | null> {
-  const db = getPool();
-
   const updates: string[] = [];
   const values: any[] = [];
   let paramCount = 1;
 
-  // Build dynamic UPDATE query based on provided fields
   if (data.patternId !== undefined) {
     updates.push(`pattern_id = $${paramCount++}`);
     values.push(data.patternId);
@@ -46,8 +44,7 @@ export async function update(
   }
 
   if (updates.length === 0) {
-    // No fields to update, just return existing record
-    return findById(id);
+    return findById(pool, id);
   }
 
   values.push(id);
@@ -58,7 +55,7 @@ export async function update(
     RETURNING *
   `;
 
-  const result = await db.query(query, values);
+  const result = await pool.query(query, values);
 
   if (result.rows.length === 0) {
     return null;

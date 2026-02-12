@@ -1,15 +1,17 @@
+import type { Pool } from 'pg';
 import { LLMCallEntity } from '@flusk/entities';
-import { getPool } from './pool.js';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
  * Find LLM call by prompt hash (for cache lookups)
+ * @param pool - PostgreSQL connection pool
  * @param hash - SHA-256 hash of the prompt
- * @returns Most recent LLM call with this hash or null if not found
+ * @returns Most recent LLM call with this hash or null
  */
-export async function findByPromptHash(hash: string): Promise<LLMCallEntity | null> {
-  const db = getPool();
-
+export async function findByPromptHash(
+  pool: Pool,
+  hash: string
+): Promise<LLMCallEntity | null> {
   const query = `
     SELECT * FROM llm_calls
     WHERE prompt_hash = $1
@@ -17,7 +19,7 @@ export async function findByPromptHash(hash: string): Promise<LLMCallEntity | nu
     LIMIT 1
   `;
 
-  const result = await db.query(query, [hash]);
+  const result = await pool.query(query, [hash]);
 
   if (result.rows.length === 0) {
     return null;

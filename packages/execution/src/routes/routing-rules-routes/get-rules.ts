@@ -7,6 +7,6 @@ export function registerGetRules(fastify: FastifyInstance): void {
     schema: { querystring: Type.Object({ organizationId: Type.String() }) },
   }, async (request) => {
     const { organizationId } = request.query as { organizationId: string };
-    return RoutingRuleRepository.findByOrganization(organizationId);
+    return RoutingRuleRepository.findByOrganization(fastify.pg.pool, organizationId);
   });
 }

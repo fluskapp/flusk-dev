@@ -1,20 +1,20 @@
+import type { Pool } from 'pg';
 import { ConversionEntity } from '@flusk/entities';
-import { getPool } from './pool.js';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
  * Create a new conversion suggestion
- * @param conversion - Partial conversion data (id, timestamps auto-generated)
- * @returns Created conversion entity with generated id and timestamps
+ * @param pool - PostgreSQL connection pool
+ * @param conversion - Partial conversion data
  */
 export async function create(
+  pool: Pool,
   conversion: Omit<ConversionEntity, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<ConversionEntity> {
-  const db = getPool();
-
   const query = `
     INSERT INTO conversions (
-      pattern_id, organization_id, conversion_type, status, estimated_savings, config
+      pattern_id, organization_id, conversion_type,
+      status, estimated_savings, config
     ) VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *
   `;
@@ -28,6 +28,6 @@ export async function create(
     JSON.stringify(conversion.config)
   ];
 
-  const result = await db.query(query, values);
+  const result = await pool.query(query, values);
   return rowToEntity(result.rows[0]);
 }

@@ -1,7 +1,8 @@
 /**
  * Optimization Repository — CRUD for generated code optimization suggestions.
+ * All functions accept a Pool instance as first parameter.
  */
-import { getPool } from '../db/pool.js';
+import type { Pool } from 'pg';
 import type { OptimizationEntity } from '@flusk/entities';
 
 function rowToEntity(row: any): OptimizationEntity {
@@ -22,9 +23,9 @@ function rowToEntity(row: any): OptimizationEntity {
 }
 
 export async function create(
+  pool: Pool,
   data: Omit<OptimizationEntity, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<OptimizationEntity> {
-  const db = getPool();
   const q = `
     INSERT INTO optimizations (
       organization_id, type, title, description,
@@ -37,19 +38,26 @@ export async function create(
     data.estimatedSavingsPerMonth, data.generatedCode, data.language,
     data.status, data.sourcePatternId,
   ];
-  const result = await db.query(q, vals);
+  const result = await pool.query(q, vals);
   return rowToEntity(result.rows[0]);
 }
 
-export async function findById(id: string): Promise<OptimizationEntity | null> {
-  const db = getPool();
-  const result = await db.query('SELECT * FROM optimizations WHERE id = $1', [id]);
+export async function findById(
+  pool: Pool,
+  id: string
+): Promise<OptimizationEntity | null> {
+  const result = await pool.query(
+    'SELECT * FROM optimizations WHERE id = $1',
+    [id]
+  );
   return result.rows.length ? rowToEntity(result.rows[0]) : null;
 }
 
-export async function findByOrg(orgId: string): Promise<OptimizationEntity[]> {
-  const db = getPool();
-  const result = await db.query(
+export async function findByOrg(
+  pool: Pool,
+  orgId: string
+): Promise<OptimizationEntity[]> {
+  const result = await pool.query(
     'SELECT * FROM optimizations WHERE organization_id = $1 ORDER BY created_at DESC',
     [orgId]
   );
@@ -57,25 +65,30 @@ export async function findByOrg(orgId: string): Promise<OptimizationEntity[]> {
 }
 
 export async function update(
+  pool: Pool,
   id: string,
   data: Partial<Omit<OptimizationEntity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<OptimizationEntity | null> {
-  const db = getPool();
   const sets: string[] = ['updated_at = NOW()'];
   const vals: any[] = [];
   let i = 1;
 
-  if (data.status !== undefined) { sets.push(`status = $${i++}`); vals.push(data.status); }
-  if (data.title !== undefined) { sets.push(`title = $${i++}`); vals.push(data.title); }
+  if (data.status !== undefined) {
+    sets.push(`status = $${i++}`); vals.push(data.status);
+  }
+  if (data.title !== undefined) {
+    sets.push(`title = $${i++}`); vals.push(data.title);
+  }
 
   vals.push(id);
   const q = `UPDATE optimizations SET ${sets.join(', ')} WHERE id = $${i} RETURNING *`;
-  const result = await db.query(q, vals);
+  const result = await pool.query(q, vals);
   return result.rows.length ? rowToEntity(result.rows[0]) : null;
 }
 
-export async function generateForOrg(orgId: string): Promise<OptimizationEntity[]> {
-  // In a real implementation, this would analyze patterns and generate optimizations
-  // For now, return existing suggestions for the org
-  return findByOrg(orgId);
+export async function generateForOrg(
+  pool: Pool,
+  orgId: string
+): Promise<OptimizationEntity[]> {
+  return findByOrg(pool, orgId);
 }

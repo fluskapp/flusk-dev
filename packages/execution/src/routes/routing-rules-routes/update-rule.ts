@@ -18,7 +18,7 @@ export function registerUpdateRule(fastify: FastifyInstance): void {
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     const body = request.body as Record<string, unknown>;
-    const rule = await RoutingRuleRepository.update(id, body as any);
+    const rule = await RoutingRuleRepository.update(fastify.pg.pool, id, body as any);
     if (!rule) return reply.status(404).send({ error: 'Not found' });
     return rule;
   });

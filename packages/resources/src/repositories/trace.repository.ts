@@ -1,7 +1,8 @@
 /**
  * Trace Repository — CRUD for distributed trace records.
+ * All functions accept a Pool instance as first parameter.
  */
-import { getPool } from '../db/pool.js';
+import type { Pool } from 'pg';
 import { TraceEntity } from '@flusk/entities';
 
 function rowToEntity(row: any): TraceEntity {
@@ -22,14 +23,14 @@ function rowToEntity(row: any): TraceEntity {
 }
 
 export async function create(
+  pool: Pool,
   data: Omit<TraceEntity, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<TraceEntity> {
-  const db = getPool();
   const q = `
     INSERT INTO traces (organization_id, name, total_cost, total_tokens,
       total_latency_ms, call_count, status, started_at, completed_at)
     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING *`;
-  const r = await db.query(q, [
+  const r = await pool.query(q, [
     data.organizationId, data.name, data.totalCost, data.totalTokens,
     data.totalLatencyMs, data.callCount, data.status, data.startedAt,
     data.completedAt ?? null,
@@ -37,19 +38,25 @@ export async function create(
   return rowToEntity(r.rows[0]);
 }
 
-export async function findById(id: string): Promise<TraceEntity | null> {
-  const r = await getPool().query('SELECT * FROM traces WHERE id = $1', [id]);
+export async function findById(
+  pool: Pool, id: string
+): Promise<TraceEntity | null> {
+  const r = await pool.query('SELECT * FROM traces WHERE id = $1', [id]);
   return r.rows.length ? rowToEntity(r.rows[0]) : null;
 }
 
-export async function findByOrganization(orgId: string): Promise<TraceEntity[]> {
-  const r = await getPool().query(
-    'SELECT * FROM traces WHERE organization_id = $1 ORDER BY started_at DESC', [orgId]
+export async function findByOrganization(
+  pool: Pool, orgId: string
+): Promise<TraceEntity[]> {
+  const r = await pool.query(
+    'SELECT * FROM traces WHERE organization_id = $1 ORDER BY started_at DESC',
+    [orgId]
   );
   return r.rows.map(rowToEntity);
 }
 
 export async function updateStats(
+  pool: Pool,
   id: string,
   stats: { totalCost: number; totalTokens: number; totalLatencyMs: number; callCount: number }
 ): Promise<TraceEntity | null> {
@@ -57,13 +64,14 @@ export async function updateStats(
     UPDATE traces SET total_cost=$2, total_tokens=$3, total_latency_ms=$4,
       call_count=$5, status='completed', completed_at=NOW(), updated_at=NOW()
     WHERE id=$1 RETURNING *`;
-  const r = await getPool().query(q, [
+  const r = await pool.query(q, [
     id, stats.totalCost, stats.totalTokens, stats.totalLatencyMs, stats.callCount,
   ]);
   return r.rows.length ? rowToEntity(r.rows[0]) : null;
 }
 
 export async function update(
+  pool: Pool,
   id: string,
   data: Partial<Omit<TraceEntity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<TraceEntity | null> {
@@ -75,6 +83,6 @@ export async function update(
   if (data.name) { sets.push(`name = $${i++}`); vals.push(data.name); }
   vals.push(id);
   const q = `UPDATE traces SET ${sets.join(', ')} WHERE id = $${i} RETURNING *`;
-  const r = await getPool().query(q, vals);
+  const r = await pool.query(q, vals);
   return r.rows.length ? rowToEntity(r.rows[0]) : null;
 }

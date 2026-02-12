@@ -1,7 +1,8 @@
 /**
- * Prompt Template Repository — CRUD for prompt templates with variable placeholders.
+ * Prompt Template Repository — CRUD for prompt templates.
+ * All functions accept a Pool instance as first parameter.
  */
-import { getPool } from '../db/pool.js';
+import type { Pool } from 'pg';
 import type { PromptTemplateEntity } from '@flusk/entities';
 
 function rowToEntity(row: any): PromptTemplateEntity {
@@ -18,10 +19,10 @@ function rowToEntity(row: any): PromptTemplateEntity {
 }
 
 export async function create(
+  pool: Pool,
   data: Omit<PromptTemplateEntity, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<PromptTemplateEntity> {
-  const db = getPool();
-  const result = await db.query(
+  const result = await pool.query(
     `INSERT INTO prompt_templates (organization_id, name, description, active_version_id, variables)
      VALUES ($1, $2, $3, $4, $5) RETURNING *`,
     [data.organizationId, data.name, data.description, data.activeVersionId, JSON.stringify(data.variables)]
@@ -29,25 +30,30 @@ export async function create(
   return rowToEntity(result.rows[0]);
 }
 
-export async function findById(id: string): Promise<PromptTemplateEntity | null> {
-  const db = getPool();
-  const result = await db.query('SELECT * FROM prompt_templates WHERE id = $1', [id]);
+export async function findById(
+  pool: Pool, id: string
+): Promise<PromptTemplateEntity | null> {
+  const result = await pool.query(
+    'SELECT * FROM prompt_templates WHERE id = $1', [id]
+  );
   return result.rows.length ? rowToEntity(result.rows[0]) : null;
 }
 
-export async function findByOrganizationId(orgId: string): Promise<PromptTemplateEntity[]> {
-  const db = getPool();
-  const result = await db.query(
-    'SELECT * FROM prompt_templates WHERE organization_id = $1 ORDER BY created_at DESC', [orgId]
+export async function findByOrganizationId(
+  pool: Pool, orgId: string
+): Promise<PromptTemplateEntity[]> {
+  const result = await pool.query(
+    'SELECT * FROM prompt_templates WHERE organization_id = $1 ORDER BY created_at DESC',
+    [orgId]
   );
   return result.rows.map(rowToEntity);
 }
 
 export async function update(
+  pool: Pool,
   id: string,
   data: Partial<Omit<PromptTemplateEntity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<PromptTemplateEntity | null> {
-  const db = getPool();
   const sets: string[] = ['updated_at = NOW()'];
   const vals: any[] = [];
   let idx = 1;
@@ -58,13 +64,12 @@ export async function update(
   if (data.variables !== undefined) { sets.push(`variables = $${idx}`); vals.push(JSON.stringify(data.variables)); idx++; }
 
   vals.push(id);
-  const result = await db.query(
+  const result = await pool.query(
     `UPDATE prompt_templates SET ${sets.join(', ')} WHERE id = $${idx} RETURNING *`, vals
   );
   return result.rows.length ? rowToEntity(result.rows[0]) : null;
 }
 
-export async function deleteById(id: string): Promise<void> {
-  const db = getPool();
-  await db.query('DELETE FROM prompt_templates WHERE id = $1', [id]);
+export async function deleteById(pool: Pool, id: string): Promise<void> {
+  await pool.query('DELETE FROM prompt_templates WHERE id = $1', [id]);
 }

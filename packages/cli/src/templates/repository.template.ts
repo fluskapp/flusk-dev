@@ -13,38 +13,8 @@ export function generateRepositoryTemplate(entityName: string): string {
  * DO NOT EDIT - regenerate using: flusk g ${entityName}.entity.ts
  */
 
-import { Pool } from 'pg';
+import type { Pool } from 'pg';
 import { ${pascalName}Entity } from '@flusk/entities';
-
-/**
- * PostgreSQL connection pool singleton
- */
-let pool: Pool | null = null;
-
-/**
- * Get or create PostgreSQL connection pool
- */
-function getPool(): Pool {
-  if (!pool) {
-    const connectionString = process.env.DATABASE_URL;
-    if (!connectionString) {
-      throw new Error('DATABASE_URL environment variable is required');
-    }
-
-    pool = new Pool({
-      connectionString,
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000
-    });
-
-    pool.on('error', (err) => {
-      console.error('Unexpected database error:', err);
-    });
-  }
-
-  return pool;
-}
 
 /**
  * Convert database row to ${pascalName}Entity
@@ -62,10 +32,9 @@ function rowToEntity(row: any): ${pascalName}Entity {
  * Create a new ${entityName} record
  */
 export async function create(
+  pool: Pool,
   data: Omit<${pascalName}Entity, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<${pascalName}Entity> {
-  const db = getPool();
-
   // TODO: Add actual fields from schema
   const query = \`
     INSERT INTO ${tableName} (
@@ -76,18 +45,19 @@ export async function create(
     RETURNING *
   \`;
 
-  const result = await db.query(query);
+  const result = await pool.query(query);
   return rowToEntity(result.rows[0]);
 }
 
 /**
  * Find ${entityName} by UUID
  */
-export async function findById(id: string): Promise<${pascalName}Entity | null> {
-  const db = getPool();
-
+export async function findById(
+  pool: Pool,
+  id: string
+): Promise<${pascalName}Entity | null> {
   const query = 'SELECT * FROM ${tableName} WHERE id = $1';
-  const result = await db.query(query, [id]);
+  const result = await pool.query(query, [id]);
 
   if (result.rows.length === 0) {
     return null;
@@ -100,11 +70,10 @@ export async function findById(id: string): Promise<${pascalName}Entity | null> 
  * Update ${entityName} record
  */
 export async function update(
+  pool: Pool,
   id: string,
   data: Partial<Omit<${pascalName}Entity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<${pascalName}Entity | null> {
-  const db = getPool();
-
   // TODO: Implement dynamic update logic
   const query = \`
     UPDATE ${tableName}
@@ -113,23 +82,13 @@ export async function update(
     RETURNING *
   \`;
 
-  const result = await db.query(query, [id]);
+  const result = await pool.query(query, [id]);
 
   if (result.rows.length === 0) {
     return null;
   }
 
   return rowToEntity(result.rows[0]);
-}
-
-/**
- * Close database connection pool
- */
-export async function closePool(): Promise<void> {
-  if (pool) {
-    await pool.end();
-    pool = null;
-  }
 }
 `;
 }

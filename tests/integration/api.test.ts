@@ -4,11 +4,15 @@ import type { FastifyInstance } from 'fastify';
 
 /**
  * Integration tests for API routes
- * Requires Docker (postgres + redis) running: pnpm db:up && pnpm db:migrate
+ * Requires Docker (postgres + redis) running: docker compose up -d
+ * Skip with: SKIP_DB_TESTS=1 pnpm test
  */
+const skipDb = !!process.env.SKIP_DB_TESTS;
+
 let app: FastifyInstance;
 
 beforeAll(async () => {
+  if (skipDb) return;
   process.env.DATABASE_URL ??=
     'postgresql://flusk:dev_password_change_me@localhost:5432/flusk';
   process.env.REDIS_URL ??= 'redis://localhost:6379';
@@ -18,10 +22,10 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  await app.close();
+  if (app) await app.close();
 });
 
-describe('Health endpoints', () => {
+describe.skipIf(skipDb)('Health endpoints', () => {
   it('GET /health returns ok', async () => {
     const res = await app.inject({ method: 'GET', url: '/health' });
     expect(res.statusCode).toBe(200);
@@ -37,7 +41,7 @@ describe('Health endpoints', () => {
   });
 });
 
-describe('POST /api/v1/llm-calls', () => {
+describe.skipIf(skipDb)('POST /api/v1/llm-calls', () => {
   const validPayload = {
     provider: 'openai',
     model: 'gpt-4',
@@ -82,7 +86,7 @@ describe('POST /api/v1/llm-calls', () => {
   });
 });
 
-describe('GET /api/v1/llm-calls/:id', () => {
+describe.skipIf(skipDb)('GET /api/v1/llm-calls/:id', () => {
   it('returns 404 for non-existent ID', async () => {
     const fakeId = '00000000-0000-0000-0000-000000000000';
     const res = await app.inject({
@@ -115,7 +119,7 @@ describe('GET /api/v1/llm-calls/:id', () => {
   });
 });
 
-describe('GET /api/v1/patterns', () => {
+describe.skipIf(skipDb)('GET /api/v1/patterns', () => {
   it('returns a list with total', async () => {
     const res = await app.inject({
       method: 'GET',

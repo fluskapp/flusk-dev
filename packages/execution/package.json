@@ -16,14 +16,19 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@flusk/entities": "workspace:*",
-    "@flusk/types": "workspace:*",
-    "@flusk/resources": "workspace:*",
-    "@flusk/business-logic": "workspace:*",
-    "fastify": "^5.0.0",
-    "@fastify/type-provider-typebox": "^5.0.0",
     "@fastify/cors": "^10.0.0",
+    "@fastify/env": "^5.0.3",
+    "@fastify/postgres": "^6.0.2",
+    "@fastify/redis": "^7.2.0",
+    "@fastify/sensible": "^6.0.4",
+    "@fastify/type-provider-typebox": "^5.0.0",
+    "@fastify/under-pressure": "^9.0.3",
+    "@flusk/business-logic": "workspace:*",
+    "@flusk/entities": "workspace:*",
+    "@flusk/resources": "workspace:*",
+    "@flusk/types": "workspace:*",
     "@sinclair/typebox": "^0.32.0",
+    "fastify": "^5.0.0",
     "fastify-plugin": "^5.0.0"
   },
   "devDependencies": {

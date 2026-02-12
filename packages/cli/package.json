@@ -16,6 +16,7 @@
     "test:all": "pnpm test && pnpm test:e2e"
   },
   "dependencies": {
+    "@clack/prompts": "^1.0.0",
     "@sinclair/typebox": "^0.34.48",
     "boxen": "^7.1.0",
     "chalk": "^5.4.1",

@@ -1,6 +1,5 @@
 import type { FastifyRequest } from 'fastify';
 import { logAudit } from '@flusk/resources';
-import { getPool } from './pool.js';
 import { DeleteParams } from './types.js';
 
 /**
@@ -12,29 +11,23 @@ export async function deleteUserData(
   reply: any
 ) {
   const { orgId } = request.params;
-  const db = getPool();
+  const db = request.server.pg.pool;
 
   try {
-    // Start transaction
     await db.query('BEGIN');
 
-    // Delete all data (cascade deletes handled by foreign keys)
     const llmCallsResult = await db.query(
-      'DELETE FROM llm_calls WHERE organization_id = $1',
-      [orgId]
+      'DELETE FROM llm_calls WHERE organization_id = $1', [orgId]
     );
     const patternsResult = await db.query(
-      'DELETE FROM patterns WHERE organization_id = $1',
-      [orgId]
+      'DELETE FROM patterns WHERE organization_id = $1', [orgId]
     );
     const conversionsResult = await db.query(
-      'DELETE FROM conversions WHERE organization_id = $1',
-      [orgId]
+      'DELETE FROM conversions WHERE organization_id = $1', [orgId]
     );
 
     await db.query('COMMIT');
 
-    // Log audit event
     await logAudit({
       action: 'delete_all',
       resource: 'organization_data',

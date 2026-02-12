@@ -1,21 +1,22 @@
+import type { Pool } from 'pg';
 import { ConversionEntity } from '@flusk/entities';
-import { getPool } from './pool.js';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
- * Find accepted conversions for an organization (active automation rules)
+ * Find accepted conversions for an organization
+ * @param pool - PostgreSQL connection pool
  * @param organizationId - UUID of the organization
- * @returns Array of accepted conversion entities
  */
-export async function findAccepted(organizationId: string): Promise<ConversionEntity[]> {
-  const db = getPool();
-
+export async function findAccepted(
+  pool: Pool,
+  organizationId: string
+): Promise<ConversionEntity[]> {
   const query = `
     SELECT * FROM conversions
     WHERE organization_id = $1 AND status = 'accepted'
     ORDER BY created_at DESC
   `;
 
-  const result = await db.query(query, [organizationId]);
+  const result = await pool.query(query, [organizationId]);
   return result.rows.map(rowToEntity);
 }

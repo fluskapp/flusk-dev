@@ -45,10 +45,10 @@ export function registerCreateLLMCall(fastify: FastifyInstance): void {
       }
 
       // Create database record
-      const created = await LLMCallRepository.create(llmCallData);
+      const created = await LLMCallRepository.create(fastify.pg.pool, llmCallData);
 
       // Generate embedding async (non-blocking)
-      scheduleEmbedding(created.id, created.prompt);
+      scheduleEmbedding(fastify.pg.pool, created.id, created.prompt);
 
       // Emit real-time cost event
       costEventBus.emit('cost', {

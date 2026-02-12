@@ -1,5 +1,5 @@
+import type { Pool } from 'pg';
 import type { ModelPerformanceEntity } from '@flusk/entities';
-import { getPool } from './pool.js';
 import { rowToEntity } from './row-to-entity.js';
 
 export interface UpsertInput {
@@ -13,11 +13,15 @@ export interface UpsertInput {
 /**
  * Upsert model performance metrics using incremental averaging
  */
-export async function upsert(input: UpsertInput): Promise<ModelPerformanceEntity> {
-  const db = getPool();
+export async function upsert(
+  pool: Pool,
+  input: UpsertInput
+): Promise<ModelPerformanceEntity> {
   const query = `
-    INSERT INTO model_performance (model, prompt_category, avg_quality, avg_latency_ms, avg_cost_per_1k_tokens, sample_count)
-    VALUES ($1, $2, $3, $4, $5, 1)
+    INSERT INTO model_performance (
+      model, prompt_category, avg_quality, avg_latency_ms,
+      avg_cost_per_1k_tokens, sample_count
+    ) VALUES ($1, $2, $3, $4, $5, 1)
     ON CONFLICT (model, prompt_category) DO UPDATE SET
       avg_quality = (model_performance.avg_quality * model_performance.sample_count + $3) / (model_performance.sample_count + 1),
       avg_latency_ms = (model_performance.avg_latency_ms * model_performance.sample_count + $4) / (model_performance.sample_count + 1),
@@ -26,7 +30,10 @@ export async function upsert(input: UpsertInput): Promise<ModelPerformanceEntity
       updated_at = now()
     RETURNING *
   `;
-  const values = [input.model, input.promptCategory, input.quality, input.latencyMs, input.costPer1kTokens];
-  const result = await db.query(query, values);
+  const values = [
+    input.model, input.promptCategory, input.quality,
+    input.latencyMs, input.costPer1kTokens,
+  ];
+  const result = await pool.query(query, values);
   return rowToEntity(result.rows[0]);
 }

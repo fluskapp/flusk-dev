@@ -1,5 +1,6 @@
 /**
- * Conversion Repository — CRUD for optimization suggestions (cache, downgrade, remove).
+ * Conversion Repository — CRUD for optimization suggestions.
+ * All functions accept a Pool instance as first parameter.
  */
 
 export { create } from './create.js';
@@ -10,4 +11,3 @@ export { findAccepted } from './find-accepted.js';
 export { update } from './update.js';
 export { updateStatus } from './update-status.js';
 export { deleteById } from './delete-by-id.js';
-export { closePool } from './pool.js';

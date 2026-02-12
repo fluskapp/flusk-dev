@@ -47,6 +47,7 @@ export function registerSearchSimilar(fastify: FastifyInstance): void {
 
       const { embedding } = await OpenAIEmbeddingClient.generateEmbedding(prompt);
       const similar = await LLMCallRepository.findSimilar(
+        fastify.pg.pool,
         embedding,
         threshold ?? DEFAULT_THRESHOLD,
         limit ?? DEFAULT_LIMIT

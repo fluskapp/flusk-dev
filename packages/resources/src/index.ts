@@ -1,10 +1,10 @@
-// Database pool
+// Database pool (deprecated — use @fastify/postgres instead)
 export { getPool, closePool } from './db/pool.js';
 
 // Repository exports
 export * as LLMCallRepository from './repositories/llm-call.repository.js';
 export * as PatternRepository from './repositories/pattern/index.js';
-export * as ConversionRepository from './repositories/conversion.repository.js';
+export * as ConversionRepository from './repositories/conversion/index.js';
 
 // Routing repository exports
 export * as RoutingRuleRepository from './repositories/routing-rule/index.js';
@@ -28,11 +28,7 @@ export * from './encryption/decrypt.js';
 export * from './audit/audit-log.repository.js';
 
 export * as TraceRepository from './repositories/trace.repository.js';
-
 export * as SpanRepository from './repositories/span.repository.js';
-
 export * as OptimizationRepository from './repositories/optimization.repository.js';
-
 export * as PromptTemplateRepository from './repositories/prompt-template.repository.js';
-
 export * as PromptVersionRepository from './repositories/prompt-version.repository.js';

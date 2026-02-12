@@ -1,6 +1,5 @@
 import type { FastifyRequest } from 'fastify';
 import { logAudit } from '@flusk/resources';
-import { getPool } from './pool.js';
 import { ExportParams } from './types.js';
 
 /**
@@ -12,7 +11,7 @@ export async function exportUserData(
   reply: any
 ) {
   const { orgId } = request.params;
-  const db = getPool();
+  const db = request.server.pg.pool;
 
   try {
     const [llmCalls, patterns, conversions] = await Promise.all([

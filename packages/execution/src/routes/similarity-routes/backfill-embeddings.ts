@@ -28,7 +28,7 @@ export function registerBackfillEmbeddings(fastify: FastifyInstance): void {
       }
 
       const { limit } = request.body as { limit?: number };
-      const calls = await LLMCallRepository.findWithoutEmbedding(limit ?? 100);
+      const calls = await LLMCallRepository.findWithoutEmbedding(fastify.pg.pool, limit ?? 100);
 
       let processed = 0;
       let errors = 0;
@@ -36,7 +36,7 @@ export function registerBackfillEmbeddings(fastify: FastifyInstance): void {
       for (const call of calls) {
         try {
           const { embedding } = await OpenAIEmbeddingClient.generateEmbedding(call.prompt);
-          await LLMCallRepository.updateEmbedding(call.id, embedding);
+          await LLMCallRepository.updateEmbedding(fastify.pg.pool, call.id, embedding);
           processed++;
         } catch {
           errors++;

@@ -2,24 +2,19 @@ import Fastify from 'fastify';
 import type { FastifyInstance } from 'fastify';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { errorHandler } from './middleware/error-handler.middleware.js';
+import { plugin as configPlugin } from './plugins/config.plugin.js';
+import { plugin as postgresPlugin } from './plugins/postgres.plugin.js';
+import { plugin as redisPlugin } from './plugins/redis.plugin.js';
+import { plugin as sensiblePlugin } from './plugins/sensible.plugin.js';
+import { plugin as migratePlugin } from './plugins/migrate.plugin.js';
 import { healthRoutes } from './routes/health.routes.js';
-import { llmCallsRoutes } from './routes/llm-calls.route.js';
-import { patternRoutes } from './routes/pattern.routes.js';
-import gdprRoutes from './routes/gdpr.routes.js';
-import { similarityRoutes } from './routes/similarity.routes.js';
-import { costEventsRoutes } from './routes/cost-events.routes.js';
-import { routingRulesRoutes } from './routes/routing-rules-routes/index.js';
-import { routingRoutes } from './routes/routing-routes/index.js';
-import { traceRoutes } from './routes/trace.routes.js';
-import { spanRoutes } from './routes/span.routes.js';
-import { optimizationRoutes } from './routes/optimization.routes.js';
-import { prompttemplateRoutes } from './routes/prompt-template-routes/index.js';
-import { promptversionRoutes } from './routes/prompt-version-routes/index.js';
 import { otlpRoutes } from './routes/otlp-routes/index.js';
+import { registerApiRoutes } from './routes/register-routes.js';
 
 export interface CreateAppOptions {
   logger?: boolean;
   requireAuth?: boolean;
+  skipDb?: boolean;
   cors?: {
     origin: string | string[] | boolean;
     credentials?: boolean;
@@ -35,6 +30,7 @@ export async function createApp(
   const {
     logger = process.env.NODE_ENV !== 'production',
     requireAuth = false,
+    skipDb = false,
     cors,
   } = options;
 
@@ -43,6 +39,17 @@ export async function createApp(
     requestIdHeader: 'x-request-id',
     trustProxy: true,
   }).withTypeProvider<TypeBoxTypeProvider>();
+
+  // 1. Config
+  await app.register(configPlugin);
+
+  // 2. Infrastructure (skip in unit tests)
+  if (!skipDb) {
+    await app.register(postgresPlugin);
+    await app.register(redisPlugin);
+    await app.register(sensiblePlugin);
+    await app.register(migratePlugin);
+  }
 
   app.setErrorHandler(errorHandler);
 
@@ -69,23 +76,7 @@ export async function createApp(
   await app.register(otlpRoutes, { prefix: '/v1' });
 
   // Feature routes under /api/v1
-  await app.register(
-    async (api) => {
-      await api.register(llmCallsRoutes, { prefix: '/llm-calls' });
-      await api.register(patternRoutes, { prefix: '/patterns' });
-      await api.register(gdprRoutes);
-      await api.register(similarityRoutes, { prefix: '/similarity' });
-      await api.register(costEventsRoutes, { prefix: '/events/costs' });
-      await api.register(routingRulesRoutes, { prefix: '/routing-rules' });
-      await api.register(routingRoutes, { prefix: '/route' });
-      await api.register(traceRoutes, { prefix: '/traces' });
-      await api.register(spanRoutes, { prefix: '/spans' });
-      await api.register(optimizationRoutes, { prefix: '/optimizations' });
-      await api.register(prompttemplateRoutes, { prefix: '/prompt-templates' });
-      await api.register(promptversionRoutes, { prefix: '/prompt-versions' });
-    },
-    { prefix: '/api/v1' }
-  );
+  await app.register(registerApiRoutes, { prefix: '/api/v1' });
 
   return app;
 }

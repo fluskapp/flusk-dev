@@ -16,7 +16,7 @@ export function registerCreateRule(fastify: FastifyInstance): void {
       organizationId: string; name: string;
       qualityThreshold: number; fallbackModel: string; enabled?: boolean;
     };
-    const rule = await RoutingRuleRepository.create({
+    const rule = await RoutingRuleRepository.create(fastify.pg.pool, {
       ...body,
       enabled: body.enabled ?? false,
     });

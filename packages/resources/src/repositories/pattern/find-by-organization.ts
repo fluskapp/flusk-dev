@@ -1,20 +1,19 @@
+import type { Pool } from 'pg';
 import { PatternEntity } from '@flusk/entities';
-import { getPool } from './pool.js';
 import { rowToEntity } from './row-to-entity.js';
 import { PatternFilters } from './types.js';
 
 /**
- * Find patterns for a specific organization with filters
+ * Find patterns for an organization with filters
+ * @param pool - PostgreSQL connection pool
  * @param organizationId - UUID of the organization
  * @param filters - Optional filtering and sorting options
- * @returns Array of pattern entities matching the criteria
  */
 export async function findByOrganization(
+  pool: Pool,
   organizationId: string,
   filters: PatternFilters = {}
 ): Promise<PatternEntity[]> {
-  const db = getPool();
-
   const {
     minOccurrences = 1,
     minTotalCost = 0,
@@ -38,7 +37,7 @@ export async function findByOrganization(
     LIMIT $4 OFFSET $5
   `;
 
-  const result = await db.query(query, [
+  const result = await pool.query(query, [
     organizationId,
     minOccurrences,
     minTotalCost,

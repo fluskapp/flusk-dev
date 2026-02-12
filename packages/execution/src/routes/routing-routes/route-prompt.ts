@@ -16,11 +16,12 @@ const BodySchema = Type.Object({
 
 export function registerRoutePrompt(fastify: FastifyInstance): void {
   fastify.post('/', { schema: { body: BodySchema } }, async (request, reply) => {
+    const pool = fastify.pg.pool;
     const body = request.body as {
       ruleId: string; prompt: string; tokenCount: number; originalModel: string;
     };
 
-    const rule = await RoutingRuleRepository.findById(body.ruleId);
+    const rule = await RoutingRuleRepository.findById(pool, body.ruleId);
     if (!rule) return reply.status(404).send({ error: 'Rule not found' });
     if (!rule.enabled) return reply.status(400).send({ error: 'Rule is disabled' });
 
@@ -29,7 +30,7 @@ export function registerRoutePrompt(fastify: FastifyInstance): void {
       tokenCount: body.tokenCount,
     });
 
-    const perfData = await ModelPerformanceRepository.findByCategory(complexity.level);
+    const perfData = await ModelPerformanceRepository.findByCategory(pool, complexity.level);
 
     const selection = routing.selectModel({
       complexity: complexity.level,
@@ -38,7 +39,7 @@ export function registerRoutePrompt(fastify: FastifyInstance): void {
       modelPerformance: perfData,
     });
 
-    await RoutingDecisionRepository.create({
+    await RoutingDecisionRepository.create(pool, {
       ruleId: rule.id,
       selectedModel: selection.selectedModel,
       originalModel: body.originalModel,

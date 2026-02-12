@@ -1,23 +1,20 @@
+import type { Pool } from 'pg';
 import { PatternEntity } from '@flusk/entities';
-import { getPool } from './pool.js';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
  * Update pattern occurrence when a duplicate call is detected
- * Increments count, updates timestamps, recalculates averages, adds sample if needed
+ * @param pool - PostgreSQL connection pool
  * @param id - UUID of the pattern to update
  * @param newCost - Cost of the new occurrence
  * @param newPrompt - Optional new sample prompt to add
- * @returns Updated pattern entity or null if not found
  */
 export async function updateOccurrence(
+  pool: Pool,
   id: string,
   newCost: number,
   newPrompt?: string
 ): Promise<PatternEntity | null> {
-  const db = getPool();
-
-  // Build sample_prompts update logic
   const sampleUpdate = newPrompt
     ? `sample_prompts = array_append(
          CASE WHEN array_length(sample_prompts, 1) >= 5
@@ -41,7 +38,7 @@ export async function updateOccurrence(
   `;
 
   const values = newPrompt ? [id, newCost, newPrompt] : [id, newCost];
-  const result = await db.query(query, values);
+  const result = await pool.query(query, values);
 
   if (result.rows.length === 0) {
     return null;

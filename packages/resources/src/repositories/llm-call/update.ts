@@ -1,25 +1,23 @@
+import type { Pool } from 'pg';
 import { LLMCallEntity } from '@flusk/entities';
-import { getPool } from './pool.js';
 import { rowToEntity } from './row-to-entity.js';
 import { findById } from './find-by-id.js';
 
 /**
  * Update LLM call record
+ * @param pool - PostgreSQL connection pool
  * @param id - UUID of the LLM call to update
  * @param data - Partial data to update
- * @returns Updated LLM call entity or null if not found
  */
 export async function update(
+  pool: Pool,
   id: string,
   data: Partial<Omit<LLMCallEntity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<LLMCallEntity | null> {
-  const db = getPool();
-
   const updates: string[] = [];
   const values: any[] = [];
   let paramCount = 1;
 
-  // Build dynamic UPDATE query based on provided fields
   if (data.provider !== undefined) {
     updates.push(`provider = $${paramCount++}`);
     values.push(data.provider);
@@ -54,8 +52,7 @@ export async function update(
   }
 
   if (updates.length === 0) {
-    // No fields to update, just return existing record
-    return findById(id);
+    return findById(pool, id);
   }
 
   values.push(id);
@@ -66,7 +63,7 @@ export async function update(
     RETURNING *
   `;
 
-  const result = await db.query(query, values);
+  const result = await pool.query(query, values);
 
   if (result.rows.length === 0) {
     return null;

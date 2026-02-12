@@ -26,7 +26,7 @@ export async function optimizationRoutes(
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { organizationId } = request.body as { organizationId: string };
-      const results = await OptimizationRepository.generateForOrg(organizationId);
+      const results = await OptimizationRepository.generateForOrg(fastify.pg.pool, organizationId);
       return reply.code(200).send(results);
     }
   );
@@ -45,7 +45,7 @@ export async function optimizationRoutes(
       request: FastifyRequest<{ Params: { orgId: string } }>,
       reply: FastifyReply
     ) => {
-      const items = await OptimizationRepository.findByOrg(request.params.orgId);
+      const items = await OptimizationRepository.findByOrg(fastify.pg.pool, request.params.orgId);
       return reply.code(200).send(items);
     }
   );
@@ -75,6 +75,7 @@ export async function optimizationRoutes(
     ) => {
       const { status } = request.body as { status: string };
       const updated = await OptimizationRepository.update(
+        fastify.pg.pool,
         request.params.id,
         { status }
       );
@@ -103,7 +104,7 @@ export async function optimizationRoutes(
       request: FastifyRequest<{ Params: { id: string } }>,
       reply: FastifyReply
     ) => {
-      const entity = await OptimizationRepository.findById(request.params.id);
+      const entity = await OptimizationRepository.findById(fastify.pg.pool, request.params.id);
       if (!entity) return reply.code(404).send({ error: 'Not found' });
       return reply.code(200).send({
         code: entity.generatedCode,

@@ -1,17 +1,17 @@
+import type { Pool } from 'pg';
 import { LLMCallEntity } from '@flusk/entities';
-import { getPool } from './pool.js';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
  * Create a new LLM call record
+ * @param pool - PostgreSQL connection pool
  * @param llmCall - Partial LLM call data (id, timestamps auto-generated)
  * @returns Created LLM call entity with generated id and timestamps
  */
 export async function create(
+  pool: Pool,
   llmCall: Omit<LLMCallEntity, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<LLMCallEntity> {
-  const db = getPool();
-
   const query = `
     INSERT INTO llm_calls (
       provider, model, prompt, prompt_hash, tokens, cost,
@@ -34,6 +34,6 @@ export async function create(
     llmCall.consentPurpose ?? 'optimization',
   ];
 
-  const result = await db.query(query, values);
+  const result = await pool.query(query, values);
   return rowToEntity(result.rows[0]);
 }

@@ -1,5 +1,5 @@
+import type { Pool } from 'pg';
 import { LLMCallEntity } from '@flusk/entities';
-import { getPool } from './pool.js';
 import { rowToEntity } from './row-to-entity.js';
 
 export interface SimilarResult {
@@ -9,21 +9,18 @@ export interface SimilarResult {
 
 /**
  * Find LLM calls with similar embeddings using cosine similarity
+ * @param pool - PostgreSQL connection pool
  * @param embedding - Query embedding vector (1536-dim)
- * @param threshold - Minimum similarity (0-1, default 0.90)
+ * @param threshold - Minimum similarity (0-1, default 0.95)
  * @param limit - Max results (default 20)
- * @returns Calls sorted by similarity descending
  */
 export async function findSimilar(
+  pool: Pool,
   embedding: number[],
   threshold: number = 0.95,
   limit: number = 20
 ): Promise<SimilarResult[]> {
-  const db = getPool();
   const vectorStr = `[${embedding.join(',')}]`;
-
-  // cosine distance: 1 - cosine_similarity
-  // So we want distance < (1 - threshold)
   const maxDistance = 1 - threshold;
 
   const query = `
@@ -35,7 +32,7 @@ export async function findSimilar(
     LIMIT $3
   `;
 
-  const result = await db.query(query, [vectorStr, maxDistance, limit]);
+  const result = await pool.query(query, [vectorStr, maxDistance, limit]);
 
   return result.rows.map((row: any) => ({
     call: rowToEntity(row),
@@ -45,18 +42,19 @@ export async function findSimilar(
 
 /**
  * Find calls missing embeddings (for backfill)
+ * @param pool - PostgreSQL connection pool
  * @param limit - Max results
  */
 export async function findWithoutEmbedding(
+  pool: Pool,
   limit: number = 100
 ): Promise<LLMCallEntity[]> {
-  const db = getPool();
   const query = `
     SELECT * FROM llm_calls
     WHERE embedding IS NULL
     ORDER BY created_at DESC
     LIMIT $1
   `;
-  const result = await db.query(query, [limit]);
+  const result = await pool.query(query, [limit]);
   return result.rows.map(rowToEntity);
 }

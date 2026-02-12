@@ -1,0 +1,57 @@
+import { describe, it, expect } from 'vitest';
+import { getAttr, getStringAttr, getNumAttr } from './parse-attributes.js';
+import type { OtlpAttribute } from './types.js';
+
+const attrs: OtlpAttribute[] = [
+  { key: 'str', value: { stringValue: 'hello' } },
+  { key: 'int', value: { intValue: '42' } },
+  { key: 'dbl', value: { doubleValue: 3.14 } },
+  { key: 'bool', value: { boolValue: true } },
+];
+
+describe('getAttr', () => {
+  it('handles string values', () => {
+    expect(getAttr(attrs, 'str')).toBe('hello');
+  });
+
+  it('handles int values', () => {
+    expect(getAttr(attrs, 'int')).toBe(42);
+  });
+
+  it('handles double values', () => {
+    expect(getAttr(attrs, 'dbl')).toBe(3.14);
+  });
+
+  it('handles bool values', () => {
+    expect(getAttr(attrs, 'bool')).toBe(true);
+  });
+
+  it('returns undefined for missing keys', () => {
+    expect(getAttr(attrs, 'nope')).toBeUndefined();
+  });
+});
+
+describe('getStringAttr', () => {
+  it('returns string value', () => {
+    expect(getStringAttr(attrs, 'str')).toBe('hello');
+  });
+
+  it('returns empty string for non-string values', () => {
+    expect(getStringAttr(attrs, 'int')).toBe('');
+    expect(getStringAttr(attrs, 'bool')).toBe('');
+    expect(getStringAttr(attrs, 'missing')).toBe('');
+  });
+});
+
+describe('getNumAttr', () => {
+  it('returns number value', () => {
+    expect(getNumAttr(attrs, 'int')).toBe(42);
+    expect(getNumAttr(attrs, 'dbl')).toBe(3.14);
+  });
+
+  it('returns 0 for non-number values', () => {
+    expect(getNumAttr(attrs, 'str')).toBe(0);
+    expect(getNumAttr(attrs, 'bool')).toBe(0);
+    expect(getNumAttr(attrs, 'missing')).toBe(0);
+  });
+});

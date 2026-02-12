@@ -1,4 +1,4 @@
-import { getPool } from './pool.js';
+import type { Pool } from 'pg';
 
 export interface SavingsSummary {
   ruleId: string;
@@ -7,9 +7,11 @@ export interface SavingsSummary {
   avgSavedPerCall: number;
 }
 
-export async function getSavingsSummary(ruleId: string): Promise<SavingsSummary> {
-  const db = getPool();
-  const result = await db.query(
+export async function getSavingsSummary(
+  pool: Pool,
+  ruleId: string
+): Promise<SavingsSummary> {
+  const result = await pool.query(
     `SELECT
       COUNT(*)::int as decision_count,
       COALESCE(SUM(cost_saved), 0) as total_saved,

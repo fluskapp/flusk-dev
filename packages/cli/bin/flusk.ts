@@ -18,6 +18,7 @@ import { generatePackageCommand } from '../src/commands/generate-package.js';
 import { validateCommand } from '../src/commands/validate.js';
 import { generateMigrationCommand } from '../src/commands/generate-migration.js';
 import { generateRouteCommand } from '../src/commands/generate-route.js';
+import { setupCommand } from '../src/commands/setup.js';
 
 const program = new Command();
 
@@ -47,5 +48,6 @@ program.addCommand(generatePackageCommand);
 program.addCommand(validateCommand);
 program.addCommand(generateMigrationCommand);
 program.addCommand(generateRouteCommand);
+program.addCommand(setupCommand);
 
 program.parse(process.argv);

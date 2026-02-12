@@ -7,6 +7,6 @@ export function registerGetSavings(fastify: FastifyInstance): void {
     schema: { params: Type.Object({ ruleId: Type.String() }) },
   }, async (request) => {
     const { ruleId } = request.params as { ruleId: string };
-    return RoutingDecisionRepository.getSavingsSummary(ruleId);
+    return RoutingDecisionRepository.getSavingsSummary(fastify.pg.pool, ruleId);
   });
 }
