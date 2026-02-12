@@ -1,1 +1,0 @@
-{"version":3,"file":"validate-conversion.function.d.ts","sourceRoot":"","sources":["../../src/conversion/validate-conversion.function.ts"],"names":[],"mappings":"AAAA;;;GAGG;AAEH,OAAO,EAAE,gBAAgB,EAAE,MAAM,cAAc,CAAC;AAEhD;;;GAGG;AACH,wBAAgB,kBAAkB,CAChC,OAAO,EAAE,OAAO,CAAC,gBAAgB,CAAC,GACjC;IAAE,KAAK,EAAE,OAAO,CAAC;IAAC,MAAM,EAAE,MAAM,EAAE,CAAA;CAAE,CAatC"}
