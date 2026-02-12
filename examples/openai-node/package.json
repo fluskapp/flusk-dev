@@ -1,0 +1,16 @@
+{
+  "name": "@flusk/example-openai-node",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --import @flusk/otel dist/index.js",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@flusk/otel": "workspace:*",
+    "openai": "^4.77.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  }
+}

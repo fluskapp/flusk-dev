@@ -3,6 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "description": "Open-source LLM cost optimization platform — zero-code tracking via OpenTelemetry",
+  "keywords": ["llm", "opentelemetry", "cost-optimization", "openai", "anthropic", "observability"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AdirBenYossef/flusk.git"
+  },
+  "homepage": "https://github.com/AdirBenYossef/flusk",
+  "license": "MIT",
+  "author": "Adir Ben Yossef",
   "scripts": {
     "build": "pnpm -r build",
     "clean": "pnpm -r clean",
@@ -11,6 +20,7 @@
     "start:minimal": "tsx server-minimal.ts",
     "db:up": "docker compose up -d postgres redis",
     "db:down": "docker compose down",
+    "docker:up": "docker compose up",
     "db:migrate": "tsx scripts/migrate.ts",
     "example": "cd examples && pnpm start",
     "test": "vitest run",

@@ -1,12 +1,11 @@
 <p align="center">
-  <h1 align="center">Flusk</h1>
-  <p align="center"><strong>Flusk doesn't just show you the problem. It writes the fix.</strong></p>
+  <h1 align="center">⚡ Flusk</h1>
+  <p align="center"><strong>Cut your LLM costs by 50%+ with zero code changes.</strong></p>
+  <p align="center">Open-source LLM cost optimization — auto-detects waste, generates fixes.</p>
   <p align="center">
-    <a href="#quick-start">Quick Start</a> •
-    <a href="#features">Features</a> •
-    <a href="#how-it-works">How It Works</a> •
-    <a href="#api-reference">API</a> •
-    <a href="#self-hosting">Self-Hosting</a>
+    <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
+    <a href="https://github.com/AdirBenYossef/flusk/actions"><img src="https://img.shields.io/github/actions/workflow/status/AdirBenYossef/flusk/ci.yml?branch=main" alt="CI"></a>
+    <a href="https://www.npmjs.com/package/@flusk/otel"><img src="https://img.shields.io/npm/v/@flusk/otel.svg" alt="npm"></a>
   </p>
 </p>
 
@@ -14,163 +13,111 @@
 
 ## What is Flusk?
 
-Flusk is an open-source LLM cost optimization platform. It automatically tracks every LLM API call via OpenTelemetry auto-instrumentation — **zero code changes required**. It detects wasteful patterns (duplicate prompts, overqualified models) and generates code fixes that reduce your bill.
+Flusk tracks every LLM API call via OpenTelemetry auto-instrumentation — **zero code changes** — detects wasteful patterns (duplicate prompts, overqualified models), and generates code fixes that shrink your bill.
 
-## Features
+### Before Flusk vs After Flusk
 
-- **Zero-Touch LLM Tracking** — `node --require @flusk/otel` captures all OpenAI/Anthropic calls automatically
-- **Semantic Similarity Detection** — pgvector-powered duplicate/near-duplicate prompt detection
-- **Automatic Model Routing** — route prompts to cheaper models when quality permits
-- **Agentic Workflow Tracking** — traces and spans for multi-step LLM workflows
-- **Code Generation** — auto-generated optimization code (caching, model swaps, dedup)
-- **Prompt Versioning & A/B Testing** — version templates, render with variables, compare performance
-- **Real-Time Cost Events** — SSE stream of cost data as calls happen
+```diff
+- # You have no idea where $12k/month in LLM costs is going
+- # Duplicate prompts, GPT-4 doing GPT-3.5 work, no visibility
 
-## Quick Start
++ # Add one flag. That's it.
++ node --import @flusk/otel ./index.js
++
++ # ✅ Every LLM call tracked (model, tokens, cost, latency)
++ # ✅ Duplicate prompts detected → cache suggestions generated
++ # ✅ Overqualified models flagged → routing rules auto-created
++ # ✅ Real-time cost dashboard with SSE events
+```
 
-### 1. Set up Flusk server
+## 🚀 Quick Start
 
 ```bash
 git clone https://github.com/AdirBenYossef/flusk.git
-cd flusk
-cp .env.example .env
-docker compose up              # PostgreSQL + Redis + Flusk on :3000
+cd flusk && cp .env.example .env
+docker compose up       # PostgreSQL + Redis + Flusk on :3000
 ```
 
-### 2. Install the OTel package in your app
+Then in **your** app:
 
 ```bash
 npm install @flusk/otel
 ```
 
-### 3. Add one flag to your start command
-
 ```json
-{
-  "scripts": {
-    "start": "node --require @flusk/otel ./index.js"
-  }
-}
+{ "scripts": { "start": "node --import @flusk/otel ./index.js" } }
 ```
-
-### 4. Set environment variables
 
 ```bash
-FLUSK_API_KEY=your-flusk-api-key
-FLUSK_ENDPOINT=http://localhost:3000
-FLUSK_PROJECT_NAME=my-app
+FLUSK_ENDPOINT=http://localhost:3000 npm start
 ```
 
-**That's it.** Your LLM calls are now tracked automatically. No code changes needed.
+**Done.** Your LLM calls are now tracked. No wrappers. No SDK imports. Just OTel.
 
-```typescript
-// Your code stays exactly the same — no wrappers, no imports
-import OpenAI from 'openai';
-const openai = new OpenAI();
+## ✨ Features
 
-const response = await openai.chat.completions.create({
-  model: 'gpt-4',
-  messages: [{ role: 'user', content: 'Hello' }],
-});
-// Flusk captures this automatically via OTel ✨
-```
+- ✅ **Zero-Touch Tracking** — `--import @flusk/otel` auto-instruments OpenAI, Anthropic, Bedrock
+- ✅ **Duplicate Detection** — pgvector semantic similarity finds repeated/near-identical prompts
+- ✅ **Model Routing** — auto-route prompts to cheaper models when quality permits
+- ✅ **Code Generation** — generates caching, model swap, and dedup code for you
+- ✅ **Prompt Versioning** — version templates, A/B test, compare performance
+- ✅ **Real-Time Events** — SSE stream of cost data as calls happen
+- ✅ **Self-Hosted** — your data stays on your infrastructure
 
-## How It Works
-
-Flusk uses OpenTelemetry auto-instrumentation (`@opentelemetry/instrumentation-openai`) to capture all LLM API calls without touching your code. Traces are sent to Flusk's OTLP endpoint where they're parsed, analyzed, and stored.
+## 🏗️ Architecture
 
 ```
-Your App (unchanged)
-  │ node --require @flusk/otel
-  │ ↓ auto-instruments OpenAI/Anthropic/HTTP
-  │
-  │ OTLP/HTTP traces
+Your App (unchanged code)
+  │ node --import @flusk/otel
   ▼
-Flusk Server (POST /v1/traces)
-  → Parse GenAI semantic conventions
-  → Extract: model, tokens, cost, latency, content
-  → Store, detect patterns, generate optimizations
+┌────────────────────────────────────────┐
+│  Flusk Server (Fastify)                │
+│  ┌──────────┐  ┌───────────────────┐   │
+│  │ OTLP     │→ │ Pattern Detection │   │
+│  │ Ingestion│  │ (pgvector)        │   │
+│  └──────────┘  └───────────────────┘   │
+│  ┌──────────┐  ┌───────────────────┐   │
+│  │ Model    │  │ Code Generation   │   │
+│  │ Routing  │  │ (Optimizations)   │   │
+│  └──────────┘  └───────────────────┘   │
+│          PostgreSQL + Redis            │
+└────────────────────────────────────────┘
 ```
 
-## Programmatic SDK
+## 📊 Comparison
 
-For features like model routing and prompt versioning, use `@flusk/sdk`:
+| Feature | Flusk | Helicone | Langfuse | Portkey |
+|---------|-------|----------|----------|---------|
+| Zero-code instrumentation | ✅ OTel | ⚠️ Proxy | ⚠️ SDK | ⚠️ Proxy |
+| Self-hosted | ✅ | ✅ | ✅ | ❌ |
+| Auto-generates fixes | ✅ | ❌ | ❌ | ❌ |
+| Semantic dedup detection | ✅ | ❌ | ❌ | ❌ |
+| Model routing | ✅ | ❌ | ❌ | ✅ |
+| Open source | ✅ MIT | ✅ | ✅ | Partial |
 
-```typescript
-import { FluskClient } from '@flusk/sdk';
-
-const flusk = new FluskClient({
-  apiKey: 'your-flusk-api-key',
-  baseUrl: 'http://localhost:3000',
-});
-
-// Model routing
-const result = await flusk.route({
-  ruleId: 'my-rule',
-  prompt: 'Summarize this article...',
-  tokenCount: 500,
-  originalModel: 'gpt-4',
-});
-
-// Prompt versioning
-const rendered = await flusk.renderPrompt('summarize-v2', {
-  article: 'The quick brown fox...',
-});
-```
-
-## Architecture
+## 🗂️ Monorepo Structure
 
 ```
-flusk/
-├── packages/
-│   ├── otel/             # @flusk/otel — zero-touch OTel auto-instrumentation
-│   ├── entities/         # TypeBox schemas — single source of truth
-│   ├── types/            # Derived TS types (Insert, Update, Query)
-│   ├── business-logic/   # Pure functions, no I/O, no side effects
-│   ├── resources/        # DB repositories, migrations, clients (pg, Redis)
-│   ├── execution/        # Fastify app: routes, plugins, hooks, OTLP ingestion
-│   ├── sdk/node/         # Client SDK (routing, prompts, optimizations)
-│   └── cli/              # Code generators, validators
-├── server.ts             # Entry point
-├── docker-compose.yml    # One-command local dev
-└── Dockerfile            # Multi-stage production build
+packages/
+  otel/             @flusk/otel — zero-touch OTel auto-instrumentation
+  entities/         TypeBox schemas — single source of truth
+  types/            Derived TS types (Insert, Update, Query)
+  business-logic/   Pure functions, no I/O
+  resources/        DB repositories, migrations (pg, Redis)
+  execution/        Fastify app: routes, plugins, OTLP ingestion
+  cli/              Code generators, validators
 ```
 
-## API Reference
+## 📖 Examples
 
-All routes are prefixed with `/api/v1` except OTLP ingestion (`/v1/traces`).
+- [`examples/openai-node/`](./examples/openai-node/) — OpenAI with zero-touch tracking
+- [`examples/anthropic-node/`](./examples/anthropic-node/) — Anthropic with zero-touch tracking
+- [`examples/bedrock-node/`](./examples/bedrock-node/) — AWS Bedrock with zero-touch tracking
 
-| Method | Path | Description |
-|--------|------|-------------|
-| `POST` | `/v1/traces` | OTLP trace ingestion (OpenTelemetry) |
-| `POST` | `/api/v1/llm-calls` | Record an LLM call |
-| `GET` | `/api/v1/llm-calls/:id` | Get call by ID |
-| `GET` | `/api/v1/patterns` | List detected patterns |
-| `POST` | `/api/v1/route` | Route a prompt to optimal model |
-| `GET` | `/api/v1/optimizations` | List optimization suggestions |
-| `GET` | `/api/v1/prompt-templates` | List templates |
-| `GET` | `/api/v1/events/costs` | SSE stream of real-time cost events |
+## 🤝 Contributing
 
-See [API Reference](./docs/api-reference.md) for full documentation.
+We love contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup instructions and guidelines.
 
-## Self-Hosting
-
-```bash
-git clone https://github.com/AdirBenYossef/flusk.git
-cd flusk
-cp .env.example .env
-docker compose up -d
-```
-
-### Key Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `DATABASE_URL` | `postgresql://flusk:...@localhost:5432/flusk` | PostgreSQL connection |
-| `REDIS_URL` | `redis://localhost:6379/0` | Redis connection |
-| `FLUSK_API_KEY` | `test_org_key` | API authentication key |
-| `PORT` | `3000` | Server port |
-
-## License
+## 📄 License
 
 [MIT](LICENSE) © Adir Ben Yossef 2026
