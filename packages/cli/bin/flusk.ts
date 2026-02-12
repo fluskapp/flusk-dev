@@ -25,6 +25,11 @@ import { generateEnvCommand } from '../src/commands/generate-env.js';
 import { generateWattCommand } from '../src/commands/generate-watt.js';
 import { generateSwaggerCommand } from '../src/commands/generate-swagger.js';
 import { generateEntrypointCommand } from '../src/commands/generate-entrypoint.js';
+import { dashboardCommand } from '../src/commands/dashboard.js';
+import { generateTuiComponentCommand } from '../src/commands/generate-tui-component.js';
+import { generateTuiHookCommand } from '../src/commands/generate-tui-hook.js';
+import { generateTuiScreenCommand } from '../src/commands/generate-tui-screen.js';
+import { generateTuiAppCommand } from '../src/commands/generate-tui-app.js';
 
 const program = new Command();
 
@@ -63,5 +68,14 @@ program.addCommand(generateEnvCommand);
 program.addCommand(generateWattCommand);
 program.addCommand(generateSwaggerCommand);
 program.addCommand(generateEntrypointCommand);
+
+// Dashboard
+program.addCommand(dashboardCommand);
+
+// TUI generators
+program.addCommand(generateTuiComponentCommand);
+program.addCommand(generateTuiHookCommand);
+program.addCommand(generateTuiScreenCommand);
+program.addCommand(generateTuiAppCommand);
 
 program.parse(process.argv);
