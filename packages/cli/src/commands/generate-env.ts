@@ -1,0 +1,24 @@
+import { Command } from 'commander';
+import chalk from 'chalk';
+import { generateEnv } from '../generators/env.generator.js';
+
+export const generateEnvCommand = new Command('g:env')
+  .description('Generate .env.example with all environment variables')
+  .option('--name <name>', 'Project name', 'flusk')
+  .option('--postgres-port <port>', 'PostgreSQL port', '5432')
+  .option('--redis-port <port>', 'Redis port', '6379')
+  .action(async (options) => {
+    console.log(chalk.blue('\n📋 Generating .env.example...\n'));
+    try {
+      const result = await generateEnv({
+        projectName: options.name,
+        postgresPort: parseInt(options.postgresPort, 10),
+        redisPort: parseInt(options.redisPort, 10),
+      });
+      console.log(chalk.green(`✅ ${result.path}`));
+      console.log(chalk.green('\n✨ .env.example generated!\n'));
+    } catch (error) {
+      console.error(chalk.red(`\n❌ ${(error as Error).message}\n`));
+      process.exit(1);
+    }
+  });

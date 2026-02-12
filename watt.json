@@ -1,24 +1,35 @@
 {
-  "$schema": "https://schemas.platformatic.dev/watt/3.0.0",
+  "$schema": "https://platformatic.dev/schemas/v3.37.0/watt",
+  "composer": {
+    "services": [
+      {
+        "id": "main",
+        "path": "./packages/execution",
+        "config": "watt.service.json"
+      }
+    ],
+    "refreshTimeout": 1000
+  },
   "server": {
-    "hostname": "0.0.0.0",
-    "port": 3000,
+    "hostname": "{HOST}",
+    "port": "{PORT}",
     "logger": {
-      "level": "info"
+      "level": "{LOG_LEVEL}"
     }
   },
-  "services": [
-    {
-      "id": "api",
-      "path": ".",
-      "entrypoint": "server.ts"
-    }
-  ],
+  "watch": {
+    "enabled": "{NODE_ENV !== 'production'}",
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      "**/*.test.ts",
+      "**/*.spec.ts"
+    ]
+  },
   "metrics": {
-    "server": "own",
+    "server": "hide",
     "defaultMetrics": {
       "enabled": true
     }
-  },
-  "managementApi": true
+  }
 }

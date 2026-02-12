@@ -1,0 +1,22 @@
+import { Command } from 'commander';
+import chalk from 'chalk';
+import { generateWatt } from '../generators/watt.generator.js';
+
+export const generateWattCommand = new Command('g:watt')
+  .description('Generate Platformatic Watt config (watt.json)')
+  .option('--name <name>', 'Project name', 'flusk')
+  .option('--port <port>', 'Server port', '3000')
+  .action(async (options) => {
+    console.log(chalk.blue('\n⚡ Generating watt.json...\n'));
+    try {
+      const result = await generateWatt({
+        projectName: options.name,
+        port: parseInt(options.port, 10),
+      });
+      console.log(chalk.green(`✅ ${result.path}`));
+      console.log(chalk.green('\n✨ watt.json generated!\n'));
+    } catch (error) {
+      console.error(chalk.red(`\n❌ ${(error as Error).message}\n`));
+      process.exit(1);
+    }
+  });

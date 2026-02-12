@@ -19,6 +19,12 @@ import { validateCommand } from '../src/commands/validate.js';
 import { generateMigrationCommand } from '../src/commands/generate-migration.js';
 import { generateRouteCommand } from '../src/commands/generate-route.js';
 import { setupCommand } from '../src/commands/setup.js';
+import { generateDockerfileCommand } from '../src/commands/generate-dockerfile.js';
+import { generateDockerComposeCommand } from '../src/commands/generate-docker-compose.js';
+import { generateEnvCommand } from '../src/commands/generate-env.js';
+import { generateWattCommand } from '../src/commands/generate-watt.js';
+import { generateSwaggerCommand } from '../src/commands/generate-swagger.js';
+import { generateEntrypointCommand } from '../src/commands/generate-entrypoint.js';
 
 const program = new Command();
 
@@ -49,5 +55,13 @@ program.addCommand(validateCommand);
 program.addCommand(generateMigrationCommand);
 program.addCommand(generateRouteCommand);
 program.addCommand(setupCommand);
+
+// Infrastructure generators
+program.addCommand(generateDockerfileCommand);
+program.addCommand(generateDockerComposeCommand);
+program.addCommand(generateEnvCommand);
+program.addCommand(generateWattCommand);
+program.addCommand(generateSwaggerCommand);
+program.addCommand(generateEntrypointCommand);
 
 program.parse(process.argv);

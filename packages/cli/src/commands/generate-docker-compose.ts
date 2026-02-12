@@ -1,0 +1,24 @@
+import { Command } from 'commander';
+import chalk from 'chalk';
+import { generateDockerCompose } from '../generators/docker-compose.generator.js';
+
+export const generateDockerComposeCommand = new Command('g:docker-compose')
+  .description('Generate docker-compose.yml with all services')
+  .option('--name <name>', 'Project name', 'flusk')
+  .option('--postgres-port <port>', 'PostgreSQL port', '5432')
+  .option('--redis-port <port>', 'Redis port', '6379')
+  .action(async (options) => {
+    console.log(chalk.blue('\n🐳 Generating docker-compose.yml...\n'));
+    try {
+      const result = await generateDockerCompose({
+        projectName: options.name,
+        postgresPort: parseInt(options.postgresPort, 10),
+        redisPort: parseInt(options.redisPort, 10),
+      });
+      console.log(chalk.green(`✅ ${result.path}`));
+      console.log(chalk.green('\n✨ docker-compose.yml generated!\n'));
+    } catch (error) {
+      console.error(chalk.red(`\n❌ ${(error as Error).message}\n`));
+      process.exit(1);
+    }
+  });
