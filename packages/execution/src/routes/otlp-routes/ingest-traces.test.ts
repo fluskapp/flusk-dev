@@ -1,45 +1,61 @@
 import { describe, it, expect, vi } from 'vitest';
 
-// Mock parse-llm-span before importing handler
 vi.mock('./parse-llm-span.js', () => ({
-  isGenAiSpan: vi.fn((span) => span.attributes?.some((a: { key: string }) => a.key.startsWith('gen_ai.'))),
+  isGenAiSpan: vi.fn((span) =>
+    span.attributes?.some((a: { key: string }) => a.key.startsWith('gen_ai.'))
+  ),
   parseLlmSpan: vi.fn((span) => ({ model: 'gpt-4', spanId: span.spanId })),
 }));
 
+vi.mock('./map-span-to-llm-call.js', () => ({
+  mapSpanToLlmCall: vi.fn((parsed) => ({ ...parsed, mapped: true })),
+}));
+
+vi.mock('@flusk/resources', () => ({
+  LLMCallRepository: {
+    create: vi.fn(async (_pool: unknown, data: unknown) => ({ id: '1', ...data as object })),
+  },
+}));
+
 import { ingestTracesHandler } from './ingest-traces.js';
+import { LLMCallRepository } from '@flusk/resources';
 
 function makeApp() {
-  const injected: Array<{ url: string; payload: unknown }> = [];
   const routes: Record<string, Function> = {};
-  const app = {
-    post: vi.fn((_path: string, handler: Function) => { routes['post'] = handler; }),
-    inject: vi.fn(async (opts: { url: string; payload: unknown }) => { injected.push(opts); }),
+  return {
+    app: {
+      post: vi.fn((_path: string, handler: Function) => { routes['post'] = handler; }),
+      pg: { pool: {} },
+      eventBus: { emit: vi.fn() },
+    },
+    routes,
   };
-  return { app, injected, routes };
 }
 
-async function setup() {
-  const { app, injected, routes } = makeApp();
-  await ingestTracesHandler(app as any);
-  const handler = routes['post']!;
-  return { handler, injected, app };
-}
-
-const genAiSpan = { spanId: 's1', attributes: [{ key: 'gen_ai.system', value: { stringValue: 'openai' } }] };
-const httpSpan = { spanId: 's2', attributes: [{ key: 'http.method', value: { stringValue: 'GET' } }] };
+const genAiSpan = {
+  spanId: 's1',
+  attributes: [{ key: 'gen_ai.system', value: { stringValue: 'openai' } }],
+};
+const httpSpan = {
+  spanId: 's2',
+  attributes: [{ key: 'http.method', value: { stringValue: 'GET' } }],
+};
 
 describe('ingestTracesHandler', () => {
   it('filters only GenAI spans from mixed data', async () => {
-    const { handler, injected, app } = await setup();
+    const { app, routes } = makeApp();
+    await ingestTracesHandler(app as any);
+    const handler = routes['post']!;
     const body = { resourceSpans: [{ scopeSpans: [{ spans: [genAiSpan, httpSpan] }] }] };
     const reply = { status: vi.fn().mockReturnThis(), send: vi.fn() };
     await handler({ body, headers: {}, log: { error: vi.fn() } }, reply);
-    expect(injected).toHaveLength(1);
-    expect(injected[0]!.url).toBe('/api/v1/llm-calls');
+    expect(LLMCallRepository.create).toHaveBeenCalledTimes(1);
   });
 
   it('returns 200 with partialSuccess on empty input', async () => {
-    const { handler } = await setup();
+    const { app, routes } = makeApp();
+    await ingestTracesHandler(app as any);
+    const handler = routes['post']!;
     const body = { resourceSpans: [] };
     const reply = { status: vi.fn().mockReturnThis(), send: vi.fn() };
     await handler({ body, headers: {}, log: { error: vi.fn() } }, reply);
@@ -47,14 +63,18 @@ describe('ingestTracesHandler', () => {
     expect(reply.send).toHaveBeenCalledWith({ partialSuccess: {} });
   });
 
-  it('handles malformed spans gracefully', async () => {
-    const { handler, app } = await setup();
-    vi.mocked(app.inject).mockRejectedValueOnce(new Error('boom'));
+  it('handles failed spans gracefully', async () => {
+    const { app, routes } = makeApp();
+    await ingestTracesHandler(app as any);
+    vi.mocked(LLMCallRepository.create).mockRejectedValueOnce(new Error('boom'));
+    const handler = routes['post']!;
     const body = { resourceSpans: [{ scopeSpans: [{ spans: [genAiSpan] }] }] };
     const logError = vi.fn();
     const reply = { status: vi.fn().mockReturnThis(), send: vi.fn() };
     await handler({ body, headers: {}, log: { error: logError } }, reply);
     expect(logError).toHaveBeenCalled();
-    expect(reply.status).toHaveBeenCalledWith(200);
+    expect(reply.send).toHaveBeenCalledWith(
+      expect.objectContaining({ partialSuccess: { rejectedSpans: 1 } })
+    );
   });
 });
