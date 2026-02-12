@@ -8,6 +8,7 @@ import { plugin as redisPlugin } from './plugins/redis.plugin.js';
 import { plugin as sensiblePlugin } from './plugins/sensible.plugin.js';
 import { plugin as migratePlugin } from './plugins/migrate.plugin.js';
 import { plugin as eventBusPlugin } from './plugins/event-bus.plugin.js';
+import { plugin as swaggerPlugin } from './plugins/swagger.plugin.js';
 import { healthRoutes } from './routes/health.routes.js';
 import { otlpRoutes } from './routes/otlp-routes/index.js';
 import { registerApiRoutes } from './routes/register-routes.js';
@@ -52,9 +53,10 @@ export async function createApp(
     await app.register(migratePlugin);
   }
 
-  // Event bus + WebSocket (always available)
+  // Event bus + WebSocket + Swagger (always available)
   await app.register(eventBusPlugin);
   await app.register(import('@fastify/websocket'));
+  await app.register(swaggerPlugin);
 
   app.setErrorHandler(errorHandler);
 

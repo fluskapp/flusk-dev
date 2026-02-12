@@ -46,6 +46,18 @@ services:
     networks:
       - flusk
 
+  jaeger:
+    image: jaegertracing/jaeger:2
+    container_name: ${COMPOSE_PROJECT_NAME:-flusk}-jaeger
+    restart: unless-stopped
+    ports:
+      - "16686:16686"
+      - "4318:4318"
+    environment:
+      COLLECTOR_OTLP_ENABLED: "true"
+    networks:
+      - flusk
+
   flusk:
     build:
       context: .
@@ -66,6 +78,7 @@ services:
       VECTOR_SIMILARITY_THRESHOLD: ${VECTOR_SIMILARITY_THRESHOLD:-0.95}
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://jaeger:4318
     depends_on:
       postgres:
         condition: service_healthy

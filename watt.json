@@ -1,0 +1,24 @@
+{
+  "$schema": "https://schemas.platformatic.dev/watt/3.0.0",
+  "server": {
+    "hostname": "0.0.0.0",
+    "port": 3000,
+    "logger": {
+      "level": "info"
+    }
+  },
+  "services": [
+    {
+      "id": "api",
+      "path": ".",
+      "entrypoint": "server.ts"
+    }
+  ],
+  "metrics": {
+    "server": "own",
+    "defaultMetrics": {
+      "enabled": true
+    }
+  },
+  "managementApi": true
+}
