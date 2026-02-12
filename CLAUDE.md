@@ -27,7 +27,9 @@ packages/
 
 ## Adding a New Feature (Step-by-Step)
 
-### ⚠️ ALWAYS use the generator first
+### ⚠️ ALWAYS use the generator — no exceptions
+
+**Rule: All code must be generated via the CLI generators whenever possible.** This includes new features, refactors, pivots, and architectural changes. The majority of code should come from generators — manual code is only for customizing the generated stubs. If a refactor/pivot requires new patterns the generator doesn't support yet, **update the generator first**, then use it to generate the code.
 
 ```bash
 # From project root:
@@ -50,7 +52,9 @@ This creates all files across all packages and wires them together (entity, type
 - No support for entities that don't extend BaseEntitySchema (e.g., immutable records without updatedAt)
 - Generated barrel updaters append but don't check for existing exports
 
-### Option B: Manual (follow this order — only if generator doesn't fit)
+### Option B: Manual (LAST RESORT — only if generator genuinely can't handle it)
+
+**Before writing manual code:** Consider if the generator should be extended to handle this case. Prefer updating the generator over manual code.
 
 1. **Entity** — `packages/entities/src/<name>.entity.ts`
    - Define TypeBox schema extending `BaseEntitySchema`
