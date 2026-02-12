@@ -29,7 +29,7 @@ export interface OtlpTraceRequest {
 }
 
 export interface ParsedLlmCall {
-  provider: 'openai' | 'anthropic' | 'other';
+  provider: 'openai' | 'anthropic' | 'bedrock' | 'other';
   model: string;
   prompt: string;
   response: string;

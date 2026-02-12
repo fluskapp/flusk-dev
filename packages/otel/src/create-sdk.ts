@@ -4,6 +4,7 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
+import { BedrockInstrumentation } from '@traceloop/instrumentation-bedrock';
 import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import type { FluskOtelConfig } from './config.js';
@@ -20,6 +21,7 @@ export function createSdk(config: FluskOtelConfig): NodeSDK {
   });
 
   const instrumentations = [
+    new BedrockInstrumentation(),
     getNodeAutoInstrumentations({
       '@opentelemetry/instrumentation-openai': {
         captureContent: config.captureContent,

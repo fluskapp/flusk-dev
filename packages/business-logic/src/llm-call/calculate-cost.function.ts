@@ -1,10 +1,12 @@
 import type { TokenUsage } from '@flusk/entities';
+import { BEDROCK_PRICING } from './providers/bedrock.pricing.js';
 
 /**
  * Pricing table for LLM providers (USD per 1M tokens)
  * Updated as of February 2026
  */
 const PRICING = {
+  bedrock: BEDROCK_PRICING,
   openai: {
     'gpt-4': { input: 30.0, output: 60.0 },
     'gpt-4-turbo': { input: 10.0, output: 30.0 },

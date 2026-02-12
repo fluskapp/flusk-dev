@@ -26,6 +26,7 @@ import { generateWattCommand } from '../src/commands/generate-watt.js';
 import { generateSwaggerCommand } from '../src/commands/generate-swagger.js';
 import { generateEntrypointCommand } from '../src/commands/generate-entrypoint.js';
 import { dashboardCommand } from '../src/commands/dashboard.js';
+import { generateProviderCommand } from '../src/commands/generate-provider.js';
 import { generateTuiComponentCommand } from '../src/commands/generate-tui-component.js';
 import { generateTuiHookCommand } from '../src/commands/generate-tui-hook.js';
 import { generateTuiScreenCommand } from '../src/commands/generate-tui-screen.js';
@@ -71,6 +72,9 @@ program.addCommand(generateEntrypointCommand);
 
 // Dashboard
 program.addCommand(dashboardCommand);
+
+// Provider generator
+program.addCommand(generateProviderCommand);
 
 // TUI generators
 program.addCommand(generateTuiComponentCommand);

@@ -7,3 +7,8 @@ export { calculateCost } from './calculate-cost.function.js';
 export { hashPrompt } from './hash-prompt.function.js';
 export { validateTokens } from './validate-tokens.function.js';
 export { normalizeProvider } from './normalize-provider.function.js';
+export {
+  BEDROCK_SYSTEM_VALUES,
+  BEDROCK_MODEL_PREFIXES,
+  normalizBedrockModelId,
+} from './providers/index.js';

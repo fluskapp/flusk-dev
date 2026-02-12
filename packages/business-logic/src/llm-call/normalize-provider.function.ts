@@ -6,7 +6,7 @@ export type ProviderInput = string;
 /**
  * Output type for normalizeProvider function
  */
-export type ProviderOutput = 'openai' | 'anthropic' | 'azure' | 'google' | 'custom';
+export type ProviderOutput = 'openai' | 'anthropic' | 'azure' | 'google' | 'bedrock' | 'custom';
 
 /**
  * Map of provider aliases to canonical provider names
@@ -22,6 +22,10 @@ const PROVIDER_ALIASES: Record<string, ProviderOutput> = {
   'google': 'google',
   'gemini': 'google',
   'vertex': 'google',
+  'bedrock': 'bedrock',
+  'aws.bedrock': 'bedrock',
+  'aws_bedrock': 'bedrock',
+  'aws-bedrock': 'bedrock',
 };
 
 /**
