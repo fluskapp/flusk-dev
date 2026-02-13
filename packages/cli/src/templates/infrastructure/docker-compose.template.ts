@@ -55,6 +55,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./docker/postgres/init:/docker-entrypoint-initdb.d
+      - ./profiles:/app/profiles
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U \${POSTGRES_USER:-${projectName}} -d \${POSTGRES_DB:-${projectName}}"]
       interval: 10s

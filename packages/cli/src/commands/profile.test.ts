@@ -1,0 +1,55 @@
+/**
+ * Unit tests for profile command
+ */
+
+import { test, describe } from 'node:test';
+import assert from 'node:assert';
+import {
+  profileCommand,
+  profileRunCommand,
+  profileGenerateCommand,
+  profileAnalyzeCommand,
+} from './profile.js';
+
+describe('Profile Command', () => {
+  test('profile command has correct name', () => {
+    assert.strictEqual(profileCommand.name(), 'profile');
+  });
+
+  test('profile command has three subcommands', () => {
+    const names = profileCommand.commands.map((c) => c.name());
+    assert.deepStrictEqual(names, ['run', 'generate', 'analyze']);
+  });
+
+  test('run subcommand accepts optional script argument', () => {
+    const args = profileRunCommand.registeredArguments;
+    assert.strictEqual(args.length, 1);
+    assert.strictEqual(args[0].required, false);
+  });
+
+  test('generate subcommand requires pprof-file argument', () => {
+    const args = profileGenerateCommand.registeredArguments;
+    assert.strictEqual(args.length, 1);
+    assert.strictEqual(args[0].required, true);
+  });
+
+  test('analyze subcommand requires md-file argument', () => {
+    const args = profileAnalyzeCommand.registeredArguments;
+    assert.strictEqual(args.length, 1);
+    assert.strictEqual(args[0].required, true);
+  });
+
+  test('run subcommand has duration option', () => {
+    const opt = profileRunCommand.options.find(
+      (o) => o.long === '--duration',
+    );
+    assert.ok(opt, 'should have --duration option');
+  });
+
+  test('generate subcommand has output option', () => {
+    const opt = profileGenerateCommand.options.find(
+      (o) => o.long === '--output',
+    );
+    assert.ok(opt, 'should have --output option');
+  });
+});

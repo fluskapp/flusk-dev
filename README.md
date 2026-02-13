@@ -163,6 +163,24 @@ packages/
 - [`examples/anthropic-node/`](./examples/anthropic-node/) — Anthropic with zero-touch tracking
 - [`examples/bedrock-node/`](./examples/bedrock-node/) — AWS Bedrock with zero-touch tracking
 
+## 🔥 Performance Profiling
+
+Flusk integrates [`@platformatic/flame`](https://github.com/platformatic/flame) for CPU profiling and flamegraph generation.
+
+```bash
+# Scaffold profiling config
+flusk g:profile
+
+# Profile your server (default 30s)
+flusk profile run ./dist/index.js --duration 60
+
+# Generate flamegraph from pprof output
+flusk profile generate ./profiles/cpu.pprof
+
+# View hotspot summary
+flusk profile analyze ./profiles/cpu.md
+```
+
 ## 🤝 Contributing
 
 We love contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup instructions and guidelines.

@@ -31,6 +31,8 @@ import { generateTuiComponentCommand } from '../src/commands/generate-tui-compon
 import { generateTuiHookCommand } from '../src/commands/generate-tui-hook.js';
 import { generateTuiScreenCommand } from '../src/commands/generate-tui-screen.js';
 import { generateTuiAppCommand } from '../src/commands/generate-tui-app.js';
+import { profileCommand } from '../src/commands/profile.js';
+import { generateProfileCommand } from '../src/commands/generate-profile.js';
 
 const program = new Command();
 
@@ -81,5 +83,9 @@ program.addCommand(generateTuiComponentCommand);
 program.addCommand(generateTuiHookCommand);
 program.addCommand(generateTuiScreenCommand);
 program.addCommand(generateTuiAppCommand);
+
+// Performance profiling
+program.addCommand(profileCommand);
+program.addCommand(generateProfileCommand);
 
 program.parse(process.argv);
