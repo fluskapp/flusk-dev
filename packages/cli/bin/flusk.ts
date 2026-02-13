@@ -33,6 +33,9 @@ import { generateTuiScreenCommand } from '../src/commands/generate-tui-screen.js
 import { generateTuiAppCommand } from '../src/commands/generate-tui-app.js';
 import { profileCommand } from '../src/commands/profile.js';
 import { generateProfileCommand } from '../src/commands/generate-profile.js';
+import { generateFastifyPluginCommand } from '../src/commands/generate-fastify-plugin.js';
+import { generateOtelHookCommand } from '../src/commands/generate-otel-hook.js';
+import { generateDetectorCommand } from '../src/commands/generate-detector.js';
 
 const program = new Command();
 
@@ -87,5 +90,10 @@ program.addCommand(generateTuiAppCommand);
 // Performance profiling
 program.addCommand(profileCommand);
 program.addCommand(generateProfileCommand);
+
+// Fastify plugin, OTel hook, detector generators
+program.addCommand(generateFastifyPluginCommand);
+program.addCommand(generateOtelHookCommand);
+program.addCommand(generateDetectorCommand);
 
 program.parse(process.argv);

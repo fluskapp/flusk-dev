@@ -1,0 +1,35 @@
+/**
+ * CLI command: flusk g:hook <name>
+ * Scaffolds an OTel SpanProcessor hook
+ */
+
+import { Command } from 'commander';
+import chalk from 'chalk';
+import { generateOtelHook } from '../generators/otel-hook.generator.js';
+
+export const generateOtelHookCommand = new Command('g:hook')
+  .description('Generate an OTel SpanProcessor hook')
+  .argument('<name>', 'Hook name in kebab-case (e.g., auto-profile)')
+  .option('--span-filter <prefixes>', 'Comma-separated span name prefixes')
+  .action(async (name: string, options) => {
+    if (!/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(name)) {
+      console.error(chalk.red('Error: Name must be kebab-case'));
+      process.exit(1);
+    }
+
+    console.log(chalk.blue(`\n🪝 Generating OTel hook: ${name}\n`));
+
+    try {
+      const result = await generateOtelHook({
+        name,
+        spanFilter: options.spanFilter,
+      });
+      for (const f of result.files) {
+        console.log(chalk.green(`  ✅ ${f.path}`));
+      }
+      console.log(chalk.green('\n✨ OTel hook generated!\n'));
+    } catch (error) {
+      console.error(chalk.red(`\n❌ Failed: ${error}`));
+      process.exit(1);
+    }
+  });

@@ -1,0 +1,39 @@
+/**
+ * CLI command: flusk g:fastify-plugin <name>
+ * Scaffolds a Fastify plugin with fp wrapper
+ */
+
+import { Command } from 'commander';
+import chalk from 'chalk';
+import { generateFastifyPlugin } from '../generators/fastify-plugin.generator.js';
+
+export const generateFastifyPluginCommand = new Command('g:fastify-plugin')
+  .description('Generate a Fastify plugin with fastify-plugin wrapper')
+  .argument('<name>', 'Plugin name in kebab-case (e.g., flame-profile)')
+  .option('--package <pkg>', 'Target package', 'otel')
+  .option('--with-config', 'Add @fastify/env schema')
+  .option('--with-decorator', 'Add app decorator')
+  .action(async (name: string, options) => {
+    if (!/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(name)) {
+      console.error(chalk.red('Error: Name must be kebab-case'));
+      process.exit(1);
+    }
+
+    console.log(chalk.blue(`\n🔌 Generating Fastify plugin: ${name}\n`));
+
+    try {
+      const result = await generateFastifyPlugin({
+        name,
+        package: options.package,
+        withConfig: options.withConfig,
+        withDecorator: options.withDecorator,
+      });
+      for (const f of result.files) {
+        console.log(chalk.green(`  ✅ ${f.path}`));
+      }
+      console.log(chalk.green('\n✨ Fastify plugin generated!\n'));
+    } catch (error) {
+      console.error(chalk.red(`\n❌ Failed: ${error}`));
+      process.exit(1);
+    }
+  });

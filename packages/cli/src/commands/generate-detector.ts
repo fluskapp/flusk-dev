@@ -1,0 +1,31 @@
+/**
+ * CLI command: flusk g:detector <name>
+ * Scaffolds a pattern detector function
+ */
+
+import { Command } from 'commander';
+import chalk from 'chalk';
+import { generateDetector } from '../generators/detector.generator.js';
+
+export const generateDetectorCommand = new Command('g:detector')
+  .description('Generate a pattern detector function')
+  .argument('<name>', 'Detector name in kebab-case (e.g., hot-path-calls)')
+  .action(async (name: string) => {
+    if (!/^[a-z][a-z0-9]*(-[a-z0-9]+)*$/.test(name)) {
+      console.error(chalk.red('Error: Name must be kebab-case'));
+      process.exit(1);
+    }
+
+    console.log(chalk.blue(`\n🔍 Generating detector: ${name}\n`));
+
+    try {
+      const result = await generateDetector({ name });
+      for (const f of result.files) {
+        console.log(chalk.green(`  ✅ ${f.path}`));
+      }
+      console.log(chalk.green('\n✨ Detector generated!\n'));
+    } catch (error) {
+      console.error(chalk.red(`\n❌ Failed: ${error}`));
+      process.exit(1);
+    }
+  });
