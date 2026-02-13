@@ -7,3 +7,7 @@
 export { loadConfig } from './config.js';
 export type { FluskOtelConfig } from './config.js';
 export { createSdk } from './create-sdk.js';
+export { flameProfilePlugin } from './plugins/flame-profile.plugin.js';
+export type { ProfilerDecorator, ProfileMode, FlameProfileOptions } from './plugins/flame-profile.plugin.js';
+export { createAutoProfileProcessor } from './hooks/auto-profile.hook.js';
+export type { AutoProfileHookOptions } from './hooks/auto-profile.hook.js';

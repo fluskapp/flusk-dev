@@ -1,0 +1,48 @@
+/**
+ * Auto-Profile Hook — Listens for GenAI spans and triggers profiling
+ * Hooks into OTel span processor to detect LLM span starts
+ */
+import type { ReadableSpan, Span, SpanProcessor } from '@opentelemetry/sdk-trace-base';
+import type { ProfilerDecorator } from '../plugins/flame-profile.plugin.js';
+
+const GENAI_PREFIXES = ['gen_ai', 'openai', 'anthropic', 'bedrock', 'llm'];
+
+function isLlmSpan(span: Span): boolean {
+  const name = span.constructor?.name ?? '';
+  const spanName = (span as unknown as { name: string }).name ?? '';
+  return GENAI_PREFIXES.some(
+    (p) => spanName.toLowerCase().includes(p) || name.toLowerCase().includes(p),
+  );
+}
+
+export interface AutoProfileHookOptions {
+  profiler: ProfilerDecorator;
+}
+
+/**
+ * Creates a SpanProcessor that auto-triggers flame profiling on LLM spans
+ */
+export function createAutoProfileProcessor(
+  opts: AutoProfileHookOptions,
+): SpanProcessor {
+  return {
+    onStart(span: Span): void {
+      if (opts.profiler.mode !== 'auto') return;
+      if (!isLlmSpan(span)) return;
+
+      const ctx = span.spanContext();
+      const traceId = ctx.traceId;
+
+      void opts.profiler.start([traceId]);
+    },
+    onEnd(_span: ReadableSpan): void {
+      // profiling runs for configured duration; no action needed on end
+    },
+    async shutdown(): Promise<void> {
+      await opts.profiler.stop();
+    },
+    async forceFlush(): Promise<void> {
+      // no-op
+    },
+  };
+}

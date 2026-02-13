@@ -1,0 +1,84 @@
+/**
+ * Flame Profile Plugin — Fastify plugin for automated CPU profiling
+ * Reads FLUSK_PROFILE_MODE env var and decorates app with profiler controls
+ */
+import { type FastifyPluginAsync } from 'fastify';
+import fp from 'fastify-plugin';
+import { type ProfileUploadClient } from '@flusk/resources';
+import { profileSession } from '@flusk/business-logic';
+
+const { parseFlameMarkdown } = profileSession;
+
+export type ProfileMode = 'auto' | 'manual' | 'off';
+
+export interface ProfilerDecorator {
+  start: (traceIds?: string[]) => Promise<boolean>;
+  stop: () => Promise<void>;
+  mode: ProfileMode;
+}
+
+export interface FlameApi {
+  startProfiling: (opts: { duration: number }) => Promise<{ markdown: string }>;
+}
+
+export interface FlameProfileOptions {
+  uploadClient: ProfileUploadClient;
+  flame?: FlameApi;
+  durationMs?: number;
+  rateLimitMs?: number;
+}
+
+const flameProfilePlugin: FastifyPluginAsync<FlameProfileOptions> = async (
+  app,
+  opts,
+) => {
+  const mode = (process.env['FLUSK_PROFILE_MODE'] || 'off') as ProfileMode;
+  const durationMs = opts.durationMs ?? Number(process.env['FLUSK_PROFILE_DURATION_MS'] ?? 10_000);
+  const rateLimitMs = opts.rateLimitMs ?? Number(process.env['FLUSK_PROFILE_RATE_LIMIT_MS'] ?? 60_000);
+  let lastProfileAt = 0;
+  let active = false;
+
+  const profiler: ProfilerDecorator = {
+    mode,
+    start: async (traceIds?: string[]) => {
+      const now = Date.now();
+      if (active || mode === 'off') return false;
+      if (now - lastProfileAt < rateLimitMs) return false;
+
+      active = true;
+      lastProfileAt = now;
+      app.log.info({ mode, durationMs }, 'flame profile started');
+
+      try {
+        const flame = opts.flame ?? await import('@platformatic/flame') as unknown as FlameApi;
+        const result = await flame.startProfiling({ duration: durationMs });
+        const markdown = result?.markdown ?? '';
+        const hotspots = parseFlameMarkdown(markdown);
+
+        await opts.uploadClient.upload({
+          name: `auto-profile-${now}`,
+          type: 'cpu',
+          durationMs,
+          totalSamples: hotspots.reduce((s, h) => s + h.samples, 0),
+          hotspots,
+          markdownRaw: markdown,
+          traceIds: traceIds ?? [],
+        });
+      } catch (err) {
+        app.log.error({ err }, 'flame profile failed');
+      } finally {
+        active = false;
+      }
+      return true;
+    },
+    stop: async () => { active = false; },
+  };
+
+  app.decorate('profiler', profiler);
+};
+
+export const flameProfilePlugin_ = fp(flameProfilePlugin, {
+  name: 'flame-profile-plugin',
+});
+
+export { flameProfilePlugin_ as flameProfilePlugin };

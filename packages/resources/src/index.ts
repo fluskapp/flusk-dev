@@ -21,6 +21,8 @@ export * as PricingClient from './clients/pricing.client.js';
 export * as EmbeddingClient from './clients/embedding.client.js';
 export * as OpenAIEmbeddingClient from './clients/openai-embedding.client.js';
 export * as EventBusClient from './clients/event-bus.client.js';
+export { ProfileUploadClient } from './clients/profile-upload.client.js';
+export type { ProfileUploadPayload, ProfileUploadResult } from './clients/profile-upload.client.js';
 
 // Encryption exports (GDPR)
 export * from './encryption/encrypt.js';

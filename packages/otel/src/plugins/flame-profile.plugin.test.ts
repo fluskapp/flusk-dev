@@ -1,0 +1,76 @@
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import Fastify from 'fastify';
+import { flameProfilePlugin, type ProfilerDecorator } from './flame-profile.plugin.js';
+
+const mockUploadClient = { upload: vi.fn().mockResolvedValue({ id: '1', success: true }) };
+const mockFlame = {
+  startProfiling: vi.fn().mockResolvedValue({
+    markdown: '| 1 | foo | bar.ts | 50.0% | 100 |',
+  }),
+};
+
+describe('flame-profile.plugin', () => {
+  const originalEnv = process.env['FLUSK_PROFILE_MODE'];
+
+  afterEach(() => {
+    if (originalEnv === undefined) delete process.env['FLUSK_PROFILE_MODE'];
+    else process.env['FLUSK_PROFILE_MODE'] = originalEnv;
+  });
+
+  it('decorates app with profiler', async () => {
+    process.env['FLUSK_PROFILE_MODE'] = 'manual';
+    const app = Fastify();
+    await app.register(flameProfilePlugin, { uploadClient: mockUploadClient as never, flame: mockFlame as never });
+    const profiler = (app as unknown as { profiler: ProfilerDecorator }).profiler;
+    expect(profiler).toBeDefined();
+    expect(profiler.mode).toBe('manual');
+    await app.close();
+  });
+
+  it('returns false when mode is off', async () => {
+    process.env['FLUSK_PROFILE_MODE'] = 'off';
+    const app = Fastify();
+    await app.register(flameProfilePlugin, { uploadClient: mockUploadClient as never, flame: mockFlame as never });
+    const profiler = (app as unknown as { profiler: ProfilerDecorator }).profiler;
+    const result = await profiler.start();
+    expect(result).toBe(false);
+    await app.close();
+  });
+
+  it('rate limits profiling', async () => {
+    process.env['FLUSK_PROFILE_MODE'] = 'auto';
+    const app = Fastify();
+    await app.register(flameProfilePlugin, {
+      uploadClient: mockUploadClient as never,
+      durationMs: 10,
+      rateLimitMs: 60_000,
+    });
+    const profiler = (app as unknown as { profiler: ProfilerDecorator }).profiler;
+    const first = await profiler.start();
+    // Wait for profile to complete
+    await new Promise((r) => setTimeout(r, 50));
+    const second = await profiler.start();
+    expect(first).toBe(true);
+    expect(second).toBe(false);
+    await app.close();
+  });
+
+  it('uploads parsed profile on success', async () => {
+    process.env['FLUSK_PROFILE_MODE'] = 'auto';
+    mockUploadClient.upload.mockClear();
+    const app = Fastify();
+    await app.register(flameProfilePlugin, {
+      uploadClient: mockUploadClient as never,
+      flame: mockFlame as never,
+      durationMs: 10,
+      rateLimitMs: 0,
+    });
+    const profiler = (app as unknown as { profiler: ProfilerDecorator }).profiler;
+    const started = await profiler.start(['trace-1']);
+    expect(started).toBe(true);
+    expect(mockUploadClient.upload).toHaveBeenCalledWith(
+      expect.objectContaining({ traceIds: ['trace-1'], type: 'cpu' }),
+    );
+    await app.close();
+  });
+});

@@ -26,7 +26,12 @@
     "@opentelemetry/resources": "^1.30.0",
     "@opentelemetry/sdk-node": "^0.57.0",
     "@opentelemetry/semantic-conventions": "^1.30.0",
-    "@traceloop/instrumentation-bedrock": "^0.22.6"
+    "@traceloop/instrumentation-bedrock": "^0.22.6",
+    "@platformatic/flame": "^1.6.0",
+    "fastify": "^5.0.0",
+    "fastify-plugin": "^5.0.0",
+    "@flusk/business-logic": "workspace:*",
+    "@flusk/resources": "workspace:*"
   },
   "keywords": [
     "flusk",
