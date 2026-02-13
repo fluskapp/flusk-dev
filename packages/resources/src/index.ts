@@ -11,6 +11,8 @@ export * as RoutingRuleRepository from './repositories/routing-rule/index.js';
 export * as ModelPerformanceRepository from './repositories/model-performance/index.js';
 export * as RoutingDecisionRepository from './repositories/routing-decision/index.js';
 
+export * as ProfileSessionRepository from './repositories/profile-session/index.js';
+
 // Cache exports
 export * as RedisClient from './cache/redis.client.js';
 

@@ -14,6 +14,7 @@ import { spanRoutes } from './span.routes.js';
 import { optimizationRoutes } from './optimization.routes.js';
 import { prompttemplateRoutes } from './prompt-template-routes/index.js';
 import { promptversionRoutes } from './prompt-version-routes/index.js';
+import { profileRoutes } from './profile-routes/index.js';
 
 export async function registerApiRoutes(api: FastifyInstance): Promise<void> {
   await api.register(llmCallsRoutes, { prefix: '/llm-calls' });
@@ -28,4 +29,5 @@ export async function registerApiRoutes(api: FastifyInstance): Promise<void> {
   await api.register(optimizationRoutes, { prefix: '/optimizations' });
   await api.register(prompttemplateRoutes, { prefix: '/prompt-templates' });
   await api.register(promptversionRoutes, { prefix: '/prompt-versions' });
+  await api.register(profileRoutes, { prefix: '/profiles' });
 }

@@ -1,0 +1,44 @@
+import { describe, it, expect } from 'vitest';
+import { parseFlameMarkdown } from './parse-flame-markdown.function.js';
+
+const SAMPLE_MARKDOWN = `
+# CPU Profile Report
+
+## Hotspots
+
+| Rank | Function | File | CPU% | Samples |
+|------|----------|------|------|---------|
+| 1 | JSON.stringify | middleware.ts:42 | 30.5 | 1520 |
+| 2 | processEmbedding | embedding-handler.ts:18 | 22.3 | 1112 |
+| 3 | handleRequest | server.ts:95 | 8.1 | 405 |
+
+## Flame Graph
+
+Generated at 2026-02-13T18:00:00Z
+`;
+
+describe('parseFlameMarkdown', () => {
+  it('should parse hotspot table rows', () => {
+    const hotspots = parseFlameMarkdown(SAMPLE_MARKDOWN);
+    expect(hotspots).toHaveLength(3);
+    expect(hotspots[0]).toEqual({
+      functionName: 'JSON.stringify',
+      filePath: 'middleware.ts:42',
+      cpuPercent: 30.5,
+      samples: 1520,
+    });
+    expect(hotspots[1].functionName).toBe('processEmbedding');
+    expect(hotspots[2].cpuPercent).toBe(8.1);
+  });
+
+  it('should return empty array for no hotspots', () => {
+    expect(parseFlameMarkdown('# No table here')).toHaveLength(0);
+  });
+
+  it('should handle CPU% with percent sign', () => {
+    const md = '| 1 | foo | bar.ts:1 | 15.2% | 200 |';
+    const hotspots = parseFlameMarkdown(md);
+    expect(hotspots).toHaveLength(1);
+    expect(hotspots[0].cpuPercent).toBe(15.2);
+  });
+});

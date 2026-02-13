@@ -58,6 +58,14 @@ export {
 } from './prompt-template.types.js';
 
 export {
+  type ProfileSessionEntity as ProfileSessionEntityType,
+  type ProfileSessionInsert, type ProfileSessionUpdate, type ProfileSessionQuery,
+  type HotspotEntry,
+  ProfileSessionEntityJSONSchema, ProfileSessionInsertSchema, ProfileSessionUpdateSchema, ProfileSessionQuerySchema,
+  HotspotEntryJSONSchema
+} from './profile-session.types.js';
+
+export {
   type PromptVersionEntity as PromptVersionEntityType,
   type PromptVersionInsert, type PromptVersionUpdate, type PromptVersionQuery,
   PromptVersionEntityJSONSchema, PromptVersionInsertSchema, PromptVersionUpdateSchema, PromptVersionQuerySchema

@@ -1,0 +1,37 @@
+import type { FastifyInstance } from 'fastify';
+import { ProfileSessionRepository } from '@flusk/resources';
+import { profileSession } from '@flusk/business-logic';
+
+/**
+ * POST /v1/profiles — create a new profile session
+ */
+export async function createProfileRoute(app: FastifyInstance): Promise<void> {
+  app.post('/', async (request, reply) => {
+    const body = request.body as any;
+    const pool = app.pg.pool;
+
+    const hotspots = body.markdownRaw
+      ? profileSession.parseFlameMarkdown(body.markdownRaw)
+      : body.hotspots ?? [];
+
+    const totalSamples = hotspots.reduce(
+      (sum: number, h: any) => sum + h.samples, 0
+    );
+
+    const entity = await ProfileSessionRepository.create(pool, {
+      name: body.name,
+      type: body.type,
+      durationMs: body.durationMs,
+      totalSamples: body.totalSamples ?? totalSamples,
+      hotspots,
+      markdownRaw: body.markdownRaw ?? '',
+      pprofPath: body.pprofPath ?? '',
+      flamegraphPath: body.flamegraphPath ?? '',
+      traceIds: body.traceIds ?? [],
+      organizationId: body.organizationId,
+      startedAt: body.startedAt ?? new Date().toISOString(),
+    });
+
+    return reply.status(201).send(entity);
+  });
+}

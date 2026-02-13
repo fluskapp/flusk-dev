@@ -70,6 +70,14 @@ export {
   type PromptTemplateEntity
 } from './prompt-template.entity.js';
 
+// ProfileSession entity exports
+export {
+  HotspotEntrySchema,
+  type HotspotEntry,
+  ProfileSessionEntitySchema,
+  type ProfileSessionEntity
+} from './profile-session.entity.js';
+
 // PromptVersion entity exports
 export {
   PromptVersionEntitySchema,

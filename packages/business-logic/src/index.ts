@@ -31,3 +31,6 @@ export { promptTemplate };
 
 import * as promptVersion from './prompt-version/index.js';
 export { promptVersion };
+
+import * as profileSession from './profile-session/index.js';
+export { profileSession };

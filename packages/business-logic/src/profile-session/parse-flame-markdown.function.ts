@@ -1,0 +1,27 @@
+import { HotspotEntry } from '@flusk/entities';
+
+/**
+ * Parse @platformatic/flame markdown output into HotspotEntry[].
+ * The flame markdown has a hotspots table with columns:
+ * | Rank | Function | File | CPU% | Samples |
+ */
+export function parseFlameMarkdown(markdown: string): HotspotEntry[] {
+  const hotspots: HotspotEntry[] = [];
+  const lines = markdown.split('\n');
+
+  const rowRegex = /^\|\s*\d+\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*([\d.]+)%?\s*\|\s*(\d+)\s*\|$/;
+
+  for (const line of lines) {
+    const match = rowRegex.exec(line.trim());
+    if (match) {
+      hotspots.push({
+        functionName: match[1].trim(),
+        filePath: match[2].trim(),
+        cpuPercent: parseFloat(match[3]),
+        samples: parseInt(match[4], 10),
+      });
+    }
+  }
+
+  return hotspots;
+}

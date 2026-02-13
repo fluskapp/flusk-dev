@@ -1,0 +1,20 @@
+import type { FastifyInstance } from 'fastify';
+import { ProfileSessionRepository } from '@flusk/resources';
+
+/**
+ * GET /v1/profiles — list profile sessions with pagination
+ */
+export async function listProfilesRoute(app: FastifyInstance): Promise<void> {
+  app.get('/', async (request, reply) => {
+    const { limit = '50', offset = '0' } = request.query as any;
+    const pool = app.pg.pool;
+
+    const profiles = await ProfileSessionRepository.list(
+      pool,
+      parseInt(limit, 10),
+      parseInt(offset, 10)
+    );
+
+    return reply.send(profiles);
+  });
+}
