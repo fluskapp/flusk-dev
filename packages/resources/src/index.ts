@@ -12,6 +12,7 @@ export * as ModelPerformanceRepository from './repositories/model-performance/in
 export * as RoutingDecisionRepository from './repositories/routing-decision/index.js';
 
 export * as ProfileSessionRepository from './repositories/profile-session/index.js';
+export * as PerformancePatternRepository from './repositories/performance-pattern/index.js';
 
 // Cache exports
 export * as RedisClient from './cache/redis.client.js';

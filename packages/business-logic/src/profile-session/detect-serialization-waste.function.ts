@@ -1,0 +1,42 @@
+import type { CorrelationResult } from './correlate-with-traces.function.js';
+import type { DetectedPattern } from './detect-patterns.function.js';
+
+const SERIALIZATION_KEYWORDS = [
+  'stringify', 'parse', 'json', 'serialize', 'deserialize',
+];
+
+/**
+ * Detects JSON.stringify/parse overhead around LLM calls.
+ * Flags hotspots with serialization-related names that use >10% CPU
+ * and overlap with LLM call traces.
+ */
+export function detectSerializationWaste(
+  correlations: CorrelationResult[],
+): DetectedPattern[] {
+  const patterns: DetectedPattern[] = [];
+
+  for (const { llmCall, relatedHotspots } of correlations) {
+    for (const hotspot of relatedHotspots) {
+      if (hotspot.cpuPercent < 10) continue;
+
+      const nameLC = hotspot.functionName.toLowerCase();
+      const isSerial = SERIALIZATION_KEYWORDS.some((k) =>
+        nameLC.includes(k),
+      );
+      if (!isSerial) continue;
+
+      patterns.push({
+        pattern: 'serialization-waste',
+        severity: hotspot.cpuPercent >= 20 ? 'high' : 'medium',
+        description: `${hotspot.functionName} uses ${hotspot.cpuPercent}% CPU serializing data for ${llmCall.model}`,
+        suggestion: 'Use streaming or pre-serialized buffers instead of repeated JSON round-trips',
+        metadata: {
+          hotspot,
+          llmCallId: llmCall.id,
+        },
+      });
+    }
+  }
+
+  return patterns;
+}

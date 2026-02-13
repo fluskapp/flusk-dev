@@ -1,0 +1,118 @@
+import { describe, it, expect } from 'vitest';
+import { detectHotPathCalls } from './detect-hot-path-calls.function.js';
+import { detectSerializationWaste } from './detect-serialization-waste.function.js';
+import { detectMemoryChurn } from './detect-memory-churn.function.js';
+import { detectColdStart } from './detect-cold-start.function.js';
+import { detectPatterns } from './detect-patterns.function.js';
+import type { ProfileSessionEntity, LLMCallEntity } from '@flusk/entities';
+import type { CorrelationResult } from './correlate-with-traces.function.js';
+
+const BASE_SESSION: ProfileSessionEntity = {
+  id: 'sess-1', createdAt: '2026-02-13T18:00:00Z',
+  updatedAt: '2026-02-13T18:00:00Z', name: 'cpu-test',
+  type: 'cpu', durationMs: 30000, totalSamples: 5000,
+  hotspots: [], markdownRaw: '', pprofPath: '', flamegraphPath: '',
+  traceIds: [], startedAt: '2026-02-13T18:00:00Z',
+};
+
+const MOCK_CALL: LLMCallEntity = {
+  id: 'call-1', createdAt: '2026-02-13T18:00:05Z',
+  updatedAt: '2026-02-13T18:00:05Z', provider: 'openai',
+  model: 'gpt-4', prompt: 'test', promptHash: 'a'.repeat(64),
+  tokens: { input: 10, output: 20, total: 30 }, cost: 0.12,
+  response: 'resp', cached: false, consentGiven: true,
+  consentPurpose: 'optimization',
+};
+
+const hotCorrelation: CorrelationResult = {
+  llmCall: MOCK_CALL,
+  relatedHotspots: [
+    { functionName: 'handleRequest', filePath: 'api.ts:10', cpuPercent: 25, samples: 1200 },
+  ],
+};
+
+describe('detectHotPathCalls', () => {
+  it('flags high CPU hotspot on LLM call path', () => {
+    const results = detectHotPathCalls([hotCorrelation]);
+    expect(results).toHaveLength(1);
+    expect(results[0].pattern).toBe('hot-path-llm-call');
+    expect(results[0].severity).toBe('high');
+  });
+
+  it('skips low CPU hotspots', () => {
+    const low: CorrelationResult = {
+      llmCall: MOCK_CALL,
+      relatedHotspots: [
+        { functionName: 'idle', filePath: 'x.ts:1', cpuPercent: 2, samples: 50 },
+      ],
+    };
+    expect(detectHotPathCalls([low])).toHaveLength(0);
+  });
+});
+
+describe('detectSerializationWaste', () => {
+  it('flags serialization hotspot with >10% CPU', () => {
+    const corr: CorrelationResult = {
+      llmCall: MOCK_CALL,
+      relatedHotspots: [
+        { functionName: 'JSON.stringify', filePath: 'util.ts:5', cpuPercent: 15, samples: 800 },
+      ],
+    };
+    const results = detectSerializationWaste([corr]);
+    expect(results).toHaveLength(1);
+    expect(results[0].pattern).toBe('serialization-waste');
+  });
+
+  it('ignores non-serialization hotspots', () => {
+    const results = detectSerializationWaste([hotCorrelation]);
+    expect(results).toHaveLength(0);
+  });
+});
+
+describe('detectMemoryChurn', () => {
+  it('flags heap profile with many concurrent LLM calls', () => {
+    const heapSession: ProfileSessionEntity = {
+      ...BASE_SESSION, type: 'heap',
+      hotspots: [
+        { functionName: 'allocBuf', filePath: 'buf.ts:1', cpuPercent: 5, samples: 1000 },
+      ],
+    };
+    const corrs = Array.from({ length: 4 }, (_, i) => ({
+      llmCall: { ...MOCK_CALL, id: `call-${i}` },
+      relatedHotspots: heapSession.hotspots,
+    }));
+    const results = detectMemoryChurn(heapSession, corrs);
+    expect(results).toHaveLength(1);
+    expect(results[0].pattern).toBe('memory-churn');
+  });
+
+  it('skips CPU profiles', () => {
+    expect(detectMemoryChurn(BASE_SESSION, [])).toHaveLength(0);
+  });
+});
+
+describe('detectColdStart', () => {
+  it('flags session with >2x samples vs average', () => {
+    const prev = [{ ...BASE_SESSION, id: 'p1', totalSamples: 1000 }];
+    const current = { ...BASE_SESSION, totalSamples: 3000 };
+    const results = detectColdStart(current, prev);
+    expect(results).toHaveLength(1);
+    expect(results[0].pattern).toBe('cold-start');
+  });
+
+  it('returns empty when no previous sessions', () => {
+    expect(detectColdStart(BASE_SESSION, [])).toHaveLength(0);
+  });
+});
+
+describe('detectPatterns orchestrator', () => {
+  it('deduplicates and sorts by severity', () => {
+    const results = detectPatterns(BASE_SESSION, [hotCorrelation]);
+    expect(results.length).toBeGreaterThan(0);
+    for (let i = 1; i < results.length; i++) {
+      const order = ['critical', 'high', 'medium', 'low'];
+      expect(order.indexOf(results[i - 1].severity))
+        .toBeLessThanOrEqual(order.indexOf(results[i].severity));
+    }
+  });
+});

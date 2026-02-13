@@ -1,0 +1,32 @@
+import type { Pool } from 'pg';
+import { PerformancePatternEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Create a new performance pattern record
+ */
+export async function create(
+  pool: Pool,
+  data: Omit<PerformancePatternEntity, 'id' | 'createdAt' | 'updatedAt'>,
+): Promise<PerformancePatternEntity> {
+  const query = `
+    INSERT INTO performance_patterns (
+      profile_session_id, pattern, severity,
+      description, suggestion, metadata, organization_id
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7)
+    RETURNING *
+  `;
+
+  const values = [
+    data.profileSessionId,
+    data.pattern,
+    data.severity,
+    data.description,
+    data.suggestion,
+    JSON.stringify(data.metadata),
+    data.organizationId ?? null,
+  ];
+
+  const result = await pool.query(query, values);
+  return rowToEntity(result.rows[0]);
+}

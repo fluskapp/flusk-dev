@@ -66,6 +66,13 @@ export {
 } from './profile-session.types.js';
 
 export {
+  type PerformancePatternEntity as PerformancePatternEntityType,
+  type PerformancePatternInsert, type PerformancePatternUpdate, type PerformancePatternQuery,
+  PerformancePatternEntityJSONSchema, PerformancePatternInsertSchema,
+  PerformancePatternUpdateSchema, PerformancePatternQuerySchema,
+} from './performance-pattern.types.js';
+
+export {
   type PromptVersionEntity as PromptVersionEntityType,
   type PromptVersionInsert, type PromptVersionUpdate, type PromptVersionQuery,
   PromptVersionEntityJSONSchema, PromptVersionInsertSchema, PromptVersionUpdateSchema, PromptVersionQuerySchema

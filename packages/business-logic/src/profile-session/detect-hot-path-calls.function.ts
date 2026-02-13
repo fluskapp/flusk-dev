@@ -1,0 +1,39 @@
+import type { CorrelationResult } from './correlate-with-traces.function.js';
+import type { DetectedPattern } from './detect-patterns.function.js';
+
+/**
+ * Detects LLM calls that happen in CPU-intensive code paths.
+ * If a hotspot function appears in the same file/module as an
+ * LLM call handler, flag it.
+ */
+export function detectHotPathCalls(
+  correlations: CorrelationResult[],
+): DetectedPattern[] {
+  const patterns: DetectedPattern[] = [];
+
+  for (const { llmCall, relatedHotspots } of correlations) {
+    for (const hotspot of relatedHotspots) {
+      if (hotspot.cpuPercent < 5) continue;
+
+      const severity = hotspot.cpuPercent >= 20
+        ? 'high'
+        : hotspot.cpuPercent >= 10
+          ? 'medium'
+          : 'low';
+
+      patterns.push({
+        pattern: 'hot-path-llm-call',
+        severity,
+        description: `${hotspot.functionName} uses ${hotspot.cpuPercent}% CPU in same path as ${llmCall.model} call`,
+        suggestion: 'Move LLM call outside hot path or cache results',
+        metadata: {
+          hotspot,
+          llmCallId: llmCall.id,
+          model: llmCall.model,
+        },
+      });
+    }
+  }
+
+  return patterns;
+}

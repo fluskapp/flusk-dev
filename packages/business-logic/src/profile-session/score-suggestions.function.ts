@@ -1,0 +1,83 @@
+import type { ProfileSuggestion } from './generate-profile-suggestions.function.js';
+import type { DetectedPattern } from './detect-patterns.function.js';
+
+export type ScoredSuggestion = {
+  severity: string;
+  message: string;
+  score: number;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  source: 'profile' | 'pattern';
+};
+
+const BASE_SCORES: Record<string, number> = {
+  critical: 90,
+  warning: 60,
+  info: 30,
+  high: 80,
+  medium: 50,
+  low: 20,
+};
+
+/**
+ * Score and rank suggestions from profile analysis + detected patterns.
+ * Formula: base_score * (1 + cpu_impact * 0.5) * (1 + cost_impact * 0.3)
+ */
+export function scoreSuggestions(
+  suggestions: ProfileSuggestion[],
+  patterns: DetectedPattern[],
+): ScoredSuggestion[] {
+  const scored: ScoredSuggestion[] = [];
+
+  for (const s of suggestions) {
+    const base = BASE_SCORES[s.severity] ?? 30;
+    const cpuImpact = extractCpuImpact(s.message);
+    const costImpact = extractCostImpact(s.message);
+    const score = base * (1 + cpuImpact * 0.5) * (1 + costImpact * 0.3);
+
+    scored.push({
+      severity: s.severity,
+      message: s.message,
+      score: Math.round(score * 100) / 100,
+      priority: scoreToPriority(score),
+      source: 'profile',
+    });
+  }
+
+  for (const p of patterns) {
+    const base = BASE_SCORES[p.severity] ?? 30;
+    const cpuImpact = extractCpuFromMeta(p.metadata);
+    const score = base * (1 + cpuImpact * 0.5);
+
+    scored.push({
+      severity: p.severity,
+      message: `[${p.pattern}] ${p.description} — ${p.suggestion}`,
+      score: Math.round(score * 100) / 100,
+      priority: scoreToPriority(score),
+      source: 'pattern',
+    });
+  }
+
+  return scored.sort((a, b) => b.score - a.score);
+}
+
+function extractCpuImpact(msg: string): number {
+  const match = msg.match(/(\d+(?:\.\d+)?)%\s*CPU/);
+  return match ? parseFloat(match[1]) / 100 : 0;
+}
+
+function extractCostImpact(msg: string): number {
+  const match = msg.match(/\$(\d+(?:\.\d+)?)/);
+  return match ? Math.min(parseFloat(match[1]), 1) : 0;
+}
+
+function extractCpuFromMeta(meta: Record<string, unknown>): number {
+  const hotspot = meta.hotspot as { cpuPercent?: number } | undefined;
+  return hotspot?.cpuPercent ? hotspot.cpuPercent / 100 : 0;
+}
+
+function scoreToPriority(score: number): ScoredSuggestion['priority'] {
+  if (score >= 80) return 'critical';
+  if (score >= 50) return 'high';
+  if (score >= 30) return 'medium';
+  return 'low';
+}

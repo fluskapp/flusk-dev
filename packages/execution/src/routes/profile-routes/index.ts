@@ -4,6 +4,7 @@ import { listProfilesRoute } from './list-profiles.js';
 import { getProfileRoute } from './get-profile.js';
 import { getCorrelationsRoute } from './get-correlations.js';
 import { deleteProfileRoute } from './delete-profile.js';
+import { getSuggestionsRoute } from './get-suggestions.js';
 
 /**
  * Profile session routes — /v1/profiles
@@ -14,4 +15,5 @@ export async function profileRoutes(app: FastifyInstance): Promise<void> {
   await app.register(getProfileRoute);
   await app.register(getCorrelationsRoute);
   await app.register(deleteProfileRoute);
+  await app.register(getSuggestionsRoute);
 }

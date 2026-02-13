@@ -1,0 +1,42 @@
+import type { ProfileSessionEntity } from '@flusk/entities';
+import type { CorrelationResult } from './correlate-with-traces.function.js';
+import type { DetectedPattern } from './detect-patterns.function.js';
+
+const HIGH_SAMPLE_THRESHOLD = 500;
+const BATCH_CALL_THRESHOLD = 3;
+
+/**
+ * Detects allocation spikes during LLM batch processing (heap profiles).
+ * Flags when heap hotspots have high sample count and multiple LLM calls
+ * occur in the same time window.
+ */
+export function detectMemoryChurn(
+  session: ProfileSessionEntity,
+  correlations: CorrelationResult[],
+): DetectedPattern[] {
+  if (session.type !== 'heap') return [];
+  if (correlations.length < BATCH_CALL_THRESHOLD) return [];
+
+  const patterns: DetectedPattern[] = [];
+  const highSampleHotspots = session.hotspots.filter(
+    (h) => h.samples >= HIGH_SAMPLE_THRESHOLD,
+  );
+
+  if (highSampleHotspots.length === 0) return [];
+
+  patterns.push({
+    pattern: 'memory-churn',
+    severity: highSampleHotspots.some((h) => h.samples >= 1000)
+      ? 'high'
+      : 'medium',
+    description: `${highSampleHotspots.length} high-alloc hotspots during ${correlations.length} concurrent LLM calls`,
+    suggestion: 'Use batching or streaming to reduce memory allocation spikes',
+    metadata: {
+      hotspotCount: highSampleHotspots.length,
+      llmCallCount: correlations.length,
+      topHotspot: highSampleHotspots[0],
+    },
+  });
+
+  return patterns;
+}

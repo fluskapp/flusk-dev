@@ -78,6 +78,14 @@ export {
   type ProfileSessionEntity
 } from './profile-session.entity.js';
 
+// PerformancePattern entity exports
+export {
+  SeveritySchema,
+  type Severity,
+  PerformancePatternEntitySchema,
+  type PerformancePatternEntity
+} from './performance-pattern.entity.js';
+
 // PromptVersion entity exports
 export {
   PromptVersionEntitySchema,

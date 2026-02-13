@@ -1,0 +1,38 @@
+import type { ProfileSessionEntity } from '@flusk/entities';
+import type { DetectedPattern } from './detect-patterns.function.js';
+
+const COLD_START_RATIO = 2;
+
+/**
+ * Compares first profile session vs subsequent ones for same org.
+ * If first session shows >2x latency/samples → cold start pattern.
+ */
+export function detectColdStart(
+  current: ProfileSessionEntity,
+  previous: ProfileSessionEntity[],
+): DetectedPattern[] {
+  if (previous.length === 0) return [];
+
+  const avgSamples =
+    previous.reduce((sum, s) => sum + s.totalSamples, 0) /
+    previous.length;
+
+  if (avgSamples === 0) return [];
+
+  const ratio = current.totalSamples / avgSamples;
+  if (ratio < COLD_START_RATIO) return [];
+
+  return [
+    {
+      pattern: 'cold-start',
+      severity: ratio >= 4 ? 'high' : 'medium',
+      description: `Session has ${ratio.toFixed(1)}x more samples than average (${current.totalSamples} vs ${Math.round(avgSamples)})`,
+      suggestion: 'Implement warm-up strategies: pre-load models, prime caches before first request',
+      metadata: {
+        currentSamples: current.totalSamples,
+        averageSamples: Math.round(avgSamples),
+        ratio: Math.round(ratio * 10) / 10,
+      },
+    },
+  ];
+}
