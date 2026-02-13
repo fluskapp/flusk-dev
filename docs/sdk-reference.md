@@ -1,12 +1,5 @@
 # Flusk SDK Reference
 
-Flusk provides two packages:
-
-- **`@flusk/otel`** — Zero-touch OpenTelemetry auto-instrumentation (primary)
-- **`@flusk/sdk`** — Programmatic API access for routing, optimizations, prompts, and tracing
-
----
-
 ## @flusk/otel
 
 Zero-code LLM observability via OpenTelemetry auto-instrumentation.
@@ -19,17 +12,15 @@ npm install @flusk/otel
 
 ### Usage
 
-Add `--require @flusk/otel` to your Node.js start command:
-
 ```json
 {
   "scripts": {
-    "start": "node --require @flusk/otel ./index.js"
+    "start": "node --import @flusk/otel ./index.js"
   }
 }
 ```
 
-Or import at the top of your entry file:
+Or import directly:
 
 ```typescript
 import '@flusk/otel';
@@ -39,23 +30,23 @@ import '@flusk/otel';
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `FLUSK_API_KEY` | ✅ | — | Flusk API key for authentication |
-| `FLUSK_ENDPOINT` | ❌ | `https://otel.flusk.dev` | OTLP endpoint URL |
-| `FLUSK_PROJECT_NAME` | ❌ | `default` | Service/project name in traces |
-| `FLUSK_CAPTURE_CONTENT` | ❌ | `true` | Capture prompt/response content |
+| `FLUSK_API_KEY` | ✅ | — | API key |
+| `FLUSK_ENDPOINT` | No | `https://otel.flusk.dev` | OTLP endpoint |
+| `FLUSK_PROJECT_NAME` | No | `default` | Service name |
+| `FLUSK_CAPTURE_CONTENT` | No | `true` | Capture content |
+| `FLUSK_PROFILE_MODE` | No | `auto` | Profiling mode |
+| `FLUSK_LOG_LEVEL` | No | `info` | Log level |
 
-### What it captures
+### What It Captures
 
-- All OpenAI API calls (via `@opentelemetry/instrumentation-openai`)
-- All HTTP calls (via `@opentelemetry/instrumentation-undici`)
-- Model, tokens (prompt/completion), latency, finish reason
-- Request/response content (when `FLUSK_CAPTURE_CONTENT=true`)
+- OpenAI API calls (via `@opentelemetry/instrumentation-openai`)
+- HTTP calls (via `@opentelemetry/instrumentation-undici`)
+- Model, tokens, latency, finish reason, content
 
 ### Programmatic API
 
 ```typescript
 import { loadConfig, createSdk } from '@flusk/otel';
-
 const config = loadConfig();
 const sdk = createSdk(config);
 sdk.start();
@@ -64,8 +55,6 @@ sdk.start();
 ---
 
 ## @flusk/sdk — FluskClient
-
-Programmatic API access for routing, optimizations, prompts, and tracing.
 
 ### Installation
 
@@ -80,38 +69,17 @@ import { FluskClient } from '@flusk/sdk';
 
 const flusk = new FluskClient({
   apiKey: 'your-api-key',
-  baseUrl: 'http://localhost:3000', // default: https://api.flusk.ai
+  baseUrl: 'http://localhost:3000',
 });
 ```
 
----
-
 ### `getSuggestions(organizationId?)`
 
-Get conversion suggestions for optimizing LLM calls.
-
-**Returns:** `Promise<ConversionSuggestion[]>`
-
-```typescript
-const suggestions = await flusk.getSuggestions('org-uuid');
-```
-
----
+Returns `Promise<ConversionSuggestion[]>`.
 
 ### `route(options)`
 
-Ask Flusk which model to use for a given prompt.
-
-**Parameters:**
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `options.ruleId` | `string` | ✅ | Routing rule UUID |
-| `options.prompt` | `string` | ✅ | Prompt text |
-| `options.tokenCount` | `number` | ✅ | Estimated token count |
-| `options.originalModel` | `string` | ✅ | Original model |
-
-**Returns:** `Promise<RouteResult>` — `{ selectedModel, reason, complexity, expectedQuality }`
+Ask which model to use for a given prompt.
 
 ```typescript
 const result = await flusk.route({
@@ -120,50 +88,32 @@ const result = await flusk.route({
   tokenCount: 10,
   originalModel: 'gpt-4',
 });
+// result.selectedModel → 'gpt-4o-mini'
 ```
 
----
+### `getOptimizations()` / `getOptimizationCode(id)`
 
-### `getOptimizations()`
-
-Generate optimization suggestions.
-
-**Returns:** `Promise<OptimizationSuggestion[]>`
-
----
-
-### `getOptimizationCode(id)`
-
-Get generated code for a specific optimization.
-
-**Returns:** `Promise<{ code: string; language: string }>`
-
----
+Generate and retrieve optimization code snippets.
 
 ### `renderPrompt(templateId, variables, abTest?)`
 
-Render a prompt template with variable substitution. Optionally run A/B test.
-
-**Returns:** `Promise<{ rendered: string; versionId: string; isCandidate?: boolean }>`
-
-```typescript
-const { rendered } = await flusk.renderPrompt('tpl-uuid', {
-  user_query: 'What is TypeScript?',
-});
-```
-
----
+Render a prompt template with variable substitution.
 
 ### `reportPromptMetrics(versionId, metrics)`
 
-Report quality/latency/cost metrics after using a prompt version.
+Report quality/latency/cost metrics for a prompt version.
+
+### Profile Endpoints
 
 ```typescript
-await flusk.reportPromptMetrics('version-uuid', {
-  quality: 0.92,
-  latencyMs: 450,
-  cost: 0.003,
-});
+// List profile sessions
+const profiles = await flusk.getProfiles(orgId);
+
+// Get correlations between profiles and LLM calls
+const corr = await flusk.getProfileCorrelations(profileId);
+
+// Get optimization suggestions from profiling data
+const suggestions = await flusk.getProfileSuggestions(profileId);
 ```
 
 ---
@@ -180,25 +130,21 @@ const trace = startTrace({
 }, 'my-agent-workflow');
 
 await trace.start();
-
 const span = trace.span('generate-response', { type: 'llm' });
 await span.start();
 await span.end({ output: 'result', cost: 0.002, tokens: 150 });
-
 await trace.end();
 ```
 
 ---
 
-## Standalone Routing
+## @flusk/logger
 
 ```typescript
-import { route } from '@flusk/sdk';
+import { getLogger } from '@flusk/logger';
 
-const result = await route('http://localhost:3000', 'api-key', {
-  ruleId: 'rule-uuid',
-  prompt: 'Hello',
-  tokenCount: 5,
-  originalModel: 'gpt-4',
-});
+const logger = getLogger().child({ module: 'my-module' });
+logger.info({ userId: 42 }, 'user created');
 ```
+
+Configure via `FLUSK_LOG_LEVEL` and `NODE_ENV`.

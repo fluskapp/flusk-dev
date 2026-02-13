@@ -1,190 +1,132 @@
-<p align="center">
-  <h1 align="center">⚡ Flusk</h1>
-  <p align="center"><strong>Cut your LLM costs by 50%+ with zero code changes.</strong></p>
-  <p align="center">Open-source LLM cost optimization — auto-detects waste, generates fixes.</p>
-  <p align="center">
-    <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License"></a>
-    <a href="https://github.com/AdirBenYossef/flusk/actions"><img src="https://img.shields.io/github/actions/workflow/status/AdirBenYossef/flusk/ci.yml?branch=main" alt="CI"></a>
-    <a href="https://www.npmjs.com/package/@flusk/otel"><img src="https://img.shields.io/npm/v/@flusk/otel.svg" alt="npm"></a>
-  </p>
-</p>
+# Flusk
 
----
+LLM cost observability and optimization for Node.js. Auto-instruments
+OpenAI, Anthropic, and Bedrock via OpenTelemetry — zero code changes.
+Tracks every call, detects waste, suggests fixes.
 
-## What is Flusk?
+**Who it's for:** Backend engineers running LLM-powered Node.js apps who
+want to understand and reduce API costs without changing application code.
 
-Flusk tracks every LLM API call via OpenTelemetry auto-instrumentation — **zero code changes** — detects wasteful patterns (duplicate prompts, overqualified models), and generates code fixes that shrink your bill.
+**Why:** LLM APIs are expensive and opaque. You don't know which calls are
+wasteful until you measure. Flusk auto-instruments via OTel, tracks
+everything, detects patterns (duplicate prompts, overqualified models),
+and generates code fixes.
 
-### Before Flusk vs After Flusk
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![CI](https://img.shields.io/github/actions/workflow/status/adirbenyossef/flusk-dev/ci.yml?branch=main)](https://github.com/adirbenyossef/flusk-dev/actions)
+[![npm](https://img.shields.io/npm/v/@flusk/otel.svg)](https://www.npmjs.com/package/@flusk/otel)
 
-```diff
-- # You have no idea where $12k/month in LLM costs is going
-- # Duplicate prompts, GPT-4 doing GPT-3.5 work, no visibility
-
-+ # Add one flag. That's it.
-+ node --import @flusk/otel ./index.js
-+
-+ # ✅ Every LLM call tracked (model, tokens, cost, latency)
-+ # ✅ Duplicate prompts detected → cache suggestions generated
-+ # ✅ Overqualified models flagged → routing rules auto-created
-+ # ✅ Real-time cost dashboard with SSE events
-```
-
-## 🚀 Quick Start
-
-### 1. Start the Flusk server
+## Quick Start
 
 ```bash
-git clone https://github.com/AdirBenYossef/flusk.git
-cd flusk && cp .env.example .env
-docker compose up -d    # PostgreSQL + Redis + Jaeger + Flusk on :3000
+git clone https://github.com/adirbenyossef/flusk-dev.git
+cd flusk-dev && cp .env.example .env
+docker compose up -d   # PostgreSQL + Redis + Flusk on :3000
 ```
 
-Verify it's running:
-```bash
-curl http://localhost:3000/health        # → { "status": "ok" }
-curl http://localhost:3000/docs          # → Swagger UI
-```
-
-### 2. Instrument your app (zero code changes)
+Install the OTel package in your app:
 
 ```bash
 npm install @flusk/otel
 ```
 
-Set environment variables:
 ```bash
 export FLUSK_ENDPOINT=http://localhost:3000
-export FLUSK_API_KEY=your_api_key        # optional for local dev
-export FLUSK_PROJECT_NAME=my-app         # optional, default: "default"
-```
-
-Start your app with the OTel flag:
-```bash
 node --import @flusk/otel ./index.js
 ```
 
-Or add to `package.json`:
-```json
-{ "scripts": { "start": "node --import @flusk/otel ./index.js" } }
-```
+Every OpenAI, Anthropic, and Bedrock call is now tracked automatically.
 
-That's it — **every OpenAI, Anthropic, and Bedrock call is now tracked automatically.**
-
-### 3. View your data
-
-```bash
-# Terminal dashboard
-pnpm tsx packages/cli/bin/flusk.ts dashboard
-
-# Or use Swagger API
-open http://localhost:3000/docs
-
-# Or view raw traces in Jaeger
-open http://localhost:16686
-```
-
-### 4. Environment variables reference
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `FLUSK_ENDPOINT` | ✅ | `https://otel.flusk.dev` | Flusk server URL |
-| `FLUSK_API_KEY` | No | — | API key for authenticated traces |
-| `FLUSK_PROJECT_NAME` | No | `default` | Project name for grouping |
-| `FLUSK_CAPTURE_CONTENT` | No | `true` | Capture prompt/response content |
-
-### 5. Supported providers (auto-detected)
-
-| Provider | Package | Instrumentation |
-|----------|---------|-----------------|
-| OpenAI | `openai` | `@opentelemetry/instrumentation-openai` |
-| Anthropic | `@anthropic-ai/sdk` | `@traceloop/instrumentation-anthropic` |
-| AWS Bedrock | `@aws-sdk/client-bedrock-runtime` | `@traceloop/instrumentation-bedrock` |
-
-> **Adding a new provider?** `pnpm tsx packages/cli/bin/flusk.ts g:provider <name>` scaffolds pricing, span config, and tests.
-
-## ✨ Features
-
-- ✅ **Zero-Touch Tracking** — `--import @flusk/otel` auto-instruments OpenAI, Anthropic, Bedrock
-- ✅ **Duplicate Detection** — pgvector semantic similarity finds repeated/near-identical prompts
-- ✅ **Model Routing** — auto-route prompts to cheaper models when quality permits
-- ✅ **Code Generation** — generates caching, model swap, and dedup code for you
-- ✅ **Prompt Versioning** — version templates, A/B test, compare performance
-- ✅ **Real-Time Events** — SSE stream of cost data as calls happen
-- ✅ **Self-Hosted** — your data stays on your infrastructure
-
-## 🏗️ Architecture
+## Architecture
 
 ```
-Your App (unchanged code)
+Your App (unchanged)
   │ node --import @flusk/otel
   ▼
-┌────────────────────────────────────────┐
-│  Flusk Server (Fastify)                │
-│  ┌──────────┐  ┌───────────────────┐   │
-│  │ OTLP     │→ │ Pattern Detection │   │
-│  │ Ingestion│  │ (pgvector)        │   │
-│  └──────────┘  └───────────────────┘   │
-│  ┌──────────┐  ┌───────────────────┐   │
-│  │ Model    │  │ Code Generation   │   │
-│  │ Routing  │  │ (Optimizations)   │   │
-│  └──────────┘  └───────────────────┘   │
-│          PostgreSQL + Redis            │
-└────────────────────────────────────────┘
+┌──────────────────────────────────────┐
+│  Flusk Server (Fastify)              │
+│  OTLP Ingestion → Pattern Detection │
+│  Model Routing  → Code Generation   │
+│  Performance Profiling (flame)       │
+│         PostgreSQL + Redis           │
+└──────────────────────────────────────┘
 ```
 
-## 📊 Comparison
+## Packages
 
-| Feature | Flusk | Helicone | Langfuse | Portkey |
-|---------|-------|----------|----------|---------|
-| Zero-code instrumentation | ✅ OTel | ⚠️ Proxy | ⚠️ SDK | ⚠️ Proxy |
-| Self-hosted | ✅ | ✅ | ✅ | ❌ |
-| Auto-generates fixes | ✅ | ❌ | ❌ | ❌ |
-| Semantic dedup detection | ✅ | ❌ | ❌ | ❌ |
-| Model routing | ✅ | ❌ | ❌ | ✅ |
-| Open source | ✅ MIT | ✅ | ✅ | Partial |
+| Package | Description |
+|---------|-------------|
+| `@flusk/otel` | Zero-touch OTel auto-instrumentation |
+| `@flusk/sdk` | Programmatic API client (routing, prompts, tracing) |
+| `@flusk/entities` | TypeBox schemas — single source of truth |
+| `@flusk/types` | Derived TS types (Insert, Update, Query) |
+| `@flusk/business-logic` | Pure functions, no I/O |
+| `@flusk/resources` | DB repositories, migrations, Redis cache |
+| `@flusk/execution` | Fastify app: routes, plugins, OTLP ingestion |
+| `@flusk/cli` | Code generators, validators, project scaffolding |
+| `@flusk/logger` | Structured logging (Pino) |
 
-## 🗂️ Monorepo Structure
+## Entities
 
-```
-packages/
-  otel/             @flusk/otel — zero-touch OTel auto-instrumentation
-  entities/         TypeBox schemas — single source of truth
-  types/            Derived TS types (Insert, Update, Query)
-  business-logic/   Pure functions, no I/O
-  resources/        DB repositories, migrations (pg, Redis)
-  execution/        Fastify app: routes, plugins, OTLP ingestion
-  cli/              Code generators, validators
-```
+base, llm-call, pattern, conversion, model-performance, routing-rule,
+routing-decision, trace, span, optimization, prompt-template,
+prompt-version, profile-session, performance-pattern
 
-## 📖 Examples
+## Generators
 
-- [`examples/openai-node/`](./examples/openai-node/) — OpenAI with zero-touch tracking
-- [`examples/anthropic-node/`](./examples/anthropic-node/) — Anthropic with zero-touch tracking
-- [`examples/bedrock-node/`](./examples/bedrock-node/) — AWS Bedrock with zero-touch tracking
-
-## 🔥 Performance Profiling
-
-Flusk integrates [`@platformatic/flame`](https://github.com/platformatic/flame) for CPU profiling and flamegraph generation.
+The CLI scaffolds code across all packages:
 
 ```bash
-# Scaffold profiling config
-flusk g:profile
+pnpm tsx packages/cli/bin/flusk.ts g <entity-file>
+```
 
-# Profile your server (default 30s)
+Available generators: entity-schema, types, resources, business-logic,
+execution, feature, feature-test, route, plugin, middleware, service,
+fastify-plugin, otel-hook, detector, profile, provider, package,
+infrastructure, docker-compose, dockerfile, entrypoint, env, swagger,
+watt, test, barrel-updater
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `FLUSK_ENDPOINT` | `https://otel.flusk.dev` | Flusk server URL |
+| `FLUSK_API_KEY` | — | API key (optional for local) |
+| `FLUSK_PROJECT_NAME` | `default` | Project name |
+| `FLUSK_CAPTURE_CONTENT` | `true` | Capture prompt/response |
+| `FLUSK_LOG_LEVEL` | `info` | Log level |
+| `FLUSK_PROFILE_MODE` | `auto` | Profiling: auto/manual/off |
+
+## Supported Providers
+
+OpenAI, Anthropic, AWS Bedrock — all auto-detected via OTel.
+
+## Performance Profiling
+
+```bash
+flusk g:profile           # scaffold config
 flusk profile run ./dist/index.js --duration 60
-
-# Generate flamegraph from pprof output
-flusk profile generate ./profiles/cpu.pprof
-
-# View hotspot summary
 flusk profile analyze ./profiles/cpu.md
 ```
 
-## 🤝 Contributing
+## Examples
 
-We love contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup instructions and guidelines.
+- [`examples/openai-node/`](./examples/openai-node/)
+- [`examples/anthropic-node/`](./examples/anthropic-node/)
+- [`examples/bedrock-node/`](./examples/bedrock-node/)
 
-## 📄 License
+## Docs
+
+- [Getting Started](./docs/getting-started.md)
+- [Architecture](./docs/architecture.md)
+- [API Reference](./docs/api-reference.md)
+- [SDK Reference](./docs/sdk-reference.md)
+- [Self-Hosting](./docs/self-hosting.md)
+
+## Contributing
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md).
+
+## License
 
 [MIT](LICENSE) © Adir Ben Yossef 2026

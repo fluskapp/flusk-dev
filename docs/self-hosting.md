@@ -11,7 +11,7 @@ Deploy your own Flusk instance using Docker Compose.
 ## Quick Start
 
 ```bash
-git clone https://github.com/your-org/flusk.git
+git clone https://github.com/adirbenyossef/flusk-dev.git
 cd flusk
 cp .env.example .env
 # Edit .env with your settings (see Environment Variables below)
@@ -138,6 +138,8 @@ POSTGRES_PASSWORD=your-secure-password docker compose -f docker-compose.prod.yml
 |----------|---------|-------------|
 | `LOG_LEVEL` | `info` | `fatal`, `error`, `warn`, `info`, `debug`, `trace` |
 | `LOG_PRETTY` | `true` | Pretty-print logs in dev |
+| `FLUSK_LOG_LEVEL` | `info` | Flusk logger level (overrides LOG_LEVEL) |
+| `FLUSK_PROFILE_MODE` | `auto` | Profiling: `auto`, `manual`, `off` |
 | `SENTRY_DSN` | (none) | Sentry error tracking DSN |
 | `SENTRY_ENVIRONMENT` | `development` | Sentry environment |
 

@@ -5,7 +5,7 @@ Zero-touch OpenTelemetry auto-instrumentation for Flusk.
 ## Usage
 
 ```bash
-node --require @flusk/otel ./index.js
+node --import @flusk/otel ./index.js
 ```
 
 Or import at the top of your entry file:
