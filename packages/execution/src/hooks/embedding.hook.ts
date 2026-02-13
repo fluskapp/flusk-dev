@@ -1,6 +1,9 @@
 import type { Pool } from 'pg';
+import { getLogger } from '@flusk/logger';
 import { OpenAIEmbeddingClient } from '@flusk/resources';
 import { LLMCallRepository } from '@flusk/resources';
+
+const logger = getLogger().child({ module: 'embedding-hook' });
 
 /**
  * Generate and store embedding for a newly created LLM call
@@ -16,6 +19,6 @@ export function scheduleEmbedding(pool: Pool, callId: string, prompt: string): v
   OpenAIEmbeddingClient.generateEmbedding(prompt)
     .then((result) => LLMCallRepository.updateEmbedding(pool, callId, result.embedding))
     .catch((err) => {
-      console.error(`Embedding failed for ${callId}:`, err.message);
+      logger.error({ callId, err }, 'embedding failed');
     });
 }

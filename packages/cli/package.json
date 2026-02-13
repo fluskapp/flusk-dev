@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@clack/prompts": "^1.0.0",
+    "@flusk/logger": "workspace:*",
     "@platformatic/flame": "1.6.0",
     "@sinclair/typebox": "^0.34.48",
     "boxen": "^7.1.0",

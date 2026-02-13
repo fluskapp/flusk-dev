@@ -31,6 +31,9 @@ export function generateFastifyPluginContent(opts: FastifyPluginGenOptions): str
  */
 import fp from 'fastify-plugin';
 import type { FastifyInstance } from 'fastify';
+import { getLogger } from '@flusk/logger';
+
+const logger = getLogger().child({ module: '${opts.name}-plugin' });
 
 export interface ${pascal}PluginOptions {
   // TODO: add plugin options
@@ -40,6 +43,7 @@ async function ${camel}Plugin(
   app: FastifyInstance,
   opts: ${pascal}PluginOptions,
 ): Promise<void> {
+  logger.info({ opts }, '${opts.name} plugin registered');
   // TODO: plugin logic${decoratorLine}
 }
 

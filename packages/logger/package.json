@@ -1,0 +1,25 @@
+{
+  "name": "@flusk/logger",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Structured logging for Flusk platform — powered by Pino",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "pino": "^9.6.0"
+  },
+  "devDependencies": {
+    "pino-pretty": "^13.0.0",
+    "typescript": "^5.7.0"
+  }
+}

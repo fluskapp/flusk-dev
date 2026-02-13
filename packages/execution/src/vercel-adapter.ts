@@ -7,7 +7,10 @@
 
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import type { FastifyInstance } from 'fastify';
+import { getLogger } from '@flusk/logger';
 import { createApp } from './app.js';
+
+const logger = getLogger().child({ module: 'vercel-adapter' });
 
 /**
  * Global Fastify instance (reused across warm invocations)
@@ -98,7 +101,7 @@ export default async function handler(
     res.status(response.statusCode).send(response.body);
   } catch (error) {
     // Log error and return 500
-    console.error('Vercel adapter error:', error);
+    logger.error({ err: error }, 'vercel adapter error');
     res.status(500).json({
       error: 'Internal Server Error',
       message: error instanceof Error ? error.message : 'Unknown error',

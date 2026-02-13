@@ -4,7 +4,10 @@
  */
 
 import type Redis from 'ioredis';
+import { getLogger } from '@flusk/logger';
 import { getConnection } from '../cache/redis.client.js';
+
+const logger = getLogger().child({ module: 'event-bus' });
 
 export interface EventMessage {
   eventType: string;
@@ -155,16 +158,16 @@ export class EventBusClient {
               // Acknowledge message
               await this.redis.xack(streamKey, groupName, messageId);
             } catch (handlerError) {
-              console.error(
-                `Error handling message ${messageId}:`,
-                handlerError
+              logger.error(
+                { messageId, err: handlerError },
+                'error handling message',
               );
               // Message will be retried by another consumer
             }
           }
         }
       } catch (err) {
-        console.error('Error reading from stream:', err);
+        logger.error({ err }, 'error reading from stream');
         // Wait before retrying
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }

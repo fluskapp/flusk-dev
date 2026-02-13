@@ -1,6 +1,8 @@
 /**
  * Flusk OTel configuration from environment variables
  */
+import { getLogger } from '@flusk/logger';
+
 export interface FluskOtelConfig {
   apiKey: string;
   endpoint: string;
@@ -9,11 +11,12 @@ export interface FluskOtelConfig {
 }
 
 const DEFAULT_ENDPOINT = 'https://otel.flusk.dev';
+const logger = getLogger().child({ module: 'otel-config' });
 
 export function loadConfig(): FluskOtelConfig {
   const apiKey = process.env['FLUSK_API_KEY'] || '';
   if (!apiKey) {
-    console.warn('[flusk/otel] FLUSK_API_KEY not set — traces will not be authenticated');
+    logger.warn('FLUSK_API_KEY not set — traces will not be authenticated');
   }
 
   return {

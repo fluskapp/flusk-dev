@@ -10,10 +10,12 @@
  *   FLUSK_PROJECT_NAME  — Service/project name (default: 'default')
  *   FLUSK_CAPTURE_CONTENT — Capture prompt/response content (default: true)
  */
+import { getLogger } from '@flusk/logger';
 import { loadConfig } from './config.js';
 import { createSdk } from './create-sdk.js';
 import { setupAutoFlame } from './utils/auto-register-flame.js';
 
+const logger = getLogger().child({ module: 'otel-register' });
 const config = loadConfig();
 const spanProcessors = await setupAutoFlame();
 const sdk = createSdk(config, { spanProcessors });
@@ -21,11 +23,11 @@ const sdk = createSdk(config, { spanProcessors });
 sdk.start();
 
 process.on('SIGTERM', () => {
-  sdk.shutdown().catch(console.error);
+  sdk.shutdown().catch((err: unknown) => logger.error({ err }, 'shutdown failed'));
 });
 
 process.on('SIGINT', () => {
-  sdk.shutdown().catch(console.error);
+  sdk.shutdown().catch((err: unknown) => logger.error({ err }, 'shutdown failed'));
 });
 
-console.log(`[flusk/otel] Instrumentation active — project: ${config.projectName}`);
+logger.info({ project: config.projectName }, 'instrumentation active');

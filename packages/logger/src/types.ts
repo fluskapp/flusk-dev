@@ -1,0 +1,12 @@
+/**
+ * Logger configuration types
+ */
+
+export interface FluskLoggerOptions {
+  /** Logger name (appears in log output) */
+  name?: string;
+  /** Log level — overridden by FLUSK_LOG_LEVEL env var */
+  level?: string;
+  /** Use pino-pretty transport (defaults to true outside production) */
+  pretty?: boolean;
+}

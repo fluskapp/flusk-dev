@@ -21,6 +21,9 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
+    "@flusk/business-logic": "workspace:*",
+    "@flusk/logger": "workspace:*",
+    "@flusk/resources": "workspace:*",
     "@opentelemetry/auto-instrumentations-node": "^0.56.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.57.0",
     "@opentelemetry/resources": "^1.30.0",
@@ -28,9 +31,7 @@
     "@opentelemetry/semantic-conventions": "^1.30.0",
     "@traceloop/instrumentation-bedrock": "^0.22.6",
     "fastify": "^5.0.0",
-    "fastify-plugin": "^5.0.0",
-    "@flusk/business-logic": "workspace:*",
-    "@flusk/resources": "workspace:*"
+    "fastify-plugin": "^5.0.0"
   },
   "peerDependencies": {
     "@platformatic/flame": "^1.6.0"

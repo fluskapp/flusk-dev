@@ -1,9 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// Mock @flusk/logger
+const mockWarn = vi.fn();
+vi.mock('@flusk/logger', () => ({
+  getLogger: () => ({
+    child: () => ({ warn: mockWarn, info: vi.fn(), error: vi.fn(), debug: vi.fn() }),
+    warn: mockWarn,
+    info: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+  }),
+}));
+
 describe('loadConfig', () => {
   beforeEach(() => {
     vi.unstubAllEnvs();
     vi.resetModules();
+    mockWarn.mockClear();
   });
 
   async function load() {
@@ -21,10 +34,10 @@ describe('loadConfig', () => {
 
   it('warns when FLUSK_API_KEY is missing', async () => {
     vi.stubEnv('FLUSK_API_KEY', '');
-    const spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     await load();
-    expect(spy).toHaveBeenCalledWith(expect.stringContaining('FLUSK_API_KEY'));
-    spy.mockRestore();
+    expect(mockWarn).toHaveBeenCalledWith(
+      expect.stringContaining('FLUSK_API_KEY'),
+    );
   });
 
   it('reads all env vars correctly', async () => {

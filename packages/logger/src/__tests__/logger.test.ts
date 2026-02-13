@@ -1,0 +1,28 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { getLogger, setLogger, resetLogger } from '../logger.js';
+import { createLogger } from '../create-logger.js';
+
+describe('singleton logger', () => {
+  beforeEach(() => {
+    resetLogger();
+  });
+
+  it('should return same instance on multiple calls', () => {
+    const a = getLogger();
+    const b = getLogger();
+    expect(a).toBe(b);
+  });
+
+  it('should allow replacing the instance via setLogger', () => {
+    const custom = createLogger({ name: 'custom', pretty: false });
+    setLogger(custom);
+    expect(getLogger()).toBe(custom);
+  });
+
+  it('should reset the singleton', () => {
+    const first = getLogger();
+    resetLogger();
+    const second = getLogger();
+    expect(first).not.toBe(second);
+  });
+});

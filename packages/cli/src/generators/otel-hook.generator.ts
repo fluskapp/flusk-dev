@@ -30,18 +30,23 @@ import type {
   Span,
   SpanProcessor,
 } from '@opentelemetry/sdk-trace-base';
+import { getLogger } from '@flusk/logger';
+
+const logger = getLogger().child({ module: '${opts.name}-hook' });
 ${filterBlock}
 export class ${pascal}Hook implements SpanProcessor {
   onStart(span: Span): void {
+    logger.debug({ spanName: (span as unknown as { name: string }).name }, 'span started');
     // TODO: handle span start
   }
 
   onEnd(span: ReadableSpan): void {
+    logger.debug({ spanName: span.name }, 'span ended');
     // TODO: handle span end
   }
 
   async shutdown(): Promise<void> {
-    // cleanup
+    logger.info('${opts.name} hook shutting down');
   }
 
   async forceFlush(): Promise<void> {

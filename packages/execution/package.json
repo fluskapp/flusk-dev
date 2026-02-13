@@ -29,6 +29,7 @@
     "@fastify/websocket": "^11.2.0",
     "@flusk/business-logic": "workspace:*",
     "@flusk/entities": "workspace:*",
+    "@flusk/logger": "workspace:*",
     "@flusk/resources": "workspace:*",
     "@flusk/types": "workspace:*",
     "@opentelemetry/otlp-transformer": "^0.211.0",

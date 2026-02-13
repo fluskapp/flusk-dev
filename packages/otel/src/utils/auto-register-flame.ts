@@ -3,9 +3,12 @@
  * Returns SpanProcessors to add to the OTel SDK
  */
 import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { getLogger } from '@flusk/logger';
 import { isFlameAvailable } from './detect-flame.js';
 import { createAutoProfileProcessor } from '../hooks/auto-profile.hook.js';
 import type { ProfileMode, ProfilerDecorator, FlameApi } from '../plugins/flame-profile.plugin.js';
+
+const logger = getLogger().child({ module: 'auto-register-flame' });
 
 /**
  * Checks flame availability and returns span processors for auto-profiling.
@@ -40,7 +43,7 @@ export async function setupAutoFlame(): Promise<SpanProcessor[]> {
     stop: async () => { /* no-op */ },
   };
 
-  console.log('[flusk/otel] 🔥 @platformatic/flame detected, auto-profiling enabled');
+  logger.info('flame detected, auto-profiling enabled');
 
   return [createAutoProfileProcessor({ profiler })];
 }

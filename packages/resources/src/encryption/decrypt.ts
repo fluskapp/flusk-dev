@@ -1,4 +1,7 @@
 import { createDecipheriv, scryptSync } from 'crypto';
+import { getLogger } from '@flusk/logger';
+
+const logger = getLogger().child({ module: 'decrypt' });
 
 /**
  * Decryption configuration
@@ -85,7 +88,7 @@ export function decryptFields<T extends Record<string, any>>(
       } catch (err) {
         // If decryption fails, field might not be encrypted (migration case)
         // Leave it as-is and log warning
-        console.warn(`Failed to decrypt field ${String(field)}:`, err);
+        logger.warn({ field: String(field), err }, 'failed to decrypt field');
       }
     }
   }

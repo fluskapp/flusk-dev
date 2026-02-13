@@ -1,4 +1,7 @@
 import Redis from 'ioredis';
+import { getLogger } from '@flusk/logger';
+
+const logger = getLogger().child({ module: 'redis-client' });
 
 /**
  * Redis client singleton for Flusk cache operations
@@ -23,11 +26,11 @@ export function getConnection(): Redis {
     });
 
     redisClient.on('error', (err) => {
-      console.error('Redis connection error:', err);
+      logger.error({ err }, 'redis connection error');
     });
 
     redisClient.on('connect', () => {
-      console.log('Redis connected successfully');
+      logger.info('redis connected');
     });
   }
 

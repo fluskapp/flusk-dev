@@ -1,4 +1,7 @@
 import { Pool } from 'pg';
+import { getLogger } from '@flusk/logger';
+
+const logger = getLogger().child({ module: 'db-pool' });
 
 /**
  * Shared PostgreSQL connection pool singleton
@@ -22,7 +25,7 @@ export function getPool(): Pool {
       connectionTimeoutMillis: 2000,
     });
     pool.on('error', (err) => {
-      console.error('Unexpected database error:', err);
+      logger.error({ err }, 'unexpected database error');
     });
   }
   return pool;

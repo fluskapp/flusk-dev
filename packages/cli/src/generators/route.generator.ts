@@ -61,12 +61,18 @@ function handlerTemplate(name: string): string {
  */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
+import { getLogger } from '@flusk/logger';
+
+const logger = getLogger().child({ module: '${name}-routes' });
 
 /** Register ${name} handlers */
 export function register${pascal}Handlers(fastify: FastifyInstance): void {
   fastify.get('/', {
     schema: { response: { 200: Type.Object({ status: Type.String() }) } },
-  }, async () => ({ status: 'ok' }));
+  }, async (request) => {
+    logger.info({ url: request.url }, '${name} request');
+    return { status: 'ok' };
+  });
 }
 `;
 }

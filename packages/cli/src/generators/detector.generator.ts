@@ -22,6 +22,9 @@ export function generateDetectorContent(name: string): string {
  */
 import type { CorrelationResult } from './correlate-with-traces.function.js';
 import type { DetectedPattern } from './detect-patterns.function.js';
+import { getLogger } from '@flusk/logger';
+
+const logger = getLogger().child({ module: 'detect-${name}' });
 
 /**
  * Detects ${name} patterns in profiling data.
@@ -35,6 +38,7 @@ export function detect${pascal}(
   for (const { llmCall, relatedHotspots } of correlations) {
     for (const hotspot of relatedHotspots) {
       // TODO: add detection criteria
+      logger.debug({ hotspot: hotspot.functionName, llmCallId: llmCall.id }, 'pattern found');
       patterns.push({
         pattern: '${name}',
         severity: 'medium',
@@ -45,6 +49,7 @@ export function detect${pascal}(
     }
   }
 
+  logger.info({ count: patterns.length }, '${name} detection complete');
   return patterns;
 }
 `;
