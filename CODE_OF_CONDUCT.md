@@ -28,7 +28,7 @@ and orientation.
 ## Enforcement
 
 Instances of abusive behavior may be reported to the project team at
-**flusk@adirbenyossef.com**. All complaints will be reviewed and investigated.
+**adir@flusk.app**. All complaints will be reviewed and investigated.
 
 ## Attribution
 
