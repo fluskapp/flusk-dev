@@ -7,9 +7,14 @@ import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentation
 import { BedrockInstrumentation } from '@traceloop/instrumentation-bedrock';
 import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
+import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import type { FluskOtelConfig } from './config.js';
 
-export function createSdk(config: FluskOtelConfig): NodeSDK {
+export interface CreateSdkOptions {
+  spanProcessors?: SpanProcessor[];
+}
+
+export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): NodeSDK {
   const traceExporter = new OTLPTraceExporter({
     url: `${config.endpoint}/v1/traces`,
     headers: { 'x-flusk-api-key': config.apiKey },
@@ -33,5 +38,10 @@ export function createSdk(config: FluskOtelConfig): NodeSDK {
     }),
   ];
 
-  return new NodeSDK({ traceExporter, resource, instrumentations });
+  return new NodeSDK({
+    traceExporter,
+    resource,
+    instrumentations,
+    spanProcessors: opts?.spanProcessors,
+  });
 }

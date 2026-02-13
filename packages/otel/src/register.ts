@@ -12,9 +12,11 @@
  */
 import { loadConfig } from './config.js';
 import { createSdk } from './create-sdk.js';
+import { setupAutoFlame } from './utils/auto-register-flame.js';
 
 const config = loadConfig();
-const sdk = createSdk(config);
+const spanProcessors = await setupAutoFlame();
+const sdk = createSdk(config, { spanProcessors });
 
 sdk.start();
 
