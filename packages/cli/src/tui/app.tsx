@@ -9,8 +9,9 @@ import { Header } from './components/header.js';
 import { OverviewScreen } from './screens/overview.js';
 import { PatternsScreen } from './screens/patterns.js';
 import { SuggestionsScreen } from './screens/suggestions.js';
+import { ProfileScreen } from './screens/profile.js';
 
-type Screen = 'overview' | 'patterns' | 'suggestions';
+type Screen = 'overview' | 'patterns' | 'suggestions' | 'profile';
 
 interface AppProps {
   endpoint: string;
@@ -24,6 +25,7 @@ function App({ endpoint, apiKey }: AppProps) {
     if (input === '1') setScreen('overview');
     if (input === '2') setScreen('patterns');
     if (input === '3') setScreen('suggestions');
+    if (input === '4') setScreen('profile');
     if (input === 'q') process.exit(0);
   });
 
@@ -31,7 +33,7 @@ function App({ endpoint, apiKey }: AppProps) {
     <Box flexDirection="column">
       <Header endpoint={endpoint} />
       <Text dimColor>
-        [1] Overview  [2] Patterns  [3] Suggestions  [q] Quit
+        [1] Overview  [2] Patterns  [3] Suggestions  [4] Profile  [q] Quit
       </Text>
       <Box marginTop={1}>
         {screen === 'overview' && (
@@ -42,6 +44,9 @@ function App({ endpoint, apiKey }: AppProps) {
         )}
         {screen === 'suggestions' && (
           <SuggestionsScreen endpoint={endpoint} apiKey={apiKey} />
+        )}
+        {screen === 'profile' && (
+          <ProfileScreen endpoint={endpoint} apiKey={apiKey} />
         )}
       </Box>
     </Box>

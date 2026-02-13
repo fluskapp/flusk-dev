@@ -32,6 +32,7 @@ export async function createProfileRoute(app: FastifyInstance): Promise<void> {
       startedAt: body.startedAt ?? new Date().toISOString(),
     });
 
+    app.eventBus?.emit('profile:completed', entity);
     return reply.status(201).send(entity);
   });
 }

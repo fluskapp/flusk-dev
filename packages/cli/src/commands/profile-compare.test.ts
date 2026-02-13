@@ -1,0 +1,53 @@
+/**
+ * Unit tests for profile-compare command
+ */
+
+import { test, describe } from 'node:test';
+import assert from 'node:assert';
+import { profileCompareCommand, formatDiff, formatHotspotDiff } from './profile-compare.js';
+
+describe('Profile Compare Command', () => {
+  test('command has correct name', () => {
+    assert.strictEqual(profileCompareCommand.name(), 'compare');
+  });
+
+  test('command requires two arguments', () => {
+    const args = profileCompareCommand.registeredArguments;
+    assert.strictEqual(args.length, 2);
+  });
+
+  test('formatDiff shows improvement in green', () => {
+    const output = formatDiff('Duration', 1000, 800, 'ms');
+    assert.ok(output.includes('Duration'));
+    assert.ok(output.includes('1000ms'));
+    assert.ok(output.includes('800ms'));
+    assert.ok(output.includes('▼'));
+  });
+
+  test('formatDiff shows regression in red', () => {
+    const output = formatDiff('Samples', 500, 700);
+    assert.ok(output.includes('▲'));
+  });
+
+  test('formatDiff shows unchanged', () => {
+    const output = formatDiff('Samples', 500, 500);
+    assert.ok(output.includes('unchanged'));
+  });
+
+  test('formatHotspotDiff compares functions', () => {
+    const a = {
+      id: '1', name: 'a', type: 'cpu', durationMs: 1000,
+      totalSamples: 100,
+      hotspots: [{ functionName: 'fn1', samples: 50, percentage: 50 }],
+    };
+    const b = {
+      id: '2', name: 'b', type: 'cpu', durationMs: 900,
+      totalSamples: 90,
+      hotspots: [{ functionName: 'fn1', samples: 40, percentage: 44 }],
+    };
+    const output = formatHotspotDiff(a, b);
+    assert.ok(output.includes('fn1'));
+    assert.ok(output.includes('50.0%'));
+    assert.ok(output.includes('44.0%'));
+  });
+});

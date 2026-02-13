@@ -1,0 +1,45 @@
+/**
+ * Unit tests for profile-report command
+ */
+
+import { test, describe } from 'node:test';
+import assert from 'node:assert';
+import { profileReportCommand, formatHotspots, formatCorrelations } from './profile-report.js';
+import type { Hotspot, Correlation } from './profile-report.js';
+
+describe('Profile Report Command', () => {
+  test('command has correct name', () => {
+    assert.strictEqual(profileReportCommand.name(), 'report');
+  });
+
+  test('command requires session-id argument', () => {
+    const args = profileReportCommand.registeredArguments;
+    assert.strictEqual(args.length, 1);
+    assert.strictEqual(args[0].required, true);
+  });
+
+  test('formatHotspots renders top functions', () => {
+    const hotspots: Hotspot[] = [
+      { functionName: 'processRequest', samples: 100, percentage: 25.5 },
+      { functionName: 'serialize', samples: 80, percentage: 20.0 },
+    ];
+    const output = formatHotspots(hotspots);
+    assert.ok(output.includes('processRequest'));
+    assert.ok(output.includes('serialize'));
+    assert.ok(output.includes('25.5%'));
+  });
+
+  test('formatCorrelations with empty array', () => {
+    const output = formatCorrelations([]);
+    assert.ok(output.includes('No correlated'));
+  });
+
+  test('formatCorrelations renders LLM calls', () => {
+    const corrs: Correlation[] = [
+      { model: 'gpt-4', durationMs: 450, cost: 0.0032, traceId: 'abc12345def' },
+    ];
+    const output = formatCorrelations(corrs);
+    assert.ok(output.includes('gpt-4'));
+    assert.ok(output.includes('450ms'));
+  });
+});

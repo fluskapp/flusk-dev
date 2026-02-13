@@ -7,3 +7,5 @@ export { useApi } from './use-api.js';
 export type { UseApiResult } from './use-api.js';
 export { useLiveFeed } from './use-live-feed.js';
 export type { FeedEvent } from './use-live-feed.js';
+export { useProfiles } from './use-profiles.js';
+export type { UseProfilesResult, ProfileSession, CorrelationData } from './use-profiles.js';

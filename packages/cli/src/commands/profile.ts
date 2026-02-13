@@ -7,6 +7,9 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { resolve } from 'node:path';
 import { readFile } from 'node:fs/promises';
+import { profileListCommand } from './profile-list.js';
+import { profileReportCommand } from './profile-report.js';
+import { profileCompareCommand } from './profile-compare.js';
 
 export const profileRunCommand = new Command('run')
   .description('Start CPU profiling the Flusk server')
@@ -65,3 +68,6 @@ export const profileCommand = new Command('profile')
 profileCommand.addCommand(profileRunCommand);
 profileCommand.addCommand(profileGenerateCommand);
 profileCommand.addCommand(profileAnalyzeCommand);
+profileCommand.addCommand(profileListCommand);
+profileCommand.addCommand(profileReportCommand);
+profileCommand.addCommand(profileCompareCommand);

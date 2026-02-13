@@ -1,0 +1,41 @@
+/**
+ * Unit tests for profile-list command
+ */
+
+import { test, describe } from 'node:test';
+import assert from 'node:assert';
+import { profileListCommand, formatTable } from './profile-list.js';
+import type { ProfileSummary } from './profile-list.js';
+
+describe('Profile List Command', () => {
+  test('command has correct name', () => {
+    assert.strictEqual(profileListCommand.name(), 'list');
+  });
+
+  test('command has endpoint and limit options', () => {
+    const names = profileListCommand.options.map((o) => o.long);
+    assert.ok(names.includes('--endpoint'));
+    assert.ok(names.includes('--limit'));
+  });
+
+  test('formatTable renders header and rows', () => {
+    const profiles: ProfileSummary[] = [{
+      id: 'abc12345-6789-0000-0000-000000000000',
+      name: 'test-profile',
+      type: 'cpu',
+      durationMs: 30000,
+      totalSamples: 500,
+      createdAt: '2025-01-15T10:00:00Z',
+    }];
+    const output = formatTable(profiles);
+    assert.ok(output.includes('abc12345'));
+    assert.ok(output.includes('test-profile'));
+    assert.ok(output.includes('cpu'));
+  });
+
+  test('formatTable handles empty array', () => {
+    const output = formatTable([]);
+    assert.ok(output.includes('ID'));
+    assert.ok(!output.includes('undefined'));
+  });
+});

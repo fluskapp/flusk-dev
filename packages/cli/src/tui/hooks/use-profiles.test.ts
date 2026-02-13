@@ -1,0 +1,18 @@
+/**
+ * Unit tests for use-profiles hook (type/export validation)
+ */
+
+import { test, describe } from 'node:test';
+import assert from 'node:assert';
+import { useProfiles } from './use-profiles.js';
+
+describe('useProfiles Hook', () => {
+  test('useProfiles is a function export', () => {
+    assert.strictEqual(typeof useProfiles, 'function');
+  });
+
+  test('module exports expected types', async () => {
+    const mod = await import('./use-profiles.js');
+    assert.ok('useProfiles' in mod);
+  });
+});

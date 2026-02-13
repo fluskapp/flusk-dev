@@ -1,0 +1,80 @@
+/**
+ * TUI Hook: useProfiles — fetch profile sessions from API
+ */
+
+import { useState, useEffect, useCallback } from 'react';
+import { request } from 'undici';
+
+export interface ProfileSession {
+  id: string;
+  name: string;
+  type: string;
+  durationMs: number;
+  totalSamples: number;
+  hotspots: Array<{ functionName: string; samples: number; percentage: number }>;
+  createdAt: string;
+}
+
+export interface Correlation {
+  model: string;
+  durationMs: number;
+  cost: number;
+  traceId: string;
+}
+
+export interface CorrelationData {
+  correlations: Correlation[];
+  suggestions: string[];
+}
+
+export interface UseProfilesResult {
+  profiles: ProfileSession[];
+  loading: boolean;
+  error: string | null;
+  fetchCorrelations: (id: string) => Promise<CorrelationData | null>;
+}
+
+export function useProfiles(
+  endpoint: string,
+  apiKey: string,
+  intervalMs = 10000,
+): UseProfilesResult {
+  const [profiles, setProfiles] = useState<ProfileSession[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    const headers: Record<string, string> = {};
+    if (apiKey) headers['x-flusk-api-key'] = apiKey;
+
+    const load = async () => {
+      try {
+        const res = await request(`${endpoint}/v1/profiles?limit=20`, { headers });
+        const data = (await res.body.json()) as ProfileSession[];
+        if (active) { setProfiles(data); setError(null); }
+      } catch (err) {
+        if (active) setError(String(err));
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    load();
+    const id = setInterval(load, intervalMs);
+    return () => { active = false; clearInterval(id); };
+  }, [endpoint, apiKey, intervalMs]);
+
+  const fetchCorrelations = useCallback(async (id: string) => {
+    try {
+      const headers: Record<string, string> = {};
+      if (apiKey) headers['x-flusk-api-key'] = apiKey;
+      const res = await request(`${endpoint}/v1/profiles/${id}/correlations`, { headers });
+      return (await res.body.json()) as CorrelationData;
+    } catch {
+      return null;
+    }
+  }, [endpoint, apiKey]);
+
+  return { profiles, loading, error, fetchCorrelations };
+}
