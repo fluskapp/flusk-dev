@@ -2,8 +2,9 @@
  * Time-range trait — generates findByTimeRange + date indexes.
  *
  * WHY: Many entities need time-based queries (analytics, logs).
- * This trait adds a findByTimeRange method and creates an index
- * on created_at for efficient time-range scans.
+ * This trait adds a findByTimeRange method that uses rowToEntity
+ * for proper type mapping, and creates an index on created_at
+ * for efficient time-range scans.
  */
 
 import type { Trait, TraitContext, TraitOutput } from './trait.types.js';
@@ -33,7 +34,7 @@ function generateTimeRange(ctx: TraitContext): TraitOutput {
     : `import type { DatabaseSync } from 'node:sqlite';`;
 
   const fnBody = st === 'postgres'
-    ? buildPgTimeRange(n, tableName, dbType)
+    ? buildPgTimeRange(n, tableName)
     : buildSqliteTimeRange(n, tableName, p1, p2, dbType);
 
   return {
@@ -67,7 +68,7 @@ function generateTimeRange(ctx: TraitContext): TraitOutput {
   };
 }
 
-function buildPgTimeRange(n: string, tableName: string, _dbType: string): string {
+function buildPgTimeRange(n: string, tableName: string): string {
   return `/** Find ${n} records within a time range */
 export async function findByTimeRange(
   pool: Pool,
@@ -90,8 +91,9 @@ export function find${n}sByTimeRange(
   db: ${dbType}, from: string, to: string,
 ): ${n}Entity[] {
   const stmt = db.prepare(
-    \`SELECT * FROM ${tableName} WHERE created_at >= ${p1} AND created_at <= ${p2} ORDER BY created_at DESC\`
+    \`SELECT * FROM ${tableName} WHERE created_at >= ${p1} AND created_at <= ${p2} ORDER BY created_at DESC\`,
   );
-  return stmt.all(from, to) as ${n}Entity[];
+  const rows = stmt.all(from, to) as Record<string, unknown>[];
+  return rows.map(rowToEntity);
 }`;
 }
