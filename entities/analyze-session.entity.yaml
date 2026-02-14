@@ -1,0 +1,49 @@
+name: AnalyzeSession
+description: Tracks CLI analyze runs — created when flusk analyze executes
+storage: [sqlite]
+
+fields:
+  script:
+    type: string
+    required: true
+    description: Script path that was analyzed
+    min: 1
+
+  durationMs:
+    type: integer
+    required: true
+    description: Total analysis duration in milliseconds
+    min: 0
+
+  totalCalls:
+    type: integer
+    required: true
+    description: Total LLM calls captured
+    min: 0
+    default: 0
+
+  totalCost:
+    type: number
+    required: true
+    description: Total cost in USD
+    min: 0
+    default: 0
+
+  modelsUsed:
+    type: json
+    required: true
+    description: List of model identifiers used (JSON array)
+    default: "[]"
+
+  startedAt:
+    type: date
+    required: true
+    description: ISO datetime when analysis started
+
+  completedAt:
+    type: date
+    description: ISO datetime when analysis completed
+
+capabilities:
+  crud: true
+  time-range: true

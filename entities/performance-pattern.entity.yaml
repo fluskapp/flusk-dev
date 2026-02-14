@@ -1,0 +1,52 @@
+name: PerformancePattern
+description: Detected performance patterns from profiling data combined with LLM call analysis
+storage: [sqlite]
+
+fields:
+  profileSessionId:
+    type: uuid
+    required: true
+    index: true
+    description: FK to profile_sessions
+
+  pattern:
+    type: string
+    required: true
+    description: Pattern type name
+
+  severity:
+    type: enum
+    required: true
+    values: [critical, high, medium, low]
+    description: Severity level of the pattern
+
+  description:
+    type: string
+    required: true
+    description: Human-readable description
+
+  suggestion:
+    type: string
+    required: true
+    description: Actionable suggestion for the developer
+
+  metadata:
+    type: json
+    required: true
+    description: Extra context (hotspot data, llm call ids)
+    default: "{}"
+
+  organizationId:
+    type: string
+    description: Organization ID for multi-tenant
+    min: 1
+
+relations:
+  profileSession:
+    entity: ProfileSession
+    type: belongs-to
+    foreignKey: profileSessionId
+    cascade: cascade
+
+capabilities:
+  crud: true

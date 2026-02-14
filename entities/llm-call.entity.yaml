@@ -1,0 +1,77 @@
+name: LLMCall
+description: A single LLM API call with cost tracking and deduplication
+storage: [sqlite]
+
+fields:
+  provider:
+    type: string
+    required: true
+    description: LLM provider name (e.g., openai, anthropic, cohere)
+    min: 1
+
+  model:
+    type: string
+    required: true
+    index: true
+    description: Model identifier (e.g., gpt-4, claude-3-opus)
+    min: 1
+
+  prompt:
+    type: string
+    required: true
+    description: Full prompt text sent to the LLM
+
+  promptHash:
+    type: string
+    required: true
+    index: true
+    description: SHA-256 hash of the prompt for deduplication
+    min: 64
+    max: 64
+
+  tokens:
+    type: json
+    required: true
+    description: Token usage object (input, output, total)
+    default: "{}"
+
+  cost:
+    type: number
+    required: true
+    description: Calculated cost in USD for this API call
+    min: 0
+    default: 0
+
+  response:
+    type: string
+    required: true
+    description: Full response text from the LLM
+    default: ""
+
+  cached:
+    type: boolean
+    required: true
+    description: Whether this response was served from cache
+    default: false
+
+  organizationId:
+    type: string
+    description: Organization ID for GDPR data portability and deletion
+    min: 1
+
+  consentGiven:
+    type: boolean
+    required: true
+    description: GDPR consent flag
+    default: true
+
+  consentPurpose:
+    type: string
+    required: true
+    description: Purpose of data processing (optimization, analytics, training)
+    default: optimization
+
+capabilities:
+  crud: true
+  aggregation: true
+  time-range: true

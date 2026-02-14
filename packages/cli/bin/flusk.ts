@@ -42,6 +42,7 @@ import { reportCommand } from '../src/commands/report.js';
 import { historyCommand } from '../src/commands/history.js';
 import { budgetCommand } from '../src/commands/budget.js';
 import { initConfigCommand } from '../src/commands/init-config.js';
+import { generateEntityFromYamlCommand } from '../src/commands/generate-entity-from-yaml.js';
 
 const program = new Command();
 
@@ -111,5 +112,8 @@ program.addCommand(reportCommand);
 program.addCommand(historyCommand);
 program.addCommand(budgetCommand);
 program.addCommand(initConfigCommand);
+
+// Schema-first entity generation
+program.addCommand(generateEntityFromYamlCommand);
 
 program.parse(process.argv);

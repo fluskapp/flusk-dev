@@ -1,0 +1,74 @@
+name: ProfileSession
+description: Captures profiling session data from @platformatic/flame integration
+storage: [sqlite]
+
+fields:
+  name:
+    type: string
+    required: true
+    description: User label for the profiling session
+    min: 1
+
+  profileType:
+    type: enum
+    required: true
+    values: [cpu, heap]
+    description: Profile type
+
+  durationMs:
+    type: integer
+    required: true
+    description: Profiling duration in milliseconds
+    min: 0
+    default: 0
+
+  totalSamples:
+    type: integer
+    required: true
+    description: Total samples from flame
+    min: 0
+    default: 0
+
+  hotspots:
+    type: json
+    required: true
+    description: Top-N hotspot functions (JSON array)
+    default: "[]"
+
+  markdownRaw:
+    type: string
+    required: true
+    description: Full flame markdown output
+    default: ""
+
+  pprofPath:
+    type: string
+    required: true
+    description: Path to .pb file
+    default: ""
+
+  flamegraphPath:
+    type: string
+    required: true
+    description: Path to .html file
+    default: ""
+
+  traceIds:
+    type: json
+    required: true
+    description: Linked OTel trace IDs (JSON array)
+    default: "[]"
+
+  organizationId:
+    type: string
+    description: Organization ID for multi-tenant
+    min: 1
+
+  startedAt:
+    type: date
+    required: true
+    description: ISO datetime when profiling started
+
+capabilities:
+  crud: true
+  time-range: true
