@@ -10,7 +10,7 @@
 
 **Do not open a public issue for security vulnerabilities.**
 
-Email **flusk@adirbenyossef.com** with:
+Email **adir@flusk.app** with:
 
 1. Description of the vulnerability
 2. Steps to reproduce
