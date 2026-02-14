@@ -94,6 +94,30 @@ base, llm-call, pattern, conversion, model-performance, routing-rule,
 routing-decision, trace, span, optimization, prompt-template,
 prompt-version, profile-session, performance-pattern
 
+## Generator Architecture
+
+```
+Entity YAML
+  │  flusk recipe full-entity --from <yaml>
+  ▼
+Schema Parser → Validator → Recipe Runner
+                              │
+                    ┌─────────┼─────────┐
+                    ▼         ▼         ▼
+              Types/Entity  Migration  Traits Composer
+                                         │
+                                    ┌────┼────┐
+                                    ▼    ▼    ▼
+                                  Repo  Routes Barrels
+```
+
+**Layers:**
+- **Schema** (Phase 1) — YAML → parsed EntitySchema + validation
+- **Traits** (Phase 2) — Composable code units (crud, time-range, aggregation, etc.)
+- **Recipes** (Phase 3) — Multi-step pipelines that orchestrate generators
+
+See [Recipes](./generators/recipes.md) for the recipe system docs.
+
 ## Design Decisions
 
 - **OTel-first** — no wrappers, industry-standard instrumentation

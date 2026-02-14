@@ -43,6 +43,7 @@ import { historyCommand } from '../src/commands/history.js';
 import { budgetCommand } from '../src/commands/budget.js';
 import { initConfigCommand } from '../src/commands/init-config.js';
 import { generateEntityFromYamlCommand } from '../src/commands/generate-entity-from-yaml.js';
+import { recipeCommand } from '../src/commands/recipe.js';
 
 const program = new Command();
 
@@ -115,5 +116,8 @@ program.addCommand(initConfigCommand);
 
 // Schema-first entity generation
 program.addCommand(generateEntityFromYamlCommand);
+
+// Recipe system
+program.addCommand(recipeCommand);
 
 program.parse(process.argv);
