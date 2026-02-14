@@ -115,8 +115,10 @@ Schema Parser → Validator → Recipe Runner
 - **Schema** (Phase 1) — YAML → parsed EntitySchema + validation
 - **Traits** (Phase 2) — Composable code units (crud, time-range, aggregation, etc.)
 - **Recipes** (Phase 3) — Multi-step pipelines that orchestrate generators
+- **Regeneration** (Phase 4) — Safe incremental regeneration with protected regions
 
 See [Recipes](./generators/recipes.md) for the recipe system docs.
+See [Regeneration](./generators/regeneration.md) for the regeneration system docs.
 
 ## Design Decisions
 

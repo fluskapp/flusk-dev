@@ -6,8 +6,8 @@
  * Each step is logged for debuggability.
  */
 
-import { resolve } from 'node:path';
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { resolve, relative } from 'node:path';
+import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
 import { createLogger } from '@flusk/logger';
 import { parseEntitySchema } from './entity-schema.parser.js';
 import { validateEntitySchema } from './entity-schema.validator.js';
@@ -17,6 +17,9 @@ import { generateTypesFileContent } from './generate-types-file.js';
 import { toKebabCase } from '../generators/utils.js';
 import { registerDefaultTraits } from '../traits/register-defaults.js';
 import { composeTraits } from '../traits/trait.composer.js';
+import { buildFileHeader } from '../regeneration/file-header.js';
+import { wrapGenerated, emptyCustomSection } from '../regeneration/region-markers.js';
+import { smartMerge } from '../regeneration/smart-merge.js';
 import type { StorageTarget } from './entity-schema.types.js';
 
 const logger = createLogger({ name: 'schema:pipeline' });
@@ -46,23 +49,28 @@ export function runEntityPipeline(
   }
 
   const kebab = toKebabCase(schema.name);
+  const yamlContent = readFileSync(yamlPath, 'utf-8');
+  const yamlRel = relative(projectRoot, yamlPath);
+  const header = buildFileHeader(yamlRel, yamlContent);
   const files: PipelineResult['files'] = [];
   let allTraits: string[] = [];
 
   // 1. Generate TypeBox entity
   const entityDir = resolve(projectRoot, 'packages/entities/src');
-  writeGenerated(entityDir, `${kebab}.entity.ts`,
-    generateTypeBoxContent(schema), files);
+  const entityBody = wrapGenerated(generateTypeBoxContent(schema), 'typebox');
+  writeGeneratedFile(entityDir, `${kebab}.entity.ts`,
+    `${header}\n\n${entityBody}\n\n${emptyCustomSection('entity')}`, files);
 
   // 2. Generate types file
   const typesDir = resolve(projectRoot, 'packages/types/src');
-  writeGenerated(typesDir, `${kebab}.types.ts`,
-    generateTypesFileContent(schema), files);
+  const typesBody = wrapGenerated(generateTypesFileContent(schema), 'types');
+  writeGeneratedFile(typesDir, `${kebab}.types.ts`,
+    `${header}\n\n${typesBody}`, files);
 
   // 3. Generate migration SQL
   const sqlDir = resolve(projectRoot, 'packages/resources/src/sqlite/sql');
-  const migName = `${kebab}.sql`;
-  writeGenerated(sqlDir, migName, generateMigrationSql(schema), files);
+  writeGeneratedFile(sqlDir, `${kebab}.sql`,
+    `${header}\n\n${generateMigrationSql(schema)}`, files);
 
   // 4. Compose traits for each storage target
   const hasCapabilities = schema.capabilities &&
@@ -74,19 +82,19 @@ export function runEntityPipeline(
       allTraits = composed.traitNames;
       const dir = resolve(projectRoot,
         `packages/resources/src/${target}/repositories`);
-      writeGenerated(dir, `${kebab}.repository.ts`,
-        composed.repository, files);
+      const repoBody = `${header}\n\n${wrapGenerated(composed.repository, 'repository')}\n\n${emptyCustomSection('repository')}`;
+      writeGeneratedFile(dir, `${kebab}.repository.ts`, repoBody, files);
       if (composed.migration) {
         const migDir = resolve(projectRoot,
           `packages/resources/src/${target}/sql`);
-        writeGenerated(migDir, `${kebab}-traits.sql`,
-          composed.migration, files);
+        writeGeneratedFile(migDir, `${kebab}-traits.sql`,
+          `${header}\n\n${composed.migration}`, files);
       }
       if (composed.route) {
         const routeDir = resolve(projectRoot,
           `packages/execution/src/routes`);
-        writeGenerated(routeDir, `${kebab}.routes.ts`,
-          composed.route, files);
+        const routeBody = `${header}\n\n${wrapGenerated(composed.route, 'routes')}\n\n${emptyCustomSection('routes')}`;
+        writeGeneratedFile(routeDir, `${kebab}.routes.ts`, routeBody, files);
       }
     }
     logger.info({ traits: allTraits }, 'Traits composed');
@@ -97,8 +105,8 @@ export function runEntityPipeline(
   return { files, entityName: schema.name, traits: allTraits };
 }
 
-/** Write a file and track it in the results */
-function writeGenerated(
+/** Write a file with smart-merge if it already exists */
+function writeGeneratedFile(
   dir: string,
   filename: string,
   content: string,
@@ -107,7 +115,14 @@ function writeGenerated(
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   const fullPath = resolve(dir, filename);
   const action = existsSync(fullPath) ? 'updated' : 'created';
-  writeFileSync(fullPath, content, 'utf-8');
+  if (action === 'updated') {
+    const existing = readFileSync(fullPath, 'utf-8');
+    const merged = smartMerge(content, existing);
+    writeFileSync(fullPath, merged.content, 'utf-8');
+    logger.debug({ file: filename, preserved: merged.customSectionsPreserved }, 'Merged');
+  } else {
+    writeFileSync(fullPath, content, 'utf-8');
+  }
   files.push({ path: fullPath, action });
   logger.debug({ file: filename, action }, 'File written');
 }

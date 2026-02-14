@@ -44,6 +44,8 @@ import { budgetCommand } from '../src/commands/budget.js';
 import { initConfigCommand } from '../src/commands/init-config.js';
 import { generateEntityFromYamlCommand } from '../src/commands/generate-entity-from-yaml.js';
 import { recipeCommand } from '../src/commands/recipe.js';
+import { regenerateCommand } from '../src/commands/regenerate.js';
+import { statusCommand } from '../src/commands/status.js';
 
 const program = new Command();
 
@@ -119,5 +121,9 @@ program.addCommand(generateEntityFromYamlCommand);
 
 // Recipe system
 program.addCommand(recipeCommand);
+
+// Regeneration system
+program.addCommand(regenerateCommand);
+program.addCommand(statusCommand);
 
 program.parse(process.argv);
