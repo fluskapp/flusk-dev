@@ -1,0 +1,33 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { PatternEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Insert a new Pattern record into SQLite
+ */
+export function create(
+  db: DatabaseSync,
+  data: Omit<PatternEntity, 'id' | 'createdAt' | 'updatedAt'>,
+): PatternEntity {
+  const stmt = db.prepare(`
+    INSERT INTO patterns (
+      organization_id, prompt_hash, occurrence_count, first_seen_at, last_seen_at,
+      sample_prompts, avg_cost, total_cost, suggested_conversion
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    RETURNING *
+  `);
+
+  const row = stmt.get(
+    data.organizationId,
+    data.promptHash,
+    data.occurrenceCount,
+    data.firstSeenAt,
+    data.lastSeenAt,
+    JSON.stringify(data.samplePrompts),
+    data.avgCost,
+    data.totalCost,
+    data.suggestedConversion ?? null,
+  ) as Record<string, unknown>;
+
+  return rowToEntity(row);
+}

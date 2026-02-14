@@ -1,0 +1,15 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { ConversionEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Find Conversion by id
+ */
+export function findById(
+  db: DatabaseSync,
+  id: string,
+): ConversionEntity | null {
+  const stmt = db.prepare('SELECT * FROM conversions WHERE id = ?');
+  const row = stmt.get(id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
+}

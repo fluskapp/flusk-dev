@@ -1,0 +1,17 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { PatternEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Find pattern by prompt hash
+ */
+export function findByPromptHash(
+  db: DatabaseSync,
+  hash: string,
+): PatternEntity | null {
+  const stmt = db.prepare(
+    'SELECT * FROM patterns WHERE prompt_hash = ? LIMIT 1',
+  );
+  const row = stmt.get(hash) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
+}

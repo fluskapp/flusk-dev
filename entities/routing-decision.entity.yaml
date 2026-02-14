@@ -1,0 +1,60 @@
+name: RoutingDecision
+description: Records each routing decision and savings for analytics and cost reports
+storage: [postgres]
+
+fields:
+  ruleId:
+    type: uuid
+    required: true
+    index: true
+    description: Routing rule that triggered this decision
+
+  llmCallId:
+    type: uuid
+    description: Associated LLM call (if tracked)
+
+  selectedModel:
+    type: string
+    required: true
+    min: 1
+    description: Model chosen by the router
+
+  originalModel:
+    type: string
+    required: true
+    min: 1
+    description: Model originally requested by the user
+
+  reason:
+    type: string
+    required: true
+    description: Why this model was selected (e.g., cheapest-qualifying, fallback, ab-test)
+
+  costSaved:
+    type: number
+    required: true
+    description: Estimated cost savings in USD (can be negative if A/B test)
+
+relations:
+  rule:
+    entity: RoutingRule
+    type: belongs-to
+    foreignKey: ruleId
+
+capabilities:
+  crud: false
+
+queries:
+  - name: findByRule
+    description: Find decisions for a specific rule
+    params:
+      ruleId: { type: string }
+    where: "rule_id = :ruleId"
+    order: "created_at DESC"
+    returns: list
+
+  - name: getSavingsSummary
+    description: Get total savings summary
+    type: raw-sql
+    sql: "SELECT COALESCE(SUM(cost_saved), 0) as total_saved, COUNT(*) as total_decisions FROM routing_decisions"
+    returns: raw

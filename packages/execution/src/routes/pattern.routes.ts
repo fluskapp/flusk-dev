@@ -1,84 +1,91 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+/** @generated from Pattern YAML — Traits: crud */
+import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { PatternEntitySchema } from '@flusk/entities';
 import { PatternRepository } from '@flusk/resources';
-
+const CreatePatternSchema = Type.Omit(PatternEntitySchema, ['id', 'createdAt', 'updatedAt']);
 const PatternResponseSchema = PatternEntitySchema;
+const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
+const NotFoundSchema = Type.Object({ error: Type.String() });
+const ListQuerySchema = Type.Object({
+  limit: Type.Optional(Type.Integer({ minimum: 1 })),
+  offset: Type.Optional(Type.Integer({ minimum: 0 })),
+});
 
 /**
- * Register pattern routes
+ * Register Pattern routes
  */
 export async function patternRoutes(
-  fastify: FastifyInstance
+  fastify: FastifyInstance,
 ): Promise<void> {
-  /** GET /patterns — list with optional filters */
-  fastify.get(
-    '/',
-    {
-      schema: {
-        querystring: Type.Object({
-          organizationId: Type.Optional(Type.String()),
-          limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 1000 })),
-          offset: Type.Optional(Type.Integer({ minimum: 0 })),
-        }),
-        response: {
-          200: Type.Object({
-            patterns: Type.Array(PatternResponseSchema),
-            total: Type.Integer(),
-          }),
-        },
-      },
+  fastify.post('/', {
+    schema: {
+      body: CreatePatternSchema,
+      response: { 201: PatternResponseSchema },
+      tags: ['Pattern'],
+      description: 'Create a new Pattern record',
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
-      const q = request.query as {
-        organizationId?: string;
-        limit?: number;
-        offset?: number;
-      };
-      let patterns;
-      if (q.organizationId) {
-        patterns = await PatternRepository.findByOrganization(
-          q.organizationId,
-          { limit: q.limit, offset: q.offset }
-        );
-      } else {
-        patterns = await PatternRepository.findMany(q.limit || 100, q.offset || 0);
-      }
-      return reply.send({ patterns, total: patterns.length });
-    }
-  );
+  }, async (request, reply) => {
+    const created = await PatternRepository.create(request.body);
+    return reply.code(201).send(created);
+  });
 
-  /** GET /patterns/:id — get by UUID */
-  fastify.get(
-    '/:id',
-    {
-      schema: {
-        params: Type.Object({ id: Type.String({ format: 'uuid' }) }),
-        response: {
-          200: PatternResponseSchema,
-          404: Type.Object({ error: Type.String() }),
-        },
-      },
+  fastify.get('/:id', {
+    schema: {
+      params: IdParamsSchema,
+      response: { 200: PatternResponseSchema, 404: NotFoundSchema },
+      tags: ['Pattern'],
+      description: 'Get a Pattern by ID',
     },
-    async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-      const entity = await PatternRepository.findById(request.params.id);
-      if (!entity) return reply.code(404).send({ error: 'Pattern not found' });
-      return reply.send(entity);
-    }
-  );
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const entity = await PatternRepository.findById(id);
+    if (!entity) return reply.code(404).send({ error: 'Not found' });
+    return reply.code(200).send(entity);
+  });
 
-  /** POST /patterns — create */
-  fastify.post(
-    '/',
-    {
-      schema: {
-        body: Type.Omit(PatternEntitySchema, ['id', 'createdAt', 'updatedAt']),
-        response: { 201: PatternResponseSchema },
-      },
+  fastify.get('/', {
+    schema: {
+      querystring: ListQuerySchema,
+      response: { 200: Type.Array(PatternResponseSchema) },
+      tags: ['Pattern'],
+      description: 'List Pattern records',
     },
-    async (request: FastifyRequest, reply: FastifyReply) => {
-      const created = await PatternRepository.create(request.body as Record<string, unknown>);
-      return reply.code(201).send(created);
-    }
-  );
+  }, async (request, reply) => {
+    const { limit, offset } = request.query as { limit?: number; offset?: number };
+    const items = await PatternRepository.list(limit, offset);
+    return reply.code(200).send(items);
+  });
+
+  fastify.put('/:id', {
+    schema: {
+      params: IdParamsSchema,
+      body: Type.Partial(CreatePatternSchema),
+      response: { 200: PatternResponseSchema, 404: NotFoundSchema },
+      tags: ['Pattern'],
+      description: 'Update a Pattern by ID',
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const updated = await PatternRepository.update(id, request.body);
+    if (!updated) return reply.code(404).send({ error: 'Not found' });
+    return reply.code(200).send(updated);
+  });
+
+  fastify.delete('/:id', {
+    schema: {
+      params: IdParamsSchema,
+      response: { 204: Type.Null(), 404: NotFoundSchema },
+      tags: ['Pattern'],
+      description: 'Delete a Pattern by ID',
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const deleted = await PatternRepository.delete(id);
+    if (!deleted) return reply.code(404).send({ error: 'Not found' });
+    return reply.code(204).send();
+  });
 }
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

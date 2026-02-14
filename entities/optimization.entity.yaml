@@ -1,0 +1,65 @@
+name: Optimization
+description: Generated code optimization suggestions for LLM usage patterns
+storage: [postgres]
+
+fields:
+  organizationId:
+    type: uuid
+    required: true
+    index: true
+    description: Organization that owns this optimization
+
+  optimizationType:
+    type: enum
+    values: [cache-config, model-swap, prompt-dedup, batch-merge]
+    required: true
+    description: Type of optimization
+
+  title:
+    type: string
+    required: true
+    description: Human-readable title
+
+  description:
+    type: string
+    required: true
+    description: Detailed description of the optimization
+
+  estimatedSavingsPerMonth:
+    type: number
+    required: true
+    min: 0
+    description: Estimated monthly savings in USD
+
+  generatedCode:
+    type: string
+    required: true
+    description: Generated code snippet implementing the optimization
+
+  language:
+    type: enum
+    values: [typescript, python, json]
+    required: true
+    description: Language of the generated code
+
+  status:
+    type: enum
+    values: [suggested, applied, dismissed]
+    required: true
+    description: Current status of the optimization
+
+  sourcePatternId:
+    type: uuid
+    description: Pattern that triggered this optimization (nullable)
+
+capabilities:
+  crud: true
+
+queries:
+  - name: findByOrg
+    description: Find all optimizations for an organization
+    params:
+      orgId: { type: string }
+    where: "organization_id = :orgId"
+    order: "created_at DESC"
+    returns: list

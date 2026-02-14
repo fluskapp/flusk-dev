@@ -1,0 +1,74 @@
+name: Trace
+description: Distributed trace records for agent workflows with aggregated cost and performance metrics
+storage: [postgres]
+
+fields:
+  organizationId:
+    type: uuid
+    required: true
+    index: true
+    description: Organization ID
+
+  name:
+    type: string
+    required: true
+    description: Trace name (e.g. agent workflow name)
+
+  totalCost:
+    type: number
+    required: true
+    description: Aggregated cost across all spans
+
+  totalTokens:
+    type: number
+    required: true
+    description: Aggregated token count
+
+  totalLatencyMs:
+    type: number
+    required: true
+    description: Total latency in milliseconds
+
+  callCount:
+    type: number
+    required: true
+    description: Number of LLM calls in this trace
+
+  status:
+    type: enum
+    values: [running, completed, failed]
+    required: true
+    description: Trace execution status
+
+  startedAt:
+    type: date
+    required: true
+    description: When the trace began
+
+  completedAt:
+    type: date
+    description: When the trace completed
+
+capabilities:
+  crud: true
+
+queries:
+  - name: findByOrganization
+    description: Find all traces for an organization
+    params:
+      orgId: { type: string }
+    where: "organization_id = :orgId"
+    order: "started_at DESC"
+    returns: list
+
+  - name: updateStats
+    description: Update trace statistics on completion
+    type: update
+    params:
+      id: { type: string }
+      totalCost: { type: number }
+      totalTokens: { type: number }
+      totalLatencyMs: { type: number }
+      callCount: { type: number }
+    set: "total_cost = :totalCost, total_tokens = :totalTokens, total_latency_ms = :totalLatencyMs, call_count = :callCount, status = 'completed', completed_at = NOW()"
+    where: "id = :id"

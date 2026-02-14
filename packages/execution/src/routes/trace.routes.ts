@@ -1,61 +1,91 @@
-import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+/** @generated from Trace YAML — Traits: crud */
+import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { TraceEntitySchema } from '@flusk/entities';
-import { TraceRepository, SpanRepository } from '@flusk/resources';
-import { trace as traceBL } from '@flusk/business-logic';
-
-const CreateBody = Type.Object({
-  organizationId: Type.String({ format: 'uuid' }),
-  name: Type.String(),
+import { TraceRepository } from '@flusk/resources';
+const CreateTraceSchema = Type.Omit(TraceEntitySchema, ['id', 'createdAt', 'updatedAt']);
+const TraceResponseSchema = TraceEntitySchema;
+const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
+const NotFoundSchema = Type.Object({ error: Type.String() });
+const ListQuerySchema = Type.Object({
+  limit: Type.Optional(Type.Integer({ minimum: 1 })),
+  offset: Type.Optional(Type.Integer({ minimum: 0 })),
 });
 
-const IdParams = Type.Object({ id: Type.String({ format: 'uuid' }) });
-const OrgParams = Type.Object({ organizationId: Type.String({ format: 'uuid' }) });
-
-export async function traceRoutes(fastify: FastifyInstance): Promise<void> {
-  const pool = fastify.pg.pool;
-
+/**
+ * Register Trace routes
+ */
+export async function traceRoutes(
+  fastify: FastifyInstance,
+): Promise<void> {
   fastify.post('/', {
-    schema: { body: CreateBody, response: { 201: TraceEntitySchema }, tags: ['Trace'] },
-  }, async (req: FastifyRequest, reply: FastifyReply) => {
-    const { organizationId, name } = req.body as { organizationId: string; name: string };
-    const trace = await TraceRepository.create(pool, {
-      organizationId, name, totalCost: 0, totalTokens: 0,
-      totalLatencyMs: 0, callCount: 0, status: 'running',
-      startedAt: new Date().toISOString(), completedAt: null,
-    });
-    return reply.code(201).send(trace);
+    schema: {
+      body: CreateTraceSchema,
+      response: { 201: TraceResponseSchema },
+      tags: ['Trace'],
+      description: 'Create a new Trace record',
+    },
+  }, async (request, reply) => {
+    const created = await TraceRepository.create(request.body);
+    return reply.code(201).send(created);
   });
 
   fastify.get('/:id', {
-    schema: { params: IdParams, tags: ['Trace'] },
-  }, async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    const trace = await TraceRepository.findById(pool, req.params.id);
-    if (!trace) return reply.code(404).send({ error: 'Trace not found' });
-    return reply.send(trace);
+    schema: {
+      params: IdParamsSchema,
+      response: { 200: TraceResponseSchema, 404: NotFoundSchema },
+      tags: ['Trace'],
+      description: 'Get a Trace by ID',
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const entity = await TraceRepository.findById(id);
+    if (!entity) return reply.code(404).send({ error: 'Not found' });
+    return reply.code(200).send(entity);
   });
 
-  fastify.get('/organization/:organizationId', {
-    schema: { params: OrgParams, tags: ['Trace'] },
-  }, async (req: FastifyRequest<{ Params: { organizationId: string } }>, reply) => {
-    const traces = await TraceRepository.findByOrganization(pool, req.params.organizationId);
-    return reply.send(traces);
+  fastify.get('/', {
+    schema: {
+      querystring: ListQuerySchema,
+      response: { 200: Type.Array(TraceResponseSchema) },
+      tags: ['Trace'],
+      description: 'List Trace records',
+    },
+  }, async (request, reply) => {
+    const { limit, offset } = request.query as { limit?: number; offset?: number };
+    const items = await TraceRepository.list(limit, offset);
+    return reply.code(200).send(items);
   });
 
-  fastify.post('/:id/complete', {
-    schema: { params: IdParams, tags: ['Trace'] },
-  }, async (req: FastifyRequest<{ Params: { id: string } }>, reply) => {
-    const spans = await SpanRepository.findByTrace(pool, req.params.id);
-    const stats = traceBL.aggregateTraceStats(spans);
-    const trace = await TraceRepository.updateStats(pool, req.params.id, stats);
-    if (!trace) return reply.code(404).send({ error: 'Trace not found' });
-    return reply.send(trace);
+  fastify.put('/:id', {
+    schema: {
+      params: IdParamsSchema,
+      body: Type.Partial(CreateTraceSchema),
+      response: { 200: TraceResponseSchema, 404: NotFoundSchema },
+      tags: ['Trace'],
+      description: 'Update a Trace by ID',
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const updated = await TraceRepository.update(id, request.body);
+    if (!updated) return reply.code(404).send({ error: 'Not found' });
+    return reply.code(200).send(updated);
   });
 
-  fastify.get('/:id/waterfall', {
-    schema: { params: IdParams, tags: ['Trace'] },
-  }, async (req: FastifyRequest<{ Params: { id: string } }>, reply) => {
-    const spans = await SpanRepository.findByTrace(pool, req.params.id);
-    return reply.send(spans);
+  fastify.delete('/:id', {
+    schema: {
+      params: IdParamsSchema,
+      response: { 204: Type.Null(), 404: NotFoundSchema },
+      tags: ['Trace'],
+      description: 'Delete a Trace by ID',
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const deleted = await TraceRepository.delete(id);
+    if (!deleted) return reply.code(404).send({ error: 'Not found' });
+    return reply.code(204).send();
   });
 }
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

@@ -2,8 +2,8 @@ import { Type, Static } from '@sinclair/typebox';
 import { BaseEntitySchema } from './base.entity.js';
 
 /**
- * PromptTemplate entity schema
- * Tracks prompt templates with variable placeholders for A/B testing
+ * PromptTemplateEntity schema
+ * @generated from PromptTemplate YAML definition
  */
 export const PromptTemplateEntitySchema = Type.Composite([
   BaseEntitySchema,
@@ -11,12 +11,8 @@ export const PromptTemplateEntitySchema = Type.Composite([
     organizationId: Type.String({ format: 'uuid', description: 'Organization ID' }),
     name: Type.String({ description: 'Template name' }),
     description: Type.String({ description: 'Template description' }),
-    activeVersionId: Type.Union([Type.String({ format: 'uuid' }), Type.Null()], {
-      description: 'Currently active version ID',
-    }),
-    variables: Type.Array(Type.String(), {
-      description: 'Template variable names e.g. ["user_query", "context"]',
-    }),
+    activeVersionId: Type.Optional(Type.String({ format: 'uuid', description: 'Currently active version ID' })),
+    variables: Type.Unknown({ description: 'Template variable names e.g. ["user_query", "context"]', default: '[]' })
   })
 ]);
 

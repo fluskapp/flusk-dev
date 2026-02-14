@@ -1,6 +1,6 @@
 /**
- * Routing decision types — Insert + Query variants
- * Note: No Update variant — routing decisions are immutable once recorded
+ * @generated from RoutingDecision YAML schema
+ * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
 
 import { Type, Static } from '@sinclair/typebox';
@@ -10,19 +10,19 @@ export type RoutingDecisionEntity = Static<typeof RoutingDecisionEntitySchema>;
 
 export const RoutingDecisionEntityJSONSchema = RoutingDecisionEntitySchema;
 
-/**
- * Insert variant — excludes auto-generated fields (id, createdAt)
- */
-export const RoutingDecisionInsertSchema = Type.Omit(
-  RoutingDecisionEntitySchema,
-  ['id', 'createdAt']
-);
+export const RoutingDecisionInsertSchema = Type.Omit(RoutingDecisionEntitySchema, [
+  'id', 'createdAt', 'updatedAt',
+]);
+
 export type RoutingDecisionInsert = Static<typeof RoutingDecisionInsertSchema>;
 
-/**
- * Query variant — filterable fields for lookups
- */
-export const RoutingDecisionQuerySchema = Type.Partial(
-  Type.Pick(RoutingDecisionEntitySchema, ['ruleId', 'llmCallId', 'selectedModel'])
-);
+export const RoutingDecisionUpdateSchema = Type.Composite([
+  Type.Object({ id: Type.String({ format: 'uuid' }) }),
+  Type.Partial(Type.Omit(RoutingDecisionEntitySchema, ['id', 'createdAt', 'updatedAt'])),
+]);
+
+export type RoutingDecisionUpdate = Static<typeof RoutingDecisionUpdateSchema>;
+
+export const RoutingDecisionQuerySchema = Type.Partial(RoutingDecisionEntitySchema);
+
 export type RoutingDecisionQuery = Static<typeof RoutingDecisionQuerySchema>;

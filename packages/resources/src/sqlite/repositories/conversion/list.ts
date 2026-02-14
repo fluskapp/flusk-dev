@@ -1,0 +1,18 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { ConversionEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * List Conversions with pagination
+ */
+export function list(
+  db: DatabaseSync,
+  limit = 50,
+  offset = 0,
+): ConversionEntity[] {
+  const stmt = db.prepare(
+    'SELECT * FROM conversions ORDER BY created_at DESC LIMIT ? OFFSET ?',
+  );
+  const rows = stmt.all(limit, offset) as Record<string, unknown>[];
+  return rows.map(rowToEntity);
+}

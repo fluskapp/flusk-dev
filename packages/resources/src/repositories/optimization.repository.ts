@@ -1,95 +1,74 @@
-/**
- * Optimization Repository — CRUD for generated code optimization suggestions.
- * All functions accept a Pool instance as first parameter.
- */
-import type { Pool } from 'pg';
-import type { OptimizationEntity } from '@flusk/entities';
-import type { OptimizationRow } from './optimization/types.js';
+/** @generated from Optimization YAML — Traits: crud */
 
-function rowToEntity(row: OptimizationRow): OptimizationEntity {
+import type { OptimizationEntity } from '@flusk/entities';
+import type { DatabaseSync } from 'node:sqlite';
+
+export type CreateOptimizationInput = Omit<OptimizationEntity, 'id' | 'createdAt' | 'updatedAt'>;
+export type UpdateOptimizationInput = Partial<CreateOptimizationInput>;
+
+function toISOString(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object' && 'toISOString' in value) {
+    return (value as { toISOString(): string }).toISOString();
+  }
+  return String(value);
+}
+
+/** Convert a SQLite row (snake_case) to OptimizationEntity (camelCase) */
+function rowToEntity(row: Record<string, unknown>): OptimizationEntity {
   return {
-    id: row.id,
-    organizationId: row.organization_id,
-    type: row.type,
-    title: row.title,
-    description: row.description,
-    estimatedSavingsPerMonth: parseFloat(row.estimated_savings_per_month),
-    generatedCode: row.generated_code,
-    language: row.language,
-    status: row.status,
-    sourcePatternId: row.source_pattern_id ?? null,
-    createdAt: row.created_at.toISOString(),
-    updatedAt: row.updated_at.toISOString(),
+    id: row.id as string,
+    createdAt: toISOString(row.created_at),
+    updatedAt: toISOString(row.updated_at),
+    organizationId: row.organization_id as string,
+    optimizationType: row.optimization_type as string,
+    title: row.title as string,
+    description: row.description as string,
+    estimatedSavingsPerMonth: row.estimated_savings_per_month as number,
+    generatedCode: row.generated_code as string,
+    language: row.language as string,
+    status: row.status as string,
+    sourcePatternId: (row.source_pattern_id as string) ?? undefined,
   };
 }
 
-export async function create(
-  pool: Pool,
-  data: Omit<OptimizationEntity, 'id' | 'createdAt' | 'updatedAt'>
-): Promise<OptimizationEntity> {
-  const q = `
-    INSERT INTO optimizations (
-      organization_id, type, title, description,
-      estimated_savings_per_month, generated_code, language,
-      status, source_pattern_id
-    ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-    RETURNING *`;
-  const vals = [
-    data.organizationId, data.type, data.title, data.description,
-    data.estimatedSavingsPerMonth, data.generatedCode, data.language,
-    data.status, data.sourcePatternId,
-  ];
-  const result = await pool.query(q, vals);
-  return rowToEntity(result.rows[0]);
+function toSnake(s: string): string { return s.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase(); }
+function convertValueForDb(key: string, value: unknown): unknown {
+  return value ?? null;
 }
 
-export async function findById(
-  pool: Pool,
-  id: string
-): Promise<OptimizationEntity | null> {
-  const result = await pool.query(
-    'SELECT * FROM optimizations WHERE id = $1',
-    [id]
-  );
-  return result.rows.length ? rowToEntity(result.rows[0]) : null;
+export function createOptimization(db: DatabaseSync, data: CreateOptimizationInput): OptimizationEntity {
+  const stmt = db.prepare(`INSERT INTO optimizations (organization_id, optimization_type, title, description, estimated_savings_per_month, generated_code, language, status, source_pattern_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`);
+  const row = stmt.get(data.organizationId, data.optimizationType, data.title, data.description, data.estimatedSavingsPerMonth, data.generatedCode, data.language, data.status, data.sourcePatternId ?? null) as Record<string, unknown>;
+  return rowToEntity(row);
 }
 
-export async function findByOrg(
-  pool: Pool,
-  orgId: string
-): Promise<OptimizationEntity[]> {
-  const result = await pool.query(
-    'SELECT * FROM optimizations WHERE organization_id = $1 ORDER BY created_at DESC',
-    [orgId]
-  );
-  return result.rows.map(rowToEntity);
+export function findOptimizationById(db: DatabaseSync, id: string): OptimizationEntity | null {
+  const stmt = db.prepare('SELECT * FROM optimizations WHERE id = $1');
+  const row = stmt.get(id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
 }
 
-export async function update(
-  pool: Pool,
-  id: string,
-  data: Partial<Omit<OptimizationEntity, 'id' | 'createdAt' | 'updatedAt'>>
-): Promise<OptimizationEntity | null> {
-  const sets: string[] = ['updated_at = NOW()'];
-  const vals: unknown[] = [];
-  let i = 1;
-
-  if (data.status !== undefined) {
-    sets.push(`status = $${i++}`); vals.push(data.status);
-  }
-  if (data.title !== undefined) {
-    sets.push(`title = $${i++}`); vals.push(data.title);
-  }
-
-  vals.push(id);
-  const q = `UPDATE optimizations SET ${sets.join(', ')} WHERE id = $${i} RETURNING *`;
-  const result = await pool.query(q, vals);
-  return result.rows.length ? rowToEntity(result.rows[0]) : null;
+export function listOptimizations(db: DatabaseSync, limit = 50, offset = 0): OptimizationEntity[] {
+  const stmt = db.prepare('SELECT * FROM optimizations ORDER BY created_at DESC LIMIT $1 OFFSET $2');
+  return (stmt.all(limit, offset) as Record<string, unknown>[]).map(rowToEntity);
 }
 
-export async function generateForOrg(
-  pool: Pool,
-  orgId: string
-): Promise<OptimizationEntity[]> {
-  return findByOrg(pool, orgId);
+export function updateOptimization(db: DatabaseSync, id: string, data: UpdateOptimizationInput): OptimizationEntity | null {
+  const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
+  if (keys.length === 0) return findOptimizationById(db, id);
+  const sets = keys.map((k) => `${toSnake(k)} = ?`).join(', ');
+  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));
+  const stmt = db.prepare(`UPDATE optimizations SET ${sets} WHERE id = ? RETURNING *`);
+  const row = stmt.get(...vals, id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
 }
+
+export function deleteOptimization(db: DatabaseSync, id: string): boolean {
+  const stmt = db.prepare('DELETE FROM optimizations WHERE id = $1');
+  return stmt.run(id).changes > 0;
+}
+
+// --- BEGIN CUSTOM ---
+
+// --- END CUSTOM ---

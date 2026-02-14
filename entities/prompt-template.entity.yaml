@@ -1,0 +1,42 @@
+name: PromptTemplate
+description: Prompt templates with variable placeholders for A/B testing
+storage: [postgres]
+
+fields:
+  organizationId:
+    type: uuid
+    required: true
+    index: true
+    description: Organization ID
+
+  name:
+    type: string
+    required: true
+    description: Template name
+
+  description:
+    type: string
+    required: true
+    description: Template description
+
+  activeVersionId:
+    type: uuid
+    description: Currently active version ID
+
+  variables:
+    type: json
+    required: true
+    description: Template variable names e.g. ["user_query", "context"]
+    default: "[]"
+
+capabilities:
+  crud: true
+
+queries:
+  - name: findByOrganizationId
+    description: Find all templates for an organization
+    params:
+      orgId: { type: string }
+    where: "organization_id = :orgId"
+    order: "created_at DESC"
+    returns: list

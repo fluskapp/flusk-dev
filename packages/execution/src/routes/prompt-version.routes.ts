@@ -1,0 +1,91 @@
+/** @generated from PromptVersion YAML — Traits: crud */
+import type { FastifyInstance } from 'fastify';
+import { Type } from '@sinclair/typebox';
+import { PromptVersionEntitySchema } from '@flusk/entities';
+import { PromptVersionRepository } from '@flusk/resources';
+const CreatePromptVersionSchema = Type.Omit(PromptVersionEntitySchema, ['id', 'createdAt', 'updatedAt']);
+const PromptVersionResponseSchema = PromptVersionEntitySchema;
+const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
+const NotFoundSchema = Type.Object({ error: Type.String() });
+const ListQuerySchema = Type.Object({
+  limit: Type.Optional(Type.Integer({ minimum: 1 })),
+  offset: Type.Optional(Type.Integer({ minimum: 0 })),
+});
+
+/**
+ * Register PromptVersion routes
+ */
+export async function promptVersionRoutes(
+  fastify: FastifyInstance,
+): Promise<void> {
+  fastify.post('/', {
+    schema: {
+      body: CreatePromptVersionSchema,
+      response: { 201: PromptVersionResponseSchema },
+      tags: ['PromptVersion'],
+      description: 'Create a new PromptVersion record',
+    },
+  }, async (request, reply) => {
+    const created = await PromptVersionRepository.create(request.body);
+    return reply.code(201).send(created);
+  });
+
+  fastify.get('/:id', {
+    schema: {
+      params: IdParamsSchema,
+      response: { 200: PromptVersionResponseSchema, 404: NotFoundSchema },
+      tags: ['PromptVersion'],
+      description: 'Get a PromptVersion by ID',
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const entity = await PromptVersionRepository.findById(id);
+    if (!entity) return reply.code(404).send({ error: 'Not found' });
+    return reply.code(200).send(entity);
+  });
+
+  fastify.get('/', {
+    schema: {
+      querystring: ListQuerySchema,
+      response: { 200: Type.Array(PromptVersionResponseSchema) },
+      tags: ['PromptVersion'],
+      description: 'List PromptVersion records',
+    },
+  }, async (request, reply) => {
+    const { limit, offset } = request.query as { limit?: number; offset?: number };
+    const items = await PromptVersionRepository.list(limit, offset);
+    return reply.code(200).send(items);
+  });
+
+  fastify.put('/:id', {
+    schema: {
+      params: IdParamsSchema,
+      body: Type.Partial(CreatePromptVersionSchema),
+      response: { 200: PromptVersionResponseSchema, 404: NotFoundSchema },
+      tags: ['PromptVersion'],
+      description: 'Update a PromptVersion by ID',
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const updated = await PromptVersionRepository.update(id, request.body);
+    if (!updated) return reply.code(404).send({ error: 'Not found' });
+    return reply.code(200).send(updated);
+  });
+
+  fastify.delete('/:id', {
+    schema: {
+      params: IdParamsSchema,
+      response: { 204: Type.Null(), 404: NotFoundSchema },
+      tags: ['PromptVersion'],
+      description: 'Delete a PromptVersion by ID',
+    },
+  }, async (request, reply) => {
+    const { id } = request.params as { id: string };
+    const deleted = await PromptVersionRepository.delete(id);
+    if (!deleted) return reply.code(404).send({ error: 'Not found' });
+    return reply.code(204).send();
+  });
+}
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

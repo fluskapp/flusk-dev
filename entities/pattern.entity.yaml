@@ -1,0 +1,86 @@
+name: Pattern
+description: Detected repetitive prompt patterns - identifies optimization opportunities by grouping duplicate API calls
+storage: [sqlite, postgres]
+
+fields:
+  organizationId:
+    type: uuid
+    required: true
+    index: true
+    description: Organization that owns this pattern
+
+  promptHash:
+    type: string
+    required: true
+    index: true
+    min: 64
+    max: 64
+    description: SHA-256 hash identifying the repeated prompt
+
+  occurrenceCount:
+    type: integer
+    required: true
+    min: 1
+    default: 1
+    description: Number of times this pattern has been observed
+
+  firstSeenAt:
+    type: date
+    required: true
+    description: Timestamp of first occurrence
+
+  lastSeenAt:
+    type: date
+    required: true
+    description: Timestamp of most recent occurrence
+
+  samplePrompts:
+    type: json
+    required: true
+    default: "[]"
+    description: Sample prompt texts (up to 5) for review
+
+  avgCost:
+    type: number
+    required: true
+    min: 0
+    description: Average cost per occurrence in USD
+
+  totalCost:
+    type: number
+    required: true
+    min: 0
+    description: Total accumulated cost for all occurrences in USD
+
+  suggestedConversion:
+    type: string
+    description: Suggested automation approach (caching, function, etc.)
+
+capabilities:
+  crud: true
+
+queries:
+  - name: findByPromptHash
+    description: Find pattern by prompt hash
+    params:
+      hash: { type: string }
+    where: "prompt_hash = :hash"
+    limit: 1
+    returns: single
+
+  - name: findByOrganization
+    description: Find all patterns for an organization
+    params:
+      orgId: { type: string }
+    where: "organization_id = :orgId"
+    order: "total_cost DESC"
+    returns: list
+
+  - name: updateOccurrence
+    description: Increment occurrence count and update costs
+    type: update
+    params:
+      id: { type: string }
+      cost: { type: number }
+    set: "occurrence_count = occurrence_count + 1, last_seen_at = :now, total_cost = total_cost + :cost"
+    where: "id = :id"

@@ -1,0 +1,20 @@
+import type { PatternEntity, SamplePrompts } from '@flusk/entities';
+import { toISOString } from '../../../shared/map-row.js';
+
+/** Convert SQLite row to PatternEntity */
+export function rowToEntity(row: Record<string, unknown>): PatternEntity {
+  return {
+    id: row.id as string,
+    createdAt: toISOString(row.created_at),
+    updatedAt: toISOString(row.updated_at),
+    organizationId: row.organization_id as string,
+    promptHash: row.prompt_hash as string,
+    occurrenceCount: row.occurrence_count as number,
+    firstSeenAt: toISOString(row.first_seen_at),
+    lastSeenAt: toISOString(row.last_seen_at),
+    samplePrompts: JSON.parse(row.sample_prompts as string) as SamplePrompts,
+    avgCost: row.avg_cost as number,
+    totalCost: row.total_cost as number,
+    suggestedConversion: (row.suggested_conversion as string) ?? undefined,
+  };
+}

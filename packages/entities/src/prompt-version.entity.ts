@@ -1,34 +1,19 @@
 import { Type, Static } from '@sinclair/typebox';
+import { BaseEntitySchema } from './base.entity.js';
 
 /**
- * Metrics tracked per prompt version
+ * PromptVersionEntity schema
+ * @generated from PromptVersion YAML definition
  */
-export const PromptVersionMetricsSchema = Type.Object({
-  avgQuality: Type.Number({ description: 'Average quality score 0-1' }),
-  avgLatencyMs: Type.Number({ description: 'Average latency in ms' }),
-  avgCost: Type.Number({ description: 'Average cost per call' }),
-  sampleCount: Type.Number({ description: 'Number of samples collected' }),
-});
-
-export type PromptVersionMetrics = Static<typeof PromptVersionMetricsSchema>;
-
-/**
- * PromptVersion entity schema
- * Immutable prompt versions with metrics tracking for A/B testing
- */
-export const PromptVersionEntitySchema = Type.Object({
-  id: Type.String({ format: 'uuid', description: 'Unique identifier' }),
-  templateId: Type.String({ format: 'uuid', description: 'Parent template ID' }),
-  version: Type.Number({ description: 'Auto-increment version number per template' }),
-  content: Type.String({ description: 'Prompt text with {{variable}} placeholders' }),
-  metrics: PromptVersionMetricsSchema,
-  status: Type.Union([
-    Type.Literal('draft'),
-    Type.Literal('active'),
-    Type.Literal('archived'),
-    Type.Literal('rolled-back'),
-  ], { description: 'Version lifecycle status' }),
-  createdAt: Type.String({ format: 'date-time', description: 'Creation timestamp' }),
-});
+export const PromptVersionEntitySchema = Type.Composite([
+  BaseEntitySchema,
+  Type.Object({
+    templateId: Type.String({ format: 'uuid', description: 'Parent template ID' }),
+    version: Type.Number({ description: 'Auto-increment version number per template' }),
+    content: Type.String({ description: 'Prompt text with {{variable}} placeholders' }),
+    metrics: Type.Unknown({ description: 'Performance metrics (avgQuality, avgLatencyMs, avgCost, sampleCount)', default: '{"avgQuality":0,"avgLatencyMs":0,"avgCost":0,"sampleCount":0}' }),
+    status: Type.Union([Type.Literal('draft'), Type.Literal('active'), Type.Literal('archived'), Type.Literal('rolled-back')])
+  })
+]);
 
 export type PromptVersionEntity = Static<typeof PromptVersionEntitySchema>;

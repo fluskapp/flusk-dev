@@ -1,0 +1,50 @@
+name: PromptVersion
+description: Immutable prompt versions with metrics tracking for A/B testing
+storage: [postgres]
+
+fields:
+  templateId:
+    type: uuid
+    required: true
+    index: true
+    description: Parent template ID
+
+  version:
+    type: number
+    required: true
+    description: Auto-increment version number per template
+
+  content:
+    type: string
+    required: true
+    description: Prompt text with {{variable}} placeholders
+
+  metrics:
+    type: json
+    required: true
+    description: Performance metrics (avgQuality, avgLatencyMs, avgCost, sampleCount)
+    default: '{"avgQuality":0,"avgLatencyMs":0,"avgCost":0,"sampleCount":0}'
+
+  status:
+    type: enum
+    values: [draft, active, archived, rolled-back]
+    required: true
+    description: Version lifecycle status
+
+relations:
+  template:
+    entity: PromptTemplate
+    type: belongs-to
+    foreignKey: templateId
+
+capabilities:
+  crud: true
+
+queries:
+  - name: findByTemplateId
+    description: Find all versions for a template
+    params:
+      templateId: { type: string }
+    where: "template_id = :templateId"
+    order: "version DESC"
+    returns: list

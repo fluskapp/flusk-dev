@@ -1,0 +1,89 @@
+name: Span
+description: Individual spans within a distributed trace - tracks LLM calls, tools, retrievals, and chains
+storage: [postgres]
+
+fields:
+  traceId:
+    type: uuid
+    required: true
+    index: true
+    description: Parent trace ID
+
+  parentSpanId:
+    type: uuid
+    description: Parent span ID for nested spans
+
+  spanType:
+    type: enum
+    values: [llm, tool, retrieval, chain]
+    required: true
+    description: Span type
+
+  name:
+    type: string
+    required: true
+    description: Span name (e.g. step name)
+
+  input:
+    type: string
+    description: Input data
+
+  output:
+    type: string
+    description: Output data
+
+  cost:
+    type: number
+    required: true
+    description: Cost for this span
+
+  tokens:
+    type: number
+    required: true
+    description: Token count for this span
+
+  latencyMs:
+    type: number
+    required: true
+    description: Latency in milliseconds
+
+  status:
+    type: enum
+    values: [running, completed, failed]
+    required: true
+    description: Span execution status
+
+  startedAt:
+    type: date
+    required: true
+    description: When the span started
+
+  completedAt:
+    type: date
+    description: When the span completed
+
+relations:
+  trace:
+    entity: Trace
+    type: belongs-to
+    foreignKey: traceId
+
+capabilities:
+  crud: true
+
+queries:
+  - name: findByTrace
+    description: Find all spans for a trace
+    params:
+      traceId: { type: string }
+    where: "trace_id = :traceId"
+    order: "started_at ASC"
+    returns: list
+
+  - name: findByParent
+    description: Find child spans of a parent span
+    params:
+      parentSpanId: { type: string }
+    where: "parent_span_id = :parentSpanId"
+    order: "started_at ASC"
+    returns: list

@@ -1,97 +1,77 @@
-/**
- * Span Repository — CRUD for trace spans.
- * All functions accept a Pool instance as first parameter.
- */
-import type { Pool } from 'pg';
-import { SpanEntity } from '@flusk/entities';
+/** @generated from Span YAML — Traits: crud */
 
-interface SpanRow {
-  id: string; trace_id: string; parent_span_id?: string; type: string; name: string;
-  input?: string; output?: string; cost: string; tokens: string; latency_ms: string;
-  status: string; started_at: { toISOString(): string };
-  completed_at?: { toISOString(): string }; created_at: { toISOString(): string };
-  updated_at: { toISOString(): string };
+import type { SpanEntity } from '@flusk/entities';
+import type { DatabaseSync } from 'node:sqlite';
+
+export type CreateSpanInput = Omit<SpanEntity, 'id' | 'createdAt' | 'updatedAt'>;
+export type UpdateSpanInput = Partial<CreateSpanInput>;
+
+function toISOString(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object' && 'toISOString' in value) {
+    return (value as { toISOString(): string }).toISOString();
+  }
+  return String(value);
 }
 
-function rowToEntity(row: SpanRow): SpanEntity {
+/** Convert a SQLite row (snake_case) to SpanEntity (camelCase) */
+function rowToEntity(row: Record<string, unknown>): SpanEntity {
   return {
-    id: row.id,
-    traceId: row.trace_id,
-    parentSpanId: row.parent_span_id ?? null,
-    type: row.type,
-    name: row.name,
-    input: row.input ?? null,
-    output: row.output ?? null,
-    cost: Number(row.cost),
-    tokens: Number(row.tokens),
-    latencyMs: Number(row.latency_ms),
-    status: row.status,
-    startedAt: row.started_at.toISOString(),
-    completedAt: row.completed_at?.toISOString() ?? null,
-    createdAt: row.created_at.toISOString(),
-    updatedAt: row.updated_at.toISOString(),
+    id: row.id as string,
+    createdAt: toISOString(row.created_at),
+    updatedAt: toISOString(row.updated_at),
+    traceId: row.trace_id as string,
+    parentSpanId: (row.parent_span_id as string) ?? undefined,
+    spanType: row.span_type as string,
+    name: row.name as string,
+    input: (row.input as string) ?? undefined,
+    output: (row.output as string) ?? undefined,
+    cost: row.cost as number,
+    tokens: row.tokens as number,
+    latencyMs: row.latency_ms as number,
+    status: row.status as string,
+    startedAt: toISOString(row.started_at),
+    completedAt: row.completed_at != null ? toISOString(row.completed_at) : undefined,
   };
 }
 
-export async function create(
-  pool: Pool,
-  data: Omit<SpanEntity, 'id' | 'createdAt' | 'updatedAt'>
-): Promise<SpanEntity> {
-  const q = `
-    INSERT INTO spans (trace_id, parent_span_id, type, name, input, output,
-      cost, tokens, latency_ms, status, started_at, completed_at)
-    VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`;
-  const r = await pool.query(q, [
-    data.traceId, data.parentSpanId ?? null, data.type, data.name,
-    data.input ?? null, data.output ?? null, data.cost, data.tokens,
-    data.latencyMs, data.status, data.startedAt, data.completedAt ?? null,
-  ]);
-  return rowToEntity(r.rows[0]);
+function toSnake(s: string): string { return s.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase(); }
+function convertValueForDb(key: string, value: unknown): unknown {
+  return value ?? null;
 }
 
-export async function findById(
-  pool: Pool, id: string
-): Promise<SpanEntity | null> {
-  const r = await pool.query('SELECT * FROM spans WHERE id = $1', [id]);
-  return r.rows.length ? rowToEntity(r.rows[0]) : null;
+export function createSpan(db: DatabaseSync, data: CreateSpanInput): SpanEntity {
+  const stmt = db.prepare(`INSERT INTO spans (trace_id, parent_span_id, span_type, name, input, output, cost, tokens, latency_ms, status, started_at, completed_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`);
+  const row = stmt.get(data.traceId, data.parentSpanId ?? null, data.spanType, data.name, data.input ?? null, data.output ?? null, data.cost, data.tokens, data.latencyMs, data.status, data.startedAt, data.completedAt ?? null) as Record<string, unknown>;
+  return rowToEntity(row);
 }
 
-export async function findByTrace(
-  pool: Pool, traceId: string
-): Promise<SpanEntity[]> {
-  const r = await pool.query(
-    'SELECT * FROM spans WHERE trace_id = $1 ORDER BY started_at ASC',
-    [traceId]
-  );
-  return r.rows.map(rowToEntity);
+export function findSpanById(db: DatabaseSync, id: string): SpanEntity | null {
+  const stmt = db.prepare('SELECT * FROM spans WHERE id = $1');
+  const row = stmt.get(id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
 }
 
-export async function findByParent(
-  pool: Pool, parentSpanId: string
-): Promise<SpanEntity[]> {
-  const r = await pool.query(
-    'SELECT * FROM spans WHERE parent_span_id = $1 ORDER BY started_at ASC',
-    [parentSpanId]
-  );
-  return r.rows.map(rowToEntity);
+export function listSpans(db: DatabaseSync, limit = 50, offset = 0): SpanEntity[] {
+  const stmt = db.prepare('SELECT * FROM spans ORDER BY created_at DESC LIMIT $1 OFFSET $2');
+  return (stmt.all(limit, offset) as Record<string, unknown>[]).map(rowToEntity);
 }
 
-export async function update(
-  pool: Pool,
-  id: string,
-  data: Partial<Omit<SpanEntity, 'id' | 'createdAt' | 'updatedAt'>>
-): Promise<SpanEntity | null> {
-  const sets: string[] = ['updated_at = NOW()'];
-  const vals: unknown[] = [];
-  let i = 1;
-  if (data.status) { sets.push(`status = $${i++}`); vals.push(data.status); }
-  if (data.completedAt) { sets.push(`completed_at = $${i++}`); vals.push(data.completedAt); }
-  if (data.output !== undefined) { sets.push(`output = $${i++}`); vals.push(data.output); }
-  if (data.cost !== undefined) { sets.push(`cost = $${i++}`); vals.push(data.cost); }
-  if (data.tokens !== undefined) { sets.push(`tokens = $${i++}`); vals.push(data.tokens); }
-  if (data.latencyMs !== undefined) { sets.push(`latency_ms = $${i++}`); vals.push(data.latencyMs); }
-  vals.push(id);
-  const q = `UPDATE spans SET ${sets.join(', ')} WHERE id = $${i} RETURNING *`;
-  const r = await pool.query(q, vals);
-  return r.rows.length ? rowToEntity(r.rows[0]) : null;
+export function updateSpan(db: DatabaseSync, id: string, data: UpdateSpanInput): SpanEntity | null {
+  const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
+  if (keys.length === 0) return findSpanById(db, id);
+  const sets = keys.map((k) => `${toSnake(k)} = ?`).join(', ');
+  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));
+  const stmt = db.prepare(`UPDATE spans SET ${sets} WHERE id = ? RETURNING *`);
+  const row = stmt.get(...vals, id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
 }
+
+export function deleteSpan(db: DatabaseSync, id: string): boolean {
+  const stmt = db.prepare('DELETE FROM spans WHERE id = $1');
+  return stmt.run(id).changes > 0;
+}
+
+// --- BEGIN CUSTOM ---
+
+// --- END CUSTOM ---

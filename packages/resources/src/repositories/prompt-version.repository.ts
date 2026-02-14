@@ -1,86 +1,71 @@
-/**
- * Prompt Version Repository — CRUD for immutable prompt versions.
- * All functions accept a Pool instance as first parameter.
- */
-import type { Pool } from 'pg';
-import type { PromptVersionEntity } from '@flusk/entities';
+/** @generated from PromptVersion YAML — Traits: crud */
 
-interface PvRow {
-  id: string; template_id: string; version: number; content: string;
-  metrics: string | Record<string, unknown>; status: string;
-  created_at: { toISOString(): string };
+import type { PromptVersionEntity } from '@flusk/entities';
+import type { DatabaseSync } from 'node:sqlite';
+
+export type CreatePromptVersionInput = Omit<PromptVersionEntity, 'id' | 'createdAt' | 'updatedAt'>;
+export type UpdatePromptVersionInput = Partial<CreatePromptVersionInput>;
+
+function toISOString(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object' && 'toISOString' in value) {
+    return (value as { toISOString(): string }).toISOString();
+  }
+  return String(value);
 }
 
-function rowToEntity(row: PvRow): PromptVersionEntity {
+/** Convert a SQLite row (snake_case) to PromptVersionEntity (camelCase) */
+function rowToEntity(row: Record<string, unknown>): PromptVersionEntity {
   return {
-    id: row.id,
-    templateId: row.template_id,
-    version: row.version,
-    content: row.content,
-    metrics: typeof row.metrics === 'string' ? JSON.parse(row.metrics) : row.metrics,
-    status: row.status,
-    createdAt: row.created_at.toISOString(),
+    id: row.id as string,
+    createdAt: toISOString(row.created_at),
+    updatedAt: toISOString(row.updated_at),
+    templateId: row.template_id as string,
+    version: row.version as number,
+    content: row.content as string,
+    metrics: JSON.parse(row.metrics as string),
+    status: row.status as string,
   };
 }
 
-const DEFAULT_METRICS = {
-  avgQuality: 0, avgLatencyMs: 0, avgCost: 0, sampleCount: 0,
-};
-
-export async function create(
-  pool: Pool,
-  data: { templateId: string; content: string; status?: string }
-): Promise<PromptVersionEntity> {
-  const versionResult = await pool.query(
-    'SELECT COALESCE(MAX(version), 0) + 1 as next_version FROM prompt_versions WHERE template_id = $1',
-    [data.templateId]
-  );
-  const nextVersion = versionResult.rows[0].next_version;
-
-  const result = await pool.query(
-    `INSERT INTO prompt_versions (template_id, version, content, metrics, status)
-     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [data.templateId, nextVersion, data.content, JSON.stringify(DEFAULT_METRICS), data.status || 'draft']
-  );
-  return rowToEntity(result.rows[0]);
+function toSnake(s: string): string { return s.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase(); }
+function convertValueForDb(key: string, value: unknown): unknown {
+  if (new Set(['metrics']).has(key)) return JSON.stringify(value);
+  return value ?? null;
 }
 
-export async function findById(
-  pool: Pool, id: string
-): Promise<PromptVersionEntity | null> {
-  const result = await pool.query(
-    'SELECT * FROM prompt_versions WHERE id = $1', [id]
-  );
-  return result.rows.length ? rowToEntity(result.rows[0]) : null;
+export function createPromptVersion(db: DatabaseSync, data: CreatePromptVersionInput): PromptVersionEntity {
+  const stmt = db.prepare(`INSERT INTO prompt_versions (template_id, version, content, metrics, status) VALUES ($1, $2, $3, $4, $5) RETURNING *`);
+  const row = stmt.get(data.templateId, data.version, data.content, JSON.stringify(data.metrics), data.status) as Record<string, unknown>;
+  return rowToEntity(row);
 }
 
-export async function findByTemplateId(
-  pool: Pool, templateId: string
-): Promise<PromptVersionEntity[]> {
-  const result = await pool.query(
-    'SELECT * FROM prompt_versions WHERE template_id = $1 ORDER BY version DESC',
-    [templateId]
-  );
-  return result.rows.map(rowToEntity);
+export function findPromptVersionById(db: DatabaseSync, id: string): PromptVersionEntity | null {
+  const stmt = db.prepare('SELECT * FROM prompt_versions WHERE id = $1');
+  const row = stmt.get(id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
 }
 
-export async function update(
-  pool: Pool,
-  id: string,
-  data: Partial<{ status: string; metrics: Record<string, unknown> }>
-): Promise<PromptVersionEntity | null> {
-  const sets: string[] = [];
-  const vals: unknown[] = [];
-  let idx = 1;
-
-  if (data.status !== undefined) { sets.push(`status = $${idx}`); vals.push(data.status); idx++; }
-  if (data.metrics !== undefined) { sets.push(`metrics = $${idx}`); vals.push(JSON.stringify(data.metrics)); idx++; }
-
-  if (sets.length === 0) return findById(pool, id);
-
-  vals.push(id);
-  const result = await pool.query(
-    `UPDATE prompt_versions SET ${sets.join(', ')} WHERE id = $${idx} RETURNING *`, vals
-  );
-  return result.rows.length ? rowToEntity(result.rows[0]) : null;
+export function listPromptVersions(db: DatabaseSync, limit = 50, offset = 0): PromptVersionEntity[] {
+  const stmt = db.prepare('SELECT * FROM prompt_versions ORDER BY created_at DESC LIMIT $1 OFFSET $2');
+  return (stmt.all(limit, offset) as Record<string, unknown>[]).map(rowToEntity);
 }
+
+export function updatePromptVersion(db: DatabaseSync, id: string, data: UpdatePromptVersionInput): PromptVersionEntity | null {
+  const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
+  if (keys.length === 0) return findPromptVersionById(db, id);
+  const sets = keys.map((k) => `${toSnake(k)} = ?`).join(', ');
+  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));
+  const stmt = db.prepare(`UPDATE prompt_versions SET ${sets} WHERE id = ? RETURNING *`);
+  const row = stmt.get(...vals, id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
+}
+
+export function deletePromptVersion(db: DatabaseSync, id: string): boolean {
+  const stmt = db.prepare('DELETE FROM prompt_versions WHERE id = $1');
+  return stmt.run(id).changes > 0;
+}
+
+// --- BEGIN CUSTOM ---
+
+// --- END CUSTOM ---

@@ -1,7 +1,6 @@
 /**
- * Model performance types — Upsert + Query variants
- * Note: Uses Upsert instead of Insert/Update because model_performance
- * has a UNIQUE(model, prompt_category) constraint with ON CONFLICT logic
+ * @generated from ModelPerformance YAML schema
+ * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
 
 import { Type, Static } from '@sinclair/typebox';
@@ -11,22 +10,19 @@ export type ModelPerformanceEntity = Static<typeof ModelPerformanceEntitySchema>
 
 export const ModelPerformanceEntityJSONSchema = ModelPerformanceEntitySchema;
 
-/**
- * Upsert variant — fields needed to insert or update performance metrics
- */
-export const ModelPerformanceUpsertSchema = Type.Object({
-  model: Type.String(),
-  promptCategory: Type.String(),
-  quality: Type.Number({ minimum: 0, maximum: 1 }),
-  latencyMs: Type.Number({ minimum: 0 }),
-  costPer1kTokens: Type.Number({ minimum: 0 }),
-});
-export type ModelPerformanceUpsert = Static<typeof ModelPerformanceUpsertSchema>;
+export const ModelPerformanceInsertSchema = Type.Omit(ModelPerformanceEntitySchema, [
+  'id', 'createdAt', 'updatedAt',
+]);
 
-/**
- * Query variant — filterable fields for lookups
- */
-export const ModelPerformanceQuerySchema = Type.Partial(
-  Type.Pick(ModelPerformanceEntitySchema, ['model', 'promptCategory'])
-);
+export type ModelPerformanceInsert = Static<typeof ModelPerformanceInsertSchema>;
+
+export const ModelPerformanceUpdateSchema = Type.Composite([
+  Type.Object({ id: Type.String({ format: 'uuid' }) }),
+  Type.Partial(Type.Omit(ModelPerformanceEntitySchema, ['id', 'createdAt', 'updatedAt'])),
+]);
+
+export type ModelPerformanceUpdate = Static<typeof ModelPerformanceUpdateSchema>;
+
+export const ModelPerformanceQuerySchema = Type.Partial(ModelPerformanceEntitySchema);
+
 export type ModelPerformanceQuery = Static<typeof ModelPerformanceQuerySchema>;

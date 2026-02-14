@@ -1,0 +1,30 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { ConversionEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Insert a new Conversion record into SQLite
+ */
+export function create(
+  db: DatabaseSync,
+  data: Omit<ConversionEntity, 'id' | 'createdAt' | 'updatedAt'>,
+): ConversionEntity {
+  const stmt = db.prepare(`
+    INSERT INTO conversions (
+      pattern_id, organization_id, conversion_type, status, estimated_savings,
+      config
+    ) VALUES (?, ?, ?, ?, ?, ?)
+    RETURNING *
+  `);
+
+  const row = stmt.get(
+    data.patternId,
+    data.organizationId,
+    data.conversionType,
+    data.status,
+    data.estimatedSavings,
+    JSON.stringify(data.config),
+  ) as Record<string, unknown>;
+
+  return rowToEntity(row);
+}

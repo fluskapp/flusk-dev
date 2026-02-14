@@ -1,0 +1,76 @@
+name: Conversion
+description: Optimization suggestions for LLM usage - converting wasteful API calls into deterministic automation
+storage: [sqlite, postgres]
+
+fields:
+  patternId:
+    type: uuid
+    required: true
+    index: true
+    description: Reference to the pattern this conversion applies to
+
+  organizationId:
+    type: uuid
+    required: true
+    index: true
+    description: Organization that owns this conversion
+
+  conversionType:
+    type: enum
+    values: [cache, downgrade, remove]
+    required: true
+    description: Type of optimization (cache identical prompts, use cheaper model, or eliminate call)
+
+  status:
+    type: enum
+    values: [suggested, accepted, rejected]
+    required: true
+    description: Lifecycle state of the conversion suggestion
+
+  estimatedSavings:
+    type: number
+    required: true
+    min: 0
+    description: Projected monthly savings in USD if accepted
+
+  config:
+    type: json
+    required: true
+    description: Type-specific configuration (cache TTL, model swap details, or removal reason)
+
+relations:
+  pattern:
+    entity: Pattern
+    type: belongs-to
+    foreignKey: patternId
+
+capabilities:
+  crud: true
+
+queries:
+  - name: findByPattern
+    description: Find conversions for a specific pattern
+    params:
+      patternId: { type: string }
+    where: "pattern_id = :patternId"
+    returns: list
+
+  - name: findSuggested
+    description: Find all suggested (pending) conversions
+    where: "status = 'suggested'"
+    order: "estimated_savings DESC"
+    returns: list
+
+  - name: findAccepted
+    description: Find all accepted conversions
+    where: "status = 'accepted'"
+    returns: list
+
+  - name: updateStatus
+    description: Update conversion status
+    type: update
+    params:
+      id: { type: string }
+      status: { type: string }
+    set: "status = :status"
+    where: "id = :id"

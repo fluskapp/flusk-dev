@@ -1,0 +1,71 @@
+/** @generated from RoutingRule YAML — Traits: crud */
+
+import type { RoutingRuleEntity } from '@flusk/entities';
+import type { DatabaseSync } from 'node:sqlite';
+
+export type CreateRoutingRuleInput = Omit<RoutingRuleEntity, 'id' | 'createdAt' | 'updatedAt'>;
+export type UpdateRoutingRuleInput = Partial<CreateRoutingRuleInput>;
+
+function toISOString(value: unknown): string {
+  if (typeof value === 'string') return value;
+  if (value && typeof value === 'object' && 'toISOString' in value) {
+    return (value as { toISOString(): string }).toISOString();
+  }
+  return String(value);
+}
+
+/** Convert a SQLite row (snake_case) to RoutingRuleEntity (camelCase) */
+function rowToEntity(row: Record<string, unknown>): RoutingRuleEntity {
+  return {
+    id: row.id as string,
+    createdAt: toISOString(row.created_at),
+    updatedAt: toISOString(row.updated_at),
+    organizationId: row.organization_id as string,
+    name: row.name as string,
+    qualityThreshold: row.quality_threshold as number,
+    fallbackModel: row.fallback_model as string,
+    enabled: Boolean(row.enabled),
+  };
+}
+
+function toSnake(s: string): string { return s.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase(); }
+function convertValueForDb(key: string, value: unknown): unknown {
+  if (new Set(['enabled']).has(key)) return value ? 1 : 0;
+  return value ?? null;
+}
+
+export function createRoutingRule(db: DatabaseSync, data: CreateRoutingRuleInput): RoutingRuleEntity {
+  const stmt = db.prepare(`INSERT INTO routing_rules (organization_id, name, quality_threshold, fallback_model, enabled) VALUES ($1, $2, $3, $4, $5) RETURNING *`);
+  const row = stmt.get(data.organizationId, data.name, data.qualityThreshold, data.fallbackModel, data.enabled ? 1 : 0) as Record<string, unknown>;
+  return rowToEntity(row);
+}
+
+export function findRoutingRuleById(db: DatabaseSync, id: string): RoutingRuleEntity | null {
+  const stmt = db.prepare('SELECT * FROM routing_rules WHERE id = $1');
+  const row = stmt.get(id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
+}
+
+export function listRoutingRules(db: DatabaseSync, limit = 50, offset = 0): RoutingRuleEntity[] {
+  const stmt = db.prepare('SELECT * FROM routing_rules ORDER BY created_at DESC LIMIT $1 OFFSET $2');
+  return (stmt.all(limit, offset) as Record<string, unknown>[]).map(rowToEntity);
+}
+
+export function updateRoutingRule(db: DatabaseSync, id: string, data: UpdateRoutingRuleInput): RoutingRuleEntity | null {
+  const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
+  if (keys.length === 0) return findRoutingRuleById(db, id);
+  const sets = keys.map((k) => `${toSnake(k)} = ?`).join(', ');
+  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));
+  const stmt = db.prepare(`UPDATE routing_rules SET ${sets} WHERE id = ? RETURNING *`);
+  const row = stmt.get(...vals, id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
+}
+
+export function deleteRoutingRule(db: DatabaseSync, id: string): boolean {
+  const stmt = db.prepare('DELETE FROM routing_rules WHERE id = $1');
+  return stmt.run(id).changes > 0;
+}
+
+// --- BEGIN CUSTOM ---
+
+// --- END CUSTOM ---

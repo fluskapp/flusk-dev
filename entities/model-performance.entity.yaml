@@ -1,0 +1,67 @@
+name: ModelPerformance
+description: Tracks model quality/cost per prompt category - self-improving routing table
+storage: [postgres]
+
+fields:
+  model:
+    type: string
+    required: true
+    min: 1
+    index: true
+    description: Model identifier (e.g., gpt-4o-mini)
+
+  promptCategory:
+    type: string
+    required: true
+    min: 1
+    index: true
+    description: Complexity category (simple, medium, complex)
+
+  avgQuality:
+    type: number
+    required: true
+    min: 0
+    max: 1
+    description: Average quality score (0-1) for this model+category
+
+  avgLatencyMs:
+    type: number
+    required: true
+    min: 0
+    description: Average latency in milliseconds
+
+  avgCostPer1kTokens:
+    type: number
+    required: true
+    min: 0
+    description: Average cost per 1k tokens in USD
+
+  sampleCount:
+    type: integer
+    required: true
+    min: 0
+    description: Number of samples used to compute averages
+
+capabilities:
+  crud: false
+
+queries:
+  - name: upsert
+    description: Insert or update model performance metrics
+    type: raw-sql
+    sql: |
+      INSERT INTO model_performance (id, model, prompt_category, avg_quality, avg_latency_ms, avg_cost_per_1k_tokens, sample_count, updated_at)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, NOW())
+      ON CONFLICT (model, prompt_category) DO UPDATE SET
+        avg_quality = $4, avg_latency_ms = $5, avg_cost_per_1k_tokens = $6,
+        sample_count = $7, updated_at = NOW()
+      RETURNING *
+    returns: single
+
+  - name: findByCategory
+    description: Find performance metrics for a prompt category
+    params:
+      category: { type: string }
+    where: "prompt_category = :category"
+    order: "avg_quality DESC"
+    returns: list
