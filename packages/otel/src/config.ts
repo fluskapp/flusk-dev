@@ -6,11 +6,18 @@
 // --- BEGIN GENERATED ---
 import { getLogger } from '@flusk/logger';
 
+export interface FluskExportTarget {
+  platform: 'grafana' | 'datadog' | 'newrelic' | 'custom';
+  endpoint?: string;
+  apiKey?: string;
+}
+
 export interface FluskOtelConfig {
   apiKey: string;
   endpoint: string;
   projectName: string;
   captureContent: boolean;
+  exportTargets: FluskExportTarget[];
 }
 // --- END GENERATED ---
 
@@ -24,11 +31,29 @@ export function loadConfig(): FluskOtelConfig {
     logger.warn('FLUSK_API_KEY not set — traces will not be authenticated');
   }
 
+  const exportTargets = parseExportTargets();
+
   return {
     apiKey,
     endpoint: process.env['FLUSK_ENDPOINT'] || DEFAULT_ENDPOINT,
     projectName: process.env['FLUSK_PROJECT_NAME'] || 'default',
     captureContent: process.env['FLUSK_CAPTURE_CONTENT'] !== 'false',
+    exportTargets,
   };
+}
+
+function parseExportTargets(): FluskExportTarget[] {
+  const raw = process.env['FLUSK_EXPORT'];
+  if (!raw) return [];
+
+  const platforms = raw.split(',').map((s) => s.trim()).filter(Boolean);
+  return platforms.map((platform) => {
+    const key = platform.toUpperCase();
+    return {
+      platform: platform as FluskExportTarget['platform'],
+      endpoint: process.env[`FLUSK_${key}_ENDPOINT`],
+      apiKey: process.env[`FLUSK_${key}_API_KEY`],
+    };
+  });
 }
 // --- END CUSTOM ---

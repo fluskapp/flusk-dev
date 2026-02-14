@@ -9,4 +9,7 @@ export { parseReadableSpan } from './parse-readable-span.js';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+export { createOtlpExporter } from './otlp-exporter.js';
+export type { OtlpPlatform, OtlpExporterConfig } from './otlp-exporter.js';
+export { MultiSpanExporter } from './multi-exporter.js';
 // --- END CUSTOM ---

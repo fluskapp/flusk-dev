@@ -5,10 +5,11 @@
 
 // --- BEGIN GENERATED ---
 export { loadConfig } from './config.js';
-export type { FluskOtelConfig } from './config.js';
+export type { FluskOtelConfig, FluskExportTarget } from './config.js';
 export { createSdk } from './create-sdk.js';
 export type { CreateSdkOptions } from './create-sdk.js';
-export { SqliteSpanExporter, parseReadableSpan } from './exporters/index.js';
+export { SqliteSpanExporter, parseReadableSpan, createOtlpExporter, MultiSpanExporter } from './exporters/index.js';
+export type { OtlpPlatform, OtlpExporterConfig } from './exporters/index.js';
 export { resolveExporter, resolveMode } from './utils/resolve-exporter.js';
 export type { FluskMode } from './utils/resolve-exporter.js';
 export { isFlameAvailable, resetFlameDetectionCache } from './utils/detect-flame.js';

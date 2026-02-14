@@ -49,6 +49,7 @@ import { statusCommand } from '../src/commands/status.js';
 import { validateGeneratedCommand } from '../src/commands/validate-generated.js';
 import { ratioCommand } from '../src/commands/ratio.js';
 import { guardCommand } from '../src/commands/guard.js';
+import { exportCommand } from '../src/commands/export.js';
 import { printBanner } from '../src/utils/banner.js';
 
 const program = new Command();
@@ -135,5 +136,8 @@ program.addCommand(statusCommand);
 program.addCommand(validateGeneratedCommand);
 program.addCommand(ratioCommand);
 program.addCommand(guardCommand);
+
+// Observability platform exports
+program.addCommand(exportCommand);
 
 program.parse(process.argv);

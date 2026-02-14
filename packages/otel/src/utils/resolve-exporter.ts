@@ -16,6 +16,9 @@ export type FluskMode = 'local' | 'server';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+import { createOtlpExporter } from '../exporters/otlp-exporter.js';
+import { MultiSpanExporter } from '../exporters/multi-exporter.js';
+
 export function resolveMode(): FluskMode {
   const explicit = process.env['FLUSK_MODE'];
   if (explicit === 'server') return 'server';
@@ -25,17 +28,26 @@ export function resolveMode(): FluskMode {
 
 export function resolveExporter(config: FluskOtelConfig): SpanExporter {
   const mode = resolveMode();
+  let primary: SpanExporter;
 
   if (mode === 'local') {
     const dbPath = process.env['FLUSK_SQLITE_PATH'];
     log.info('Flusk: local mode — writing to ~/.flusk/data.db');
-    return new SqliteSpanExporter(dbPath);
+    primary = new SqliteSpanExporter(dbPath);
+  } else {
+    log.info(`Flusk: server mode — exporting to ${config.endpoint}`);
+    primary = new OTLPTraceExporter({
+      url: `${config.endpoint}/v1/traces`,
+      headers: { 'x-flusk-api-key': config.apiKey },
+    });
   }
 
-  log.info(`Flusk: server mode — exporting to ${config.endpoint}`);
-  return new OTLPTraceExporter({
-    url: `${config.endpoint}/v1/traces`,
-    headers: { 'x-flusk-api-key': config.apiKey },
-  });
+  if (!config.exportTargets?.length) return primary;
+
+  const platformExporters = config.exportTargets.map((t) =>
+    createOtlpExporter({ platform: t.platform, endpoint: t.endpoint, apiKey: t.apiKey }),
+  );
+  log.info(`Multi-export: primary + ${platformExporters.length} platform target(s)`);
+  return new MultiSpanExporter([primary, ...platformExporters]);
 }
 // --- END CUSTOM ---
