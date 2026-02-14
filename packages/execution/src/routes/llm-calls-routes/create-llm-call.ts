@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { LLMCallRepository } from '@flusk/resources';
 import { scheduleEmbedding } from '../../hooks/embedding.hook.js';

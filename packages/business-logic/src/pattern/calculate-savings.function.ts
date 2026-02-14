@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import { PatternEntity } from '@flusk/entities';
 
 /**

@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk g:tui-app
  * Generates the root TUI app with navigation
  */

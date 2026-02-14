@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Region marker constants and wrapping utilities.
  *
  * WHY: Generated files use markers to separate machine-owned

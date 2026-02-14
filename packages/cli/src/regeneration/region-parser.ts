@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Parse generated files into GENERATED and CUSTOM regions.
  *
  * WHY: Before merging new output with an existing file, we need

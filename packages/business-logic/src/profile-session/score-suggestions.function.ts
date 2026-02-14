@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { ProfileSuggestion } from './generate-profile-suggestions.function.js';
 import type { DetectedPattern } from './detect-patterns.function.js';
 

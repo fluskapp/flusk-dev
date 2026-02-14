@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk init-config — create .flusk.config.js interactively
  */
 import { Command } from 'commander';

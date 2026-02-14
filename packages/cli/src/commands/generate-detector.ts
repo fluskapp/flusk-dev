@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk g:detector <name>
  * Scaffolds a pattern detector function
  */

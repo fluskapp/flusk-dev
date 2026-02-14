@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { routing } from '@flusk/business-logic';

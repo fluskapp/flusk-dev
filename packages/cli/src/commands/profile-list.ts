@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk profile list
  * Lists recent profile sessions from the API
  */

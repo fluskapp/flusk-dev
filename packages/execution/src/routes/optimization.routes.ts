@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { FastifyInstance } from 'fastify';
 import { registerGenerateRoute } from './optimization-routes/generate.js';
 import { registerListRoute } from './optimization-routes/list.js';

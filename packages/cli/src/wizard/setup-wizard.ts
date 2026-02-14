@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Main setup wizard orchestrator — 4 steps.
  */
 

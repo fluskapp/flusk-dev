@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { TokenUsage } from '@flusk/entities';
 import { BEDROCK_PRICING } from './providers/bedrock.pricing.js';
 

@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Vercel Serverless Adapter for Flusk Platform
  *
  * Exports Fastify app as Vercel serverless function.

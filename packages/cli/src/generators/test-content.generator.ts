@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Test content generation based on file analysis
  */
 

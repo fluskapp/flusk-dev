@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Load .flusk.config.{js,mjs,ts} from project root
  */
 import { existsSync } from 'node:fs';

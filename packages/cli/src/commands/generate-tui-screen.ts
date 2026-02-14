@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk g:tui-screen <name>
  * Generates a TUI Ink screen component
  */

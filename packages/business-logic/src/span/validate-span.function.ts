@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import { SpanEntity } from '@flusk/types';
 
 const VALID_TYPES = ['llm', 'tool', 'retrieval', 'chain'] as const;

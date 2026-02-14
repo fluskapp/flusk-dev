@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Event bus plugin — in-process pub/sub for real-time span streaming
  */
 import fp from 'fastify-plugin';

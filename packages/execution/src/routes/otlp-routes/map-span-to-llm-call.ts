@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Map a parsed OTLP LLM span to the shape expected by LLMCallRepository.create
  */
 import { createHash } from 'node:crypto';

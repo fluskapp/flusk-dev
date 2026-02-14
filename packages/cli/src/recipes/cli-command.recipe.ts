@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command recipe — scaffolds a new commander command + test.
  *
  * WHY: Adding a CLI command requires boilerplate (Command setup,

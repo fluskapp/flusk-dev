@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { FastifyInstance } from 'fastify';
 import { registerCreateRule } from './create-rule.js';
 import { registerGetRules } from './get-rules.js';

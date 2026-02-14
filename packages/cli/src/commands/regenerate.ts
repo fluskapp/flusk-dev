@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk regenerate — incremental code regeneration.
  *
  * WHY: After editing entity YAML, developers need to update

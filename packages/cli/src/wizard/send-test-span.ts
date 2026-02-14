@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Send a real OpenAI call through Flusk, return trace data.
  */
 

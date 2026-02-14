@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { llmCall } from '@flusk/business-logic';
 import { RedisClient } from '@flusk/resources';

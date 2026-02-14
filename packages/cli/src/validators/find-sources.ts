@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Utility: find all TypeScript source files in packages/
  */
 

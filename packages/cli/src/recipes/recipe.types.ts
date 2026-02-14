@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Core types for the recipe-based code generation system.
  *
  * WHY: Recipes compose multiple generators into a single pipeline.

@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Config validator shared types and constants
  */
 

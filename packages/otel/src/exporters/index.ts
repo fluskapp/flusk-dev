@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Barrel exports for OTel exporters
  */
 export { SqliteSpanExporter } from './sqlite-exporter.js';

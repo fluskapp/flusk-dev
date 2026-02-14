@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Logger factory — creates a configured Pino instance
  */
 import pino from 'pino';

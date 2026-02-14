@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk migrate <name>
  * Creates a new SQL migration file
  */

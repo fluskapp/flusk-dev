@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * @flusk/business-logic
  *
  * Pure business logic functions with NO side effects.

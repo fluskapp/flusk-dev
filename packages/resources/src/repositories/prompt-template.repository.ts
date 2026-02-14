@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Prompt Template Repository — CRUD for prompt templates.
  * All functions accept a Pool instance as first parameter.
  */

@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Template for generating service files
  */
 

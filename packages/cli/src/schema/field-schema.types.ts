@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Field-level schema types for entity YAML definitions.
  *
  * WHY: Fields are the atomic building blocks of entities.

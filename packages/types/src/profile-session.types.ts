@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import { Type, Static } from '@sinclair/typebox';
 import {
   ProfileSessionEntitySchema,

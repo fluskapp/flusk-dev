@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk analyze <script>
  * Spawns user script with OTel instrumentation, captures LLM calls.
  * Local mode (default): direct SQLite export, no HTTP server.

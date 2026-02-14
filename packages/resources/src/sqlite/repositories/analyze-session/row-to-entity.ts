@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { AnalyzeSessionEntity } from '@flusk/entities';
 
 /**

@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import { ConversionEntity } from '@flusk/entities';
 
 interface ConversionRow {

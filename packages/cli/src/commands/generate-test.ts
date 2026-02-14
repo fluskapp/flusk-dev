@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Generate Test Command
  * CLI command to generate comprehensive test files
  */

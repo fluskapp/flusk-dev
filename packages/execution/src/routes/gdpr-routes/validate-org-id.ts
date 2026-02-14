@@ -1,4 +1,4 @@
-/** @generated — Org ID must be alphanumeric with hyphens/underscores, 1-128 chars */
+/** Org ID must be alphanumeric with hyphens/underscores, 1-128 chars */
 const ORG_ID_PATTERN = /^[\w-]{1,128}$/;
 
 interface ValidationError {

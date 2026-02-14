@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Gitignore core sections: dependencies, build, env, testing, database, docker, logs
  */
 

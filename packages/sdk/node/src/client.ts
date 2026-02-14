@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 export interface FluskClientConfig {
   apiKey: string
   baseUrl?: string

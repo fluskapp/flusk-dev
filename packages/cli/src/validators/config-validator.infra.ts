@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Docker and Watt config validators
  */
 

@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Generated file header with provenance and staleness hash.
  *
  * WHY: Every generated file needs metadata so the regeneration

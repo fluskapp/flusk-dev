@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * SHA-256 hashing for YAML content — staleness detection.
  *
  * WHY: By storing the hash of the YAML in generated file headers,

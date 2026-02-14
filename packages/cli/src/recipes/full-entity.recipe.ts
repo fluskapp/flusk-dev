@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Full entity recipe — YAML → 8+ generated files.
  *
  * WHY: This is the primary recipe. One YAML file produces types,

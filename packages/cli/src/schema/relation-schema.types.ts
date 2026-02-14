@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Relation schema types for entity YAML definitions.
  *
  * WHY: Relations define how entities connect. They drive

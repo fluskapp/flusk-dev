@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { DatabaseSync } from 'node:sqlite';
 import type { PerformancePatternEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';

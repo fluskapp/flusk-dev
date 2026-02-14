@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk g:profile
  * Scaffolds performance profiling configuration
  */

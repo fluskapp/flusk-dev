@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { CorrelationResult } from './correlate-with-traces.function.js';
 import type { ProfileSessionEntity } from '@flusk/entities';
 

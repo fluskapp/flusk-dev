@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Check: default exports (should be named exports)
  */
 

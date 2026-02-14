@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Template for .env.example generation
  * Comprehensive environment variables for Flusk projects
  */

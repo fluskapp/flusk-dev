@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Registers all feature routes under /api/v1 prefix.
  */
 import type { FastifyInstance } from 'fastify';

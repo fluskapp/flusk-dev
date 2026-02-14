@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * OTLP ingestion routes — receives OpenTelemetry traces
  * Includes protobuf parser, rate limiting, and WebSocket live feed
  */

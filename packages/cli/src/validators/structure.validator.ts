@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Structure validator - validates project structure and file organization
  */
 

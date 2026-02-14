@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { StorageAdapter } from './storage.js';
 import { createSqliteStorage } from './sqlite-storage.js';
 

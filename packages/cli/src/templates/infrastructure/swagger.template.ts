@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Template for Swagger/OpenAPI plugin generation
  */
 

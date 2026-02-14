@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Repository test template mutation sections
  * Update, delete, search, and transaction test generators
  */

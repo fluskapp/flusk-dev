@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import { createDecipheriv } from 'crypto';
 import { getLogger } from '@flusk/logger';
 import { ALGORITHM, deriveKey } from './crypto-utils.js';

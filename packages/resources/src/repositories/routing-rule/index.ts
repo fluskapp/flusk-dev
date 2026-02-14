@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 export { create } from './create.js';
 export { findById } from './find-by-id.js';
 export { findByOrganization } from './find-by-organization.js';

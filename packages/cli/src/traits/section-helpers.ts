@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Helper to create empty trait code sections.
  *
  * WHY: Many traits only produce output for some sections

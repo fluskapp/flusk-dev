@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * @flusk/execution
  *
  * Fastify routes, plugins, and hooks for the Flusk platform.
@@ -18,7 +18,7 @@ export { healthRoutes } from './routes/health.routes.js';
 
 // Middleware exports
 export { errorHandler } from './middleware/error-handler.middleware.js';
-export { authMiddleware } from './middleware/auth.middleware.js';
+export { authMiddleware, optionalAuthMiddleware } from './middleware/auth.middleware.js';
 
 // Hook exports
 export {

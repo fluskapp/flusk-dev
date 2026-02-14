@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * SQLite repository generator — produces repository files
  * that use node:sqlite DatabaseSync instead of pg Pool.
  */

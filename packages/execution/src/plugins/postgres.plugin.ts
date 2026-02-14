@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * PostgreSQL plugin — wraps @fastify/postgres for connection lifecycle management.
  * Decorates app with `app.pg` (pool + query helpers).
  */

@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Aggregation trait — generates sum, avg, count, groupBy queries.
  *
  * WHY: Analytics entities need aggregate methods. This trait

@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Custom log level constants for Flusk
  */
 

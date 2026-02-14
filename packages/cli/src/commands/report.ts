@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk report [session-id]
  * Regenerate analysis report from SQLite data
  */

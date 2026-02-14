@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Redis plugin — wraps @fastify/redis for cache and pub/sub.
  * Decorates app with `app.redis`.
  */

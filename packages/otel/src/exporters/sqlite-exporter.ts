@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Custom OTel SpanExporter that writes GenAI spans directly to SQLite.
  * Eliminates HTTP overhead for local mode.
  */

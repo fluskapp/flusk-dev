@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { LLMCallEntity, AnalyzeSessionEntity, ProfileSessionEntity, PerformancePatternEntity } from '@flusk/entities';
 import type { ModelCount } from './sqlite/repositories/llm-call/count-by-model.js';
 

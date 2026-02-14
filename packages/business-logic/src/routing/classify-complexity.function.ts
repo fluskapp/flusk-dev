@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Classify prompt complexity using heuristics
  * Pure function — no I/O
  */

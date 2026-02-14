@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Entity schema generator - creates TypeBox entity schema files from definitions
  */
 

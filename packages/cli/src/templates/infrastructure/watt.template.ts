@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Template for watt.json generation
  * Platformatic Watt configuration for Flusk projects
  */

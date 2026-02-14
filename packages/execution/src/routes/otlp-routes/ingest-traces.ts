@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * POST /v1/traces — OTLP trace ingestion handler
  * Calls repositories directly instead of internal HTTP
  */

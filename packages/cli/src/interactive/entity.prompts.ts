@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Interactive prompts for entity creation
  * Uses inquirer.js for CLI interactions
  */

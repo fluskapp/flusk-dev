@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Entity generation pipeline — YAML → parse → validate → generate.
  *
  * WHY: This orchestrates the full code generation from a single

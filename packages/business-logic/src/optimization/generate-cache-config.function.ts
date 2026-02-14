@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Generate Redis caching configuration for duplicate/similar patterns
  * Pure function — no I/O
  */

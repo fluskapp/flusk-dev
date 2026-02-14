@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Config validator - validates configuration files
  */
 

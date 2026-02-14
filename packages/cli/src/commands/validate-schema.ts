@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Validate Schema Command - flusk validate:schema
  */
 

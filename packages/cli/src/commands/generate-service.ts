@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { generateService } from '../generators/service.generator.js';

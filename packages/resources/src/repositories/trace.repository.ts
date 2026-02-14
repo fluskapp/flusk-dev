@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Trace Repository — CRUD for distributed trace records.
  * All functions accept a Pool instance as first parameter.
  */

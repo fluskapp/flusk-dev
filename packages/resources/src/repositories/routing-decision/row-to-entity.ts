@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { RoutingDecisionEntity } from '@flusk/entities';
 
 export function rowToEntity(row: Record<string, unknown>): RoutingDecisionEntity {

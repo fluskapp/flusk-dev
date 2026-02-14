@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Config plugin — validates environment variables using @fastify/env + TypeBox.
  * Must be registered first so app.config is available to all other plugins.
  */

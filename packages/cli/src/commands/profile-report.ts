@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk profile report <session-id>
  * Fetches and pretty-prints a profile session with correlations
  */

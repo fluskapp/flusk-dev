@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * @flusk/types — TypeScript types and JSON Schema exports from entity definitions.
  */
 

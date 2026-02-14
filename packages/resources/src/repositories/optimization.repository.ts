@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Optimization Repository — CRUD for generated code optimization suggestions.
  * All functions accept a Pool instance as first parameter.
  */

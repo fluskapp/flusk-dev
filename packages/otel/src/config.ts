@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Flusk OTel configuration from environment variables
  */
 import { getLogger } from '@flusk/logger';

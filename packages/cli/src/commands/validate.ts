@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk validate
  * Enforces project conventions across the codebase
  */

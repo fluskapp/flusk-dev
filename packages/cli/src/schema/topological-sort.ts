@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Topological sort for entity dependency ordering.
  *
  * WHY: SQLite migrations must create parent tables before

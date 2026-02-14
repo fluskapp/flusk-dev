@@ -1,4 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
 // SQLite storage
 export { getDb, closeDb } from './sqlite/connection.js';
 export { runMigrations } from './sqlite/migrations.js';

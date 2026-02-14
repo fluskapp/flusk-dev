@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { FastifyInstance } from 'fastify';
 import { ProfileSessionRepository } from '@flusk/resources';
 import { profileSession } from '@flusk/business-logic';

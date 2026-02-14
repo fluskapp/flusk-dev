@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Conversion Repository — CRUD for optimization suggestions.
  * All functions accept a Pool instance as first parameter.
  */

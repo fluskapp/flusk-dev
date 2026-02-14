@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * SQLite migration SQL generator from YAML.
  *
  * WHY: Generates CREATE TABLE + indexes from entity YAML.

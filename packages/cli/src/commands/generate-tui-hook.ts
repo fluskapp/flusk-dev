@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk g:tui-hook <name>
  * Generates a TUI React hook
  */

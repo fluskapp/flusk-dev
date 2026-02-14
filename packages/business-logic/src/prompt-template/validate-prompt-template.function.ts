@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Validate PromptTemplate fields
  * Pure function — no side effects, no I/O
  */

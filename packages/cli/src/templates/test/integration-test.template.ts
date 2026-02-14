@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Integration Test Template Generator
  * Generates integration test files for API endpoints, services with dependencies
  */

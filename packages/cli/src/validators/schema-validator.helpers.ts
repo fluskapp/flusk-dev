@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Schema validation helpers
  * Content validation and syntax error detection for TypeBox schemas
  */

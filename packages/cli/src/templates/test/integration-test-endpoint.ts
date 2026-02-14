@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Integration test endpoint test case generator
  */
 

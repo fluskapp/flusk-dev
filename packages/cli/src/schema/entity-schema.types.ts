@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Top-level entity schema type for YAML definitions.
  *
  * WHY: This is the single source of truth for what an entity

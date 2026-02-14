@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Main validation runner — collects violations from all checkers
  */
 

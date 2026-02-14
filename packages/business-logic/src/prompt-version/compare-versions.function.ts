@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Compare two prompt version metrics to determine which is better
  * Weighted score: quality * 0.6 + cost_savings * 0.3 + latency * 0.1
  */

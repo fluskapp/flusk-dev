@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { FastifyInstance } from 'fastify';
 import { registerCreateLLMCall } from './create-llm-call.js';
 import { registerGetLLMCall } from './get-llm-call.js';

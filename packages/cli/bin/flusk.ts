@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 #!/usr/bin/env node
 
 import { Command } from 'commander';

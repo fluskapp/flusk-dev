@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Barrel export update step for full-entity recipe.
  *
  * WHY: After generating entity files, barrel exports (index.ts)

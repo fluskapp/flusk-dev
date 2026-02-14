@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * SQLite Performance Pattern Repository barrel
  */
 

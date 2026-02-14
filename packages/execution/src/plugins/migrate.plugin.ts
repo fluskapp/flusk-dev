@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Migration runner plugin — applies SQL migrations from @flusk/resources on startup.
  * Tracks applied migrations in _flusk_migrations table.
  */

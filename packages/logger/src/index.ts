@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * @flusk/logger — structured logging powered by Pino
  */
 export { createLogger } from './create-logger.js';

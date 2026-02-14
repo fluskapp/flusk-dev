@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * @flusk/otel — Auto-registration entry point
  *
  * Usage: node --require @flusk/otel ./index.js

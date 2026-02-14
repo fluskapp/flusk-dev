@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Recipes system barrel — public API for recipe-based generation.
  */
 

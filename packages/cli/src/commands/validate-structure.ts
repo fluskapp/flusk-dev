@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Validate Structure Command - flusk validate:structure
  */
 

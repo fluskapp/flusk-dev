@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Repository Test Template Generator
  * Generates test files for database repository classes
  */

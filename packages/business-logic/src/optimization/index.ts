@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 export { validateOptimization } from './validate-optimization.function.js';
 export { generateCacheConfig, computeTtl } from './generate-cache-config.function.js';
 export type { CachePatternInput } from './generate-cache-config.function.js';

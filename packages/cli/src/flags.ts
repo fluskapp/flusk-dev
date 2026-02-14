@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI flags for the Flusk generator
  * Used by: flusk g [entity] [flags]
  */

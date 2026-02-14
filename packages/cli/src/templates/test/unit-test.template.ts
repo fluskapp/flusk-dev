@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Unit Test Template Generator
  * Generates comprehensive unit test files for services, utilities, and business logic
  */

@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Generate / merge .env file with validated config.
  */
 

@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Test Generator
  * Analyzes source files and generates comprehensive test files
  */

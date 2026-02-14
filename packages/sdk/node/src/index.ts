@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 export { FluskClient } from './client.js'
 export type { FluskClientConfig, ConversionSuggestion, OptimizationSuggestion, RouteOptions, RouteResult } from './client.js'
 

@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { FastifyInstance } from 'fastify';
 import { registerSearchSimilar } from './search-similar.js';
 import { registerBackfillEmbeddings } from './backfill-embeddings.js';

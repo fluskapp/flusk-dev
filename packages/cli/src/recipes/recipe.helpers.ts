@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Shared helpers for recipe step implementations.
  *
  * WHY: Many recipe steps need to write files and track them.

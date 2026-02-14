@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Custom query schema types for entity YAML definitions.
  *
  * WHY: Named queries let users declare common access patterns

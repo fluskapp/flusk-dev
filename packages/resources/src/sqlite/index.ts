@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * SQLite module barrel — connection, migrations, repositories
  */
 

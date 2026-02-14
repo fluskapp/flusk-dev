@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Smart merge engine — update generated sections, preserve custom.
  *
  * WHY: When YAML changes, we regenerate code but must keep

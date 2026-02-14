@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Validation utilities barrel — CI enforcement for generated files.
  */
 

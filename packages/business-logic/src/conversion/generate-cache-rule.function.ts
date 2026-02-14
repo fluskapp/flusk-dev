@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Input for generateCacheRule function
  */
 export interface GenerateCacheRuleInput {

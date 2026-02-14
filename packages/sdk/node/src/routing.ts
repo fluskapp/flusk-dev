@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 export interface RouteOptions {
   ruleId: string;
   prompt: string;

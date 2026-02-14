@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import { Command } from 'commander';
 import { resolve } from 'node:path';
 import { setupWizard, clackPrompter } from '../wizard/index.js';

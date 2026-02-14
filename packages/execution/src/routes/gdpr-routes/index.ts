@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { FastifyInstance } from 'fastify';
 import { deleteUserData } from './delete-user-data.js';
 import { exportUserData } from './export-user-data.js';

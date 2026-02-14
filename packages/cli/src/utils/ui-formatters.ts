@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Flusk CLI UI Formatters
  * Message formatting, error display, and layout helpers
  */

@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * OTLP trace ingestion types — GenAI semantic convention attributes
  */
 export interface OtlpSpan {

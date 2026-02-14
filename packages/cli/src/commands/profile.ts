@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk profile
  * Performance profiling via @platformatic/flame
  */

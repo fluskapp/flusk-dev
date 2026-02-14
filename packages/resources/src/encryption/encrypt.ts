@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import { createCipheriv, randomBytes } from 'crypto';
 import { ALGORITHM, IV_LENGTH, SALT_LENGTH, deriveKey } from './crypto-utils.js';
 

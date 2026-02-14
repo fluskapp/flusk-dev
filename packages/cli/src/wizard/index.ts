@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 export { type WizardPrompter, type ProgressHandle } from './prompter.js';
 export { clackPrompter } from './clack-prompter.js';
 export { validateOpenAiKey, validateAnthropicKey } from './validate-api-key.js';

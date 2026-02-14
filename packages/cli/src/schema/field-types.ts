@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Field type definitions for entity YAML schemas.
  *
  * WHY: Centralizing field types ensures every part of the pipeline

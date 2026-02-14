@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CLI command: flusk ratio — generator coverage reporter.
  *
  * WHY: Track progress toward 90% generated code target.

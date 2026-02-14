@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Template for Dockerfile generation
  * Multi-stage production build with Node 22 alpine
  */

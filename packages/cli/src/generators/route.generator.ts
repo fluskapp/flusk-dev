@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Standalone route generator — creates route directory with handler
  */
 

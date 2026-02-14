@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Auto-register flame profiling when @platformatic/flame is available
  * Returns SpanProcessors to add to the OTel SDK
  */

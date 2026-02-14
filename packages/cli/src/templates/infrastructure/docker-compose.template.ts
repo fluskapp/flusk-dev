@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Template for docker-compose.yml generation
  * Used by flusk init command to set up infrastructure services
  */

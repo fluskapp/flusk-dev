@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Profile generator - scaffolds performance profiling config and scripts
  * Creates: profile.config.ts, scripts/profile.sh
  */

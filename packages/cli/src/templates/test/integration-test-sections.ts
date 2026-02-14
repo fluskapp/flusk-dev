@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Integration test template sections
  * Generates individual template parts for integration tests
  */

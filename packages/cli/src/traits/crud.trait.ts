@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * CRUD trait — generates create, findById, list, update, delete.
  *
  * WHY: CRUD is the most common capability. This trait generates

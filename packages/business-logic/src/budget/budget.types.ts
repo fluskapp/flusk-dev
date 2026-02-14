@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Budget types — canonical definitions live in @flusk/types
  */
 export type {

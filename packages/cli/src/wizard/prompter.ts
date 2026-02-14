@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Abstract WizardPrompter interface — no UI dependency.
  * Implementations: ClackPrompter (CLI), future WebPrompter.
  */

@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Webhook client — fire-and-forget POST to Slack/Discord webhooks
  */
 import { request } from 'undici';

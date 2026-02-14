@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Validate optimization entity data
  * Pure function — no I/O
  */

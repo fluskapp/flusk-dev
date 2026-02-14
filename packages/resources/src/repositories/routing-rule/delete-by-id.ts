@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { Pool } from 'pg';
 
 export async function deleteById(pool: Pool, id: string): Promise<boolean> {

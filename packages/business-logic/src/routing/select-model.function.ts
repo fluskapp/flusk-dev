@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Select the cheapest model that meets the quality threshold
  * Pure function — no I/O
  */

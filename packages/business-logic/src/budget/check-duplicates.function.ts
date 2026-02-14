@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * Check if duplicate call ratio exceeds configured threshold
  */
 import type { DuplicateAlert } from './budget.types.js';

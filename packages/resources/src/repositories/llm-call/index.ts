@@ -1,4 +1,4 @@
-/** @generated —
+/**
  * LLM Call Repository — CRUD operations for tracked LLM API calls.
  * Uses PostgreSQL with pgvector for embedding-based similarity search.
  * All functions accept a Pool instance as first parameter.

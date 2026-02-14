@@ -1,5 +1,3 @@
-/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
-
 import type { ModelPerformanceEntity } from '@flusk/entities';
 
 export function rowToEntity(row: Record<string, unknown>): ModelPerformanceEntity {
