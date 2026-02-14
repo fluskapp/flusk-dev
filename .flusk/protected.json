@@ -1,10 +1,14 @@
 {
-  "description": "Files that must NOT be modified by AI agents or generators. Only humans can edit these.",
-  "protectedPaths": [
+  "description": "Generator ownership rules. generatorOwnedPaths = AI generates via recipes. manualPaths = AI may restructure with CUSTOM sections. fullyProtected = never touch without human approval.",
+  "generatorOwnedPaths": [
+    "packages/entities/src/*.entity.ts",
+    "packages/types/src/*.types.ts",
+    "packages/resources/src/sqlite/repositories/**",
+    "packages/resources/src/sqlite/sql/**"
+  ],
+  "restructurablePaths": [
     "packages/business-logic/src/**",
-    "packages/execution/src/routes/**",
-    "packages/execution/src/plugins/**",
-    "packages/execution/src/middleware/**",
+    "packages/execution/src/**",
     "packages/otel/src/**",
     "packages/logger/src/**",
     "packages/sdk/src/**",
@@ -13,11 +17,14 @@
     "packages/resources/src/encryption/**",
     "packages/resources/src/cache/**"
   ],
-  "generatorOwnedPaths": [
-    "packages/entities/src/*.entity.ts",
-    "packages/types/src/*.types.ts",
-    "packages/resources/src/sqlite/repositories/**",
-    "packages/resources/src/sqlite/sql/**"
+  "fullyProtected": [
+    ".github/**",
+    "scripts/**",
+    ".flusk/**"
   ],
-  "reason": "AI agents repeatedly add fake @generated headers to these files. Until generators produce code that matches hand-written quality for these categories, they are OFF LIMITS."
+  "rules": {
+    "generatorOwnedPaths": "Fully generated from YAML. AI must NOT edit directly — only edit YAML and run recipe.",
+    "restructurablePaths": "AI may regenerate these via recipes. Must preserve existing logic in CUSTOM sections. Must NOT just add @generated headers — run actual recipe.",
+    "fullyProtected": "Human only. AI cannot modify."
+  }
 }
