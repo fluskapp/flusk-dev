@@ -14,3 +14,5 @@ jobs:
       - run: pnpm lint
       - run: pnpm test
       - run: pnpm exec tsx packages/cli/bin/flusk.ts validate-generated --strict
+      - run: pnpm exec tsx packages/cli/bin/flusk.ts guard
+      - run: pnpm exec tsx scripts/qa-validate.ts

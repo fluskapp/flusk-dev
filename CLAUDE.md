@@ -146,3 +146,15 @@ These rules are **non-negotiable** for any AI agent working on this repo:
 5. **Verify your work.** Run `pnpm test` and `pnpm lint` after every change. If tests fail, fix them or revert.
 6. **Preserve existing quality.** Never replace working code with worse generated code. The bar is: generated >= hand-written.
 7. **Ask before bulk operations.** Changing 100+ files? Describe what you'll do first and get confirmation.
+
+## Protected Files
+
+Some paths are OFF LIMITS for AI modification. See `.flusk/protected.json`.
+- `flusk guard` checks for violations
+- Pre-commit hook blocks fake @generated headers
+- If you need to modify protected files, ask a human first
+
+## QA Validation
+
+Run `scripts/qa-validate.ts` before any PR. It checks:
+- Generator integrity, security, code quality, test coverage, protected files

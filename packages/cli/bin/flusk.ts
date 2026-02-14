@@ -48,6 +48,7 @@ import { regenerateCommand } from '../src/commands/regenerate.js';
 import { statusCommand } from '../src/commands/status.js';
 import { validateGeneratedCommand } from '../src/commands/validate-generated.js';
 import { ratioCommand } from '../src/commands/ratio.js';
+import { guardCommand } from '../src/commands/guard.js';
 
 const program = new Command();
 
@@ -131,5 +132,6 @@ program.addCommand(statusCommand);
 // Phase 5: CI enforcement
 program.addCommand(validateGeneratedCommand);
 program.addCommand(ratioCommand);
+program.addCommand(guardCommand);
 
 program.parse(process.argv);

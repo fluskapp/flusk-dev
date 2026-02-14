@@ -1,0 +1,23 @@
+{
+  "description": "Files that must NOT be modified by AI agents or generators. Only humans can edit these.",
+  "protectedPaths": [
+    "packages/business-logic/src/**",
+    "packages/execution/src/routes/**",
+    "packages/execution/src/plugins/**",
+    "packages/execution/src/middleware/**",
+    "packages/otel/src/**",
+    "packages/logger/src/**",
+    "packages/sdk/src/**",
+    "packages/resources/src/repositories/**",
+    "packages/resources/src/clients/**",
+    "packages/resources/src/encryption/**",
+    "packages/resources/src/cache/**"
+  ],
+  "generatorOwnedPaths": [
+    "packages/entities/src/*.entity.ts",
+    "packages/types/src/*.types.ts",
+    "packages/resources/src/sqlite/repositories/**",
+    "packages/resources/src/sqlite/sql/**"
+  ],
+  "reason": "AI agents repeatedly add fake @generated headers to these files. Until generators produce code that matches hand-written quality for these categories, they are OFF LIMITS."
+}
