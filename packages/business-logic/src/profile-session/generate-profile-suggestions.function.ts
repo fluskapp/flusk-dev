@@ -39,7 +39,7 @@ export function generateProfileSuggestions(
     }
   }
 
-  if (session.type === 'heap' && session.totalSamples > 1000) {
+  if (session.profileType === 'heap' && session.totalSamples > 1000) {
     suggestions.push({
       severity: 'warning',
       message: `High memory allocation in ${session.name} — profile shows ${session.totalSamples} samples during ${session.durationMs}ms window`,

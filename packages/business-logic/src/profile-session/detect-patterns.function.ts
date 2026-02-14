@@ -3,7 +3,9 @@
  */
 
 // --- BEGIN GENERATED ---
-import type { ProfileSessionEntity, Severity } from '@flusk/entities';
+import type { ProfileSessionEntity } from '@flusk/entities';
+
+type Severity = 'low' | 'medium' | 'high' | 'critical';
 import type { CorrelationResult } from './correlate-with-traces.function.js';
 import { detectHotPathCalls } from './detect-hot-path-calls.function.js';
 import { detectSerializationWaste } from './detect-serialization-waste.function.js';

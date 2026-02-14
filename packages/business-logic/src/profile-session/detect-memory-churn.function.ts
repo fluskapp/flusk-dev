@@ -3,7 +3,7 @@
  */
 
 // --- BEGIN GENERATED ---
-import type { ProfileSessionEntity } from '@flusk/entities';
+import type { ProfileSessionEntity, HotspotEntry } from '@flusk/entities';
 import type { CorrelationResult } from './correlate-with-traces.function.js';
 import type { DetectedPattern } from './detect-patterns.function.js';
 // --- END GENERATED ---
@@ -21,11 +21,11 @@ export function detectMemoryChurn(
   session: ProfileSessionEntity,
   correlations: CorrelationResult[],
 ): DetectedPattern[] {
-  if (session.type !== 'heap') return [];
+  if (session.profileType !== 'heap') return [];
   if (correlations.length < BATCH_CALL_THRESHOLD) return [];
 
   const patterns: DetectedPattern[] = [];
-  const highSampleHotspots = session.hotspots.filter(
+  const highSampleHotspots = (session.hotspots as HotspotEntry[]).filter(
     (h) => h.samples >= HIGH_SAMPLE_THRESHOLD,
   );
 

@@ -4,13 +4,13 @@ import { detectSerializationWaste } from './detect-serialization-waste.function.
 import { detectMemoryChurn } from './detect-memory-churn.function.js';
 import { detectColdStart } from './detect-cold-start.function.js';
 import { detectPatterns } from './detect-patterns.function.js';
-import type { ProfileSessionEntity, LLMCallEntity } from '@flusk/entities';
+import type { ProfileSessionEntity, LLMCallEntity, HotspotEntry } from '@flusk/entities';
 import type { CorrelationResult } from './correlate-with-traces.function.js';
 
 const BASE_SESSION: ProfileSessionEntity = {
   id: 'sess-1', createdAt: '2026-02-13T18:00:00Z',
   updatedAt: '2026-02-13T18:00:00Z', name: 'cpu-test',
-  type: 'cpu', durationMs: 30000, totalSamples: 5000,
+  profileType: 'cpu', durationMs: 30000, totalSamples: 5000,
   hotspots: [], markdownRaw: '', pprofPath: '', flamegraphPath: '',
   traceIds: [], startedAt: '2026-02-13T18:00:00Z',
 };
@@ -72,14 +72,14 @@ describe('detectSerializationWaste', () => {
 describe('detectMemoryChurn', () => {
   it('flags heap profile with many concurrent LLM calls', () => {
     const heapSession: ProfileSessionEntity = {
-      ...BASE_SESSION, type: 'heap',
+      ...BASE_SESSION, profileType: 'heap',
       hotspots: [
         { functionName: 'allocBuf', filePath: 'buf.ts:1', cpuPercent: 5, samples: 1000 },
       ],
     };
     const corrs = Array.from({ length: 4 }, (_, i) => ({
       llmCall: { ...MOCK_CALL, id: `call-${i}` },
-      relatedHotspots: heapSession.hotspots,
+      relatedHotspots: heapSession.hotspots as HotspotEntry[],
     }));
     const results = detectMemoryChurn(heapSession, corrs);
     expect(results).toHaveLength(1);

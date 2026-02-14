@@ -8,7 +8,7 @@ const MOCK_SESSION: ProfileSessionEntity = {
   createdAt: '2026-02-13T18:00:00Z',
   updatedAt: '2026-02-13T18:00:00Z',
   name: 'cpu-profile',
-  type: 'cpu',
+  profileType: 'cpu',
   durationMs: 30000,
   totalSamples: 5000,
   hotspots: [],
@@ -50,7 +50,7 @@ describe('generateProfileSuggestions', () => {
   });
 
   it('should generate heap warning for high sample count', () => {
-    const heapSession = { ...MOCK_SESSION, type: 'heap' as const, totalSamples: 2000 };
+    const heapSession = { ...MOCK_SESSION, profileType: 'heap' as const, totalSamples: 2000 };
     const suggestions = generateProfileSuggestions(heapSession, []);
     expect(suggestions).toHaveLength(1);
     expect(suggestions[0].severity).toBe('warning');

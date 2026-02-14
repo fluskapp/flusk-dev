@@ -50,7 +50,7 @@ export async function correlateWithTraces(
       consentGiven: row.consent_given ?? true,
       consentPurpose: row.consent_purpose ?? 'optimization',
     } as LLMCallEntity,
-    relatedHotspots: session.hotspots,
+    relatedHotspots: session.hotspots as HotspotEntry[],
   }));
 }
 // --- END CUSTOM ---

@@ -34,7 +34,7 @@ describe('SQLite Profile Session Repository', () => {
 
     const found = ProfileSessionRepo.findById(db, created.id);
     expect(found).not.toBeNull();
-    expect(found!.hotspots.length).toBe(1);
+    expect((found!.hotspots as unknown[]).length).toBe(1);
   });
 
   it('should list sessions', () => {

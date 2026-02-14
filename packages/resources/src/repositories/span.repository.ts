@@ -28,14 +28,14 @@ function rowToEntity(row: Record<string, unknown>): SpanEntity {
     updatedAt: toISOString(row.updated_at),
     traceId: row.trace_id as string,
     parentSpanId: (row.parent_span_id as string) ?? undefined,
-    spanType: row.span_type as string,
+    type: row.span_type as 'llm' | 'tool' | 'retrieval' | 'chain',
     name: row.name as string,
     input: (row.input as string) ?? undefined,
     output: (row.output as string) ?? undefined,
     cost: row.cost as number,
     tokens: row.tokens as number,
     latencyMs: row.latency_ms as number,
-    status: row.status as string,
+    status: row.status as 'running' | 'completed' | 'failed',
     startedAt: toISOString(row.started_at),
     completedAt: row.completed_at != null ? toISOString(row.completed_at) : undefined,
   };
@@ -48,7 +48,7 @@ function convertValueForDb(key: string, value: unknown): unknown {
 
 export function createSpan(db: DatabaseSync, data: CreateSpanInput): SpanEntity {
   const stmt = db.prepare(`INSERT INTO spans (trace_id, parent_span_id, span_type, name, input, output, cost, tokens, latency_ms, status, started_at, completed_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING *`);
-  const row = stmt.get(data.traceId, data.parentSpanId ?? null, data.spanType, data.name, data.input ?? null, data.output ?? null, data.cost, data.tokens, data.latencyMs, data.status, data.startedAt, data.completedAt ?? null) as Record<string, unknown>;
+  const row = stmt.get(data.traceId, data.parentSpanId ?? null, data.type, data.name, data.input ?? null, data.output ?? null, data.cost, data.tokens, data.latencyMs, data.status, data.startedAt, data.completedAt ?? null) as Record<string, unknown>;
   return rowToEntity(row);
 }
 

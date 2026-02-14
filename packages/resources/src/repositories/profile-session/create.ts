@@ -27,7 +27,7 @@ export async function create(
 
   const values = [
     data.name,
-    data.type,
+    data.profileType,
     data.durationMs,
     data.totalSamples,
     JSON.stringify(data.hotspots),

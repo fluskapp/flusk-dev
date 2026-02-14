@@ -15,7 +15,7 @@ export function rowToEntity(row: Record<string, unknown>): ProfileSessionEntity 
     createdAt: toISOString(row.created_at),
     updatedAt: toISOString(row.updated_at),
     name: row.name as string,
-    type: row.type as string,
+    profileType: row.type as 'cpu' | 'heap',
     durationMs: row.duration_ms as number,
     totalSamples: row.total_samples as number,
     hotspots: (typeof row.hotspots === 'string'

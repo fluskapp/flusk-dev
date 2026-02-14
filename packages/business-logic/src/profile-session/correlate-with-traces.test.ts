@@ -11,7 +11,7 @@ const MOCK_SESSION: ProfileSessionEntity = {
   createdAt: '2026-02-13T18:00:00.000Z',
   updatedAt: '2026-02-13T18:00:00.000Z',
   name: 'test-profile',
-  type: 'cpu',
+  profileType: 'cpu',
   durationMs: 30000,
   totalSamples: 5000,
   hotspots: [

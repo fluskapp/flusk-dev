@@ -13,7 +13,7 @@ fields:
     type: uuid
     description: Parent span ID for nested spans
 
-  spanType:
+  type:
     type: enum
     values: [llm, tool, retrieval, chain]
     required: true

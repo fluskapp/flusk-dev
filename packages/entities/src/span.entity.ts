@@ -10,7 +10,7 @@ export const SpanEntitySchema = Type.Composite([
   Type.Object({
     traceId: Type.String({ format: 'uuid', description: 'Parent trace ID' }),
     parentSpanId: Type.Optional(Type.String({ format: 'uuid', description: 'Parent span ID for nested spans' })),
-    spanType: Type.Union([Type.Literal('llm'), Type.Literal('tool'), Type.Literal('retrieval'), Type.Literal('chain')]),
+    type: Type.Union([Type.Literal('llm'), Type.Literal('tool'), Type.Literal('retrieval'), Type.Literal('chain')]),
     name: Type.String({ description: 'Span name (e.g. step name)' }),
     input: Type.Optional(Type.String({ description: 'Input data' })),
     output: Type.Optional(Type.String({ description: 'Output data' })),
