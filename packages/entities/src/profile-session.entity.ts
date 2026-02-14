@@ -23,17 +23,3 @@ export const ProfileSessionEntitySchema = Type.Composite([
 ]);
 
 export type ProfileSessionEntity = Static<typeof ProfileSessionEntitySchema>;
-
-// --- BEGIN CUSTOM ---
-/**
- * HotspotEntry schema - represents a hot function from profiling
- */
-export const HotspotEntrySchema = Type.Object({
-  functionName: Type.String({ description: 'Function name' }),
-  filePath: Type.String({ description: 'Source file path' }),
-  cpuPercent: Type.Number({ description: 'CPU percentage', minimum: 0 }),
-  samples: Type.Integer({ description: 'Sample count', minimum: 0 }),
-});
-
-export type HotspotEntry = Static<typeof HotspotEntrySchema>;
-// --- END CUSTOM ---

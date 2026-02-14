@@ -1,0 +1,30 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { BudgetAlertEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Insert a new Budget alert record into SQLite
+ */
+export function create(
+  db: DatabaseSync,
+  data: Omit<BudgetAlertEntity, 'id' | 'createdAt' | 'updatedAt'>,
+): BudgetAlertEntity {
+  const stmt = db.prepare(`
+    INSERT INTO budget_alerts (
+      alert_type, threshold, actual, model, acknowledged,
+      metadata
+    ) VALUES (?, ?, ?, ?, ?, ?)
+    RETURNING *
+  `);
+
+  const row = stmt.get(
+    data.alertType,
+    data.threshold,
+    data.actual,
+    data.model ?? null,
+    data.acknowledged ? 1 : 0,
+    data.metadata != null ? JSON.stringify(data.metadata) : null,
+  ) as Record<string, unknown>;
+
+  return rowToEntity(row);
+}

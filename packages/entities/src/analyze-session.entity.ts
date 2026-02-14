@@ -19,8 +19,3 @@ export const AnalyzeSessionEntitySchema = Type.Composite([
 ]);
 
 export type AnalyzeSessionEntity = Static<typeof AnalyzeSessionEntitySchema>;
-
-// --- BEGIN CUSTOM ---
-/** Models used during the analysis session */
-export type ModelsUsed = string[];
-// --- END CUSTOM ---

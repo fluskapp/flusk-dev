@@ -9,6 +9,13 @@ import { registerRecipe, clearRecipes } from './recipe.registry.js';
 import { fullEntityRecipe } from './full-entity.recipe.js';
 import { cliCommandRecipe } from './cli-command.recipe.js';
 import { fastifyPluginRecipe } from './fastify-plugin.recipe.js';
+import { middlewareRecipe } from './middleware.recipe.js';
+import { routeRecipe } from './route.recipe.js';
+import { businessLogicRecipe } from './business-logic.recipe.js';
+import { clientRecipe } from './client.recipe.js';
+import { otelHookRecipe } from './otel-hook.recipe.js';
+import { loggerRecipe } from './logger.recipe.js';
+import { sdkProviderRecipe } from './sdk-provider.recipe.js';
 
 let registered = false;
 
@@ -18,6 +25,13 @@ export function registerDefaultRecipes(): void {
   registerRecipe(fullEntityRecipe);
   registerRecipe(cliCommandRecipe);
   registerRecipe(fastifyPluginRecipe);
+  registerRecipe(middlewareRecipe);
+  registerRecipe(routeRecipe);
+  registerRecipe(businessLogicRecipe);
+  registerRecipe(clientRecipe);
+  registerRecipe(otelHookRecipe);
+  registerRecipe(loggerRecipe);
+  registerRecipe(sdkProviderRecipe);
   registered = true;
 }
 
