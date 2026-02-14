@@ -144,21 +144,6 @@ export function buildDelete(n: string, t: string, st: StorageTarget): string {
   ].join('\n');
 }
 
-/** Build CRUD route section */
-export function buildCrudRoutes(n: string, camel: string): import('./trait.types.js').TraitCodeSection {
-  return {
-    imports: [`import { ${n}EntitySchema } from '@flusk/types';`],
-    types: [],
-    functions: [
-      `export function register${n}CrudRoutes(app: FastifyInstance): void {`,
-      `  app.get('/${camel}s', async (req) => list${n}s(req.db));`,
-      `  app.get('/${camel}s/:id', async (req) => find${n}ById(req.db, req.params.id));`,
-      `  app.post('/${camel}s', async (req) => create${n}(req.db, req.body));`,
-      `  app.put('/${camel}s/:id', async (req) => update${n}(req.db, req.params.id, req.body));`,
-      `  app.delete('/${camel}s/:id', async (req) => delete${n}(req.db, req.params.id));`,
-      `}`,
-    ],
-    sql: [],
-    routes: [],
-  };
-}
+
+/** Re-export route builders from dedicated module */
+export { buildCrudRoutes } from './crud-route-builders.js';

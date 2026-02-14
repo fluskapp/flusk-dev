@@ -143,7 +143,20 @@ capabilities:
     assert.ok(existsSync(routePath), 'Route file should exist');
 
     const route = readFileSync(routePath, 'utf-8');
-    assert.ok(route.includes('invoices'), 'Should have entity routes');
+    assert.ok(route.includes("import { Type } from '@sinclair/typebox'"), 'Should import TypeBox');
+    assert.ok(route.includes('InvoiceEntitySchema'), 'Should import entity schema');
+    assert.ok(route.includes('CreateInvoiceSchema'), 'Should have create schema');
+    assert.ok(route.includes("tags: ['Invoice']"), 'Should have Swagger tags');
+    assert.ok(route.includes('reply.code(201)'), 'POST should return 201');
+    assert.ok(route.includes('reply.code(404)'), 'Should handle 404');
+    assert.ok(route.includes('reply.code(204)'), 'DELETE should return 204');
+    assert.ok(route.includes('IdParamsSchema'), 'Should have params schema');
+    assert.ok(route.includes('ListQuerySchema'), 'Should have list query schema');
+    assert.ok(route.includes("fastify.post('/'"), 'Should register POST route');
+    assert.ok(route.includes("fastify.get('/:id'"), 'Should register GET by ID route');
+    assert.ok(route.includes("fastify.get('/'"), 'Should register list route');
+    assert.ok(route.includes("fastify.put('/:id'"), 'Should register PUT route');
+    assert.ok(route.includes("fastify.delete('/:id'"), 'Should register DELETE route');
   });
 
   test('generates trait migration SQL', () => {

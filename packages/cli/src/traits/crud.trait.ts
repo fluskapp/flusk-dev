@@ -31,7 +31,7 @@ export function createCrudTrait(): Trait {
 
 /** Generate CRUD code sections for the given context */
 function generateCrud(ctx: TraitContext): TraitOutput {
-  const { schema, storageTarget: st, tableName, camelName } = ctx;
+  const { schema, storageTarget: st, tableName } = ctx;
   const n = schema.name;
   const fields = Object.entries(schema.fields);
 
@@ -58,7 +58,7 @@ function generateCrud(ctx: TraitContext): TraitOutput {
       sql: [],
       routes: [],
     },
-    route: buildCrudRoutes(n, camelName),
+    route: buildCrudRoutes(n),
     migration: emptySection(),
   };
 }
