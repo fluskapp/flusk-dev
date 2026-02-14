@@ -4,7 +4,7 @@
  */
 
 import { Type, Static } from '@sinclair/typebox';
-import { ProfileSessionEntitySchema } from '@flusk/entities';
+import { ProfileSessionEntitySchema, HotspotEntrySchema, type HotspotEntry } from '@flusk/entities';
 
 export type ProfileSessionEntity = Static<typeof ProfileSessionEntitySchema>;
 
@@ -26,3 +26,9 @@ export type ProfileSessionUpdate = Static<typeof ProfileSessionUpdateSchema>;
 export const ProfileSessionQuerySchema = Type.Partial(ProfileSessionEntitySchema);
 
 export type ProfileSessionQuery = Static<typeof ProfileSessionQuerySchema>;
+
+// --- BEGIN CUSTOM ---
+/** Re-export HotspotEntry types from entities */
+export { type HotspotEntry };
+export const HotspotEntryJSONSchema = HotspotEntrySchema;
+// --- END CUSTOM ---

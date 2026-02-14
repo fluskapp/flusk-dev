@@ -24,3 +24,16 @@ export const LLMCallEntitySchema = Type.Composite([
 ]);
 
 export type LLMCallEntity = Static<typeof LLMCallEntitySchema>;
+
+// --- BEGIN CUSTOM ---
+/**
+ * Token usage breakdown for an LLM call
+ */
+export const TokenUsageSchema = Type.Object({
+  input: Type.Integer({ description: 'Input/prompt tokens', minimum: 0 }),
+  output: Type.Integer({ description: 'Output/completion tokens', minimum: 0 }),
+  total: Type.Integer({ description: 'Total tokens', minimum: 0 }),
+});
+
+export type TokenUsage = Static<typeof TokenUsageSchema>;
+// --- END CUSTOM ---

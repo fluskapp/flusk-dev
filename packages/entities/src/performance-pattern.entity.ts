@@ -19,3 +19,13 @@ export const PerformancePatternEntitySchema = Type.Composite([
 ]);
 
 export type PerformancePatternEntity = Static<typeof PerformancePatternEntitySchema>;
+
+// --- BEGIN CUSTOM ---
+export const SeveritySchema = Type.Union([
+  Type.Literal('critical'),
+  Type.Literal('high'),
+  Type.Literal('medium'),
+  Type.Literal('low'),
+]);
+export type Severity = Static<typeof SeveritySchema>;
+// --- END CUSTOM ---

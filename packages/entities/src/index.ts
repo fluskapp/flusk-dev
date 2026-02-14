@@ -89,7 +89,8 @@ export {
 // AnalyzeSession entity exports
 export {
   AnalyzeSessionEntitySchema,
-  type AnalyzeSessionEntity
+  type AnalyzeSessionEntity,
+  type ModelsUsed
 } from './analyze-session.entity.js';
 
 // PromptVersion entity exports
