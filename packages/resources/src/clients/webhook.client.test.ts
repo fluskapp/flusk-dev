@@ -1,0 +1,25 @@
+import { describe, it, expect, vi } from 'vitest';
+import { sendWebhook, fireAndForget } from './webhook.client.js';
+
+vi.mock('undici', () => ({
+  request: vi.fn().mockResolvedValue({ statusCode: 200 }),
+}));
+
+describe('webhook client', () => {
+  it('sends payload to webhook URL', async () => {
+    const { request } = await import('undici');
+    await sendWebhook('https://hooks.example.com/test', { text: 'hello' });
+    expect(request).toHaveBeenCalledWith(
+      'https://hooks.example.com/test',
+      expect.objectContaining({ method: 'POST' }),
+    );
+  });
+
+  it('fireAndForget does nothing without URL', () => {
+    expect(() => fireAndForget(undefined, ['alert'])).not.toThrow();
+  });
+
+  it('fireAndForget does nothing without alerts', () => {
+    expect(() => fireAndForget('https://hooks.example.com', [])).not.toThrow();
+  });
+});

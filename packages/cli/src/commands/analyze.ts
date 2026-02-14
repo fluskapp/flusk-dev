@@ -10,6 +10,9 @@ import { writeFile } from 'node:fs/promises';
 import { createSqliteStorage } from '@flusk/resources';
 import { startReceiver } from './analyze-receiver.js';
 import { generateReport } from './analyze-report.js';
+import { budget as budgetLogic } from '@flusk/business-logic';
+import { WebhookClient } from '@flusk/resources';
+import { loadConfig } from '../config/index.js';
 import { createLogger } from '@flusk/logger';
 
 const log = createLogger('analyze');
@@ -23,7 +26,9 @@ export const analyzeCommand = new Command('analyze')
   .option('-a, --agent <name>', 'Label for multi-agent tracking')
   .action(async (script: string, opts) => {
     const duration = parseInt(opts.duration, 10);
-    const storage = createSqliteStorage();
+    const config = await loadConfig();
+    const agentLabel = opts.agent || config.agent || process.env.FLUSK_AGENT;
+    const storage = createSqliteStorage(config.storage?.path);
     const receiver = await startReceiver(storage);
 
     console.log(chalk.cyan(`🔍 Analyzing ${script}...`));
@@ -39,7 +44,7 @@ export const analyzeCommand = new Command('analyze')
       startedAt: new Date().toISOString(),
     });
 
-    const child = spawnChild(script, receiver.port, opts.agent);
+    const child = spawnChild(script, receiver.port, agentLabel);
     const exitCode = await waitForCompletion(child, duration);
     await receiver.close();
 
@@ -66,6 +71,27 @@ export const analyzeCommand = new Command('analyze')
       console.log('\n' + report);
     }
 
+    // Budget check
+    if (config.budget) {
+      const now = new Date();
+      const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+      const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const budgetStatus = budgetLogic.checkBudget(config.budget, {
+        dailyCost: storage.llmCalls.sumCostSince(dayStart),
+        monthlyCost: storage.llmCalls.sumCostSince(monthStart),
+        totalCalls: calls.length,
+        duplicateCalls: storage.llmCalls.countDuplicates(),
+      });
+      if (budgetStatus.alerts.length > 0) {
+        console.log(chalk.yellow('\n⚠️  Budget Alerts:'));
+        for (const alert of budgetStatus.alerts) console.log(chalk.yellow(`  - ${alert}`));
+        if (config.alerts?.onBudgetExceeded === 'block') {
+          console.log(chalk.red.bold('\n🛑 BUDGET EXCEEDED — onBudgetExceeded is set to "block"'));
+        }
+        WebhookClient.fireAndForget(config.alerts?.webhook, budgetStatus.alerts);
+      }
+    }
+
     log.info('Analysis complete', { exitCode, calls: receiver.getCallCount() });
   });
 
@@ -75,7 +101,7 @@ function spawnChild(script: string, port: number, agent?: string) {
     FLUSK_MODE: 'local',
     FLUSK_SQLITE_PATH: resolve(process.env.HOME ?? '~', '.flusk', 'data.db'),
     FLUSK_ENDPOINT: `http://127.0.0.1:${port}`,
-    ...(agent ? { FLUSK_AGENT_LABEL: agent } : {}),
+    ...(agent ? { FLUSK_AGENT: agent, FLUSK_AGENT_LABEL: agent } : {}),
   };
   return spawn('node', ['--import', '@flusk/otel', resolve(script)], {
     stdio: 'inherit',

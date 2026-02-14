@@ -23,6 +23,8 @@ export function createSqliteStorage(dbPath?: string): StorageAdapter {
       list: (limit, offset) => LLMCallRepo.list(db, limit, offset),
       countByModel: () => LLMCallRepo.countByModel(db),
       sumCost: () => LLMCallRepo.sumCost(db),
+      sumCostSince: (since: string) => LLMCallRepo.sumCostSince(db, since),
+      countDuplicates: () => LLMCallRepo.countDuplicates(db),
     },
     analyzeSessions: {
       create: (data) => AnalyzeSessionRepo.create(db, data),

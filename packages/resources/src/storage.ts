@@ -8,6 +8,8 @@ export interface LLMCallMethods {
   list: (limit?: number, offset?: number) => LLMCallEntity[];
   countByModel: () => ModelCount[];
   sumCost: () => number;
+  sumCostSince: (since: string) => number;
+  countDuplicates: () => number;
 }
 
 export interface AnalyzeSessionMethods {

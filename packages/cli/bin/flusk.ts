@@ -40,6 +40,8 @@ import { generateSqliteRepoCommand } from '../src/commands/generate-sqlite-repo.
 import { analyzeCommand } from '../src/commands/analyze.js';
 import { reportCommand } from '../src/commands/report.js';
 import { historyCommand } from '../src/commands/history.js';
+import { budgetCommand } from '../src/commands/budget.js';
+import { initConfigCommand } from '../src/commands/init-config.js';
 
 const program = new Command();
 
@@ -107,5 +109,7 @@ program.addCommand(generateSqliteRepoCommand);
 program.addCommand(analyzeCommand);
 program.addCommand(reportCommand);
 program.addCommand(historyCommand);
+program.addCommand(budgetCommand);
+program.addCommand(initConfigCommand);
 
 program.parse(process.argv);

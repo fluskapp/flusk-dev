@@ -34,3 +34,6 @@ export { promptVersion };
 
 import * as profileSession from './profile-session/index.js';
 export { profileSession };
+
+import * as budget from './budget/index.js';
+export { budget };

@@ -1,0 +1,24 @@
+import { describe, it, expect } from 'vitest';
+import { checkPerCall } from './check-per-call.function.js';
+
+describe('checkPerCall', () => {
+  it('returns null when under threshold', () => {
+    expect(checkPerCall(1.0, 'gpt-4', 0.5)).toBeNull();
+  });
+
+  it('returns null when no threshold set', () => {
+    expect(checkPerCall(undefined, 'gpt-4', 10)).toBeNull();
+  });
+
+  it('returns alert when cost exceeds threshold', () => {
+    const result = checkPerCall(0.5, 'gpt-4', 1.2);
+    expect(result).not.toBeNull();
+    expect(result!.cost).toBe(1.2);
+    expect(result!.message).toContain('gpt-4');
+    expect(result!.message).toContain('exceeds');
+  });
+
+  it('returns null when exactly at threshold', () => {
+    expect(checkPerCall(1.0, 'gpt-4', 1.0)).toBeNull();
+  });
+});
