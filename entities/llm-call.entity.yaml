@@ -1,6 +1,6 @@
 name: LLMCall
 description: A single LLM API call with cost tracking and deduplication
-storage: [postgres]
+storage: [sqlite]
 
 fields:
   provider:
@@ -75,3 +75,43 @@ capabilities:
   crud: true
   aggregation: true
   time-range: true
+
+queries:
+  - name: findByPromptHash
+    description: Find most recent LLM call by prompt hash (cache lookup)
+    params:
+      hash: { type: string }
+    where: "prompt_hash = :hash"
+    order: "created_at DESC"
+    limit: 1
+    returns: single
+
+  - name: countDuplicates
+    description: Count LLM calls sharing prompt_hash with others
+    type: raw-sql
+    sql: |
+      SELECT COALESCE(SUM(cnt), 0) as total FROM (
+        SELECT COUNT(*) as cnt FROM llm_calls
+        GROUP BY prompt_hash HAVING COUNT(*) > 1
+      )
+    returns: scalar
+
+  - name: countByModel
+    description: Count LLM calls grouped by model
+    type: raw-sql
+    sql: "SELECT model, COUNT(*) as count FROM llm_calls GROUP BY model ORDER BY count DESC"
+    returns: raw
+
+  - name: sumCost
+    description: Sum total cost of all LLM calls
+    type: raw-sql
+    sql: "SELECT COALESCE(SUM(cost), 0) as total FROM llm_calls"
+    returns: scalar
+
+  - name: sumCostSince
+    description: Sum cost of LLM calls since a given date
+    params:
+      since: { type: string }
+    type: raw-sql
+    sql: "SELECT COALESCE(SUM(cost), 0) as total FROM llm_calls WHERE created_at >= :since"
+    returns: scalar

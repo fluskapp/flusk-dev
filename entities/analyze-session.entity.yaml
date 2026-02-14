@@ -1,6 +1,6 @@
 name: AnalyzeSession
 description: Tracks CLI analyze runs — created when flusk analyze executes
-storage: [postgres]
+storage: [sqlite]
 
 fields:
   script:

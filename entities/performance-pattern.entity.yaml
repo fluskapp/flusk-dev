@@ -1,6 +1,6 @@
 name: PerformancePattern
 description: Detected performance patterns from profiling data combined with LLM call analysis
-storage: [postgres]
+storage: [sqlite]
 
 fields:
   profileSessionId:
@@ -50,3 +50,12 @@ relations:
 
 capabilities:
   crud: true
+
+queries:
+  - name: findByProfileId
+    description: Find all patterns for a profile session
+    params:
+      profileSessionId: { type: string }
+    where: "profile_session_id = :profileSessionId"
+    order: "severity ASC, created_at DESC"
+    returns: list

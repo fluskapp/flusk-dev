@@ -28,6 +28,6 @@ export interface EntitySchema {
   relations?: Record<string, RelationSchema>;
   /** Capabilities to enable */
   capabilities?: CapabilitySchema;
-  /** Custom named queries */
-  queries?: Record<string, QuerySchema>;
+  /** Custom named queries (array with name property, or keyed by name) */
+  queries?: QuerySchema[] | Record<string, QuerySchema>;
 }

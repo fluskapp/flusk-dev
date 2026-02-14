@@ -12,6 +12,7 @@ import { generateTypeBoxContent } from '../schema/generate-typebox.js';
 import { generateMigrationSql } from '../schema/generate-migration.js';
 import { generateTypesFileContent } from '../schema/generate-types-file.js';
 import { composeTraits } from '../traits/trait.composer.js';
+import { generateMultiFileRepo } from '../generators/multi-file-repo.js';
 import type { EntitySchema, StorageTarget } from '../schema/entity-schema.types.js';
 
 /** Generate TypeBox entity schema file */
@@ -49,10 +50,10 @@ export const generateMigrationStep: RecipeStep = {
   },
 };
 
-/** Compose traits into repository + routes */
+/** Compose traits into repository + routes (multi-file output) */
 export const composeTraitsStep: RecipeStep = {
   name: 'compose-traits',
-  description: 'Generate repository with traits',
+  description: 'Generate repository with traits (multi-file)',
   when: (ctx) => {
     const schema = ctx.shared['schema'] as EntitySchema | undefined;
     return !!schema?.capabilities &&
@@ -63,12 +64,29 @@ export const composeTraitsStep: RecipeStep = {
     const kebab = ctx.shared['kebab'] as string;
     const targets: StorageTarget[] = schema.storage ?? ['sqlite'];
     const files = [];
+
     for (const target of targets) {
+      if (target === 'sqlite') {
+        // Generate multi-file repo structure
+        const repoDir = resolve(ctx.projectRoot,
+          `packages/resources/src/sqlite/repositories/${kebab}`);
+        const repoFiles = generateMultiFileRepo(schema, {
+          includeUpdate: true,
+        });
+        for (const rf of repoFiles) {
+          files.push(writeRecipeFile(ctx, repoDir, rf.filename, rf.content));
+        }
+      } else {
+        // Fallback to monolithic composer for non-sqlite targets
+        const composed = composeTraits(schema, target);
+        const repoDir = resolve(ctx.projectRoot,
+          'packages/resources/src/repositories');
+        files.push(writeRecipeFile(ctx, repoDir, `${kebab}.repository.ts`,
+          composed.repository));
+      }
+
+      // Generate routes from composer
       const composed = composeTraits(schema, target);
-      const repoDir = resolve(ctx.projectRoot,
-        'packages/resources/src/repositories');
-      files.push(writeRecipeFile(ctx, repoDir, `${kebab}.repository.ts`,
-        composed.repository));
       if (composed.route) {
         const routeDir = resolve(ctx.projectRoot,
           'packages/execution/src/routes');
