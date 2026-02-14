@@ -23,10 +23,7 @@ function parseParams(query: QuerySchema & { name: string }) {
     const t = typeof def === 'string' ? def : def.type;
     return `${n}: ${t}`;
   });
-  const fnParams = types.length > 0
-    ? `db: DatabaseSync, ${types.join(', ')}`
-    : 'db: DatabaseSync';
-  return { names, fnParams };
+  return { names, types };
 }
 
 function replaceParams(sql: string, paramNames: string[]): { sql: string; args: string[] } {
@@ -39,6 +36,11 @@ function replaceParams(sql: string, paramNames: string[]): { sql: string; args: 
   return { sql: result, args };
 }
 
+/** Check if SQL is a single line (no meaningful newlines) */
+function isSingleLineSql(sql: string): boolean {
+  return sql.trim().split('\n').length === 1;
+}
+
 /** Generate a custom query file */
 export function generateCustomQuery(
   schema: EntitySchema,
@@ -47,17 +49,48 @@ export function generateCustomQuery(
   const n = schema.name;
   const table = tbl(schema);
   const kebab = toKebab(query.name);
-  const { names, fnParams } = parseParams(query);
+  const { names, types } = parseParams(query);
 
   if (query.type === 'raw-sql' && query.returns === 'scalar') {
     const { sql, args } = replaceParams(query.sql!.trim(), names);
+    const fnParams = types.length > 0
+      ? `db: DatabaseSync, ${types.join(', ')}`
+      : 'db: DatabaseSync';
+
+    let body: string;
+    const trimmedSql = sql.trim();
+    if (isSingleLineSql(trimmedSql) && trimmedSql.length <= 70) {
+      const argsStr = args.length > 0 ? args.join(', ') : '';
+      const getCall = argsStr ? `get(${argsStr})` : 'get()';
+      body = `  const stmt = db.prepare('${trimmedSql}');\n  const row = stmt.${getCall} as { total: number };\n  return row.total;`;
+    } else if (isSingleLineSql(trimmedSql)) {
+      // Single-line but long: wrap with db.prepare(\n    '...',\n  )
+      const argsStr = args.length > 0 ? args.join(', ') : '';
+      const getCall = argsStr ? `get(${argsStr})` : 'get()';
+      body = `  const stmt = db.prepare(\n    '${trimmedSql}',\n  );\n  const row = stmt.${getCall} as { total: number };\n  return row.total;`;
+    } else {
+      // Multi-line SQL: preserve indentation
+      const sqlLines = sql.split('\n');
+      const indented = sqlLines.map((line) => {
+        const trimmed = line.trimEnd();
+        if (trimmed === '') return '';
+        return `    ${trimmed.replace(/^\s+/, (m) => ' '.repeat(Math.min(m.length, 6)))}`;
+      }).join('\n');
+      const argsStr = args.length > 0 ? args.join(', ') : '';
+      const getCall = argsStr ? `get(${argsStr})` : 'get()';
+      body = `  const stmt = db.prepare(\`\n${indented}\n  \`);\n  const row = stmt.${getCall} as { total: number };\n  return row.total;`;
+    }
+
     return {
       filename: `${kebab}.ts`,
-      content: `import type { DatabaseSync } from 'node:sqlite';\n\n/**\n * ${query.description ?? query.name}\n */\nexport function ${query.name}(${fnParams}): number {\n  const stmt = db.prepare(\`\n    ${sql}\n  \`);\n  const row = stmt.get(${args.join(', ')}) as { total: number };\n  return row.total;\n}\n`,
+      content: `import type { DatabaseSync } from 'node:sqlite';\n\n/**\n * ${query.description ?? query.name}\n */\nexport function ${query.name}(${fnParams}): number {\n${body}\n}\n`,
     };
   }
 
   if (query.type === 'raw-sql' && query.returns === 'raw') {
+    const fnParams = types.length > 0
+      ? `db: DatabaseSync, ${types.join(', ')}`
+      : 'db: DatabaseSync';
     return { filename: `${kebab}.ts`, content: generateRawQuery(query, fnParams) };
   }
 
@@ -65,15 +98,23 @@ export function generateCustomQuery(
     const { sql, args } = replaceParams(query.where as string, names);
     const order = query.order ? ` ORDER BY ${query.order}` : '';
     const limit = query.limit ? ` LIMIT ${query.limit}` : '';
+    // Format function params: each on its own line when there are params
+    const fnParamLines = types.length > 0
+      ? `\n  db: DatabaseSync,\n  ${types.join(',\n  ')},\n`
+      : 'db: DatabaseSync';
+    const fnParamsCall = fnParamLines.includes('\n') ? fnParamLines : `${fnParamLines}`;
     return {
       filename: `${kebab}.ts`,
-      content: `import type { DatabaseSync } from 'node:sqlite';\nimport type { ${n}Entity } from '@flusk/entities';\nimport { rowToEntity } from './row-to-entity.js';\n\n/**\n * ${query.description ?? query.name}\n */\nexport function ${query.name}(\n  ${fnParams},\n): ${n}Entity | null {\n  const stmt = db.prepare(\n    'SELECT * FROM ${table} WHERE ${sql}${order}${limit}',\n  );\n  const row = stmt.get(${args.join(', ')}) as Record<string, unknown> | undefined;\n  return row ? rowToEntity(row) : null;\n}\n`,
+      content: `import type { DatabaseSync } from 'node:sqlite';\nimport type { ${n}Entity } from '@flusk/entities';\nimport { rowToEntity } from './row-to-entity.js';\n\n/**\n * ${query.description ?? query.name}\n */\nexport function ${query.name}(${fnParamsCall}): ${n}Entity | null {\n  const stmt = db.prepare(\n    'SELECT * FROM ${table} WHERE ${sql}${order}${limit}',\n  );\n  const row = stmt.get(${args.join(', ')}) as Record<string, unknown> | undefined;\n  return row ? rowToEntity(row) : null;\n}\n`,
     };
   }
 
   if (query.returns === 'list') {
     const { sql, args } = replaceParams(query.where as string, names);
     const order = query.order ? ` ORDER BY ${query.order}` : '';
+    const fnParams = types.length > 0
+      ? `db: DatabaseSync, ${types.join(', ')}`
+      : 'db: DatabaseSync';
     return {
       filename: `${kebab}.ts`,
       content: `import type { DatabaseSync } from 'node:sqlite';\nimport type { ${n}Entity } from '@flusk/entities';\nimport { rowToEntity } from './row-to-entity.js';\n\n/**\n * ${query.description ?? query.name}\n */\nexport function ${query.name}(\n  ${fnParams},\n): ${n}Entity[] {\n  const stmt = db.prepare(\n    'SELECT * FROM ${table} WHERE ${sql}${order}',\n  );\n  const rows = stmt.all(${args.join(', ')}) as Record<string, unknown>[];\n  return rows.map(rowToEntity);\n}\n`,
@@ -94,7 +135,9 @@ function generateRawQuery(
     return `import type { DatabaseSync } from 'node:sqlite';\n\nexport function ${query.name}(${fnParams}): unknown[] {\n  return db.prepare('${sql}').all();\n}\n`;
   }
   const cols = colMatches[1].split(',').map((c) => c.trim());
-  const iface = `${query.name.charAt(0).toUpperCase() + query.name.slice(1)}Row`;
+  // Use a clean interface name based on the return columns
+  // For "countByModel" with columns [model, count] → "ModelCount"
+  const iface = inferInterfaceName(query.name, cols);
   const fields = cols.map((col) => {
     const asMatch = col.match(/(?:as\s+)(\w+)$/i);
     const isNum = /COUNT\s*\(/i.test(col) || /SUM\s*\(/i.test(col);
@@ -102,4 +145,25 @@ function generateRawQuery(
     return `  ${name}: ${isNum ? 'number' : 'string'};`;
   });
   return `import type { DatabaseSync } from 'node:sqlite';\n\nexport interface ${iface} {\n${fields.join('\n')}\n}\n\n/**\n * ${query.description ?? query.name}\n */\nexport function ${query.name}(${fnParams}): ${iface}[] {\n  const stmt = db.prepare(\n    '${sql}',\n  );\n  return stmt.all() as ${iface}[];\n}\n`;
+}
+
+/**
+ * Infer a clean interface name from query name and columns.
+ * "countByModel" with [model, count] → "ModelCount"
+ * Falls back to PascalCase of query name + "Row"
+ */
+function inferInterfaceName(queryName: string, cols: string[]): string {
+  // Extract column names (after AS if present)
+  const colNames = cols.map((col) => {
+    const asMatch = col.match(/(?:as\s+)(\w+)$/i);
+    return asMatch ? asMatch[1] : col.replace(/\W/g, '_');
+  });
+
+  // Try to build a name from columns: capitalize each and join
+  if (colNames.length >= 2 && colNames.every((c) => c.length < 20)) {
+    return colNames.map((c) => c.charAt(0).toUpperCase() + c.slice(1)).join('');
+  }
+
+  // Fallback: PascalCase of query name + Row
+  return queryName.charAt(0).toUpperCase() + queryName.slice(1) + 'Row';
 }
