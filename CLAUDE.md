@@ -2,9 +2,15 @@
 
 ## What is Flusk?
 
-LLM cost optimization platform. Tracks LLM API calls via OTel,
-detects patterns (duplicate/similar prompts, overqualified models),
-suggests cost-saving conversions, and generates performance profiles.
+LLM cost optimization platform. One command, zero setup:
+
+```bash
+npx @flusk/cli analyze ./my-app.js
+```
+
+Tracks LLM API calls via OTel, detects patterns (duplicate/similar
+prompts, overqualified models), suggests cost-saving conversions,
+and generates performance profiles.
 
 ## Architecture (Monorepo)
 
@@ -13,13 +19,49 @@ packages/
   entities/       → TypeBox schemas (source of truth)
   types/          → Derived TS types (Insert, Update, Query)
   business-logic/ → Pure functions, NO I/O
-  resources/      → DB repos, clients (pg, Redis, OpenAI), migrations
+  resources/      → SQLite + Postgres repos, clients, migrations
   execution/      → Fastify app: routes, plugins, hooks
   sdk/            → Client wrappers (OpenAI, Anthropic interceptors)
-  cli/            → Code generators, validators, scaffolding
+  cli/            → CLI commands + code generators
   otel/           → Zero-touch OTel auto-instrumentation
   logger/         → Structured logging (Pino)
 ```
+
+## CLI Commands
+
+```bash
+flusk analyze <script>    # Run and analyze LLM costs
+  -d, --duration <s>      # Duration (default: 60, 0 = until exit)
+  -o, --output <file>     # Write report to file
+  -f, --format <fmt>      # markdown or json
+  -a, --agent <name>      # Multi-agent label
+  -m, --mode <mode>       # local (default) or server
+
+flusk report [id]         # View/regenerate analysis report
+flusk history             # List past sessions
+flusk budget              # Check budget status
+flusk init                # Create .flusk.config.js
+```
+
+## Storage Modes
+
+### Local (default)
+- `node:sqlite` — zero deps, built into Node 22+
+- `~/.flusk/data.db` — all data
+- `SqliteSpanExporter` writes GenAI spans directly to SQLite
+- `FLUSK_MODE=local` (or no env vars)
+
+### Server (opt-in)
+- PostgreSQL + Redis + pgvector
+- `OTLPTraceExporter` sends spans over HTTP
+- `FLUSK_MODE=server` or `FLUSK_ENDPOINT` set
+
+## Config System
+
+`.flusk.config.js` in project root:
+- Budget limits (daily, monthly, per-call, duplicate ratio)
+- Alert channels (stdout, webhook)
+- Agent labels (`FLUSK_AGENT` env var)
 
 ## Entities (14 total)
 
@@ -38,6 +80,7 @@ prompt-version, profile-session, performance-pattern
 - **Imports:** `@flusk/entities`, `@flusk/types`, `@flusk/resources`,
   `@flusk/business-logic`, `@flusk/logger`
 - **Logging:** Use `@flusk/logger`, not `console.log`
+- **No default exports** — named exports only
 
 ## Adding Features
 
@@ -54,36 +97,6 @@ feature-test, route, plugin, middleware, service, fastify-plugin,
 otel-hook, detector, profile, provider, package, infrastructure,
 docker-compose, dockerfile, entrypoint, env, swagger, watt, test,
 barrel-updater
-
-### Generator Known Gaps
-
-- Repo template creates own pool — use shared `getPool()`
-- Route template is single file — split for complex features
-- No support for entities without BaseEntitySchema
-- Barrel updaters append without checking existing exports
-
-## Key Patterns
-
-### Entity Schema (TypeBox)
-```typescript
-import { Type, Static } from '@sinclair/typebox';
-import { BaseEntitySchema } from './base.entity.js';
-
-export const FooEntitySchema = Type.Composite([
-  BaseEntitySchema,
-  Type.Object({ name: Type.String() })
-]);
-export type FooEntity = Static<typeof FooEntitySchema>;
-```
-
-### Business Logic (pure functions)
-```typescript
-export function validateFoo(entity: Partial<FooEntity>) {
-  const errors: string[] = [];
-  if (!entity.name) errors.push('name is required');
-  return { valid: errors.length === 0, errors };
-}
-```
 
 ## Commands
 
@@ -103,3 +116,4 @@ pnpm lint       # ESLint
 4. Use `.js` extensions in imports (ESM)
 5. Don't edit `@generated` files — regenerate with CLI
 6. Use `@flusk/logger` for all logging
+7. 2026 tools only — no deprecated APIs

@@ -1,211 +1,77 @@
-# Flusk API Reference
+# CLI Reference
 
-Base URL: `http://localhost:3000/api/v1`
+## flusk analyze
 
-All endpoints require `Authorization: Bearer <api-key>` when auth is
-enabled.
+Run a script and analyze LLM costs.
 
----
+```bash
+flusk analyze <script> [options]
+```
 
-## LLM Call Tracking
+| Option | Default | Description |
+|--------|---------|-------------|
+| `-d, --duration <s>` | `60` | Duration in seconds (0 = until exit) |
+| `-o, --output <file>` | stdout | Write report to file |
+| `-f, --format <fmt>` | `markdown` | Report format: `markdown` or `json` |
+| `-a, --agent <name>` | — | Label for multi-agent tracking |
+| `-m, --mode <mode>` | `local` | Export mode: `local` or `server` |
 
-### POST /api/v1/llm-calls
+## flusk report
 
-Create an LLM call record. Returns cached response if prompt hash
-matches.
+View or regenerate an analysis report.
 
-**Body:** `provider`, `model`, `prompt`, `tokens` (input/output/total),
-`response`
+```bash
+flusk report [session-id]
+```
 
-**Hooks:** hashPrompt → checkCache → calculateCost → cacheResponse
+Without an ID, shows the most recent report.
 
-### GET /api/v1/llm-calls/:id
+## flusk history
 
-Retrieve by UUID.
+List past analysis sessions.
 
-### GET /api/v1/llm-calls/by-hash/:hash
+```bash
+flusk history
+```
 
-Lookup by prompt SHA-256 hash.
+## flusk budget
 
----
+Check budget status against configured limits.
 
-## Similarity Search
+```bash
+flusk budget
+```
 
-### POST /api/v1/similarity/similar
+## flusk init
 
-Find semantically similar prompts via pgvector cosine similarity.
+Create a `.flusk.config.js` configuration file.
 
-**Body:** `prompt`, `threshold` (default 0.95), `limit` (default 20)
+```bash
+flusk init
+```
 
-### POST /api/v1/similarity/backfill-embeddings
+## Environment Variables
 
-Generate embeddings for calls that don't have them. Requires
-`OPENAI_API_KEY`.
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `FLUSK_MODE` | `local` | `local` (SQLite) or `server` (HTTP) |
+| `FLUSK_ENDPOINT` | — | Server URL (implies server mode) |
+| `FLUSK_API_KEY` | — | API key for server mode |
+| `FLUSK_PROJECT_NAME` | `default` | Project/service name |
+| `FLUSK_CAPTURE_CONTENT` | `true` | Capture prompt/response text |
+| `FLUSK_AGENT` | — | Agent label for multi-agent tracking |
+| `FLUSK_SQLITE_PATH` | `~/.flusk/data.db` | SQLite database path |
+| `FLUSK_LOG_LEVEL` | `info` | Log level |
 
----
+## Server API
 
-## Model Routing
+When running in server mode, the Flusk server exposes a REST API.
+See [Self-Hosting](./self-hosting.md) for setup.
 
-### POST /api/v1/route
+### Key endpoints
 
-Ask which model to use for a prompt.
-
-**Body:** `ruleId`, `prompt`, `tokenCount`, `originalModel`
-
-**Returns:** `selectedModel`, `reason`, `complexity`, `expectedQuality`
-
-### GET /api/v1/route/performance
-
-Model performance metrics by prompt category.
-
-### GET /api/v1/route/savings/:ruleId
-
-Cost savings summary for a routing rule.
-
-### Routing Rules CRUD
-
-`POST/GET/PATCH/DELETE /api/v1/routing-rules`
-
----
-
-## Traces & Spans
-
-### POST /api/v1/traces
-
-Create a trace (start tracking a workflow).
-
-### POST /api/v1/traces/:id/complete
-
-Complete trace, aggregate stats from child spans.
-
-### GET /api/v1/traces/:id/waterfall
-
-All spans for waterfall visualization.
-
-### POST /api/v1/spans
-
-Create a span within a trace.
-
-### POST /api/v1/spans/:id/complete
-
-Complete span with output, cost, tokens.
-
----
-
-## Optimizations
-
-### POST /api/v1/optimizations/generate
-
-Generate optimization suggestions for an organization.
-
-### GET /api/v1/optimizations/:orgId
-
-List optimizations.
-
-### GET /api/v1/optimizations/:id/code
-
-Get generated code for an optimization.
-
----
-
-## Prompt Templates & Versioning
-
-### POST /api/v1/prompt-templates
-
-Create template with variables.
-
-### POST /api/v1/prompt-templates/:id/render
-
-Render with variable substitution.
-
-### POST /api/v1/prompt-templates/:id/ab-test
-
-Render with A/B test variant selection.
-
-### POST /api/v1/prompt-versions
-
-Create a version for a template.
-
-### POST /api/v1/prompt-versions/:id/activate
-
-Set as active version.
-
-### POST /api/v1/prompt-versions/:id/rollback
-
-Roll back to previous version.
-
-### PATCH /api/v1/prompt-versions/:id/metrics
-
-Report quality/latency/cost metrics.
-
----
-
-## Profiles
-
-### POST /api/v1/profiles
-
-Create a profile session (CPU/heap profiling run).
-
-### GET /api/v1/profiles/:id
-
-Get profile session by UUID.
-
-### GET /api/v1/profiles?organizationId=...
-
-List profile sessions for an organization.
-
-### GET /api/v1/profiles/:id/correlations
-
-Get correlations between profile data and LLM calls.
-
-### GET /api/v1/profiles/:id/suggestions
-
-Get optimization suggestions from profiling data.
-
-### Schemas
-
-**profile-session:** id, organizationId, type (cpu/heap), duration,
-startedAt, completedAt, status, metadata
-
-**performance-pattern:** id, profileSessionId, patternType, hotspot,
-callCount, totalTime, suggestion
-
----
-
-## Cost Events (SSE)
-
-### GET /api/v1/events/costs
-
-Real-time stream of cost events via Server-Sent Events.
-
----
-
-## Patterns
-
-### GET /api/v1/patterns
-
-List detected prompt patterns with occurrence counts and savings.
-
----
-
-## GDPR
-
-### DELETE /api/v1/gdpr/user/:orgId
-
-Right to deletion.
-
-### GET /api/v1/gdpr/user/:orgId/data
-
-Right to data portability.
-
----
-
-## Health
-
-### GET /health
-
-Liveness probe.
-
-### GET /health/ready
-
-Readiness probe (DB + Redis connectivity).
+- `POST /v1/traces` — OTLP trace ingestion
+- `GET /api/v1/llm-calls/:id` — Get LLM call by ID
+- `GET /api/v1/patterns` — List detected patterns
+- `GET /api/v1/optimizations/:orgId` — List optimizations
+- `GET /health` — Health check

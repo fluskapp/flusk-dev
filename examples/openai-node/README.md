@@ -2,21 +2,26 @@
 
 Zero-touch LLM cost tracking for OpenAI via OpenTelemetry.
 
-## Setup
+## Quick Start (CLI)
 
 ```bash
-# 1. Start Flusk
-cd ../.. && docker compose up -d
-
-# 2. Install deps
-pnpm install
-
-# 3. Set env vars
+# Set your API key
 export OPENAI_API_KEY=sk-...
-export FLUSK_ENDPOINT=http://localhost:3000
 
-# 4. Run
-pnpm start
+# Analyze (one command, no server needed)
+npx @flusk/cli analyze ./index.js
+
+# Or with options
+flusk analyze ./index.js --duration 120 --agent my-bot
+```
+
+## Manual Setup
+
+Add `@flusk/otel` to your existing workflow:
+
+```bash
+npm install @flusk/otel
+node --import @flusk/otel ./index.js
 ```
 
 No wrappers. No code changes. Just `--import @flusk/otel`.

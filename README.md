@@ -1,113 +1,100 @@
 # Flusk
 
-LLM cost observability and optimization for Node.js. Auto-instruments
-OpenAI, Anthropic, and Bedrock via OpenTelemetry — zero code changes.
-Tracks every call, detects waste, suggests fixes.
-
-**Who it's for:** Backend engineers running LLM-powered Node.js apps who
-want to understand and reduce API costs without changing application code.
-
-**Why:** LLM APIs are expensive and opaque. You don't know which calls are
-wasteful until you measure. Flusk auto-instruments via OTel, tracks
-everything, detects patterns (duplicate prompts, overqualified models),
-and generates code fixes.
-
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![CI](https://img.shields.io/github/actions/workflow/status/adirbenyossef/flusk-dev/ci.yml?branch=main)](https://github.com/adirbenyossef/flusk-dev/actions)
-[![npm](https://img.shields.io/npm/v/@flusk/otel.svg)](https://www.npmjs.com/package/@flusk/otel)
+Track and optimize your LLM API costs. One command, zero setup.
 
 ## Quick Start
 
 ```bash
-git clone https://github.com/adirbenyossef/flusk-dev.git
-cd flusk-dev && cp .env.example .env
-docker compose up -d   # PostgreSQL + Redis + Flusk on :3000
+npx @flusk/cli analyze ./my-app.js
 ```
 
-Install the OTel package in your app:
+Flusk runs your app for 60 seconds, tracks every LLM call, and prints
+a cost report with optimization suggestions. No server, no accounts,
+no configuration.
+
+## What you get
+
+- Cost breakdown by model (OpenAI, Anthropic, Bedrock)
+- Duplicate prompt detection with savings estimates
+- Model optimization suggestions (e.g., gpt-4 → gpt-4o-mini)
+- Budget tracking and alerts
+- Performance profiling (optional, with @platformatic/flame)
+
+## Install
 
 ```bash
-npm install @flusk/otel
+npm install -g @flusk/cli
 ```
 
-```bash
-export FLUSK_ENDPOINT=http://localhost:3000
-node --import @flusk/otel ./index.js
-```
+Or use directly with npx — no install needed.
 
-Every OpenAI, Anthropic, and Bedrock call is now tracked automatically.
+## Commands
 
-## Architecture
+| Command | Description |
+|---------|-------------|
+| `flusk analyze <script>` | Run script and analyze LLM costs |
+| `flusk report [id]` | View or regenerate an analysis report |
+| `flusk history` | List past analysis sessions |
+| `flusk budget` | Check budget status |
+| `flusk init` | Create `.flusk.config.js` |
+
+## How it works
 
 ```
 Your App (unchanged)
   │ node --import @flusk/otel
   ▼
-┌──────────────────────────────────────┐
-│  Flusk Server (Fastify)              │
-│  OTLP Ingestion → Pattern Detection │
-│  Model Routing  → Code Generation   │
-│  Performance Profiling (flame)       │
-│         PostgreSQL + Redis           │
-└──────────────────────────────────────┘
+OTel auto-instrumentation
+  │ intercepts OpenAI/Anthropic/Bedrock calls
+  ▼
+SQLite (~/.flusk/data.db)
+  │ cost calculation, pattern detection
+  ▼
+Report (stdout or file)
 ```
 
-## Packages
+All data stays local. No network calls unless you opt into server mode.
 
-| Package | Description |
-|---------|-------------|
-| `@flusk/otel` | Zero-touch OTel auto-instrumentation |
-| `@flusk/sdk` | Programmatic API client (routing, prompts, tracing) |
-| `@flusk/entities` | TypeBox schemas — single source of truth |
-| `@flusk/types` | Derived TS types (Insert, Update, Query) |
-| `@flusk/business-logic` | Pure functions, no I/O |
-| `@flusk/resources` | DB repositories, migrations, Redis cache |
-| `@flusk/execution` | Fastify app: routes, plugins, OTLP ingestion |
-| `@flusk/cli` | Code generators, validators, project scaffolding |
-| `@flusk/logger` | Structured logging (Pino) |
+## Configuration
 
-## Entities
+Create `.flusk.config.js` in your project root:
 
-base, llm-call, pattern, conversion, model-performance, routing-rule,
-routing-decision, trace, span, optimization, prompt-template,
-prompt-version, profile-session, performance-pattern
+```javascript
+export const config = {
+  budget: {
+    daily: 10.00,
+    monthly: 200.00,
+    perCallThreshold: 0.50,
+    duplicateRatioAlert: 0.20,
+  },
+  alerts: {
+    onBudgetExceeded: 'warn',
+    webhook: 'https://hooks.slack.com/...',
+  },
+  agent: 'my-bot',
+};
+```
 
-## Generators
+## Multi-agent tracking
 
-The CLI scaffolds code across all packages:
+Label different agents in your system:
 
 ```bash
-pnpm tsx packages/cli/bin/flusk.ts g <entity-file>
+flusk analyze ./bot.js --agent customer-support
+flusk analyze ./bot.js --agent content-writer
 ```
 
-Available generators: entity-schema, types, resources, business-logic,
-execution, feature, feature-test, route, plugin, middleware, service,
-fastify-plugin, otel-hook, detector, profile, provider, package,
-infrastructure, docker-compose, dockerfile, entrypoint, env, swagger,
-watt, test, barrel-updater
+## Server mode (optional)
 
-## Environment Variables
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `FLUSK_ENDPOINT` | `https://otel.flusk.dev` | Flusk server URL |
-| `FLUSK_API_KEY` | — | API key (optional for local) |
-| `FLUSK_PROJECT_NAME` | `default` | Project name |
-| `FLUSK_CAPTURE_CONTENT` | `true` | Capture prompt/response |
-| `FLUSK_LOG_LEVEL` | `info` | Log level |
-| `FLUSK_PROFILE_MODE` | `auto` | Profiling: auto/manual/off |
-
-## Supported Providers
-
-OpenAI, Anthropic, AWS Bedrock — all auto-detected via OTel.
-
-## Performance Profiling
+For teams that want persistent monitoring with Postgres + Redis:
 
 ```bash
-flusk g:profile           # scaffold config
-flusk profile run ./dist/index.js --duration 60
-flusk profile analyze ./profiles/cpu.md
+docker compose up -d
+export FLUSK_ENDPOINT=http://localhost:3000
+node --import @flusk/otel ./index.js
 ```
+
+See [Self-Hosting Guide](./docs/self-hosting.md).
 
 ## Examples
 
@@ -119,13 +106,8 @@ flusk profile analyze ./profiles/cpu.md
 
 - [Getting Started](./docs/getting-started.md)
 - [Architecture](./docs/architecture.md)
-- [API Reference](./docs/api-reference.md)
-- [SDK Reference](./docs/sdk-reference.md)
+- [CLI Reference](./docs/api-reference.md)
 - [Self-Hosting](./docs/self-hosting.md)
-
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## License
 

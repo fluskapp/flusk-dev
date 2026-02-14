@@ -2,23 +2,28 @@
 
 Zero-touch LLM cost tracking for AWS Bedrock via OpenTelemetry.
 
-## Setup
+## Quick Start (CLI)
 
 ```bash
-# 1. Start Flusk
-cd ../.. && docker compose up -d
-
-# 2. Install deps
-pnpm install
-
-# 3. Set env vars (AWS credentials + Flusk)
+# Set AWS credentials
 export AWS_ACCESS_KEY_ID=...
 export AWS_SECRET_ACCESS_KEY=...
 export AWS_REGION=us-east-1
-export FLUSK_ENDPOINT=http://localhost:3000
 
-# 4. Run
-pnpm start
+# Analyze (one command, no server needed)
+npx @flusk/cli analyze ./index.js
+
+# Or with options
+flusk analyze ./index.js --duration 120 --agent my-bot
+```
+
+## Manual Setup
+
+Add `@flusk/otel` to your existing workflow:
+
+```bash
+npm install @flusk/otel
+node --import @flusk/otel ./index.js
 ```
 
 No wrappers. No code changes. Just `--import @flusk/otel`.

@@ -1,40 +1,92 @@
-# Flusk Architecture
+# Architecture
 
 ## Package Dependency Graph
 
 ```
-┌─────────────────────────────────────────────────┐
-│              @flusk/execution                    │
-│       (Fastify routes, plugins, hooks)           │
-│  Depends on: entities, types, business-logic,    │
-│              resources, logger                   │
-└──────┬──────────────┬──────────────┬────────────┘
+┌──────────────────────────────────────────────┐
+│           @flusk/execution                    │
+│    (Fastify routes, plugins, hooks)           │
+│  Depends on: entities, types, business-logic, │
+│              resources, logger                │
+└──────┬──────────────┬──────────────┬─────────┘
        │              │              │
        ▼              ▼              ▼
 ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
 │ @flusk/      │ │ @flusk/      │ │ @flusk/      │
 │ business-    │ │ resources    │ │ types        │
-│ logic        │ │ (DB, Redis)  │ │ (Insert/     │
-│ (Pure, no IO)│ │              │ │  Update/Query│
+│ logic        │ │ (SQLite, pg) │ │              │
 └──────┬───────┘ └──────┬───────┘ └──────┬───────┘
-       │                │                │
        ▼                ▼                ▼
   ┌──────────────────────────────────────────┐
   │            @flusk/entities                │
-  │   (TypeBox schemas — source of truth)    │
   └──────────────────────────────────────────┘
 
 ┌──────────────┐ ┌──────────────┐ ┌──────────────┐
 │ @flusk/otel  │ │ @flusk/sdk   │ │ @flusk/cli   │
-│ (OTel auto-  │ │ (API client) │ │ (Generators) │
-│ instrument)  │ │              │ │              │
+│ (OTel auto-  │ │ (API client) │ │ (Commands +  │
+│ instrument)  │ │              │ │  generators) │
 └──────────────┘ └──────────────┘ └──────────────┘
-
-┌──────────────┐
-│ @flusk/logger│
-│ (Pino-based) │
-└──────────────┘
 ```
+
+## Data Flow: Local Mode (default)
+
+```
+Your App (unchanged code)
+  │  node --import @flusk/otel index.js
+  │  → OTel SDK with SqliteSpanExporter
+  │  → intercepts OpenAI/Anthropic/Bedrock calls
+  ▼
+SqliteSpanExporter
+  │  Filters GenAI spans
+  │  Calculates cost per call
+  │  Writes to ~/.flusk/data.db
+  ▼
+CLI commands (report, history, budget)
+  │  Read from SQLite
+  ▼
+stdout / file output
+```
+
+## Data Flow: Server Mode
+
+```
+Your App
+  │  FLUSK_MODE=server node --import @flusk/otel index.js
+  │  → OTel SDK with OTLPTraceExporter
+  │  OTLP/HTTP traces
+  ▼
+Flusk Server (Fastify)
+  │  OTLP Ingestion → Pattern Detection
+  │  PostgreSQL + Redis
+  ▼
+API / Dashboard
+```
+
+## Storage
+
+### Local (SQLite via node:sqlite)
+
+- Zero dependencies — built into Node.js 22+
+- `~/.flusk/data.db` — LLM calls, sessions, patterns
+- WAL mode for concurrent reads
+- Automatic migrations on first use
+
+### Server (PostgreSQL + Redis)
+
+- pgvector for semantic similarity search
+- Redis for caching and job queues
+- See [Self-Hosting](./self-hosting.md)
+
+## Mode Detection
+
+The `@flusk/otel` package auto-detects mode:
+
+| Condition | Mode |
+|-----------|------|
+| `FLUSK_MODE=local` | Local (SQLite) |
+| `FLUSK_MODE=server` | Server (HTTP) |
+| `FLUSK_ENDPOINT` set | Server (HTTP) |
+| No env vars | Local (SQLite) |
 
 ## Entities (14)
 
@@ -42,39 +94,9 @@ base, llm-call, pattern, conversion, model-performance, routing-rule,
 routing-decision, trace, span, optimization, prompt-template,
 prompt-version, profile-session, performance-pattern
 
-## Data Flow: OTel Auto-Instrumentation
-
-```
-User's App (unchanged code)
-  │  node --import @flusk/otel index.js
-  │  → auto-registers OTel SDK + instrumentations
-  │  → intercepts OpenAI/Anthropic/Bedrock calls
-  │  OTLP/HTTP traces
-  ▼
-Flusk Server — POST /v1/traces
-  │  Parse spans with GenAI semantic conventions
-  │  Extract: model, tokens, cost, latency, content
-  ▼
-Pipeline: hash → cache check → cost calc → store
-  → embedding → pattern detection → optimization
-```
-
-## Generator System
-
-The CLI scaffolds code across all packages from entity schemas.
-28+ generators: feature, entity-schema, types, resources,
-business-logic, execution, fastify-plugin, otel-hook, detector,
-profile, provider, route, plugin, middleware, and more.
-
-```bash
-pnpm tsx packages/cli/bin/flusk.ts g feature <name>
-```
-
 ## Design Decisions
 
 - **OTel-first** — no wrappers, industry-standard instrumentation
-- **TypeBox** — JSON Schema at compile time, native Fastify integration
+- **SQLite-first** — zero-setup local mode, Postgres as upgrade
 - **Pure business logic** — no I/O in business-logic package
-- **pgvector** — semantic similarity in PostgreSQL, simpler deployment
-- **SSE** — real-time cost events, simpler than WebSocket
-- **Pino logging** — structured JSON logs via @flusk/logger
+- **node:sqlite** — zero deps, built into Node 22+

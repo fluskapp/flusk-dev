@@ -1,89 +1,68 @@
-# Getting Started with Flusk
-
-Flusk tracks LLM API calls via OpenTelemetry auto-instrumentation —
-zero code changes — detects patterns, and suggests optimizations.
+# Getting Started
 
 ## Prerequisites
 
 - **Node.js** ≥ 22
-- **pnpm** ≥ 10
-- **PostgreSQL** 16+ with pgvector
-- **Redis** 7+
 
-## 1. Install @flusk/otel
+That's it. No databases, no Docker, no API keys.
 
-```bash
-npm install @flusk/otel
-```
-
-## 2. Add the --import flag
-
-```json
-{
-  "scripts": {
-    "start": "node --import @flusk/otel ./index.js"
-  }
-}
-```
-
-## 3. Set environment variables
+## 1. Analyze your app
 
 ```bash
-FLUSK_API_KEY=your-flusk-api-key
-FLUSK_ENDPOINT=http://localhost:3000
-FLUSK_PROJECT_NAME=my-app
-FLUSK_CAPTURE_CONTENT=true
-FLUSK_LOG_LEVEL=info
+npx @flusk/cli analyze ./my-app.js
 ```
 
-## 4. Use your LLM client normally
+Flusk instruments your app via OpenTelemetry, captures every LLM call
+for 60 seconds, and prints a cost report.
 
-```typescript
-import OpenAI from 'openai';
-
-const openai = new OpenAI();
-const response = await openai.chat.completions.create({
-  model: 'gpt-4',
-  messages: [{ role: 'user', content: 'Hello!' }],
-});
-// Flusk captures this automatically via OTel
-```
-
-Works with Anthropic and Bedrock too — no wrappers needed.
-
-## 5. View tracked calls
+## 2. Customize duration
 
 ```bash
-curl http://localhost:3000/api/v1/patterns?organizationId=<org-id>
-curl http://localhost:3000/api/v1/llm-calls/<id>
+flusk analyze ./my-app.js --duration 120    # 2 minutes
+flusk analyze ./my-app.js --duration 0      # run until Ctrl-C
 ```
 
-## 6. Performance Profiling
+## 3. Save reports
+
+```bash
+flusk analyze ./my-app.js --output report.md
+flusk analyze ./my-app.js --output report.json --format json
+```
+
+## 4. View history
+
+```bash
+flusk history          # list past sessions
+flusk report <id>      # regenerate a report
+```
+
+## 5. Add a config file
+
+```bash
+flusk init             # creates .flusk.config.js
+```
+
+Configure budgets, alerts, webhooks, and agent labels.
+See the [README](../README.md) for config examples.
+
+## 6. Multi-agent labeling
+
+```bash
+flusk analyze ./bot.js --agent support-bot
+FLUSK_AGENT=writer-bot node --import @flusk/otel ./writer.js
+```
+
+## 7. Performance profiling (optional)
 
 Install `@platformatic/flame` for CPU profiling:
 
 ```bash
 npm install @platformatic/flame
+flusk analyze ./my-app.js   # auto-detects flame
 ```
 
-Set `FLUSK_PROFILE_MODE=auto` (default) to enable. Profiles are
-generated automatically during LLM calls.
+## Next steps
 
-```bash
-flusk profile run ./dist/index.js --duration 60
-flusk profile analyze ./profiles/cpu.md
-```
-
-## 7. Logger Configuration
-
-Flusk uses `@flusk/logger` (Pino-based) internally. Configure via:
-
-- `FLUSK_LOG_LEVEL` — `fatal|error|warn|info|debug|trace`
-- `NODE_ENV` — non-production enables pretty printing
-
-## Next Steps
-
-- [SDK Reference](./sdk-reference.md)
-- [Architecture](./architecture.md)
-- [API Reference](./api-reference.md)
-- [Self-Hosting](./self-hosting.md)
+- [Architecture](./architecture.md) — how it works
+- [CLI Reference](./api-reference.md) — all commands
+- [Self-Hosting](./self-hosting.md) — upgrade to server mode
