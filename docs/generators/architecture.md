@@ -35,9 +35,10 @@ YAML File
 │  (in memory)     │  Ready for code generation
 └────────┬────────┘
          │
-    ┌────┼────┬──────────┐
-    ▼    ▼    ▼          ▼
-  TypeBox  Types  Migration  (future: repo, routes, tests)
+    ┌────┼────┬──────────┬──────────────┐
+    ▼    ▼    ▼          ▼              ▼
+  TypeBox  Types  Migration    Trait Composer
+                               (repo, routes, trait SQL)
 ```
 
 ## Key Components
@@ -79,6 +80,23 @@ Generators need to resolve cross-entity references. The registry provides a sing
 ### Why synchronous file I/O in generators?
 Generation is a CLI tool, not a server. Synchronous I/O is simpler, easier to debug, and avoids race conditions when writing multiple files. The entire pipeline runs in <100ms.
 
+## Trait Layer (Phase 2)
+
+The trait system adds composable code generation. Each YAML capability maps to a trait that produces code sections. The composer merges outputs from multiple traits into final files.
+
+```
+YAML capabilities → Trait Registry → Resolve Chain → Compose → Files
+```
+
+Key components:
+- **`trait.types.ts`** — Trait, TraitContext, TraitOutput interfaces
+- **`trait.registry.ts`** — Register/lookup/resolve trait chains with dependency validation
+- **`trait.composer.ts`** — Merges trait outputs, deduplicates imports, adds custom sections
+- **Core traits** — crud, time-range, aggregation, soft-delete, export
+- **`sql-helpers.ts`** — Storage-specific SQL (SQLite vs Postgres placeholders, functions)
+
+See [traits.md](./traits.md) for usage and how to create new traits.
+
 ## File Organization
 
 ```
@@ -103,4 +121,18 @@ packages/cli/src/schema/
 ├── generate-types-file.ts      # Types variants generator
 ├── generate-migration.ts       # SQLite migration generator
 └── generate-entity-pipeline.ts # Pipeline orchestrator
+
+packages/cli/src/traits/
+├── index.ts                    # Barrel exports
+├── trait.types.ts              # Core interfaces (Trait, TraitContext, TraitOutput)
+├── trait.registry.ts           # Registration + dependency resolution
+├── trait.composer.ts           # Composition engine
+├── section-helpers.ts          # Empty section factory
+├── sql-helpers.ts              # Storage-specific SQL helpers
+├── register-defaults.ts       # Registers all built-in traits
+├── crud.trait.ts               # CRUD operations trait
+├── time-range.trait.ts         # Time-range query trait
+├── aggregation.trait.ts        # Aggregation query trait
+├── soft-delete.trait.ts        # Soft deletion trait
+└── export.trait.ts             # CSV/JSON export trait
 ```

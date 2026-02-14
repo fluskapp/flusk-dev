@@ -15,6 +15,9 @@ import { generateTypeBoxContent } from './generate-typebox.js';
 import { generateMigrationSql } from './generate-migration.js';
 import { generateTypesFileContent } from './generate-types-file.js';
 import { toKebabCase } from '../generators/utils.js';
+import { registerDefaultTraits } from '../traits/register-defaults.js';
+import { composeTraits } from '../traits/trait.composer.js';
+import type { StorageTarget } from './entity-schema.types.js';
 
 const logger = createLogger({ name: 'schema:pipeline' });
 
@@ -22,17 +25,19 @@ const logger = createLogger({ name: 'schema:pipeline' });
 export interface PipelineResult {
   files: Array<{ path: string; action: 'created' | 'updated' }>;
   entityName: string;
+  traits: string[];
 }
 
 /**
  * Run the full entity generation pipeline from a YAML file.
- * Parses, validates, generates TypeBox + migration + types.
+ * Parses, validates, generates TypeBox + migration + types + traits.
  */
 export function runEntityPipeline(
   yamlPath: string,
   projectRoot: string,
 ): PipelineResult {
   logger.info({ yamlPath }, 'Starting entity pipeline');
+  registerDefaultTraits();
 
   const schema = parseEntitySchema(yamlPath);
   const errors = validateEntitySchema(schema);
@@ -42,6 +47,7 @@ export function runEntityPipeline(
 
   const kebab = toKebabCase(schema.name);
   const files: PipelineResult['files'] = [];
+  let allTraits: string[] = [];
 
   // 1. Generate TypeBox entity
   const entityDir = resolve(projectRoot, 'packages/entities/src');
@@ -58,9 +64,37 @@ export function runEntityPipeline(
   const migName = `${kebab}.sql`;
   writeGenerated(sqlDir, migName, generateMigrationSql(schema), files);
 
+  // 4. Compose traits for each storage target
+  const hasCapabilities = schema.capabilities &&
+    Object.values(schema.capabilities).some(Boolean);
+  if (hasCapabilities) {
+    const targets: StorageTarget[] = schema.storage ?? ['sqlite'];
+    for (const target of targets) {
+      const composed = composeTraits(schema, target);
+      allTraits = composed.traitNames;
+      const dir = resolve(projectRoot,
+        `packages/resources/src/${target}/repositories`);
+      writeGenerated(dir, `${kebab}.repository.ts`,
+        composed.repository, files);
+      if (composed.migration) {
+        const migDir = resolve(projectRoot,
+          `packages/resources/src/${target}/sql`);
+        writeGenerated(migDir, `${kebab}-traits.sql`,
+          composed.migration, files);
+      }
+      if (composed.route) {
+        const routeDir = resolve(projectRoot,
+          `packages/execution/src/routes`);
+        writeGenerated(routeDir, `${kebab}.routes.ts`,
+          composed.route, files);
+      }
+    }
+    logger.info({ traits: allTraits }, 'Traits composed');
+  }
+
   logger.info({ name: schema.name, fileCount: files.length },
     'Entity pipeline complete');
-  return { files, entityName: schema.name };
+  return { files, entityName: schema.name, traits: allTraits };
 }
 
 /** Write a file and track it in the results */
