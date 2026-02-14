@@ -1,6 +1,8 @@
 # CLI Reference
 
-## flusk analyze
+## Analysis & Reporting
+
+### flusk analyze
 
 Run a script and analyze LLM costs.
 
@@ -16,7 +18,7 @@ flusk analyze <script> [options]
 | `-a, --agent <name>` | — | Label for multi-agent tracking |
 | `-m, --mode <mode>` | `local` | Export mode: `local` or `server` |
 
-## flusk report
+### flusk report
 
 View or regenerate an analysis report.
 
@@ -26,7 +28,7 @@ flusk report [session-id]
 
 Without an ID, shows the most recent report.
 
-## flusk history
+### flusk history
 
 List past analysis sessions.
 
@@ -34,7 +36,7 @@ List past analysis sessions.
 flusk history
 ```
 
-## flusk budget
+### flusk budget
 
 Check budget status against configured limits.
 
@@ -42,9 +44,121 @@ Check budget status against configured limits.
 flusk budget
 ```
 
-## flusk init
+Shows daily/monthly usage with progress bars, per-call threshold violations,
+and duplicate ratio alerts.
 
-Create a `.flusk.config.js` configuration file.
+## Code Generation
+
+### flusk generate entity
+
+Generate entity files from a YAML schema.
+
+```bash
+flusk generate entity --from <yaml>
+```
+
+Generates:
+- `<entity>.entity.ts` — TypeBox schema (→ `@flusk/entities`)
+- `<entity>.types.ts` — Insert/Update/Query type variants (→ `@flusk/types`)
+- `<entity>.sql` — SQLite CREATE TABLE + indexes (→ `@flusk/resources`)
+
+### flusk recipe
+
+Run a code generation recipe.
+
+```bash
+flusk recipe <name> [options]
+flusk recipe list          # show all available recipes
+```
+
+| Option | Description |
+|--------|-------------|
+| `--from <path>` | YAML file path (for `full-entity` recipe) |
+| `--name <name>` | Name for generated artifact |
+| `--description <desc>` | Description text |
+| `--package <pkg>` | Target package name |
+| `--with-config` | Include config block |
+| `--with-decorator` | Include decorator |
+| `--dry-run` | Preview without writing files |
+
+**Built-in recipes:**
+- `full-entity` — From YAML: entity + types + migration + repo + routes + barrels
+- `fastify-plugin` — Generate a Fastify plugin scaffold
+- `cli-command` — Generate a CLI command scaffold
+- `route` — Generate route handler
+- `middleware` — Generate middleware
+- `client` — Generate API client
+- `otel-hook` — Generate OTel instrumentation hook
+- `sdk-provider` — Generate SDK provider
+- `logger` — Generate logger instance
+
+## Regeneration & Validation
+
+### flusk regenerate
+
+Incremental regeneration — update generated files when YAML changes,
+preserving custom code in CUSTOM regions.
+
+```bash
+flusk regenerate [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--all` | Regenerate everything regardless of staleness |
+| `--dry-run` | Show what would change without writing |
+
+### flusk validate-generated
+
+CI command — check that all generated files match their source YAML hashes.
+
+```bash
+flusk validate-generated [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--strict` | Exit 1 on any stale or tampered files |
+
+### flusk ratio
+
+Report generator coverage ratio across packages.
+
+```bash
+flusk ratio [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--json` | Output machine-readable JSON |
+
+Target: 90% generated code coverage.
+
+### flusk guard
+
+Scan repo for `@generated` header violations — detects when AI agents
+or developers add fake `@generated` headers to hand-written files.
+
+```bash
+flusk guard
+```
+
+Exits with code 1 if violations found. Use in CI.
+
+### flusk status
+
+Overview of generated file health — stale files, custom sections,
+per-entity breakdown.
+
+```bash
+flusk status
+```
+
+## Setup
+
+### flusk init
+
+Create a `.flusk.config.js` configuration file interactively.
 
 ```bash
 flusk init
@@ -63,7 +177,7 @@ flusk init
 | `FLUSK_SQLITE_PATH` | `~/.flusk/data.db` | SQLite database path |
 | `FLUSK_LOG_LEVEL` | `info` | Log level |
 
-## Server API
+## Server API (server mode only)
 
 When running in server mode, the Flusk server exposes a REST API.
 See [Self-Hosting](./self-hosting.md) for setup.

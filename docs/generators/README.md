@@ -23,16 +23,31 @@ From a single `entities/foo.entity.yaml`:
 | `foo.types.ts` | `@flusk/types` | Insert/Update/Query variants |
 | `foo.sql` | `@flusk/resources` | SQLite CREATE TABLE + indexes |
 
+With `full-entity` recipe, also:
+
+| Output | Package | Description |
+|--------|---------|-------------|
+| Repository | `@flusk/resources` | CRUD + custom queries |
+| Routes | `@flusk/execution` | Fastify route handlers |
+| Barrel exports | Various | Updated `index.ts` files |
+
 ### Usage
 
 ```bash
-# Generate from a single YAML
-flusk generate:entity --from entities/llm-call.entity.yaml
+# Generate from a single YAML (entity + types + migration)
+flusk generate entity --from entities/llm-call.entity.yaml
 
-# Load and validate all entities
-# (programmatic — used by other generators)
-import { loadEntityRegistry } from '@flusk/cli/schema';
-const registry = loadEntityRegistry('./entities');
+# Full recipe — generates 8+ files
+flusk recipe full-entity --from entities/llm-call.entity.yaml
+
+# List all recipes
+flusk recipe list
+
+# Regenerate stale files after YAML edit
+flusk regenerate
+
+# Dry-run to preview changes
+flusk regenerate --dry-run
 ```
 
 ### What Stays Manual
@@ -40,8 +55,9 @@ const registry = loadEntityRegistry('./entities');
 - **Business logic** — that's where the real value is
 - **Custom queries** — beyond CRUD, your domain logic
 - **Route handlers** — generated stubs, but logic is yours
+- **Custom code in CUSTOM regions** — preserved across regeneration
 
-### Phases (All Complete)
+## Phases
 
 | Phase | Feature | Docs |
 |-------|---------|------|
@@ -51,7 +67,31 @@ const registry = loadEntityRegistry('./entities');
 | 4 | Regeneration — safe incremental updates | [regeneration.md](./regeneration.md) |
 | 5 | CI enforcement — validate + ratio tracking | [ci-enforcement.md](./ci-enforcement.md) |
 
-### For AI Agents
+## CI Commands
+
+| Command | Purpose |
+|---------|---------|
+| `flusk validate-generated --strict` | Fail if generated files are stale or tampered |
+| `flusk guard` | Fail if `@generated` headers on non-generated files |
+| `flusk ratio --json` | Report generated vs manual code ratio |
+| `flusk status` | Overview of generated file health |
+
+## Architecture Deep Dive
+
+See [Generator Architecture](./architecture.md) for the internal
+design of the schema parser, trait composer, and recipe runner.
+
+## YAML Guide
+
+See [YAML Guide](./yaml-guide.md) for the complete entity YAML format
+with all field types, capabilities, and query syntax.
+
+## For AI Agents
 
 See [for-ai-agents.md](./for-ai-agents.md) — specific instructions
 for Claude, Copilot, and Cursor on working with this system.
+
+## Agent Instructions
+
+See [agent-instructions.md](./agent-instructions.md) — rules for AI agents
+generating and modifying code in this project.

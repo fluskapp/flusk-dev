@@ -37,6 +37,13 @@ Or use directly with npx — no install needed.
 | `flusk history` | List past analysis sessions |
 | `flusk budget` | Check budget status |
 | `flusk init` | Create `.flusk.config.js` |
+| `flusk generate entity --from <yaml>` | Generate entity from YAML schema |
+| `flusk recipe <name>` | Run a code generation recipe |
+| `flusk regenerate` | Incremental regeneration (preserves custom code) |
+| `flusk validate-generated` | CI: check generated files are fresh |
+| `flusk ratio` | CI: generator coverage report |
+| `flusk guard` | CI: detect `@generated` header violations |
+| `flusk status` | Overview of generated file health |
 
 ## How it works
 
@@ -107,6 +114,7 @@ See [Self-Hosting Guide](./docs/self-hosting.md).
 - [Getting Started](./docs/getting-started.md)
 - [Architecture](./docs/architecture.md)
 - [CLI Reference](./docs/api-reference.md)
+- [Generator System](./docs/generators/README.md)
 - [Self-Hosting](./docs/self-hosting.md)
 
 ## License
