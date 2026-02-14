@@ -12,5 +12,6 @@ jobs:
           cache: pnpm
       - run: pnpm install
       - run: pnpm lint
+      - run: pnpm build
       - run: pnpm test
       - run: pnpm exec tsx scripts/qa-validate.ts

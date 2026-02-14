@@ -3,9 +3,9 @@
  */
 
 export {
-  type LLMCallEntity, type TokenUsage, type BaseEntity,
+  type LLMCallEntity,
   type LLMCallInsert, type LLMCallUpdate, type LLMCallQuery,
-  LLMCallEntityJSONSchema, TokenUsageJSONSchema,
+  LLMCallEntityJSONSchema,
   LLMCallInsertSchema, LLMCallUpdateSchema, LLMCallQuerySchema
 } from './llm-call.types.js';
 
@@ -15,7 +15,7 @@ export {
 } from './pattern.types.js';
 
 export {
-  type ConversionEntity, type ConversionType, type ConversionStatus, type ConversionConfig,
+  type ConversionEntity,
   type ConversionInsert, type ConversionUpdate, type ConversionQuery,
   ConversionEntityJSONSchema, ConversionInsertSchema, ConversionUpdateSchema, ConversionQuerySchema
 } from './conversion.types.js';
@@ -26,8 +26,8 @@ export {
 } from './routing-rule.types.js';
 
 export {
-  type ModelPerformanceEntity, type ModelPerformanceUpsert, type ModelPerformanceQuery,
-  ModelPerformanceEntityJSONSchema, ModelPerformanceUpsertSchema, ModelPerformanceQuerySchema,
+  type ModelPerformanceEntity, type ModelPerformanceInsert, type ModelPerformanceQuery,
+  ModelPerformanceEntityJSONSchema, ModelPerformanceInsertSchema, ModelPerformanceQuerySchema,
 } from './model-performance.types.js';
 
 export {
@@ -60,9 +60,7 @@ export {
 export {
   type ProfileSessionEntity,
   type ProfileSessionInsert, type ProfileSessionUpdate, type ProfileSessionQuery,
-  type HotspotEntry,
   ProfileSessionEntityJSONSchema, ProfileSessionInsertSchema, ProfileSessionUpdateSchema, ProfileSessionQuerySchema,
-  HotspotEntryJSONSchema
 } from './profile-session.types.js';
 
 export {

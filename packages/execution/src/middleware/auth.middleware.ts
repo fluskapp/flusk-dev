@@ -17,9 +17,14 @@ declare module 'fastify' {
   }
 }
 
+const HMAC_SECRET = process.env.HMAC_SECRET || process.env.FLUSK_HMAC_SECRET;
+
 /** Hash a token for constant-time comparison */
 function hashToken(token: string): Buffer {
-  return createHmac('sha256', 'flusk').update(token).digest();
+  if (!HMAC_SECRET) {
+    throw new Error('HMAC_SECRET or FLUSK_HMAC_SECRET env var is required');
+  }
+  return createHmac('sha256', HMAC_SECRET).update(token).digest();
 }
 
 /** Validate API key against configured FLUSK_API_KEY */
