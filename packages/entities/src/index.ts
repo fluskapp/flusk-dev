@@ -99,3 +99,9 @@ export {
   type PromptVersionEntity,
   type PromptVersionMetrics
 } from './prompt-version.entity.js';
+
+// BudgetAlert entity exports
+export {
+  BudgetAlertEntitySchema,
+  type BudgetAlertEntity
+} from './budget-alert.entity.js';

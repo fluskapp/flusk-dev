@@ -93,3 +93,14 @@ export type {
   PerCallAlert,
   DuplicateAlert,
 } from './budget.types.js';
+
+export {
+  type BudgetAlertEntity as BudgetAlertEntityType,
+  type BudgetAlertInsert,
+  type BudgetAlertUpdate,
+  type BudgetAlertQuery,
+  BudgetAlertEntityJSONSchema,
+  BudgetAlertInsertSchema,
+  BudgetAlertUpdateSchema,
+  BudgetAlertQuerySchema
+} from './budget-alert.types.js';

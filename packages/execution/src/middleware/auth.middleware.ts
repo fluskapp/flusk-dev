@@ -63,6 +63,18 @@ export async function authMiddleware(
   request.organizationId = organizationId;
 }
 
+/** Optional auth — attaches org ID if present but does not reject */
+export async function optionalAuthMiddleware(
+  request: FastifyRequest,
+  _reply: FastifyReply,
+): Promise<void> {
+  const token = parseToken(request.headers.authorization);
+  if (!token) return;
+  if (!isValidApiKey(token)) return;
+  const orgId = extractOrgId(token);
+  if (orgId) request.organizationId = orgId;
+}
+
 /** Validate x-flusk-api-key header for OTLP ingestion */
 export async function otlpAuthHook(
   request: FastifyRequest,

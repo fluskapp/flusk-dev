@@ -20,6 +20,7 @@ describe('SQLite migrations', () => {
     expect(names).toContain('profile_sessions');
     expect(names).toContain('performance_patterns');
     expect(names).toContain('analyze_sessions');
+    expect(names).toContain('budget_alerts');
     expect(names).toContain('_migrations');
   });
 
@@ -31,6 +32,6 @@ describe('SQLite migrations', () => {
     const migrations = db
       .prepare('SELECT * FROM _migrations')
       .all() as Array<{ name: string }>;
-    expect(migrations.length).toBe(4);
+    expect(migrations.length).toBe(5);
   });
 });

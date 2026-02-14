@@ -1,0 +1,42 @@
+name: BudgetAlert
+description: Budget threshold alert triggered when spending exceeds limits
+storage: [sqlite]
+
+fields:
+  alertType:
+    type: enum
+    values: [daily, monthly, per-call, duplicate-ratio]
+    required: true
+    description: Type of budget limit that was exceeded
+
+  threshold:
+    type: number
+    required: true
+    min: 0
+    description: The budget limit that was exceeded (USD)
+
+  actual:
+    type: number
+    required: true
+    min: 0
+    description: The actual spending amount (USD)
+
+  model:
+    type: string
+    index: true
+    description: Model that triggered the alert (if per-call)
+
+  acknowledged:
+    type: boolean
+    required: true
+    default: false
+    description: Whether the user acknowledged this alert
+
+  metadata:
+    type: json
+    description: Additional context (agent labels, time windows, etc.)
+
+capabilities:
+  crud: true
+  time-range: true
+  aggregation: true

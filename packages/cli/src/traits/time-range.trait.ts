@@ -42,7 +42,7 @@ function generateTimeRange(ctx: TraitContext): TraitOutput {
     repository: {
       imports: [
         dbImport,
-        `import type { ${n}Entity } from '@flusk/types';`,
+        `import type { ${n}Entity } from '@flusk/entities';`,
       ],
       types: [],
       functions: [fnBody],
@@ -53,11 +53,13 @@ function generateTimeRange(ctx: TraitContext): TraitOutput {
       imports: [],
       types: [],
       functions: [
-        `  /** Time-range query route for ${n} */`,
-        `  fastify.get('/by-time-range', async (req) => {`,
-        `    const { from, to } = req.query as { from: string; to: string };`,
-        `    return findByTimeRange(req.db, from, to);`,
-        `  });`,
+        [
+          `  /** Time-range query route for ${n} */`,
+          `  fastify.get('/by-time-range', async (req) => {`,
+          `    const { from, to } = req.query as { from: string; to: string };`,
+          `    return ${n}Repository.find${n}sByTimeRange(fastify.db, from, to);`,
+          `  });`,
+        ].join('\n'),
       ],
       sql: [],
       routes: [],

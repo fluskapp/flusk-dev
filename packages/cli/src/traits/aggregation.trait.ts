@@ -80,10 +80,10 @@ function generateAggregation(ctx: TraitContext): TraitOutput {
   for (const name of indexedFields) {
     const typeName = `${n}${toPascalCase(name)}Count`;
     types.push(`export interface ${typeName} { ${name}: string; count: number; }`);
-    functions.push(...buildCountBy(name, typeName, toSnakeCase(name), tableName, st, dbType, n));
+    functions.push(buildCountBy(name, typeName, toSnakeCase(name), tableName, st, dbType, n).join('\n'));
   }
   for (const name of numericFields) {
-    functions.push(...buildSumFns(name, toSnakeCase(name), tableName, st, dbType, n));
+    functions.push(buildSumFns(name, toSnakeCase(name), tableName, st, dbType, n).join('\n'));
   }
 
   const numericUnion = numericFields.map((f) => `'${f}'`).join(' | ') || 'string';
@@ -97,8 +97,9 @@ function generateAggregation(ctx: TraitContext): TraitOutput {
     traitName: 'aggregation',
     repository: { imports: [dbImport], types, functions, sql: [], routes: [] },
     route: {
-      imports: [], types: [],
-      functions: [`  fastify.get('/aggregate', async (req) => { const opts = req.query as unknown as ${n}AggregateOptions; return aggregate${n}s(req.db, opts); });`],
+      imports: [],
+      types: [],
+      functions: [`  fastify.get('/aggregate', async (req) => { const opts = req.query as unknown as ${n}Repository.${n}AggregateOptions; return ${n}Repository.aggregate${n}s(fastify.db, opts); });`],
       sql: [], routes: [],
     },
     migration: emptySection(),

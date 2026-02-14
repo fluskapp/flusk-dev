@@ -41,3 +41,5 @@ export * from './encryption/decrypt.js';
 // Audit exports (SOC2)
 export { logAudit } from './audit/audit-log.repository.js';
 export type { AuditLogEntry } from './audit/audit-log.repository.js';
+
+export * as BudgetAlertRepository from './repositories/budget-alert.repository.js';

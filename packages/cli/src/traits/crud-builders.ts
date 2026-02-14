@@ -84,7 +84,11 @@ export function buildCreate(n: string, t: string, fields: [string, FieldSchema][
   const cols = fields.map(([name]) => toSnake(name)).join(', ');
   const ph = fields.map((_, i) => placeholder(st, i + 1)).join(', ');
   const vals = fields.map(([name, field]) => {
-    if (field.type === 'json' || field.type === 'array') return `JSON.stringify(data.${name})`;
+    if (field.type === 'json' || field.type === 'array') {
+      return !field.required
+        ? `data.${name} != null ? JSON.stringify(data.${name}) : null`
+        : `JSON.stringify(data.${name})`;
+    }
     if (field.type === 'boolean') return `data.${name} ? 1 : 0`;
     if (!field.required) return `data.${name} ?? null`;
     return `data.${name}`;
