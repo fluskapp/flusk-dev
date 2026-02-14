@@ -1,0 +1,71 @@
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+
+const SUCCESS = 0;
+
+const { mockCreate, mockCloseDb } = vi.hoisted(() => ({
+  mockCreate: vi.fn(),
+  mockCloseDb: vi.fn(),
+}));
+
+vi.mock('@opentelemetry/core', () => ({
+  ExportResultCode: { SUCCESS: 0, FAILED: 1 },
+}));
+
+vi.mock('@flusk/resources', () => ({
+  createSqliteStorage: () => ({
+    mode: 'sqlite',
+    llmCalls: { create: mockCreate },
+  }),
+  closeDb: mockCloseDb,
+}));
+
+vi.mock('@flusk/logger', () => ({
+  createLogger: () => ({
+    info: vi.fn(), debug: vi.fn(), error: vi.fn(), warn: vi.fn(),
+  }),
+}));
+
+vi.mock('./parse-readable-span.js', () => ({
+  parseReadableSpan: (span: any) => {
+    if (span.name === 'genai') return { model: 'gpt-4', cost: 0.01 };
+    return null;
+  },
+}));
+
+import { SqliteSpanExporter } from './sqlite-exporter.js';
+
+describe('SqliteSpanExporter', () => {
+  let exporter: SqliteSpanExporter;
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    exporter = new SqliteSpanExporter(':memory:');
+  });
+
+  afterEach(async () => {
+    await exporter.shutdown();
+  });
+
+  it('exports GenAI spans to SQLite', () => {
+    const result = { code: -1 };
+    exporter.export(
+      [{ name: 'genai' } as any, { name: 'http' } as any],
+      (r) => { result.code = r.code; },
+    );
+    expect(result.code).toBe(SUCCESS);
+    expect(mockCreate).toHaveBeenCalledTimes(1);
+    expect(mockCreate).toHaveBeenCalledWith({ model: 'gpt-4', cost: 0.01 });
+  });
+
+  it('skips non-GenAI spans', () => {
+    const result = { code: -1 };
+    exporter.export([{ name: 'http' } as any], (r) => { result.code = r.code; });
+    expect(result.code).toBe(SUCCESS);
+    expect(mockCreate).not.toHaveBeenCalled();
+  });
+
+  it('calls closeDb on shutdown', async () => {
+    await exporter.shutdown();
+    expect(mockCloseDb).toHaveBeenCalled();
+  });
+});

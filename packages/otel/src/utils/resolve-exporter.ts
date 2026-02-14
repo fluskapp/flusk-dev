@@ -1,0 +1,37 @@
+/**
+ * Resolve the correct span exporter based on FLUSK_MODE.
+ * Local mode (default): SqliteSpanExporter → writes to ~/.flusk/data.db
+ * Server mode: OTLPTraceExporter → HTTP to Flusk server
+ */
+import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
+import type { SpanExporter } from '@opentelemetry/sdk-trace-base';
+import { SqliteSpanExporter } from '../exporters/sqlite-exporter.js';
+import { createLogger } from '@flusk/logger';
+import type { FluskOtelConfig } from '../config.js';
+
+const log = createLogger('resolve-exporter');
+
+export type FluskMode = 'local' | 'server';
+
+export function resolveMode(): FluskMode {
+  const explicit = process.env['FLUSK_MODE'];
+  if (explicit === 'server') return 'server';
+  if (explicit === 'local') return 'local';
+  return process.env['FLUSK_ENDPOINT'] ? 'server' : 'local';
+}
+
+export function resolveExporter(config: FluskOtelConfig): SpanExporter {
+  const mode = resolveMode();
+
+  if (mode === 'local') {
+    const dbPath = process.env['FLUSK_SQLITE_PATH'];
+    log.info('Flusk: local mode — writing to ~/.flusk/data.db');
+    return new SqliteSpanExporter(dbPath);
+  }
+
+  log.info(`Flusk: server mode — exporting to ${config.endpoint}`);
+  return new OTLPTraceExporter({
+    url: `${config.endpoint}/v1/traces`,
+    headers: { 'x-flusk-api-key': config.apiKey },
+  });
+}

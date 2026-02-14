@@ -1,24 +1,22 @@
 /**
- * Creates and configures the OpenTelemetry NodeSDK for Flusk
+ * Creates and configures the OpenTelemetry NodeSDK for Flusk.
+ * Auto-detects local vs server mode for exporter selection.
  */
 import { NodeSDK } from '@opentelemetry/sdk-node';
-import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { BedrockInstrumentation } from '@traceloop/instrumentation-bedrock';
 import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import type { FluskOtelConfig } from './config.js';
+import { resolveExporter } from './utils/resolve-exporter.js';
 
 export interface CreateSdkOptions {
   spanProcessors?: SpanProcessor[];
 }
 
 export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): NodeSDK {
-  const traceExporter = new OTLPTraceExporter({
-    url: `${config.endpoint}/v1/traces`,
-    headers: { 'x-flusk-api-key': config.apiKey },
-  });
+  const traceExporter = resolveExporter(config);
 
   const resource = new Resource({
     [ATTR_SERVICE_NAME]: config.projectName,

@@ -1,19 +1,15 @@
 import { describe, it, expect, vi } from 'vitest';
 import type { FluskOtelConfig } from './config.js';
 
-const { mockExporter, mockGetInstr, mockResource } = vi.hoisted(() => ({
-  mockExporter: vi.fn(),
+const { mockGetInstr, mockResource, mockResolveExporter } = vi.hoisted(() => ({
   mockGetInstr: vi.fn(() => []),
   mockResource: vi.fn(),
+  mockResolveExporter: vi.fn(() => ({ url: 'mock' })),
 }));
 
 vi.mock('@opentelemetry/sdk-node', () => {
   class NodeSDK { constructor() {} start() {} }
   return { NodeSDK };
-});
-vi.mock('@opentelemetry/exporter-trace-otlp-http', () => {
-  class OTLPTraceExporter { constructor(...args: unknown[]) { mockExporter(...args); } }
-  return { OTLPTraceExporter };
 });
 vi.mock('@opentelemetry/auto-instrumentations-node', () => ({
   getNodeAutoInstrumentations: mockGetInstr,
@@ -23,6 +19,9 @@ vi.mock('@opentelemetry/resources', () => {
   return { Resource };
 });
 vi.mock('@opentelemetry/semantic-conventions', () => ({ ATTR_SERVICE_NAME: 'service.name' }));
+vi.mock('./utils/resolve-exporter.js', () => ({
+  resolveExporter: mockResolveExporter,
+}));
 
 import { createSdk } from './create-sdk.js';
 
@@ -34,12 +33,9 @@ const config: FluskOtelConfig = {
 };
 
 describe('createSdk', () => {
-  it('creates exporter with correct URL and api-key header', () => {
+  it('calls resolveExporter with config', () => {
     createSdk(config);
-    expect(mockExporter).toHaveBeenCalledWith({
-      url: 'https://otel.flusk.dev/v1/traces',
-      headers: { 'x-flusk-api-key': 'sk-test' },
-    });
+    expect(mockResolveExporter).toHaveBeenCalledWith(config);
   });
 
   it('disables noisy instrumentations (fs, dns, net)', () => {
