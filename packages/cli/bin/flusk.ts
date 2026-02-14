@@ -49,13 +49,15 @@ import { statusCommand } from '../src/commands/status.js';
 import { validateGeneratedCommand } from '../src/commands/validate-generated.js';
 import { ratioCommand } from '../src/commands/ratio.js';
 import { guardCommand } from '../src/commands/guard.js';
+import { printBanner } from '../src/utils/banner.js';
 
 const program = new Command();
 
 program
   .name('flusk')
   .description('Flusk CLI - Code generation and project scaffolding')
-  .version('0.1.0');
+  .version('0.1.0')
+  .addHelpText('beforeAll', (() => { printBanner(); return ''; })());
 
 program.addCommand(initCommand);
 program.addCommand(generateCommand);

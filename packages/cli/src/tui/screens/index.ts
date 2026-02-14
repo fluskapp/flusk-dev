@@ -7,3 +7,6 @@ export { OverviewScreen } from './overview.js';
 export { PatternsScreen } from './patterns.js';
 export { SuggestionsScreen } from './suggestions.js';
 export { ProfileScreen } from './profile.js';
+export { BudgetScreen } from './budget.js';
+export { ModelsScreen } from './models.js';
+export { HistoryScreen } from './history.js';

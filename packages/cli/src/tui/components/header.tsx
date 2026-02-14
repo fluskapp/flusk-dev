@@ -14,7 +14,7 @@ export interface HeaderProps {
 export function Header({ endpoint, connected = true }: HeaderProps) {
   return (
     <Box borderStyle="single" paddingX={1}>
-      <Text bold color="cyan">⚡ Flusk Dashboard</Text>
+      <Text bold color="#A3E635">[F]</Text><Text bold color="cyan"> Flusk Dashboard</Text>
       <Text> | </Text>
       <Text dimColor>{endpoint}</Text>
       <Text> | </Text>

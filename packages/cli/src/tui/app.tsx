@@ -10,8 +10,11 @@ import { OverviewScreen } from './screens/overview.js';
 import { PatternsScreen } from './screens/patterns.js';
 import { SuggestionsScreen } from './screens/suggestions.js';
 import { ProfileScreen } from './screens/profile.js';
+import { BudgetScreen } from './screens/budget.js';
+import { ModelsScreen } from './screens/models.js';
+import { HistoryScreen } from './screens/history.js';
 
-type Screen = 'overview' | 'patterns' | 'suggestions' | 'profile';
+type Screen = 'overview' | 'patterns' | 'suggestions' | 'profile' | 'budget' | 'models' | 'history';
 
 interface AppProps {
   endpoint: string;
@@ -26,6 +29,9 @@ function App({ endpoint, apiKey }: AppProps) {
     if (input === '2') setScreen('patterns');
     if (input === '3') setScreen('suggestions');
     if (input === '4') setScreen('profile');
+    if (input === '5') setScreen('budget');
+    if (input === '6') setScreen('models');
+    if (input === '7') setScreen('history');
     if (input === 'q') process.exit(0);
   });
 
@@ -33,7 +39,7 @@ function App({ endpoint, apiKey }: AppProps) {
     <Box flexDirection="column">
       <Header endpoint={endpoint} />
       <Text dimColor>
-        [1] Overview  [2] Patterns  [3] Suggestions  [4] Profile  [q] Quit
+        [1] Overview  [2] Patterns  [3] Suggestions  [4] Profile  [5] Budget  [6] Models  [7] History  [q] Quit
       </Text>
       <Box marginTop={1}>
         {screen === 'overview' && (
@@ -47,6 +53,15 @@ function App({ endpoint, apiKey }: AppProps) {
         )}
         {screen === 'profile' && (
           <ProfileScreen endpoint={endpoint} apiKey={apiKey} />
+        )}
+        {screen === 'budget' && (
+          <BudgetScreen endpoint={endpoint} apiKey={apiKey} />
+        )}
+        {screen === 'models' && (
+          <ModelsScreen endpoint={endpoint} apiKey={apiKey} />
+        )}
+        {screen === 'history' && (
+          <HistoryScreen endpoint={endpoint} apiKey={apiKey} />
         )}
       </Box>
     </Box>
