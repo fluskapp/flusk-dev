@@ -135,6 +135,15 @@ pnpm lint       # ESLint
 6. Use `@flusk/logger` for all logging
 7. 2026 tools only — no deprecated APIs
 
+## AI Sub-Agent Mode (YAML-Only)
+
+For entity work, AI agents operate in **YAML-only mode**:
+- Read `docs/generators/agent-instructions.md` for full rules
+- Edit ONLY `entities/*.entity.yaml` files
+- Run `./scripts/yaml-agent.sh generate <yaml>` to produce code
+- NEVER edit `.ts` files directly (except CUSTOM sections)
+- Use `./scripts/yaml-agent.sh diff <yaml>` to preview changes
+
 ## AI Agent Behavioral Rules
 
 These rules are **non-negotiable** for any AI agent working on this repo:
