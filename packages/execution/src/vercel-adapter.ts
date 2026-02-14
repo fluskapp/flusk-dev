@@ -42,9 +42,9 @@ async function getApp(): Promise<FastifyInstance> {
         }),
       },
     },
-    requireAuth: process.env.REQUIRE_AUTH === 'true',
+    requireAuth: process.env.REQUIRE_AUTH !== 'false',
     cors: {
-      origin: process.env.CORS_ORIGIN || true,
+      origin: process.env.CORS_ORIGIN || 'https://app.flusk.dev',
       credentials: true,
     },
   });
@@ -104,7 +104,6 @@ export default async function handler(
     logger.error({ err: error }, 'vercel adapter error');
     res.status(500).json({
       error: 'Internal Server Error',
-      message: error instanceof Error ? error.message : 'Unknown error',
     });
   }
 }

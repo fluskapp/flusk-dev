@@ -25,7 +25,7 @@ export async function loadConfig(cwd?: string): Promise<FluskConfig> {
 
     log.info(`Loading config from ${filename}`);
     try {
-      const mod = await importConfigFile(fullPath);
+      const mod = await importConfigFile(fullPath, root);
       const userConfig = mod.default ?? mod;
       return mergeConfig(DEFAULT_CONFIG, userConfig);
     } catch (err) {
@@ -38,8 +38,20 @@ export async function loadConfig(cwd?: string): Promise<FluskConfig> {
   return { ...DEFAULT_CONFIG };
 }
 
-async function importConfigFile(fullPath: string): Promise<Record<string, unknown>> {
-  const url = pathToFileURL(fullPath).href;
+/**
+ * Import a config file. The resolved path must be within the project root.
+ * Config files are treated as trusted code (same as package.json scripts).
+ */
+async function importConfigFile(
+  fullPath: string,
+  root: string,
+): Promise<Record<string, unknown>> {
+  const resolved = resolve(fullPath);
+  const resolvedRoot = resolve(root);
+  if (!resolved.startsWith(resolvedRoot + '/') && resolved !== resolvedRoot) {
+    throw new Error(`Config path ${resolved} is outside project root ${resolvedRoot}`);
+  }
+  const url = pathToFileURL(resolved).href;
   return await import(url) as Record<string, unknown>;
 }
 

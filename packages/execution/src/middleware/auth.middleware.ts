@@ -1,15 +1,8 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
+import { createHmac, timingSafeEqual } from 'node:crypto';
+import { getLogger } from '@flusk/logger';
 
-/**
- * Auth Middleware
- * Validates API keys and extracts organizationId
- *
- * API Key format: orgId_secretKey
- * Example: org_123_abc456def789
- *
- * Decorates request with:
- * - organizationId: string
- */
+const log = getLogger().child({ module: 'auth-middleware' });
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -17,98 +10,70 @@ declare module 'fastify' {
   }
 }
 
-/**
- * Authentication hook
- * Validates Authorization header and extracts organization ID
- */
+/** Hash a token for constant-time comparison */
+function hashToken(token: string): Buffer {
+  return createHmac('sha256', 'flusk').update(token).digest();
+}
+
+/** Validate API key against configured FLUSK_API_KEY */
+function isValidApiKey(token: string): boolean {
+  const expected = process.env.FLUSK_API_KEY;
+  if (!expected) {
+    log.warn('FLUSK_API_KEY not configured — rejecting all requests');
+    return false;
+  }
+  const a = hashToken(token);
+  const b = hashToken(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+function sendUnauthorized(reply: FastifyReply, message: string): FastifyReply {
+  return reply.status(401).send({
+    error: { message, code: 'UNAUTHORIZED', statusCode: 401 },
+  });
+}
+
+function parseToken(authHeader: string | undefined): string | null {
+  if (!authHeader) return null;
+  const [scheme, token] = authHeader.split(' ');
+  return scheme === 'Bearer' && token ? token : null;
+}
+
+function extractOrgId(token: string): string | null {
+  const idx = token.lastIndexOf('_');
+  return idx > 0 ? token.substring(0, idx) : null;
+}
+
+/** Authentication hook — validates API key and extracts org ID */
 export async function authMiddleware(
   request: FastifyRequest,
-  reply: FastifyReply
+  reply: FastifyReply,
 ): Promise<void> {
-  const authHeader = request.headers.authorization;
+  const token = parseToken(request.headers.authorization);
+  if (!token) return sendUnauthorized(reply, 'Missing or invalid Authorization header');
 
-  if (!authHeader) {
-    return reply.status(401).send({
-      error: {
-        message: 'Missing Authorization header',
-        code: 'UNAUTHORIZED',
-        statusCode: 401
-      }
-    });
+  if (!isValidApiKey(token)) {
+    log.warn({ ip: request.ip }, 'Invalid API key attempt');
+    return sendUnauthorized(reply, 'Invalid API key');
   }
 
-  // Expected format: "Bearer orgId_secretKey"
-  const [scheme, token] = authHeader.split(' ');
+  const organizationId = extractOrgId(token);
+  if (!organizationId) return sendUnauthorized(reply, 'Invalid API key format');
 
-  if (scheme !== 'Bearer' || !token) {
-    return reply.status(401).send({
-      error: {
-        message: 'Invalid Authorization header format. Expected: Bearer <api_key>',
-        code: 'UNAUTHORIZED',
-        statusCode: 401
-      }
-    });
-  }
-
-  // Parse API key format: orgId_secretKey
-  const parts = token.split('_');
-
-  if (parts.length < 2) {
-    return reply.status(401).send({
-      error: {
-        message: 'Invalid API key format. Expected: orgId_secretKey',
-        code: 'UNAUTHORIZED',
-        statusCode: 401
-      }
-    });
-  }
-
-  // Extract organization ID (everything before the last underscore)
-  // This allows org IDs to contain underscores
-  const lastUnderscoreIndex = token.lastIndexOf('_');
-  const organizationId = token.substring(0, lastUnderscoreIndex);
-
-  if (!organizationId) {
-    return reply.status(401).send({
-      error: {
-        message: 'Invalid API key: missing organization ID',
-        code: 'UNAUTHORIZED',
-        statusCode: 401
-      }
-    });
-  }
-
-  // TODO: Validate API key against database
-  // For now, just extract and decorate the request
-
-  // Decorate request with organizationId
   request.organizationId = organizationId;
 }
 
-/**
- * Optional authentication hook
- * Validates API key if present, but allows requests without it
- */
-export async function optionalAuthMiddleware(
+/** Validate x-flusk-api-key header for OTLP ingestion */
+export async function otlpAuthHook(
   request: FastifyRequest,
-  _reply: FastifyReply
+  reply: FastifyReply,
 ): Promise<void> {
-  const authHeader = request.headers.authorization;
-
-  if (!authHeader) {
-    // No auth header, skip validation
-    return;
+  const key = request.headers['x-flusk-api-key'] as string | undefined;
+  if (!key || !isValidApiKey(key)) {
+    log.warn({ ip: request.ip }, 'OTLP request with invalid API key');
+    return sendUnauthorized(reply, 'Missing or invalid x-flusk-api-key');
   }
 
-  const [scheme, token] = authHeader.split(' ');
-
-  if (scheme === 'Bearer' && token) {
-    const lastUnderscoreIndex = token.lastIndexOf('_');
-    if (lastUnderscoreIndex > 0) {
-      const organizationId = token.substring(0, lastUnderscoreIndex);
-      if (organizationId) {
-        request.organizationId = organizationId;
-      }
-    }
-  }
+  const orgId = extractOrgId(key);
+  if (orgId) request.organizationId = orgId;
 }

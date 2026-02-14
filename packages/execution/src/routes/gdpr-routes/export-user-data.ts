@@ -1,6 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { logAudit } from '@flusk/resources';
 import { ExportParams } from './types.js';
+import { validateOrgId } from './validate-org-id.js';
 
 /**
  * Export all data for an organization (GDPR Right to Data Portability)
@@ -8,9 +9,13 @@ import { ExportParams } from './types.js';
  */
 export async function exportUserData(
   request: FastifyRequest<{ Params: ExportParams }>,
-  reply: FastifyReply
+  reply: FastifyReply,
 ): Promise<void> {
   const { orgId } = request.params;
+
+  const validationError = validateOrgId(orgId, request.organizationId);
+  if (validationError) return reply.status(validationError.status).send({ error: validationError.message });
+
   const db = request.server.pg.pool;
 
   try {
@@ -65,6 +70,6 @@ export async function exportUserData(
       metadata: null
     });
 
-    return reply.status(500).send({ error: message });
+    return reply.status(500).send({ error: 'Internal Server Error' });
   }
 }

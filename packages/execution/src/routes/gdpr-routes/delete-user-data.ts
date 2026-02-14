@@ -1,6 +1,7 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { logAudit } from '@flusk/resources';
 import { DeleteParams } from './types.js';
+import { validateOrgId } from './validate-org-id.js';
 
 /**
  * Hard delete all data for an organization (GDPR Right to Deletion)
@@ -8,9 +9,13 @@ import { DeleteParams } from './types.js';
  */
 export async function deleteUserData(
   request: FastifyRequest<{ Params: DeleteParams }>,
-  reply: FastifyReply
+  reply: FastifyReply,
 ): Promise<void> {
   const { orgId } = request.params;
+
+  const validationError = validateOrgId(orgId, request.organizationId);
+  if (validationError) return reply.status(validationError.status).send({ error: validationError.message });
+
   const db = request.server.pg.pool;
 
   try {
@@ -69,6 +74,6 @@ export async function deleteUserData(
       metadata: null
     });
 
-    return reply.status(500).send({ error: message });
+    return reply.status(500).send({ error: 'Internal Server Error' });
   }
 }

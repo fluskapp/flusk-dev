@@ -31,7 +31,7 @@ export async function createApp(
 ): Promise<FastifyInstance> {
   const {
     logger = process.env.NODE_ENV !== 'production',
-    requireAuth = false,
+    requireAuth = true,
     skipDb = false,
     cors,
   } = options;
@@ -79,7 +79,7 @@ export async function createApp(
     app.addHook('onRequest', authMiddleware);
   }
 
-  // OTLP ingestion (no auth — uses x-flusk-api-key header)
+  // OTLP ingestion (authenticated via x-flusk-api-key header)
   await app.register(otlpRoutes, { prefix: '/v1' });
 
   // Feature routes under /api/v1

@@ -6,6 +6,7 @@ import type { FastifyInstance } from 'fastify';
 import { ingestTracesHandler } from './ingest-traces.js';
 import { registerProtoParser } from './proto-parser.js';
 import { liveFeedRoute } from './live-feed.js';
+import { otlpAuthHook } from '../../middleware/auth.middleware.js';
 
 export async function otlpRoutes(app: FastifyInstance): Promise<void> {
   registerProtoParser(app);
@@ -16,6 +17,8 @@ export async function otlpRoutes(app: FastifyInstance): Promise<void> {
     keyGenerator: (request) =>
       (request.headers['x-flusk-api-key'] as string) || request.ip,
   });
+
+  app.addHook('onRequest', otlpAuthHook);
 
   await app.register(ingestTracesHandler);
   await app.register(liveFeedRoute);
