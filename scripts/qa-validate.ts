@@ -170,7 +170,7 @@ check('Protected Files', () => {
 
   for (const f of files) {
     const rel = relative(root, f);
-    if (!matchesAny(rel, config.protectedPaths)) continue;
+    if (!matchesAny(rel, config.protectedPaths ?? config.fullyProtected ?? [])) continue;
     const head = readFileSync(f, 'utf-8').slice(0, 500);
     if (head.includes('@generated')) {
       details.push(`FAKE @generated header in protected file: ${rel}`);
