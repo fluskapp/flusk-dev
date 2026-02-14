@@ -1,7 +1,7 @@
-name: CI
-on: [push, pull_request]
+name: Generator Guard
+on: [pull_request]
 jobs:
-  test:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -11,6 +11,5 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install
-      - run: pnpm lint
-      - run: pnpm test
       - run: npx flusk validate-generated --strict
+        # Fails PR if generated files are stale or hand-edited

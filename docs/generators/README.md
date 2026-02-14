@@ -41,9 +41,17 @@ const registry = loadEntityRegistry('./entities');
 - **Custom queries** — beyond CRUD, your domain logic
 - **Route handlers** — generated stubs, but logic is yours
 
-### Roadmap
+### Phases (All Complete)
 
-- Phase 2: Trait system (crud, time-range, aggregation mixins)
-- Phase 3: Recipe system (one command → 8+ files)
-- Phase 4: Regeneration with protected regions
-- Phase 5: CI enforcement and coverage tracking
+| Phase | Feature | Docs |
+|-------|---------|------|
+| 1 | Schema system — YAML → typed entities | [schema-format.md](./schema-format.md) |
+| 2 | Trait system — composable code mixins | [traits.md](./traits.md) |
+| 3 | Recipe system — one command → 8+ files | [recipes.md](./recipes.md) |
+| 4 | Regeneration — safe incremental updates | [regeneration.md](./regeneration.md) |
+| 5 | CI enforcement — validate + ratio tracking | [ci-enforcement.md](./ci-enforcement.md) |
+
+### For AI Agents
+
+See [for-ai-agents.md](./for-ai-agents.md) — specific instructions
+for Claude, Copilot, and Cursor on working with this system.

@@ -46,6 +46,8 @@ import { generateEntityFromYamlCommand } from '../src/commands/generate-entity-f
 import { recipeCommand } from '../src/commands/recipe.js';
 import { regenerateCommand } from '../src/commands/regenerate.js';
 import { statusCommand } from '../src/commands/status.js';
+import { validateGeneratedCommand } from '../src/commands/validate-generated.js';
+import { ratioCommand } from '../src/commands/ratio.js';
 
 const program = new Command();
 
@@ -125,5 +127,9 @@ program.addCommand(recipeCommand);
 // Regeneration system
 program.addCommand(regenerateCommand);
 program.addCommand(statusCommand);
+
+// Phase 5: CI enforcement
+program.addCommand(validateGeneratedCommand);
+program.addCommand(ratioCommand);
 
 program.parse(process.argv);

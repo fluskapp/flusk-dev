@@ -97,6 +97,43 @@ Key components:
 
 See [traits.md](./traits.md) for usage and how to create new traits.
 
+## Regeneration Layer (Phase 4)
+
+Safe incremental regeneration: edit YAML → update generated code → preserve custom sections.
+
+```
+YAML changed → Change Detector → Smart Merge → Updated Files
+                                     ↑
+                              CUSTOM regions preserved
+```
+
+Key components:
+- **`file-header.ts`** — `@generated` header with YAML hash for staleness detection
+- **`yaml-hash.ts`** — SHA-256 hashing for change detection
+- **`region-parser.ts`** — Parse GENERATED/CUSTOM regions
+- **`smart-merge.ts`** — Replace generated sections, keep custom code
+- **`change-detector.ts`** — Scan project for stale generated files
+
+See [regeneration.md](./regeneration.md) for details.
+
+## CI Enforcement Layer (Phase 5)
+
+Automated validation that generated files match their source schemas.
+
+```
+PR opened → Generator Guard → validate-generated --strict
+                                    ↓
+                    ✅ pass (all fresh) or ❌ fail (stale/tampered)
+```
+
+Key components:
+- **`validate-generated.ts`** — CLI command scanning all @generated files
+- **`tampering-detector.ts`** — Detects hand-edits outside CUSTOM regions
+- **`ratio-calculator.ts`** — Counts generated vs total files per package
+- **`generator-guard.yml`** — GitHub Action blocking stale PRs
+
+See [ci-enforcement.md](./ci-enforcement.md) for details.
+
 ## File Organization
 
 ```
@@ -135,4 +172,18 @@ packages/cli/src/traits/
 ├── aggregation.trait.ts        # Aggregation query trait
 ├── soft-delete.trait.ts        # Soft deletion trait
 └── export.trait.ts             # CSV/JSON export trait
+
+packages/cli/src/regeneration/
+├── index.ts                    # Barrel exports
+├── file-header.ts              # @generated header builder/parser
+├── yaml-hash.ts                # SHA-256 content hashing
+├── region-markers.ts           # BEGIN/END marker constants
+├── region-parser.ts            # Parse regions from file content
+├── smart-merge.ts              # Merge new generated + old custom
+└── change-detector.ts          # Scan for stale generated files
+
+packages/cli/src/validation/
+├── index.ts                    # Barrel exports
+├── tampering-detector.ts       # Detect hand-edits in generated regions
+└── ratio-calculator.ts         # Generator coverage ratio
 ```

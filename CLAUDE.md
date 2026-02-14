@@ -108,11 +108,22 @@ pnpm db:migrate # Run migrations
 pnpm lint       # ESLint
 ```
 
+## Code Generation Rules
+
+- **NEVER** edit files with `@generated` header directly
+- To change an entity: edit `entities/<name>.entity.yaml` then run `flusk regenerate`
+- To add a new entity: create YAML in `entities/`, run `flusk recipe full-entity --from <yaml>`
+- To add behavior: add capability to YAML, run `flusk regenerate`
+- Only `// --- BEGIN CUSTOM ---` sections may be hand-edited
+- Run `flusk validate-generated` before committing
+- Run `flusk ratio` to check generator coverage (target: 90%)
+- See [docs/generators/for-ai-agents.md](docs/generators/for-ai-agents.md) for full details
+
 ## Important Rules
 
 1. Keep files under 100 lines
 2. Business logic must be pure — no DB, no HTTP
-3. Entity changes flow from `packages/entities/`
+3. Entity changes flow from `entities/*.entity.yaml` (source of truth)
 4. Use `.js` extensions in imports (ESM)
 5. Don't edit `@generated` files — regenerate with CLI
 6. Use `@flusk/logger` for all logging
