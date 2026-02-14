@@ -12,8 +12,9 @@ export function create(
   const stmt = db.prepare(`
     INSERT INTO llm_calls (
       provider, model, prompt, prompt_hash, tokens,
-      cost, response, cached, organization_id, agent_label
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      cost, response, cached, agent_label, organization_id,
+      consent_given, consent_purpose
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     RETURNING *
   `);
 
@@ -26,8 +27,10 @@ export function create(
     data.cost,
     data.response,
     data.cached ? 1 : 0,
+    data.agentLabel ?? null,
     data.organizationId ?? null,
-    null,
+    data.consentGiven ? 1 : 0,
+    data.consentPurpose,
   ) as Record<string, unknown>;
 
   return rowToEntity(row);

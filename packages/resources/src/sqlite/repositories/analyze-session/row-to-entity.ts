@@ -1,19 +1,18 @@
-import type { AnalyzeSessionEntity } from '@flusk/entities';
+import type { AnalyzeSessionEntity, ModelsUsed } from '@flusk/entities';
+import { toISOString } from '../../../shared/map-row.js';
 
-/**
- * Convert SQLite row to AnalyzeSessionEntity
- */
+/** Convert SQLite row to AnalyzeSessionEntity */
 export function rowToEntity(row: Record<string, unknown>): AnalyzeSessionEntity {
   return {
     id: row.id as string,
-    createdAt: row.started_at as string,
-    updatedAt: row.started_at as string,
+    createdAt: toISOString(row.created_at),
+    updatedAt: toISOString(row.updated_at),
     script: row.script as string,
     durationMs: row.duration_ms as number,
     totalCalls: row.total_calls as number,
     totalCost: row.total_cost as number,
-    modelsUsed: JSON.parse(row.models_used as string) as string[],
-    startedAt: row.started_at as string,
-    completedAt: (row.completed_at as string) ?? undefined,
+    modelsUsed: JSON.parse(row.models_used as string) as ModelsUsed,
+    startedAt: toISOString(row.started_at),
+    completedAt: row.completed_at != null ? toISOString(row.completed_at) : undefined,
   };
 }

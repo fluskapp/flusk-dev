@@ -119,6 +119,12 @@ pnpm lint       # ESLint
 - Run `flusk ratio` to check generator coverage (target: 90%)
 - See [docs/generators/for-ai-agents.md](docs/generators/for-ai-agents.md) for full details
 
+## Writing Entity YAMLs
+- See `docs/generators/yaml-guide.md` for complete reference
+- Every field needs: type, description. Add required/index/default as needed.
+- Custom queries go in `queries:` block — use `returns: single|list|scalar|raw`
+- After creating/editing YAML: `flusk recipe full-entity --from entities/<name>.entity.yaml`
+
 ## Important Rules
 
 1. Keep files under 100 lines

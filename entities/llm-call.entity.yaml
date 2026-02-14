@@ -54,6 +54,10 @@ fields:
     description: Whether this response was served from cache
     default: false
 
+  agentLabel:
+    type: string
+    description: Agent label for multi-agent tracking
+
   organizationId:
     type: string
     description: Organization ID for GDPR data portability and deletion
@@ -69,7 +73,7 @@ fields:
     type: string
     required: true
     description: Purpose of data processing (optimization, analytics, training)
-    default: optimization
+    default: "optimization"
 
 capabilities:
   crud: true

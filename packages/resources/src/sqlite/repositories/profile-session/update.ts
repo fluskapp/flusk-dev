@@ -1,15 +1,15 @@
 import type { DatabaseSync } from 'node:sqlite';
-import type { AnalyzeSessionEntity } from '@flusk/entities';
+import type { ProfileSessionEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
- * Update a Analyze session
+ * Update a Profile session
  */
 export function update(
   db: DatabaseSync,
   id: string,
-  data: Partial<Omit<AnalyzeSessionEntity, 'id' | 'createdAt' | 'updatedAt'>>,
-): AnalyzeSessionEntity | null {
+  data: Partial<Omit<ProfileSessionEntity, 'id' | 'createdAt' | 'updatedAt'>>,
+): ProfileSessionEntity | null {
   const sets: string[] = [];
   const values: unknown[] = [];
   for (const [key, value] of Object.entries(data)) {
@@ -26,7 +26,7 @@ export function update(
   if (sets.length === 0) return null;
   values.push(id);
   const stmt = db.prepare(
-    `UPDATE analyze_sessions SET ${sets.join(', ')} WHERE id = ? RETURNING *`,
+    `UPDATE profile_sessions SET ${sets.join(', ')} WHERE id = ? RETURNING *`,
   );
   const row = stmt.get(...values) as Record<string, unknown> | undefined;
   return row ? rowToEntity(row) : null;

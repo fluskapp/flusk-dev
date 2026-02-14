@@ -3,7 +3,7 @@ import type { ProfileSessionEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
- * Insert a new profile session record
+ * Insert a new Profile session record into SQLite
  */
 export function create(
   db: DatabaseSync,
@@ -11,16 +11,16 @@ export function create(
 ): ProfileSessionEntity {
   const stmt = db.prepare(`
     INSERT INTO profile_sessions (
-      name, type, duration_ms, total_samples, hotspots,
-      markdown_raw, pprof_path, flamegraph_path, trace_ids,
-      organization_id, started_at
+      name, profile_type, duration_ms, total_samples, hotspots,
+      markdown_raw, pprof_path, flamegraph_path, trace_ids, organization_id,
+      started_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     RETURNING *
   `);
 
   const row = stmt.get(
     data.name,
-    data.type,
+    data.profileType,
     data.durationMs,
     data.totalSamples,
     JSON.stringify(data.hotspots),

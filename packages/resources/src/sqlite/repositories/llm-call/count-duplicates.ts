@@ -1,7 +1,7 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 /**
- * Count LLM calls that share a prompt_hash with at least one other call
+ * Count LLM calls sharing prompt_hash with others
  */
 export function countDuplicates(db: DatabaseSync): number {
   const stmt = db.prepare(`

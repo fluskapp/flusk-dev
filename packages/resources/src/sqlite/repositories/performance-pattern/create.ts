@@ -3,7 +3,7 @@ import type { PerformancePatternEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
- * Insert a new performance pattern record
+ * Insert a new Performance pattern record into SQLite
  */
 export function create(
   db: DatabaseSync,
@@ -11,8 +11,8 @@ export function create(
 ): PerformancePatternEntity {
   const stmt = db.prepare(`
     INSERT INTO performance_patterns (
-      profile_session_id, pattern, severity,
-      description, suggestion, metadata, organization_id
+      profile_session_id, pattern, severity, description, suggestion,
+      metadata, organization_id
     ) VALUES (?, ?, ?, ?, ?, ?, ?)
     RETURNING *
   `);

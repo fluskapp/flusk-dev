@@ -3,7 +3,7 @@ import type { PerformancePatternEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
- * List performance patterns with pagination
+ * List Performance patterns with pagination
  */
 export function list(
   db: DatabaseSync,

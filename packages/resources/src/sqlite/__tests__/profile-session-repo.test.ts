@@ -15,7 +15,7 @@ describe('SQLite Profile Session Repository', () => {
 
   const sampleData = {
     name: 'test-session',
-    type: 'cpu' as const,
+    profileType: 'cpu' as const,
     durationMs: 5000,
     totalSamples: 100,
     hotspots: [{ functionName: 'main', filePath: 'app.js', cpuPercent: 50, samples: 50 }],

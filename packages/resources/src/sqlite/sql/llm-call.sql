@@ -8,12 +8,13 @@ CREATE TABLE IF NOT EXISTS llm_calls (
   cost REAL NOT NULL DEFAULT 0,
   response TEXT NOT NULL DEFAULT '',
   cached INTEGER NOT NULL DEFAULT 0,
-  organization_id TEXT,
   agent_label TEXT,
+  organization_id TEXT,
+  consent_given INTEGER NOT NULL DEFAULT 1,
+  consent_purpose TEXT NOT NULL DEFAULT 'optimization',
   created_at TEXT NOT NULL DEFAULT (datetime('now')),
   updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
-CREATE INDEX IF NOT EXISTS idx_llm_calls_hash ON llm_calls(prompt_hash);
 CREATE INDEX IF NOT EXISTS idx_llm_calls_model ON llm_calls(model);
-CREATE INDEX IF NOT EXISTS idx_llm_calls_agent ON llm_calls(agent_label);
-CREATE INDEX IF NOT EXISTS idx_llm_calls_created ON llm_calls(created_at);
+CREATE INDEX IF NOT EXISTS idx_llm_calls_prompt_hash ON llm_calls(prompt_hash);
+CREATE INDEX IF NOT EXISTS idx_llm_calls_created_at ON llm_calls(created_at);

@@ -1,10 +1,10 @@
-/** @generated from LLMCall YAML — Traits: crud, aggregation, time-range */
+/** @generated from AnalyzeSession YAML — Traits: crud, time-range */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
-import { LLMCallEntitySchema } from '@flusk/entities';
-import { LLMCallRepository } from '@flusk/resources';
-const CreateLLMCallSchema = Type.Omit(LLMCallEntitySchema, ['id', 'createdAt', 'updatedAt']);
-const LLMCallResponseSchema = LLMCallEntitySchema;
+import { AnalyzeSessionEntitySchema } from '@flusk/entities';
+import { AnalyzeSessionRepository } from '@flusk/resources';
+const CreateAnalyzeSessionSchema = Type.Omit(AnalyzeSessionEntitySchema, ['id', 'createdAt', 'updatedAt']);
+const AnalyzeSessionResponseSchema = AnalyzeSessionEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
 const ListQuerySchema = Type.Object({
@@ -13,33 +13,33 @@ const ListQuerySchema = Type.Object({
 });
 
 /**
- * Register LLMCall routes
+ * Register AnalyzeSession routes
  */
-export async function llmCallRoutes(
+export async function analyzeSessionRoutes(
   fastify: FastifyInstance,
 ): Promise<void> {
   fastify.post('/', {
     schema: {
-      body: CreateLLMCallSchema,
-      response: { 201: LLMCallResponseSchema },
-      tags: ['LLMCall'],
-      description: 'Create a new LLMCall record',
+      body: CreateAnalyzeSessionSchema,
+      response: { 201: AnalyzeSessionResponseSchema },
+      tags: ['AnalyzeSession'],
+      description: 'Create a new AnalyzeSession record',
     },
   }, async (request, reply) => {
-    const created = await LLMCallRepository.create(request.body);
+    const created = await AnalyzeSessionRepository.create(request.body);
     return reply.code(201).send(created);
   });
 
   fastify.get('/:id', {
     schema: {
       params: IdParamsSchema,
-      response: { 200: LLMCallResponseSchema, 404: NotFoundSchema },
-      tags: ['LLMCall'],
-      description: 'Get a LLMCall by ID',
+      response: { 200: AnalyzeSessionResponseSchema, 404: NotFoundSchema },
+      tags: ['AnalyzeSession'],
+      description: 'Get a AnalyzeSession by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const entity = await LLMCallRepository.findById(id);
+    const entity = await AnalyzeSessionRepository.findById(id);
     if (!entity) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(entity);
   });
@@ -47,27 +47,27 @@ export async function llmCallRoutes(
   fastify.get('/', {
     schema: {
       querystring: ListQuerySchema,
-      response: { 200: Type.Array(LLMCallResponseSchema) },
-      tags: ['LLMCall'],
-      description: 'List LLMCall records',
+      response: { 200: Type.Array(AnalyzeSessionResponseSchema) },
+      tags: ['AnalyzeSession'],
+      description: 'List AnalyzeSession records',
     },
   }, async (request, reply) => {
     const { limit, offset } = request.query as { limit?: number; offset?: number };
-    const items = await LLMCallRepository.list(limit, offset);
+    const items = await AnalyzeSessionRepository.list(limit, offset);
     return reply.code(200).send(items);
   });
 
   fastify.put('/:id', {
     schema: {
       params: IdParamsSchema,
-      body: Type.Partial(CreateLLMCallSchema),
-      response: { 200: LLMCallResponseSchema, 404: NotFoundSchema },
-      tags: ['LLMCall'],
-      description: 'Update a LLMCall by ID',
+      body: Type.Partial(CreateAnalyzeSessionSchema),
+      response: { 200: AnalyzeSessionResponseSchema, 404: NotFoundSchema },
+      tags: ['AnalyzeSession'],
+      description: 'Update a AnalyzeSession by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const updated = await LLMCallRepository.update(id, request.body);
+    const updated = await AnalyzeSessionRepository.update(id, request.body);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });
@@ -76,22 +76,20 @@ export async function llmCallRoutes(
     schema: {
       params: IdParamsSchema,
       response: { 204: Type.Null(), 404: NotFoundSchema },
-      tags: ['LLMCall'],
-      description: 'Delete a LLMCall by ID',
+      tags: ['AnalyzeSession'],
+      description: 'Delete a AnalyzeSession by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const deleted = await LLMCallRepository.delete(id);
+    const deleted = await AnalyzeSessionRepository.delete(id);
     if (!deleted) return reply.code(404).send({ error: 'Not found' });
     return reply.code(204).send();
   });
 
-  fastify.get('/aggregate', async (req) => { const opts = req.query as unknown as LLMCallRepository.LLMCallAggregateOptions; return LLMCallRepository.aggregateLLMCalls(fastify.db, opts); });
-
-  /** Time-range query route for LLMCall */
+  /** Time-range query route for AnalyzeSession */
   fastify.get('/by-time-range', async (req) => {
     const { from, to } = req.query as { from: string; to: string };
-    return LLMCallRepository.findLLMCallsByTimeRange(fastify.db, from, to);
+    return AnalyzeSessionRepository.findAnalyzeSessionsByTimeRange(fastify.db, from, to);
   });
 }
 

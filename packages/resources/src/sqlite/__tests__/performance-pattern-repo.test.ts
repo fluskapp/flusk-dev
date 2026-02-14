@@ -11,7 +11,7 @@ describe('SQLite Performance Pattern Repository', () => {
     const db = getDb(':memory:');
     runMigrations(db);
     const session = ProfileSessionRepo.create(db, {
-      name: 'test', type: 'cpu', durationMs: 1000, totalSamples: 10,
+      name: 'test', profileType: 'cpu', durationMs: 1000, totalSamples: 10,
       hotspots: [], markdownRaw: '', pprofPath: '', flamegraphPath: '',
       traceIds: [], startedAt: '2026-01-01T00:00:00',
     });

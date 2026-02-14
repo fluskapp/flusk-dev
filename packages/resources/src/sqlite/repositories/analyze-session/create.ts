@@ -3,7 +3,7 @@ import type { AnalyzeSessionEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
- * Insert a new analyze session record
+ * Insert a new Analyze session record into SQLite
  */
 export function create(
   db: DatabaseSync,
@@ -11,8 +11,8 @@ export function create(
 ): AnalyzeSessionEntity {
   const stmt = db.prepare(`
     INSERT INTO analyze_sessions (
-      script, duration_ms, total_calls, total_cost,
-      models_used, started_at, completed_at
+      script, duration_ms, total_calls, total_cost, models_used,
+      started_at, completed_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?)
     RETURNING *
   `);

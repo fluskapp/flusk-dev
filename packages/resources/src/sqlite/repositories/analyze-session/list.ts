@@ -3,7 +3,7 @@ import type { AnalyzeSessionEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
- * List analyze sessions with pagination
+ * List Analyze sessions with pagination
  */
 export function list(
   db: DatabaseSync,

@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS performance_patterns (
   id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
   profile_session_id TEXT NOT NULL,
   pattern TEXT NOT NULL,
-  severity TEXT NOT NULL CHECK (severity IN ('critical', 'high', 'medium', 'low')),
+  severity TEXT NOT NULL,
   description TEXT NOT NULL,
   suggestion TEXT NOT NULL,
   metadata TEXT NOT NULL DEFAULT '{}',
@@ -11,5 +11,5 @@ CREATE TABLE IF NOT EXISTS performance_patterns (
   updated_at TEXT NOT NULL DEFAULT (datetime('now')),
   FOREIGN KEY (profile_session_id) REFERENCES profile_sessions(id)
 );
-CREATE INDEX IF NOT EXISTS idx_patterns_profile ON performance_patterns(profile_session_id);
-CREATE INDEX IF NOT EXISTS idx_patterns_severity ON performance_patterns(severity);
+CREATE INDEX IF NOT EXISTS idx_performance_patterns_profile_session_id ON performance_patterns(profile_session_id);
+CREATE INDEX IF NOT EXISTS idx_performance_patterns_created_at ON performance_patterns(created_at);

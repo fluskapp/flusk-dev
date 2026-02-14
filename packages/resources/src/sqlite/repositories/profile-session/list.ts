@@ -3,7 +3,7 @@ import type { ProfileSessionEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
- * List profile sessions with pagination
+ * List Profile sessions with pagination
  */
 export function list(
   db: DatabaseSync,

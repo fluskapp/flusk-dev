@@ -1,7 +1,7 @@
 import type { DatabaseSync } from 'node:sqlite';
 
 /**
- * Sum cost of LLM calls since a given ISO date string
+ * Sum cost of LLM calls since a given date
  */
 export function sumCostSince(db: DatabaseSync, since: string): number {
   const stmt = db.prepare(

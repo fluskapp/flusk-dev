@@ -3,7 +3,7 @@ import type { ProfileSessionEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
- * Find profile session by id
+ * Find Profile session by id
  */
 export function findById(
   db: DatabaseSync,
