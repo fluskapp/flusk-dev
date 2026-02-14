@@ -1,0 +1,82 @@
+/**
+ * Entity validation utilities for interactive prompts
+ */
+
+import { existsSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { toKebabCase } from '../generators/utils.js';
+
+export interface FieldDefinition {
+  name: string;
+  type: 'String' | 'Integer' | 'Number' | 'Boolean' | 'UUID' | 'Date' | 'Email';
+  required: boolean;
+  unique: boolean;
+  description?: string;
+}
+
+export interface EntityDefinition {
+  name: string;
+  fields: FieldDefinition[];
+}
+
+/**
+ * Validate entity name (must be PascalCase)
+ */
+export function validateEntityName(input: string): boolean | string {
+  if (!input || input.trim().length === 0) {
+    return 'Entity name is required';
+  }
+
+  // Check PascalCase (starts with uppercase, no spaces, no special chars except alphanumeric)
+  const pascalCasePattern = /^[A-Z][a-zA-Z0-9]*$/;
+  if (!pascalCasePattern.test(input)) {
+    return 'Entity name must be in PascalCase (e.g., User, LLMCall, OrderItem)';
+  }
+
+  return true;
+}
+
+/**
+ * Validate field name (must be camelCase)
+ */
+export function validateFieldName(input: string, existingFields: FieldDefinition[]): boolean | string {
+  if (!input || input.trim().length === 0) {
+    return 'Field name is required';
+  }
+
+  // Check camelCase (starts with lowercase, no spaces, no special chars except alphanumeric)
+  const camelCasePattern = /^[a-z][a-zA-Z0-9]*$/;
+  if (!camelCasePattern.test(input)) {
+    return 'Field name must be in camelCase (e.g., email, firstName, isActive)';
+  }
+
+  // Check for reserved keywords (TypeScript + SQL)
+  const reservedKeywords = [
+    'id', 'createdAt', 'updatedAt', // BaseEntity fields
+    'class', 'const', 'enum', 'export', 'extends', 'import', 'super', 'this', // TypeScript
+    'select', 'from', 'where', 'insert', 'update', 'delete', 'drop', 'create' // SQL
+  ];
+
+  if (reservedKeywords.includes(input.toLowerCase())) {
+    return `"${input}" is a reserved keyword. Please choose a different name.`;
+  }
+
+  // Check for duplicate field names
+  if (existingFields.some(f => f.name === input)) {
+    return `Field "${input}" already exists. Please choose a different name.`;
+  }
+
+  return true;
+}
+
+/**
+ * Check if entity file already exists
+ */
+export function checkEntityExists(entityName: string): boolean {
+  const entitiesDir = resolve(process.cwd(), 'packages/entities/src');
+  const kebabName = toKebabCase(entityName);
+  const fileName = `${kebabName}.entity.ts`;
+  const filePath = resolve(entitiesDir, fileName);
+
+  return existsSync(filePath);
+}

@@ -15,12 +15,12 @@ export function validateSpan(
   if (!entity.name) errors.push('name is required');
   if (!entity.type) {
     errors.push('type is required');
-  } else if (!VALID_TYPES.includes(entity.type as any)) {
+  } else if (!(VALID_TYPES as readonly string[]).includes(entity.type)) {
     errors.push('type must be llm, tool, retrieval, or chain');
   }
   if (!entity.status) {
     errors.push('status is required');
-  } else if (!VALID_STATUSES.includes(entity.status as any)) {
+  } else if (!(VALID_STATUSES as readonly string[]).includes(entity.status)) {
     errors.push('status must be running, completed, or failed');
   }
   if (!entity.startedAt) errors.push('startedAt is required');

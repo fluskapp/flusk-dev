@@ -1,4 +1,4 @@
-import type { FastifyRequest } from 'fastify';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { logAudit } from '@flusk/resources';
 import { ExportParams } from './types.js';
 
@@ -8,8 +8,8 @@ import { ExportParams } from './types.js';
  */
 export async function exportUserData(
   request: FastifyRequest<{ Params: ExportParams }>,
-  reply: any
-) {
+  reply: FastifyReply
+): Promise<void> {
   const { orgId } = request.params;
   const db = request.server.pg.pool;
 
@@ -49,7 +49,9 @@ export async function exportUserData(
     });
 
     return reply.send(exportData);
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+
     await logAudit({
       action: 'export',
       resource: 'organization_data',
@@ -59,10 +61,10 @@ export async function exportUserData(
       ipAddress: request.ip,
       userAgent: request.headers['user-agent'] || null,
       success: false,
-      errorMessage: error.message,
+      errorMessage: message,
       metadata: null
     });
 
-    return reply.status(500).send({ error: error.message });
+    return reply.status(500).send({ error: message });
   }
 }

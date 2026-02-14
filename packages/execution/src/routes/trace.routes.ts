@@ -18,7 +18,7 @@ export async function traceRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post('/', {
     schema: { body: CreateBody, response: { 201: TraceEntitySchema }, tags: ['Trace'] },
   }, async (req: FastifyRequest, reply: FastifyReply) => {
-    const { organizationId, name } = req.body as any;
+    const { organizationId, name } = req.body as { organizationId: string; name: string };
     const trace = await TraceRepository.create(pool, {
       organizationId, name, totalCost: 0, totalTokens: 0,
       totalLatencyMs: 0, callCount: 0, status: 'running',

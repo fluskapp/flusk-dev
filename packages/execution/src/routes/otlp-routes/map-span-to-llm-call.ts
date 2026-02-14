@@ -7,7 +7,21 @@ import type { ParsedLlmCall } from './types.js';
 
 const { calculateCost } = llmCall;
 
-export function mapSpanToLlmCall(parsed: ParsedLlmCall) {
+interface MappedLlmCall {
+  provider: string;
+  model: string;
+  prompt: string;
+  promptHash: string;
+  tokens: { input: number; output: number; total: number };
+  cost: number;
+  response: string;
+  cached: boolean;
+  organizationId: string;
+  consentGiven: boolean;
+  consentPurpose: string;
+}
+
+export function mapSpanToLlmCall(parsed: ParsedLlmCall): MappedLlmCall {
   const promptHash = createHash('sha256')
     .update(parsed.prompt + parsed.model)
     .digest('hex');

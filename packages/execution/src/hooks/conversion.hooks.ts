@@ -6,30 +6,30 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 
 /**
- * Example preHandler hook for Conversion
+ * Example preHandler hook for Uconversion
  * Add business logic hooks here
  */
-export async function validateConversionHook(
+export async function validateUconversionHook(
   _request: FastifyRequest,
   _reply: FastifyReply
 ): Promise<void> {
   // TODO: Add validation logic
   // Example:
-  // const body = request.body as any;
+  // const body = request.body as Record<string, unknown>;
   // if (!body.requiredField) {
   //   return reply.code(400).send({ error: 'requiredField is required' });
   // }
 }
 
 /**
- * Example onSend hook for Conversion
+ * Example onSend hook for Uconversion
  * Add post-processing logic here
  */
-export async function transformConversionHook(
-  request: FastifyRequest,
-  reply: FastifyReply,
-  payload: any
-): Promise<any> {
+export async function transformUconversionHook(
+  _request: FastifyRequest,
+  _reply: FastifyReply,
+  payload: unknown
+): Promise<unknown> {
   // TODO: Add transformation logic
   return payload;
 }

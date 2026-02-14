@@ -14,7 +14,7 @@ export function validateTrace(
   if (!entity.name) errors.push('name is required');
   if (!entity.status) {
     errors.push('status is required');
-  } else if (!VALID_STATUSES.includes(entity.status as any)) {
+  } else if (!(VALID_STATUSES as readonly string[]).includes(entity.status)) {
     errors.push('status must be running, completed, or failed');
   }
   if (!entity.startedAt) errors.push('startedAt is required');

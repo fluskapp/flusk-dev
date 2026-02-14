@@ -38,7 +38,7 @@ export function registerCreateLLMCall(fastify: FastifyInstance): void {
       // 3. Calculated cost
       // 4. Prepared llmCallData
 
-      const llmCallData = (request as any).llmCallData;
+      const llmCallData = request.llmCallData;
 
       if (!llmCallData) {
         return reply.code(400).send({ error: 'Invalid request data' });

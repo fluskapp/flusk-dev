@@ -45,7 +45,7 @@ export async function llmcallRoutes(
       }
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const data = request.body as any;
+      const data = request.body as Record<string, unknown>;
       const created = await LLMCallRepository.create(data);
       return reply.code(201).send(created);
     }

@@ -21,7 +21,7 @@ export async function validateOpenAiKey(key: string): Promise<OpenAiValidation> 
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      return { valid: false, models: [], error: (body as Record<string, any>).error?.message ?? `HTTP ${res.status}` };
+      return { valid: false, models: [], error: (body as { error?: { message?: string } }).error?.message ?? `HTTP ${res.status}` };
     }
     const body = (await res.json()) as { data: Array<{ id: string }> };
     const models = body.data.map((m) => m.id).filter((id) => id.startsWith('gpt'));
@@ -48,7 +48,7 @@ export async function validateAnthropicKey(key: string): Promise<AnthropicValida
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
-      const msg = (body as Record<string, any>).error?.message ?? `HTTP ${res.status}`;
+      const msg = (body as { error?: { message?: string } }).error?.message ?? `HTTP ${res.status}`;
       if (res.status === 401) return { valid: false, error: msg };
       // 400/429 still means the key is valid
     }

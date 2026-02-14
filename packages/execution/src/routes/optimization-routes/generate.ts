@@ -1,0 +1,28 @@
+import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { Type } from '@sinclair/typebox';
+import { OptimizationEntitySchema } from '@flusk/entities';
+import { OptimizationRepository } from '@flusk/resources';
+
+const ListResponseSchema = Type.Array(OptimizationEntitySchema);
+
+/** POST /optimizations/generate — generate optimization suggestions */
+export function registerGenerateRoute(fastify: FastifyInstance): void {
+  fastify.post(
+    '/generate',
+    {
+      schema: {
+        body: Type.Object({
+          organizationId: Type.String({ format: 'uuid' }),
+        }),
+        response: { 200: ListResponseSchema },
+        tags: ['Optimization'],
+        description: 'Generate optimization suggestions for an org',
+      }
+    },
+    async (request: FastifyRequest, reply: FastifyReply) => {
+      const { organizationId } = request.body as { organizationId: string };
+      const results = await OptimizationRepository.generateForOrg(fastify.pg.pool, organizationId);
+      return reply.code(200).send(results);
+    }
+  );
+}

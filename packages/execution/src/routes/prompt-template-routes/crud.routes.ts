@@ -12,7 +12,7 @@ export async function promptTemplateCrudRoutes(fastify: FastifyInstance): Promis
   fastify.post('/', {
     schema: { body: CreateSchema, response: { 201: PromptTemplateEntitySchema } },
   }, async (request: FastifyRequest, reply: FastifyReply) => {
-    const data = request.body as any;
+    const data = request.body as Record<string, unknown>;
     const validation = promptTemplate.validatePromptTemplate(data);
     if (!validation.valid) return reply.code(400).send({ error: validation.errors.join(', ') });
     const created = await PromptTemplateRepository.create(pool, data);
@@ -37,7 +37,7 @@ export async function promptTemplateCrudRoutes(fastify: FastifyInstance): Promis
   fastify.put('/:id', {
     schema: { params: Type.Object({ id: Type.String({ format: 'uuid' }) }) },
   }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    const updated = await PromptTemplateRepository.update(pool, request.params.id, request.body as any);
+    const updated = await PromptTemplateRepository.update(pool, request.params.id, request.body as Record<string, unknown>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.send(updated);
   });

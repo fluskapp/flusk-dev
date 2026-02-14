@@ -22,7 +22,7 @@ export const plugin = fp(async (app) => {
   `);
 
   const applied = await app.pg.query('SELECT name FROM _flusk_migrations');
-  const appliedSet = new Set(applied.rows.map((r: any) => r.name));
+  const appliedSet = new Set(applied.rows.map((r: { name: string }) => r.name));
 
   const files = (await readdir(migrationsDir))
     .filter((f: string) => f.endsWith('.sql'))

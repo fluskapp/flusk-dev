@@ -30,7 +30,7 @@ function detectProvider(model: string, system: string): string {
   return 'other';
 }
 
-export function parseReadableSpan(span: ReadableSpan) {
+export function parseReadableSpan(span: ReadableSpan): Record<string, unknown> | null {
   if (!isGenAiSpan(span)) return null;
 
   const model = getAttr(span, 'gen_ai.response.model') || getAttr(span, 'gen_ai.request.model');

@@ -17,7 +17,7 @@ export async function promptVersionCrudRoutes(fastify: FastifyInstance): Promise
       response: { 201: PromptVersionEntitySchema },
     },
   }, async (request: FastifyRequest, reply: FastifyReply) => {
-    const data = request.body as any;
+    const data = request.body as Record<string, unknown>;
     const validation = promptVersion.validatePromptVersion(data);
     if (!validation.valid) return reply.code(400).send({ error: validation.errors.join(', ') });
     const created = await PromptVersionRepository.create(pool, data);

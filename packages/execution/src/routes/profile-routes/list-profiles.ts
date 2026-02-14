@@ -6,7 +6,7 @@ import { ProfileSessionRepository } from '@flusk/resources';
  */
 export async function listProfilesRoute(app: FastifyInstance): Promise<void> {
   app.get('/', async (request, reply) => {
-    const { limit = '50', offset = '0' } = request.query as any;
+    const { limit = '50', offset = '0' } = request.query as Record<string, string>;
     const pool = app.pg.pool;
 
     const profiles = await ProfileSessionRepository.list(

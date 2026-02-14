@@ -4,8 +4,9 @@
  */
 import type { Pool } from 'pg';
 import type { OptimizationEntity } from '@flusk/entities';
+import type { OptimizationRow } from './optimization/types.js';
 
-function rowToEntity(row: any): OptimizationEntity {
+function rowToEntity(row: OptimizationRow): OptimizationEntity {
   return {
     id: row.id,
     organizationId: row.organization_id,
@@ -70,7 +71,7 @@ export async function update(
   data: Partial<Omit<OptimizationEntity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<OptimizationEntity | null> {
   const sets: string[] = ['updated_at = NOW()'];
-  const vals: any[] = [];
+  const vals: unknown[] = [];
   let i = 1;
 
   if (data.status !== undefined) {

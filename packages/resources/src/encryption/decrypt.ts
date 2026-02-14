@@ -73,7 +73,7 @@ export function decrypt(ciphertext: string, encryptionKey?: string): string {
  * @param encryptionKey - Optional encryption key (defaults to env var)
  * @returns New object with decrypted fields
  */
-export function decryptFields<T extends Record<string, any>>(
+export function decryptFields<T extends Record<string, unknown>>(
   data: T,
   fields: (keyof T)[],
   encryptionKey?: string

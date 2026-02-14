@@ -15,7 +15,7 @@ export async function update(
   data: Partial<Omit<ConversionEntity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<ConversionEntity | null> {
   const updates: string[] = [];
-  const values: any[] = [];
+  const values: unknown[] = [];
   let paramCount = 1;
 
   if (data.patternId !== undefined) {

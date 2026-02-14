@@ -8,7 +8,7 @@ import { exportUserData } from './export-user-data.js';
  * - Right to data portability (export all org data)
  */
 // eslint-disable-next-line no-restricted-syntax -- Fastify route registration pattern
-export default async function gdprRoutes(fastify: FastifyInstance) {
+export default async function gdprRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.delete('/gdpr/user/:orgId', deleteUserData);
   fastify.get('/gdpr/user/:orgId/data', exportUserData);
 }

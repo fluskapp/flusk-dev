@@ -16,7 +16,7 @@ export interface AuditLogEntry {
   userAgent: string | null;
   success: boolean;
   errorMessage: string | null;
-  metadata: Record<string, any> | null;
+  metadata: Record<string, unknown> | null;
 }
 
 /**

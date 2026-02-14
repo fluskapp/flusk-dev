@@ -5,7 +5,13 @@
 import type { Pool } from 'pg';
 import type { PromptVersionEntity } from '@flusk/entities';
 
-function rowToEntity(row: any): PromptVersionEntity {
+interface PvRow {
+  id: string; template_id: string; version: number; content: string;
+  metrics: string | Record<string, unknown>; status: string;
+  created_at: { toISOString(): string };
+}
+
+function rowToEntity(row: PvRow): PromptVersionEntity {
   return {
     id: row.id,
     templateId: row.template_id,
@@ -61,10 +67,10 @@ export async function findByTemplateId(
 export async function update(
   pool: Pool,
   id: string,
-  data: Partial<{ status: string; metrics: any }>
+  data: Partial<{ status: string; metrics: Record<string, unknown> }>
 ): Promise<PromptVersionEntity | null> {
   const sets: string[] = [];
-  const vals: any[] = [];
+  const vals: unknown[] = [];
   let idx = 1;
 
   if (data.status !== undefined) { sets.push(`status = $${idx}`); vals.push(data.status); idx++; }

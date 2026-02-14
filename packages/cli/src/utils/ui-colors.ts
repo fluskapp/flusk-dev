@@ -1,0 +1,41 @@
+import chalk from 'chalk';
+
+/** Flusk brand color palette */
+export const colors = {
+  primary: '#0066CC',
+  success: '#00CC66',
+  warning: '#FFAA00',
+  error: '#CC0000',
+  gray: '#5C6370',
+  cyan: '#56B6C2',
+} as const;
+
+/** Chalk color functions with brand colors */
+export const ui = {
+  info: chalk.hex(colors.primary),
+  success: chalk.hex(colors.success),
+  warning: chalk.hex(colors.warning),
+  error: chalk.hex(colors.error),
+  header: chalk.bold.hex(colors.primary),
+  subheader: chalk.hex(colors.primary),
+  muted: chalk.dim,
+  highlight: chalk.bold.hex(colors.warning),
+  code: chalk.hex(colors.cyan),
+  separator: chalk.gray,
+} as const;
+
+/** Status indicators with emoji */
+export const icons = {
+  success: '✅',
+  error: '❌',
+  warning: '⚠️',
+  info: 'ℹ️',
+  pending: '⏳',
+  tip: '💡',
+  tool: '🔧',
+  package: '📦',
+  database: '🗄️',
+  docker: '🐳',
+  launch: '🚀',
+  complete: '✨',
+} as const;

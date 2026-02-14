@@ -5,7 +5,13 @@
 import type { Pool } from 'pg';
 import type { PromptTemplateEntity } from '@flusk/entities';
 
-function rowToEntity(row: any): PromptTemplateEntity {
+interface PtRow {
+  id: string; organization_id: string; name: string; description: string;
+  active_version_id: string; variables: string[];
+  created_at: { toISOString(): string }; updated_at: { toISOString(): string };
+}
+
+function rowToEntity(row: PtRow): PromptTemplateEntity {
   return {
     id: row.id,
     organizationId: row.organization_id,
@@ -55,7 +61,7 @@ export async function update(
   data: Partial<Omit<PromptTemplateEntity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<PromptTemplateEntity | null> {
   const sets: string[] = ['updated_at = NOW()'];
-  const vals: any[] = [];
+  const vals: unknown[] = [];
   let idx = 1;
 
   if (data.name !== undefined) { sets.push(`name = $${idx}`); vals.push(data.name); idx++; }

@@ -15,7 +15,7 @@ export async function update(
   data: Partial<Omit<LLMCallEntity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<LLMCallEntity | null> {
   const updates: string[] = [];
-  const values: any[] = [];
+  const values: unknown[] = [];
   let paramCount = 1;
 
   if (data.provider !== undefined) {

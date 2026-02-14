@@ -123,7 +123,7 @@ export const initCommand = new Command('init')
           await execAsync('pnpm install', { cwd: targetDir });
           console.log(chalk.green('✅ Installed dependencies'));
         } catch (_error) {
-          if ((error as any).code === 'ENOENT') {
+          if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
             console.log(chalk.yellow('⚠️  pnpm not found, skipping dependency installation'));
             console.log(chalk.yellow('   Install pnpm globally: npm install -g pnpm'));
           } else {

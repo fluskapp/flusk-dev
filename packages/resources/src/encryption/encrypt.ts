@@ -70,7 +70,7 @@ export function encrypt(plaintext: string, encryptionKey?: string): string {
  * @param encryptionKey - Optional encryption key (defaults to env var)
  * @returns New object with encrypted fields
  */
-export function encryptFields<T extends Record<string, any>>(
+export function encryptFields<T extends Record<string, unknown>>(
   data: T,
   fields: (keyof T)[],
   encryptionKey?: string

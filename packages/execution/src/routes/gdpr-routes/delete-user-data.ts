@@ -1,4 +1,4 @@
-import type { FastifyRequest } from 'fastify';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import { logAudit } from '@flusk/resources';
 import { DeleteParams } from './types.js';
 
@@ -8,8 +8,8 @@ import { DeleteParams } from './types.js';
  */
 export async function deleteUserData(
   request: FastifyRequest<{ Params: DeleteParams }>,
-  reply: any
-) {
+  reply: FastifyReply
+): Promise<void> {
   const { orgId } = request.params;
   const db = request.server.pg.pool;
 
@@ -52,8 +52,9 @@ export async function deleteUserData(
         conversions: conversionsResult.rowCount
       }
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     await db.query('ROLLBACK');
+    const message = error instanceof Error ? error.message : 'Unknown error';
 
     await logAudit({
       action: 'delete_all',
@@ -64,10 +65,10 @@ export async function deleteUserData(
       ipAddress: request.ip,
       userAgent: request.headers['user-agent'] || null,
       success: false,
-      errorMessage: error.message,
+      errorMessage: message,
       metadata: null
     });
 
-    return reply.status(500).send({ error: error.message });
+    return reply.status(500).send({ error: message });
   }
 }

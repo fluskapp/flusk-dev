@@ -23,7 +23,7 @@ export async function spanRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post('/', {
     schema: { body: CreateBody, response: { 201: SpanEntitySchema }, tags: ['Span'] },
   }, async (req: FastifyRequest, reply: FastifyReply) => {
-    const data = req.body as any;
+    const data = req.body as Record<string, unknown>;
     const span = await SpanRepository.create(pool, {
       ...data, parentSpanId: data.parentSpanId ?? null,
       output: null, cost: 0, tokens: 0, latencyMs: 0,
@@ -59,7 +59,7 @@ export async function spanRoutes(fastify: FastifyInstance): Promise<void> {
       tags: ['Span'],
     },
   }, async (req: FastifyRequest<{ Params: { id: string } }>, reply) => {
-    const { output, cost, tokens } = req.body as any;
+    const { output, cost, tokens } = req.body as { output?: string; cost?: number; tokens?: Record<string, unknown> };
     const existing = await SpanRepository.findById(pool, req.params.id);
     if (!existing) return reply.code(404).send({ error: 'Span not found' });
     const now = new Date().toISOString();

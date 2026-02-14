@@ -77,7 +77,7 @@ export async function patternRoutes(
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const created = await PatternRepository.create(request.body as any);
+      const created = await PatternRepository.create(request.body as Record<string, unknown>);
       return reply.code(201).send(created);
     }
   );

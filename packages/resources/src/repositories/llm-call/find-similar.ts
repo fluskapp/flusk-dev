@@ -34,9 +34,9 @@ export async function findSimilar(
 
   const result = await pool.query(query, [vectorStr, maxDistance, limit]);
 
-  return result.rows.map((row: any) => ({
-    call: rowToEntity(row),
-    similarity: parseFloat(row.similarity),
+  return result.rows.map((row: Record<string, unknown>) => ({
+    call: rowToEntity(row as Parameters<typeof rowToEntity>[0]),
+    similarity: parseFloat(row.similarity as string),
   }));
 }
 

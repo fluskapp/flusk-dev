@@ -35,10 +35,10 @@ export async function validate${pascalName}Hook(
  * Add post-processing logic here
  */
 export async function transform${pascalName}Hook(
-  request: FastifyRequest,
-  reply: FastifyReply,
-  payload: any
-): Promise<any> {
+  _request: FastifyRequest,
+  _reply: FastifyReply,
+  payload: unknown
+): Promise<unknown> {
   // TODO: Add transformation logic
   return payload;
 }

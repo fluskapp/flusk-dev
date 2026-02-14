@@ -56,7 +56,7 @@ export const profileReportCommand = new Command('report')
     const profileRes = await request(
       `${opts.endpoint}/v1/profiles/${sessionId}`, { headers },
     );
-    const profile = (await profileRes.body.json()) as any;
+    const profile = (await profileRes.body.json()) as Record<string, unknown>;
 
     if (profile.error) {
       console.error(chalk.red(`Error: ${profile.error}`));

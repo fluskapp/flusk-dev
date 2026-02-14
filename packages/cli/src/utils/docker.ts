@@ -171,7 +171,7 @@ function mapHealth(health: string): ServiceStatus['health'] {
 /**
  * Parse Docker port mappings
  */
-function parsePorts(publishers: any[]): string[] {
+function parsePorts(publishers: Record<string, unknown>[]): string[] {
   if (!Array.isArray(publishers)) return [];
   
   return publishers.map(p => {

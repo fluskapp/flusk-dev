@@ -28,11 +28,11 @@ export async function update(
   data: UpdatableFields
 ): Promise<ProfileSessionEntity | null> {
   const updates: string[] = [];
-  const values: any[] = [];
+  const values: unknown[] = [];
   let paramCount = 1;
 
   for (const [key, col] of Object.entries(FIELD_MAP)) {
-    const val = (data as any)[key];
+    const val = (data as Record<string, unknown>)[key];
     if (val !== undefined) {
       updates.push(`${col} = $${paramCount++}`);
       values.push(key === 'hotspots' ? JSON.stringify(val) : val);

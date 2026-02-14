@@ -5,7 +5,15 @@
 import type { Pool } from 'pg';
 import { SpanEntity } from '@flusk/entities';
 
-function rowToEntity(row: any): SpanEntity {
+interface SpanRow {
+  id: string; trace_id: string; parent_span_id?: string; type: string; name: string;
+  input?: string; output?: string; cost: string; tokens: string; latency_ms: string;
+  status: string; started_at: { toISOString(): string };
+  completed_at?: { toISOString(): string }; created_at: { toISOString(): string };
+  updated_at: { toISOString(): string };
+}
+
+function rowToEntity(row: SpanRow): SpanEntity {
   return {
     id: row.id,
     traceId: row.trace_id,
@@ -74,7 +82,7 @@ export async function update(
   data: Partial<Omit<SpanEntity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<SpanEntity | null> {
   const sets: string[] = ['updated_at = NOW()'];
-  const vals: any[] = [];
+  const vals: unknown[] = [];
   let i = 1;
   if (data.status) { sets.push(`status = $${i++}`); vals.push(data.status); }
   if (data.completedAt) { sets.push(`completed_at = $${i++}`); vals.push(data.completedAt); }

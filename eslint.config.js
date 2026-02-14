@@ -71,6 +71,7 @@ export default [
   {
     // Relaxed rules for CLI templates/generators (they generate code, can be longer)
     files: ['packages/cli/**/*.ts'],
+    ignores: ['**/*.test.ts'],
     rules: {
       'max-lines': ['warn', { max: 150, skipBlankLines: true, skipComments: true }],
       'no-restricted-imports': 'off', // Templates contain string literals, not real imports

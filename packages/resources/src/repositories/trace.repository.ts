@@ -5,7 +5,14 @@
 import type { Pool } from 'pg';
 import { TraceEntity } from '@flusk/entities';
 
-function rowToEntity(row: any): TraceEntity {
+interface TraceRow {
+  id: string; organization_id: string; name: string; total_cost: string;
+  total_tokens: string; total_latency_ms: string; call_count: string; status: string;
+  started_at: { toISOString(): string }; completed_at?: { toISOString(): string };
+  created_at: { toISOString(): string }; updated_at: { toISOString(): string };
+}
+
+function rowToEntity(row: TraceRow): TraceEntity {
   return {
     id: row.id,
     organizationId: row.organization_id,
@@ -76,7 +83,7 @@ export async function update(
   data: Partial<Omit<TraceEntity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<TraceEntity | null> {
   const sets: string[] = ['updated_at = NOW()'];
-  const vals: any[] = [];
+  const vals: unknown[] = [];
   let i = 1;
   if (data.status) { sets.push(`status = $${i++}`); vals.push(data.status); }
   if (data.completedAt) { sets.push(`completed_at = $${i++}`); vals.push(data.completedAt); }

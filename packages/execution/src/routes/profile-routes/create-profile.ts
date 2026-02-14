@@ -7,7 +7,7 @@ import { profileSession } from '@flusk/business-logic';
  */
 export async function createProfileRoute(app: FastifyInstance): Promise<void> {
   app.post('/', async (request, reply) => {
-    const body = request.body as any;
+    const body = request.body as Record<string, unknown>;
     const pool = app.pg.pool;
 
     const hotspots = body.markdownRaw
@@ -15,7 +15,7 @@ export async function createProfileRoute(app: FastifyInstance): Promise<void> {
       : body.hotspots ?? [];
 
     const totalSamples = hotspots.reduce(
-      (sum: number, h: any) => sum + h.samples, 0
+      (sum: number, h: { samples: number }) => sum + h.samples, 0
     );
 
     const entity = await ProfileSessionRepository.create(pool, {

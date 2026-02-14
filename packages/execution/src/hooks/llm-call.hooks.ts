@@ -4,6 +4,35 @@ import { RedisClient } from '@flusk/resources';
 
 const { hashPrompt, calculateCost } = llmCall;
 
+interface LlmCallBody {
+  provider: string;
+  model: string;
+  prompt: string;
+  tokens: { input: number; output: number; total: number };
+  response: string;
+}
+
+interface LlmCallData {
+  provider: string;
+  model: string;
+  prompt: string;
+  promptHash: string;
+  tokens: { input: number; output: number; total: number };
+  cost: number;
+  response: string;
+  cached: boolean;
+  organizationId: string;
+  consentGiven: boolean;
+  consentPurpose: string;
+}
+
+declare module 'fastify' {
+  interface FastifyRequest {
+    promptHash?: string;
+    llmCallData?: LlmCallData;
+  }
+}
+
 /**
  * Hash prompt and attach to request for deduplication
  */
@@ -16,7 +45,7 @@ export async function hashPromptHook(
     promptText: body.prompt,
     modelName: body.model,
   });
-  (request as any).promptHash = promptHash;
+  request.promptHash = promptHash;
 }
 
 /**
@@ -26,7 +55,7 @@ export async function checkCacheHook(
   request: FastifyRequest,
   reply: FastifyReply
 ): Promise<void> {
-  const hash = (request as any).promptHash as string;
+  const hash = request.promptHash;
   if (!hash) return;
 
   try {
@@ -50,14 +79,8 @@ export async function calculateCostHook(
   request: FastifyRequest,
   _reply: FastifyReply
 ): Promise<void> {
-  const body = request.body as {
-    provider: string;
-    model: string;
-    prompt: string;
-    tokens: { input: number; output: number; total: number };
-    response: string;
-  };
-  const hash = (request as any).promptHash as string;
+  const body = request.body as LlmCallBody;
+  const hash = request.promptHash ?? '';
 
   const { costUsd } = calculateCost({
     providerName: body.provider,
@@ -65,7 +88,7 @@ export async function calculateCostHook(
     tokenUsage: body.tokens,
   });
 
-  (request as any).llmCallData = {
+  request.llmCallData = {
     provider: body.provider,
     model: body.model,
     prompt: body.prompt,
@@ -88,7 +111,7 @@ export async function cacheResponseHook(
   _reply: FastifyReply,
   payload: string
 ): Promise<string> {
-  const hash = (request as any).promptHash as string;
+  const hash = request.promptHash;
   const body = request.body as { response?: string };
   if (hash && body?.response) {
     RedisClient.cacheResponse(hash, body.response).catch(() => {});
