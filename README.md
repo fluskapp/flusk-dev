@@ -53,16 +53,16 @@ That's it. No accounts, no API keys, no config files. Flusk intercepts every LLM
 ├──────────────┬──────────┬───────────┬────────────┤
 │ Model        │ Calls    │ Tokens    │ Cost       │
 ├──────────────┼──────────┼───────────┼────────────┤
-│ gpt-4        │ 47       │ 125,340   │ $3.76      │
-│ gpt-4o-mini  │ 112      │ 89,200    │ $0.13      │
-│ claude-3.5   │ 23       │ 67,800    │ $0.81      │
+│ gpt-5.2      │ 47       │ 125,340   │ $3.76      │
+│ gpt-5.2-mini │ 112      │ 89,200    │ $0.13      │
+│ claude-4.6   │ 23       │ 67,800    │ $0.81      │
 ├──────────────┼──────────┼───────────┼────────────┤
 │ Total        │ 182      │ 282,340   │ $4.70      │
 └──────────────┴──────────┴───────────┴────────────┘
 
 ⚠ Optimization Suggestions:
   → 12 duplicate prompts detected (saving ~$0.89/day)
-  → 31 gpt-4 calls could use gpt-4o-mini (saving ~$2.10/day)
+  → 31 gpt-5.2 calls could use gpt-5.2-mini (saving ~$2.10/day)
   → Consider caching for repeated classification calls
 
 💰 Estimated monthly savings: $89.70
@@ -119,7 +119,7 @@ Your bill doubled overnight. Run Flusk against your production app and immediate
 An autonomous agent stuck in a loop can burn hundreds of dollars in minutes. Flusk's budget alerts + live cost-per-second monitoring catch this before it gets expensive.
 
 **📊 Compare model performance before switching**
-Thinking about moving from GPT-4 to Claude 3.5 Sonnet? Run both side by side with Flusk, compare cost, latency, and token usage per call. Make data-driven model decisions.
+Thinking about moving from GPT-5.2 to Claude Sonnet 4.5? Run both side by side with Flusk, compare cost, latency, and token usage per call. Make data-driven model decisions.
 
 **🔄 Optimize prompt caching**
 Flusk detects duplicate and near-duplicate prompts automatically. See exactly which prompts repeat, how often, and how much you'd save with caching. Then implement caching and verify the savings.
@@ -246,8 +246,8 @@ OTLP Export → Grafana Tempo / Datadog / New Relic / Custom
 
 | Provider | Models | Status |
 |----------|--------|--------|
-| **OpenAI** | GPT-4, GPT-4o, GPT-4o-mini, GPT-3.5, o1, o3 | ✅ Supported |
-| **Anthropic** | Claude 3.5, Claude 3, Claude Opus/Sonnet/Haiku | ✅ Supported |
+| **OpenAI** | GPT-5.2, GPT-5.1, GPT-5.2-mini, o3-pro, o3-mini | ✅ Supported |
+| **Anthropic** | Claude Opus 4.6, Sonnet 4.5, Sonnet 4, Haiku 3.5 | ✅ Supported |
 | **AWS Bedrock** | All Bedrock-hosted models | ✅ Supported |
 | **Azure OpenAI** | All Azure-hosted OpenAI models | 🔜 Planned |
 | **Google Vertex AI** | Gemini models | 🔜 Planned |
@@ -336,7 +336,7 @@ const openai = new OpenAI();
 
 app.post('/api/chat', async (req, res) => {
   const completion = await openai.chat.completions.create({
-    model: 'gpt-4o',
+    model: 'gpt-5.2',
     messages: req.body.messages,
   });
   res.json(completion);
@@ -363,7 +363,7 @@ const anthropic = new Anthropic();
 
 app.post('/api/summarize', async (request, reply) => {
   const result = await anthropic.messages.create({
-    model: 'claude-3-5-sonnet-20241022',
+    model: 'claude-sonnet-4-5-20250514',
     max_tokens: 1024,
     messages: [{ role: 'user', content: request.body.text }],
   });
@@ -390,7 +390,7 @@ export class ChatService {
 
   async chat(messages: ChatMessage[]): Promise<string> {
     const completion = await this.openai.chat.completions.create({
-      model: 'gpt-4o-mini',
+      model: 'gpt-5.2-mini',
       messages,
     });
     return completion.choices[0].message.content;
@@ -418,7 +418,7 @@ const openai = new OpenAI();
 export async function POST(req: Request) {
   const { messages } = await req.json();
   const completion = await openai.chat.completions.create({
-    model: 'gpt-4o',
+    model: 'gpt-5.2',
     messages,
     stream: true,
   });
@@ -445,7 +445,7 @@ const anthropic = new Anthropic();
 app.post('/ask', async (c) => {
   const { question } = await c.req.json();
   const msg = await anthropic.messages.create({
-    model: 'claude-3-haiku-20240307',
+    model: 'claude-haiku-3-5-20250620',
     max_tokens: 256,
     messages: [{ role: 'user', content: question }],
   });
@@ -474,7 +474,7 @@ export const appRouter = t.router({
     .input(z.object({ prompt: z.string() }))
     .mutation(async ({ input }) => {
       return openai.chat.completions.create({
-        model: 'gpt-4o-mini',
+        model: 'gpt-5.2-mini',
         messages: [{ role: 'user', content: input.prompt }],
       });
     }),
@@ -494,7 +494,7 @@ node --import @flusk/otel ./agent.js
 import { ChatOpenAI } from '@langchain/openai';
 import { AgentExecutor, createOpenAIToolsAgent } from 'langchain/agents';
 
-const llm = new ChatOpenAI({ modelName: 'gpt-4o' });
+const llm = new ChatOpenAI({ modelName: 'gpt-5.2' });
 const agent = await createOpenAIToolsAgent({ llm, tools, prompt });
 const executor = new AgentExecutor({ agent, tools });
 
