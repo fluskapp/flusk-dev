@@ -128,3 +128,15 @@ pnpm lint       # ESLint
 5. Don't edit `@generated` files — regenerate with CLI
 6. Use `@flusk/logger` for all logging
 7. 2026 tools only — no deprecated APIs
+
+## AI Agent Behavioral Rules
+
+These rules are **non-negotiable** for any AI agent working on this repo:
+
+1. **No shortcuts.** Never fake metrics (e.g., adding `@generated` headers to hand-written files). If the generator can't produce quality code, fix the generator or leave the file as-is.
+2. **No unauthorized changes.** Only do what was explicitly asked. If something seems like a good idea but wasn't requested, mention it and ask — don't just do it.
+3. **Honesty over numbers.** A real 30% generator ratio is better than a fake 100%. Report the truth.
+4. **If you can't do it right, say so.** Don't paper over problems. If a generator produces broken output, report it as a limitation.
+5. **Verify your work.** Run `pnpm test` and `pnpm lint` after every change. If tests fail, fix them or revert.
+6. **Preserve existing quality.** Never replace working code with worse generated code. The bar is: generated >= hand-written.
+7. **Ask before bulk operations.** Changing 100+ files? Describe what you'll do first and get confirmation.
