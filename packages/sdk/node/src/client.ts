@@ -133,7 +133,7 @@ export class FluskClient {
         body: JSON.stringify({ ...abTest, variables }),
       })
       if (!response.ok) throw new Error(`renderPrompt failed: ${response.status} ${await response.text()}`)
-      return response.json() as any
+      return response.json() as Promise<{ rendered: string; versionId: string; isCandidate?: boolean }>
     }
     const response = await fetch(`${this.baseUrl}/api/v1/prompt-templates/${templateId}/render`, {
       method: 'POST',
@@ -141,7 +141,7 @@ export class FluskClient {
       body: JSON.stringify({ variables }),
     })
     if (!response.ok) throw new Error(`renderPrompt failed: ${response.status} ${await response.text()}`)
-    return response.json() as any
+    return response.json() as Promise<{ rendered: string; versionId: string; isCandidate?: boolean }>
   }
 
   /**

@@ -4,7 +4,7 @@ export interface TracingConfig {
   organizationId: string;
 }
 
-async function post(config: TracingConfig, path: string, body: unknown): Promise<any> {
+async function post(config: TracingConfig, path: string, body: unknown): Promise<Record<string, unknown>> {
   const base = config.baseUrl || 'https://api.flusk.ai';
   const res = await fetch(`${base}${path}`, {
     method: 'POST',
@@ -43,7 +43,7 @@ export class Span {
       traceId: this.traceId, parentSpanId: this.options.parentSpanId ?? null,
       type: this.options.type, name: this.name, input: this.options.input ?? null,
     });
-    this.id = res.id;
+    this.id = res.id as string;
     return this;
   }
 
@@ -69,7 +69,7 @@ export class Trace {
     const res = await post(this.config, '/api/v1/traces', {
       organizationId: this.config.organizationId, name: this.name,
     });
-    this.id = res.id;
+    this.id = res.id as string;
     return this;
   }
 

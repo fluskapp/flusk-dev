@@ -22,7 +22,7 @@ export function getConnection(): Redis {
         const delay = Math.min(times * 50, 2000);
         return delay;
       },
-      lazyConnect: false
+      lazyConnect: true
     });
 
     redisClient.on('error', (err) => {

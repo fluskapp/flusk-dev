@@ -1,13 +1,12 @@
 import type { ProfileSessionEntity, HotspotEntry } from '@flusk/entities';
+import { toISOString } from '../../../shared/map-row.js';
 
-/**
- * Convert SQLite row to ProfileSessionEntity
- */
+/** Convert SQLite row to ProfileSessionEntity */
 export function rowToEntity(row: Record<string, unknown>): ProfileSessionEntity {
   return {
     id: row.id as string,
-    createdAt: row.created_at as string,
-    updatedAt: row.updated_at as string,
+    createdAt: toISOString(row.created_at),
+    updatedAt: toISOString(row.updated_at),
     name: row.name as string,
     type: row.type as 'cpu' | 'heap',
     durationMs: row.duration_ms as number,
@@ -18,6 +17,6 @@ export function rowToEntity(row: Record<string, unknown>): ProfileSessionEntity 
     flamegraphPath: row.flamegraph_path as string,
     traceIds: JSON.parse(row.trace_ids as string) as string[],
     organizationId: (row.organization_id as string) ?? undefined,
-    startedAt: row.started_at as string,
+    startedAt: toISOString(row.started_at),
   };
 }

@@ -36,29 +36,29 @@ export {
 } from './routing-decision.types.js';
 
 export {
-  type TraceEntity as TraceEntityType, type TraceInsert, type TraceUpdate, type TraceQuery,
+  type TraceEntity, type TraceInsert, type TraceUpdate, type TraceQuery,
   TraceEntityJSONSchema, TraceInsertSchema, TraceUpdateSchema, TraceQuerySchema
 } from './trace.types.js';
 
 export {
-  type SpanEntity as SpanEntityType, type SpanInsert, type SpanUpdate, type SpanQuery,
+  type SpanEntity, type SpanInsert, type SpanUpdate, type SpanQuery,
   SpanEntityJSONSchema, SpanInsertSchema, SpanUpdateSchema, SpanQuerySchema
 } from './span.types.js';
 
 export {
-  type OptimizationEntity as OptimizationEntityType,
+  type OptimizationEntity,
   type OptimizationInsert, type OptimizationUpdate, type OptimizationQuery,
   OptimizationEntityJSONSchema, OptimizationInsertSchema, OptimizationUpdateSchema, OptimizationQuerySchema
 } from './optimization.types.js';
 
 export {
-  type PromptTemplateEntity as PromptTemplateEntityType,
+  type PromptTemplateEntity,
   type PromptTemplateInsert, type PromptTemplateUpdate, type PromptTemplateQuery,
   PromptTemplateEntityJSONSchema, PromptTemplateInsertSchema, PromptTemplateUpdateSchema, PromptTemplateQuerySchema
 } from './prompt-template.types.js';
 
 export {
-  type ProfileSessionEntity as ProfileSessionEntityType,
+  type ProfileSessionEntity,
   type ProfileSessionInsert, type ProfileSessionUpdate, type ProfileSessionQuery,
   type HotspotEntry,
   ProfileSessionEntityJSONSchema, ProfileSessionInsertSchema, ProfileSessionUpdateSchema, ProfileSessionQuerySchema,
@@ -66,21 +66,30 @@ export {
 } from './profile-session.types.js';
 
 export {
-  type PerformancePatternEntity as PerformancePatternEntityType,
+  type PerformancePatternEntity,
   type PerformancePatternInsert, type PerformancePatternUpdate, type PerformancePatternQuery,
   PerformancePatternEntityJSONSchema, PerformancePatternInsertSchema,
   PerformancePatternUpdateSchema, PerformancePatternQuerySchema,
 } from './performance-pattern.types.js';
 
 export {
-  type AnalyzeSessionEntity as AnalyzeSessionEntityType,
+  type AnalyzeSessionEntity,
   type AnalyzeSessionInsert, type AnalyzeSessionUpdate, type AnalyzeSessionQuery,
   AnalyzeSessionEntityJSONSchema, AnalyzeSessionInsertSchema,
   AnalyzeSessionUpdateSchema, AnalyzeSessionQuerySchema,
 } from './analyze-session.types.js';
 
 export {
-  type PromptVersionEntity as PromptVersionEntityType,
+  type PromptVersionEntity,
   type PromptVersionInsert, type PromptVersionUpdate, type PromptVersionQuery,
   PromptVersionEntityJSONSchema, PromptVersionInsertSchema, PromptVersionUpdateSchema, PromptVersionQuerySchema
 } from './prompt-version.types.js';
+
+export type {
+  BudgetLimits,
+  UsageData,
+  BudgetPeriod,
+  BudgetStatus,
+  PerCallAlert,
+  DuplicateAlert,
+} from './budget.types.js';

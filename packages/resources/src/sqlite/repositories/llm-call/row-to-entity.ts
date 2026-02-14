@@ -1,13 +1,12 @@
 import type { LLMCallEntity, TokenUsage } from '@flusk/entities';
+import { toISOString } from '../../../shared/map-row.js';
 
-/**
- * Convert SQLite row to LLMCallEntity
- */
+/** Convert SQLite row to LLMCallEntity */
 export function rowToEntity(row: Record<string, unknown>): LLMCallEntity {
   return {
     id: row.id as string,
-    createdAt: row.created_at as string,
-    updatedAt: row.updated_at as string,
+    createdAt: toISOString(row.created_at),
+    updatedAt: toISOString(row.updated_at),
     provider: row.provider as string,
     model: row.model as string,
     prompt: row.prompt as string,

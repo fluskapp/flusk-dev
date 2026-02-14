@@ -1,4 +1,4 @@
-import { Pool } from 'pg';
+import { getPool } from '../db/pool.js';
 
 /**
  * Audit log entry for SOC2 compliance
@@ -17,29 +17,6 @@ export interface AuditLogEntry {
   success: boolean;
   errorMessage: string | null;
   metadata: Record<string, unknown> | null;
-}
-
-/**
- * PostgreSQL connection pool singleton
- */
-let pool: Pool | null = null;
-
-function getPool(): Pool {
-  if (!pool) {
-    const connectionString = process.env.DATABASE_URL;
-    if (!connectionString) {
-      throw new Error('DATABASE_URL environment variable is required');
-    }
-
-    pool = new Pool({
-      connectionString,
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 2000
-    });
-  }
-
-  return pool;
 }
 
 /**

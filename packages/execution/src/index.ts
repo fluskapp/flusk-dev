@@ -27,3 +27,8 @@ export {
   calculateCostHook,
   cacheResponseHook
 } from './hooks/llm-call.hooks.js';
+
+// OTLP parsing exports (used by CLI analyze-receiver)
+export { isGenAiSpan, parseLlmSpan } from './routes/otlp-routes/parse-llm-span.js';
+export { mapSpanToLlmCall } from './routes/otlp-routes/map-span-to-llm-call.js';
+export type { OtlpTraceRequest, OtlpSpan, ParsedLlmCall } from './routes/otlp-routes/types.js';

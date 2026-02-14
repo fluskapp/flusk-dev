@@ -1,13 +1,12 @@
 import type { PerformancePatternEntity } from '@flusk/entities';
+import { toISOString } from '../../../shared/map-row.js';
 
-/**
- * Convert SQLite row to PerformancePatternEntity
- */
+/** Convert SQLite row to PerformancePatternEntity */
 export function rowToEntity(row: Record<string, unknown>): PerformancePatternEntity {
   return {
     id: row.id as string,
-    createdAt: row.created_at as string,
-    updatedAt: row.updated_at as string,
+    createdAt: toISOString(row.created_at),
+    updatedAt: toISOString(row.updated_at),
     profileSessionId: row.profile_session_id as string,
     pattern: row.pattern as string,
     severity: row.severity as 'critical' | 'high' | 'medium' | 'low',

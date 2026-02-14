@@ -1,10 +1,6 @@
 export { parseFlameMarkdown } from './parse-flame-markdown.function.js';
 export { correlateWithTraces } from './correlate-with-traces.function.js';
 export { generateProfileSuggestions } from './generate-profile-suggestions.function.js';
-export { detectHotPathCalls } from './detect-hot-path-calls.function.js';
-export { detectSerializationWaste } from './detect-serialization-waste.function.js';
-export { detectMemoryChurn } from './detect-memory-churn.function.js';
-export { detectColdStart } from './detect-cold-start.function.js';
 export { detectPatterns } from './detect-patterns.function.js';
 export type { DetectedPattern } from './detect-patterns.function.js';
 export { scoreSuggestions } from './score-suggestions.function.js';

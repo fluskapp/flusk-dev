@@ -3,9 +3,8 @@
  * Binds to random port, accepts POST /v1/traces, writes to SQLite
  */
 import { createServer, type Server } from 'node:http';
-import { isGenAiSpan, parseLlmSpan } from '@flusk/execution/src/routes/otlp-routes/parse-llm-span.js';
-import { mapSpanToLlmCall } from '@flusk/execution/src/routes/otlp-routes/map-span-to-llm-call.js';
-import type { OtlpTraceRequest } from '@flusk/execution/src/routes/otlp-routes/types.js';
+import { isGenAiSpan, parseLlmSpan, mapSpanToLlmCall } from '@flusk/execution';
+import type { OtlpTraceRequest } from '@flusk/execution';
 import type { StorageAdapter } from '@flusk/resources';
 import { createLogger } from '@flusk/logger';
 

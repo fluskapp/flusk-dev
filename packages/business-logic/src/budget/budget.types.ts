@@ -1,44 +1,11 @@
 /**
- * Budget checker types
+ * Budget types — canonical definitions live in @flusk/types
  */
-
-export interface BudgetLimits {
-  daily?: number;
-  monthly?: number;
-  perCall?: number;
-  duplicateRatio?: number;
-}
-
-export interface UsageData {
-  dailyCost: number;
-  monthlyCost: number;
-  totalCalls: number;
-  duplicateCalls: number;
-}
-
-export interface BudgetPeriod {
-  limit: number;
-  used: number;
-  remaining: number;
-  exceeded: boolean;
-  percentage: number;
-}
-
-export interface BudgetStatus {
-  daily: BudgetPeriod;
-  monthly: BudgetPeriod;
-  alerts: string[];
-}
-
-export interface PerCallAlert {
-  model: string;
-  cost: number;
-  threshold: number;
-  message: string;
-}
-
-export interface DuplicateAlert {
-  ratio: number;
-  threshold: number;
-  message: string;
-}
+export type {
+  BudgetLimits,
+  UsageData,
+  BudgetPeriod,
+  BudgetStatus,
+  PerCallAlert,
+  DuplicateAlert,
+} from '@flusk/types';

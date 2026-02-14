@@ -1,40 +1,26 @@
-import { ProfileSessionEntity, HotspotEntry } from '@flusk/entities';
+import type { ProfileSessionEntity, HotspotEntry } from '@flusk/entities';
+import { toISOString } from '../../shared/map-row.js';
 
-interface ProfileSessionRow {
-  id: string;
-  created_at: { toISOString(): string };
-  updated_at: { toISOString(): string };
-  name: string;
-  type: string;
-  duration_ms: number;
-  total_samples: number;
-  hotspots: HotspotEntry[];
-  markdown_raw: string;
-  pprof_path: string;
-  flamegraph_path: string;
-  trace_ids: string[];
-  organization_id?: string;
-  started_at: { toISOString(): string };
-}
-
-/**
- * Convert database row to ProfileSessionEntity
- */
-export function rowToEntity(row: ProfileSessionRow): ProfileSessionEntity {
+/** Convert database row to ProfileSessionEntity */
+export function rowToEntity(row: Record<string, unknown>): ProfileSessionEntity {
   return {
-    id: row.id,
-    createdAt: row.created_at.toISOString(),
-    updatedAt: row.updated_at.toISOString(),
-    name: row.name,
-    type: row.type,
-    durationMs: row.duration_ms,
-    totalSamples: row.total_samples,
-    hotspots: row.hotspots ?? [],
-    markdownRaw: row.markdown_raw,
-    pprofPath: row.pprof_path,
-    flamegraphPath: row.flamegraph_path,
-    traceIds: row.trace_ids ?? [],
-    organizationId: row.organization_id ?? undefined,
-    startedAt: row.started_at.toISOString(),
+    id: row.id as string,
+    createdAt: toISOString(row.created_at),
+    updatedAt: toISOString(row.updated_at),
+    name: row.name as string,
+    type: row.type as string,
+    durationMs: row.duration_ms as number,
+    totalSamples: row.total_samples as number,
+    hotspots: (typeof row.hotspots === 'string'
+      ? JSON.parse(row.hotspots)
+      : row.hotspots ?? []) as HotspotEntry[],
+    markdownRaw: row.markdown_raw as string,
+    pprofPath: row.pprof_path as string,
+    flamegraphPath: row.flamegraph_path as string,
+    traceIds: (typeof row.trace_ids === 'string'
+      ? JSON.parse(row.trace_ids)
+      : row.trace_ids ?? []) as string[],
+    organizationId: (row.organization_id as string) ?? undefined,
+    startedAt: toISOString(row.started_at),
   };
 }

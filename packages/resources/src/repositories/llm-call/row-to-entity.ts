@@ -1,40 +1,24 @@
-import { LLMCallEntity, TokenUsage } from '@flusk/entities';
+import type { LLMCallEntity, TokenUsage } from '@flusk/entities';
+import { toISOString } from '../../shared/map-row.js';
 
-interface LlmCallRow {
-  id: string;
-  created_at: { toISOString(): string };
-  updated_at: { toISOString(): string };
-  provider: string;
-  model: string;
-  prompt: string;
-  prompt_hash: string;
-  tokens: TokenUsage;
-  cost: string;
-  response: string;
-  cached: boolean;
-  organization_id: string;
-  consent_given?: boolean;
-  consent_purpose?: string;
-}
-
-/**
- * Convert database row to LLMCallEntity
- */
-export function rowToEntity(row: LlmCallRow): LLMCallEntity {
+/** Convert database row to LLMCallEntity */
+export function rowToEntity(row: Record<string, unknown>): LLMCallEntity {
   return {
-    id: row.id,
-    createdAt: row.created_at.toISOString(),
-    updatedAt: row.updated_at.toISOString(),
-    provider: row.provider,
-    model: row.model,
-    prompt: row.prompt,
-    promptHash: row.prompt_hash,
-    tokens: row.tokens,
-    cost: parseFloat(row.cost),
-    response: row.response,
-    cached: row.cached,
-    organizationId: row.organization_id,
-    consentGiven: row.consent_given ?? true,
-    consentPurpose: row.consent_purpose ?? 'optimization'
+    id: row.id as string,
+    createdAt: toISOString(row.created_at),
+    updatedAt: toISOString(row.updated_at),
+    provider: row.provider as string,
+    model: row.model as string,
+    prompt: row.prompt as string,
+    promptHash: row.prompt_hash as string,
+    tokens: (typeof row.tokens === 'string'
+      ? JSON.parse(row.tokens)
+      : row.tokens) as TokenUsage,
+    cost: typeof row.cost === 'string' ? parseFloat(row.cost) : (row.cost as number),
+    response: row.response as string,
+    cached: Boolean(row.cached),
+    organizationId: (row.organization_id as string) ?? undefined,
+    consentGiven: (row.consent_given as boolean) ?? true,
+    consentPurpose: (row.consent_purpose as string) ?? 'optimization',
   };
 }
