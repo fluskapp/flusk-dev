@@ -37,6 +37,9 @@ import { generateFastifyPluginCommand } from '../src/commands/generate-fastify-p
 import { generateOtelHookCommand } from '../src/commands/generate-otel-hook.js';
 import { generateDetectorCommand } from '../src/commands/generate-detector.js';
 import { generateSqliteRepoCommand } from '../src/commands/generate-sqlite-repo.js';
+import { analyzeCommand } from '../src/commands/analyze.js';
+import { reportCommand } from '../src/commands/report.js';
+import { historyCommand } from '../src/commands/history.js';
 
 const program = new Command();
 
@@ -99,5 +102,10 @@ program.addCommand(generateDetectorCommand);
 
 // SQLite repository generator
 program.addCommand(generateSqliteRepoCommand);
+
+// LLM cost analysis
+program.addCommand(analyzeCommand);
+program.addCommand(reportCommand);
+program.addCommand(historyCommand);
 
 program.parse(process.argv);

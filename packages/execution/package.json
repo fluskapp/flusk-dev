@@ -8,7 +8,8 @@
     ".": {
       "import": "./src/index.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./src/routes/otlp-routes/*": "./src/routes/otlp-routes/*"
   },
   "scripts": {
     "build": "tsc",

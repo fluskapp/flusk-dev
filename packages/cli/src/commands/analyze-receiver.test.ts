@@ -1,0 +1,89 @@
+/**
+ * Integration test for ephemeral OTLP receiver
+ */
+import { describe, it, afterEach } from 'node:test';
+import assert from 'node:assert';
+import { startReceiver, type ReceiverHandle } from './analyze-receiver.js';
+import { createSqliteStorage } from '@flusk/resources';
+
+describe('analyze-receiver', () => {
+  let receiver: ReceiverHandle | undefined;
+
+  afterEach(async () => {
+    if (receiver) await receiver.close();
+  });
+
+  it('should start on random port', async () => {
+    const storage = createSqliteStorage(':memory:');
+    receiver = await startReceiver(storage);
+    assert.ok(receiver.port > 0);
+  });
+
+  it('should accept and process OTLP traces', async () => {
+    const storage = createSqliteStorage(':memory:');
+    receiver = await startReceiver(storage);
+
+    const tracePayload = {
+      resourceSpans: [{
+        scopeSpans: [{
+          spans: [{
+            traceId: 'abc123',
+            spanId: 'span1',
+            name: 'llm.call',
+            kind: 1,
+            startTimeUnixNano: '1000000000000000',
+            endTimeUnixNano: '1001000000000000',
+            attributes: [
+              { key: 'gen_ai.system', value: { stringValue: 'openai' } },
+              { key: 'gen_ai.request.model', value: { stringValue: 'gpt-4' } },
+              { key: 'gen_ai.usage.input_tokens', value: { intValue: '100' } },
+              { key: 'gen_ai.usage.output_tokens', value: { intValue: '50' } },
+              { key: 'gen_ai.prompt', value: { stringValue: 'Hello world' } },
+              { key: 'gen_ai.completion', value: { stringValue: 'Hi there' } },
+            ],
+          }],
+        }],
+      }],
+    };
+
+    const res = await fetch(`http://127.0.0.1:${receiver.port}/v1/traces`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(tracePayload),
+    });
+
+    assert.strictEqual(res.status, 200);
+    assert.strictEqual(receiver.getCallCount(), 1);
+  });
+
+  it('should ignore non-genai spans', async () => {
+    const storage = createSqliteStorage(':memory:');
+    receiver = await startReceiver(storage);
+
+    const payload = {
+      resourceSpans: [{
+        scopeSpans: [{
+          spans: [{
+            traceId: 'abc',
+            spanId: 'span2',
+            name: 'http.request',
+            kind: 1,
+            startTimeUnixNano: '1000000000000000',
+            endTimeUnixNano: '1001000000000000',
+            attributes: [
+              { key: 'http.method', value: { stringValue: 'GET' } },
+            ],
+          }],
+        }],
+      }],
+    };
+
+    await fetch(`http://127.0.0.1:${receiver.port}/v1/traces`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    assert.strictEqual(receiver.getCallCount(), 0);
+  });
+});

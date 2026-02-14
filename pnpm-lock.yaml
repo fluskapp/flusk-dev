@@ -97,9 +97,18 @@ importers:
       '@clack/prompts':
         specifier: ^1.0.0
         version: 1.0.0
+      '@flusk/entities':
+        specifier: workspace:*
+        version: link:../entities
+      '@flusk/execution':
+        specifier: workspace:*
+        version: link:../execution
       '@flusk/logger':
         specifier: workspace:*
         version: link:../logger
+      '@flusk/resources':
+        specifier: workspace:*
+        version: link:../resources
       '@platformatic/flame':
         specifier: 1.6.0
         version: 1.6.0

@@ -1,0 +1,78 @@
+/**
+ * Tests for analyze report generator
+ */
+import { describe, it } from 'node:test';
+import assert from 'node:assert';
+import { generateReport, type ReportData } from './analyze-report.js';
+
+function mockData(): ReportData {
+  return {
+    session: {
+      id: 'test-123',
+      script: './my-app.js',
+      durationMs: 60_000,
+      totalCalls: 3,
+      totalCost: 1.50,
+      modelsUsed: ['gpt-4', 'gpt-3.5-turbo'],
+      startedAt: '2026-02-14T02:00:00Z',
+      completedAt: '2026-02-14T02:01:00Z',
+      createdAt: '2026-02-14T02:00:00Z',
+      updatedAt: '2026-02-14T02:01:00Z',
+    },
+    calls: [
+      mockCall('gpt-4', 'Summarize this document', 'hash1', 0.80, 1000),
+      mockCall('gpt-4', 'Summarize this document', 'hash1', 0.80, 1000),
+      mockCall('gpt-3.5-turbo', 'Translate to English', 'hash2', 0.05, 500),
+    ],
+  };
+}
+
+function mockCall(model: string, prompt: string, hash: string, cost: number, tokens: number) {
+  return {
+    id: `call-${Math.random().toString(36).slice(2, 8)}`,
+    provider: 'openai' as const,
+    model,
+    prompt,
+    promptHash: hash,
+    tokens: { input: tokens, output: tokens, total: tokens * 2 },
+    cost,
+    response: 'response text',
+    cached: false,
+    organizationId: 'default',
+    consentGiven: true,
+    consentPurpose: 'optimization',
+    createdAt: '2026-02-14T02:00:00Z',
+    updatedAt: '2026-02-14T02:00:00Z',
+  };
+}
+
+describe('generateReport', () => {
+  it('should generate markdown with cost summary', () => {
+    const report = generateReport(mockData(), { format: 'markdown', color: false });
+    assert.ok(report.includes('Flusk Analysis Report'));
+    assert.ok(report.includes('gpt-4'));
+    assert.ok(report.includes('gpt-3.5-turbo'));
+    assert.ok(report.includes('Cost Summary'));
+  });
+
+  it('should detect duplicate prompts', () => {
+    const report = generateReport(mockData(), { format: 'markdown', color: false });
+    assert.ok(report.includes('Duplicate Prompts Detected'));
+    assert.ok(report.includes('Summarize this document'));
+  });
+
+  it('should generate JSON format', () => {
+    const report = generateReport(mockData(), { format: 'json', color: false });
+    const parsed = JSON.parse(report);
+    assert.strictEqual(parsed.session.script, './my-app.js');
+    assert.strictEqual(parsed.calls.length, 3);
+  });
+
+  it('should handle empty calls', () => {
+    const data = mockData();
+    data.calls = [];
+    const report = generateReport(data, { format: 'markdown', color: false });
+    assert.ok(report.includes('Flusk Analysis Report'));
+    assert.ok(!report.includes('Duplicate'));
+  });
+});

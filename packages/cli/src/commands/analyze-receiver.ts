@@ -1,0 +1,77 @@
+/**
+ * Ephemeral OTLP receiver — local HTTP server for span ingestion
+ * Binds to random port, accepts POST /v1/traces, writes to SQLite
+ */
+import { createServer, type Server } from 'node:http';
+import { isGenAiSpan, parseLlmSpan } from '@flusk/execution/src/routes/otlp-routes/parse-llm-span.js';
+import { mapSpanToLlmCall } from '@flusk/execution/src/routes/otlp-routes/map-span-to-llm-call.js';
+import type { OtlpTraceRequest } from '@flusk/execution/src/routes/otlp-routes/types.js';
+import type { StorageAdapter } from '@flusk/resources';
+import { createLogger } from '@flusk/logger';
+
+const log = createLogger('analyze-receiver');
+
+export interface ReceiverHandle {
+  port: number;
+  server: Server;
+  close: () => Promise<void>;
+  getCallCount: () => number;
+}
+
+export function startReceiver(storage: StorageAdapter): Promise<ReceiverHandle> {
+  let callCount = 0;
+
+  const server = createServer(async (req, res) => {
+    if (req.method === 'POST' && req.url === '/v1/traces') {
+      const chunks: Buffer[] = [];
+      for await (const chunk of req) chunks.push(chunk as Buffer);
+      try {
+        const body = JSON.parse(Buffer.concat(chunks).toString()) as OtlpTraceRequest;
+        callCount += processTraces(body, storage);
+        res.writeHead(200, { 'content-type': 'application/json' });
+        res.end('{}');
+      } catch (err) {
+        log.error('Failed to process traces', { error: err });
+        res.writeHead(400);
+        res.end('Bad Request');
+      }
+    } else {
+      res.writeHead(404);
+      res.end('Not Found');
+    }
+  });
+
+  return new Promise((resolve) => {
+    server.listen(0, '127.0.0.1', () => {
+      const addr = server.address();
+      const port = typeof addr === 'object' ? addr!.port : 0;
+      log.info(`OTLP receiver listening on port ${port}`);
+      resolve({
+        port,
+        server,
+        close: () => new Promise<void>((r) => server.close(() => r())),
+        getCallCount: () => callCount,
+      });
+    });
+  });
+}
+
+function processTraces(body: OtlpTraceRequest, storage: StorageAdapter): number {
+  let count = 0;
+  for (const rs of body.resourceSpans) {
+    for (const ss of rs.scopeSpans) {
+      for (const span of ss.spans) {
+        if (!isGenAiSpan(span)) continue;
+        try {
+          const parsed = parseLlmSpan(span);
+          const callData = mapSpanToLlmCall(parsed);
+          storage.llmCalls.create(callData);
+          count++;
+        } catch (err) {
+          log.error('Failed to ingest span', { error: err });
+        }
+      }
+    }
+  }
+  return count;
+}

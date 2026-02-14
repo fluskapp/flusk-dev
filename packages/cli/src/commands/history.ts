@@ -1,0 +1,48 @@
+/**
+ * CLI command: flusk history
+ * Show past analyze sessions from SQLite
+ */
+import { Command } from 'commander';
+import chalk from 'chalk';
+import { createSqliteStorage } from '@flusk/resources';
+
+export const historyCommand = new Command('history')
+  .description('Show past analyze sessions')
+  .option('-l, --limit <n>', 'Number of sessions to show', '20')
+  .action((opts) => {
+    const storage = createSqliteStorage();
+    const sessions = storage.analyzeSessions.list(parseInt(opts.limit, 10), 0);
+
+    if (sessions.length === 0) {
+      console.log(chalk.dim('No analyze sessions found. Run `flusk analyze <script>` first.'));
+      return;
+    }
+
+    const header = [
+      pad('ID', 10),
+      pad('Script', 25),
+      pad('Duration', 10),
+      pad('Calls', 8),
+      pad('Cost', 10),
+      'Date',
+    ].join('  ');
+
+    console.log(chalk.bold(header));
+    console.log(chalk.dim('─'.repeat(80)));
+
+    for (const s of sessions) {
+      const row = [
+        pad(s.id.slice(0, 8), 10),
+        pad(s.script, 25),
+        pad(`${Math.round(s.durationMs / 1000)}s`, 10),
+        pad(String(s.totalCalls), 8),
+        pad(`$${s.totalCost.toFixed(2)}`, 10),
+        s.startedAt.slice(0, 16).replace('T', ' '),
+      ].join('  ');
+      console.log(row);
+    }
+  });
+
+function pad(s: string, len: number): string {
+  return s.length >= len ? s.slice(0, len) : s + ' '.repeat(len - s.length);
+}
