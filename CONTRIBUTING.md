@@ -2,22 +2,30 @@
 
 ## Quick Setup
 
+No Docker needed for development:
+
 ```bash
 git clone https://github.com/<your-username>/flusk-dev.git
 cd flusk-dev
 pnpm install
-docker compose up -d postgres redis
-pnpm db:migrate
-pnpm dev                    # http://localhost:3000
+pnpm test
 ```
 
-## Without Docker
-
-PostgreSQL 16 (with pgvector) and Redis 7 running locally.
+Try the CLI locally:
 
 ```bash
+pnpm tsx packages/cli/bin/flusk.ts analyze <your-script.js>
+```
+
+### Server Mode (optional)
+
+Docker is only needed for server-mode integration tests (PostgreSQL + Redis):
+
+```bash
+docker compose up -d postgres redis
 cp .env.example .env
-pnpm install && pnpm db:migrate && pnpm dev
+pnpm db:migrate
+pnpm dev                    # http://localhost:3000
 ```
 
 ## Adding Features
@@ -37,9 +45,7 @@ entity-schema, types, resources, business-logic, execution, feature,
 feature-test, route, plugin, middleware, service, fastify-plugin,
 otel-hook, detector, profile, provider, package, infrastructure,
 docker-compose, dockerfile, entrypoint, env, swagger, watt, test,
-barrel-updater
-
-**Only create files manually** for genuine edge cases.
+barrel-updater, sqlite-repo
 
 ## Code Conventions
 
@@ -51,6 +57,7 @@ barrel-updater
 - **kebab-case filenames** — with suffixes: `.entity.ts`, `.function.ts`
 - **`.js` extensions** in imports (ESM)
 - **Use `@flusk/logger`** for logging, not `console.log`
+- **`node:sqlite`** — SQLite storage uses Node.js built-in, zero external deps
 
 ## Testing
 

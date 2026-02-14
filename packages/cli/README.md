@@ -1,14 +1,40 @@
 # @flusk/cli
 
-Code generator and project management CLI for Flusk.
+CLI for analyzing LLM usage, generating code, and managing Flusk projects.
 
-## Usage
+## Installation
 
 ```bash
-pnpm tsx packages/cli/bin/flusk.ts <command>
+npm install -g @flusk/cli
 ```
 
 ## Commands
+
+### Analyze
+
+Run your script with OTel instrumentation and collect LLM call data:
+
+```bash
+flusk analyze <script>              # Analyze a script
+flusk analyze app.js --budget 5.00  # Fail if cost exceeds $5
+flusk analyze app.js --runs 10      # Run 10 times, aggregate
+flusk analyze app.js --export json  # Export raw data
+flusk analyze app.js --compare <id> # Compare against previous run
+```
+
+### Reports
+
+```bash
+flusk report [id]    # Show analysis report (latest or by ID)
+flusk history        # List past analysis runs
+flusk budget         # Show budget status and spend trends
+```
+
+### Config
+
+```bash
+flusk init           # Interactive config wizard (creates flusk.config.json)
+```
 
 ### Code Generation
 
@@ -24,6 +50,7 @@ flusk g <entity> --dry-run     # Preview changes
 ```bash
 flusk g feature <name>         # Full feature (all packages)
 flusk g feature <name> --skip-entity --skip-tests
+flusk g:sqlite-repo <name>     # SQLite repository from entity
 ```
 
 ### Project Management
@@ -66,7 +93,7 @@ entity-schema, types, resources, business-logic, execution, feature,
 feature-test, route, plugin, middleware, service, fastify-plugin,
 otel-hook, detector, profile, provider, package, infrastructure,
 docker-compose, dockerfile, entrypoint, env, swagger, watt, test,
-barrel-updater
+barrel-updater, sqlite-repo
 
 ## Generated Files
 
@@ -77,4 +104,4 @@ manually — regenerate with the CLI.
 
 - Node.js 22+
 - pnpm 10+
-- Docker 24+ (for infrastructure commands)
+- Docker 24+ (for infrastructure commands only)
