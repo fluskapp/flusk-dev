@@ -19,9 +19,9 @@
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
   <a href="#what-you-get">What You Get</a> •
-  <a href="#api--integrations">API</a> •
-  <a href="#reports--dev-tools">Reports</a> •
-  <a href="#why-flusk">Why Flusk</a> •
+  <a href="#framework-integration-guides">Frameworks</a> •
+  <a href="#api-reference">API</a> •
+  <a href="#live-monitoring">Live Monitoring</a> •
   <a href="./docs/getting-started.md">Docs</a> •
   <a href="#for-contributors">Contributing</a>
 </p>
@@ -311,6 +311,256 @@ node --import @flusk/otel ./index.js
 ```
 
 See the [Self-Hosting Guide](./docs/self-hosting.md).
+
+## Framework Integration Guides
+
+Flusk works with **any Node.js app** — no code changes required. Here's how to set it up with popular frameworks:
+
+### Express
+
+```bash
+# One-shot analysis
+flusk analyze ./server.js
+
+# Or instrument your existing start command
+node --import @flusk/otel ./server.js
+```
+
+```typescript
+// server.ts — your code stays EXACTLY the same
+import express from 'express';
+import OpenAI from 'openai';
+
+const app = express();
+const openai = new OpenAI();
+
+app.post('/api/chat', async (req, res) => {
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: req.body.messages,
+  });
+  res.json(completion);
+});
+
+app.listen(3000);
+// Flusk captures every OpenAI call automatically via OTel.
+// No imports, no wrappers, no middleware needed.
+```
+
+### Fastify
+
+```bash
+node --import @flusk/otel ./server.js
+```
+
+```typescript
+// server.ts
+import Fastify from 'fastify';
+import Anthropic from '@anthropic-ai/sdk';
+
+const app = Fastify({ logger: true });
+const anthropic = new Anthropic();
+
+app.post('/api/summarize', async (request, reply) => {
+  const result = await anthropic.messages.create({
+    model: 'claude-3-5-sonnet-20241022',
+    max_tokens: 1024,
+    messages: [{ role: 'user', content: request.body.text }],
+  });
+  return result;
+});
+
+await app.listen({ port: 3000 });
+// Zero config. Flusk hooks into HTTP layer via OpenTelemetry.
+```
+
+### NestJS
+
+```bash
+# In your package.json, update your start command:
+# "start": "node --import @flusk/otel dist/main.js"
+node --import @flusk/otel dist/main.js
+```
+
+```typescript
+// chat.service.ts — no changes needed
+@Injectable()
+export class ChatService {
+  private openai = new OpenAI();
+
+  async chat(messages: ChatMessage[]): Promise<string> {
+    const completion = await this.openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      messages,
+    });
+    return completion.choices[0].message.content;
+  }
+}
+
+// Flusk intercepts at the HTTP layer — works with any
+// DI container, middleware, or decorator pattern.
+```
+
+### Next.js (API Routes / Server Actions)
+
+```bash
+# next.config.js — add the OTel loader
+# NODE_OPTIONS='--import @flusk/otel' next dev
+NODE_OPTIONS='--import @flusk/otel' npx next dev
+```
+
+```typescript
+// app/api/chat/route.ts — unchanged
+import OpenAI from 'openai';
+
+const openai = new OpenAI();
+
+export async function POST(req: Request) {
+  const { messages } = await req.json();
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages,
+    stream: true,
+  });
+  // Flusk captures streamed calls too
+  return new Response(completion.toReadableStream());
+}
+```
+
+### Hono
+
+```bash
+node --import @flusk/otel ./src/index.ts
+```
+
+```typescript
+// src/index.ts
+import { Hono } from 'hono';
+import { serve } from '@hono/node-server';
+import Anthropic from '@anthropic-ai/sdk';
+
+const app = new Hono();
+const anthropic = new Anthropic();
+
+app.post('/ask', async (c) => {
+  const { question } = await c.req.json();
+  const msg = await anthropic.messages.create({
+    model: 'claude-3-haiku-20240307',
+    max_tokens: 256,
+    messages: [{ role: 'user', content: question }],
+  });
+  return c.json(msg);
+});
+
+serve({ fetch: app.fetch, port: 3000 });
+```
+
+### tRPC
+
+```bash
+node --import @flusk/otel ./server.ts
+```
+
+```typescript
+// server.ts — tRPC router, zero changes
+import { initTRPC } from '@trpc/server';
+import OpenAI from 'openai';
+
+const t = initTRPC.create();
+const openai = new OpenAI();
+
+export const appRouter = t.router({
+  generate: t.procedure
+    .input(z.object({ prompt: z.string() }))
+    .mutation(async ({ input }) => {
+      return openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: input.prompt }],
+      });
+    }),
+});
+```
+
+### LangChain / LlamaIndex
+
+```bash
+# Works out of the box — LangChain uses OpenAI/Anthropic SDKs
+# under the hood, which Flusk intercepts at the HTTP layer
+node --import @flusk/otel ./agent.js
+```
+
+```typescript
+// agent.ts — LangChain agent, no changes
+import { ChatOpenAI } from '@langchain/openai';
+import { AgentExecutor, createOpenAIToolsAgent } from 'langchain/agents';
+
+const llm = new ChatOpenAI({ modelName: 'gpt-4o' });
+const agent = await createOpenAIToolsAgent({ llm, tools, prompt });
+const executor = new AgentExecutor({ agent, tools });
+
+// Every LLM call the agent makes is tracked with cost
+const result = await executor.invoke({ input: 'Research this topic' });
+```
+
+### Docker / Production
+
+```dockerfile
+# Dockerfile
+FROM node:22-slim
+WORKDIR /app
+COPY . .
+RUN npm install
+
+# Add Flusk instrumentation
+ENV NODE_OPTIONS="--import @flusk/otel"
+ENV FLUSK_EXPORT=grafana
+ENV FLUSK_GRAFANA_API_KEY=your-key
+
+CMD ["node", "dist/server.js"]
+```
+
+```yaml
+# docker-compose.yml
+services:
+  api:
+    build: .
+    environment:
+      - NODE_OPTIONS=--import @flusk/otel
+      - FLUSK_EXPORT=datadog
+      - FLUSK_DATADOG_API_KEY=${DATADOG_API_KEY}
+    ports:
+      - "3000:3000"
+```
+
+### CI / GitHub Actions
+
+```yaml
+# .github/workflows/cost-check.yml
+name: LLM Cost Check
+on: [pull_request]
+
+jobs:
+  cost-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install
+      - run: npx @flusk/cli analyze ./test-app.js -d 30 -f json -o cost-report.json
+      - run: |
+          # Fail if daily projected cost > $50
+          COST=$(jq '.projectedDaily' cost-report.json)
+          if (( $(echo "$COST > 50" | bc -l) )); then
+            echo "❌ Cost gate failed: projected \$$COST/day"
+            exit 1
+          fi
+          echo "✅ Cost gate passed: projected \$$COST/day"
+```
+
+> **The key insight:** `--import @flusk/otel` is the only thing you add. It works with TypeScript (via tsx/ts-node), ESM, CJS, any framework, any LLM SDK. Flusk never touches your code.
 
 ## Roadmap
 
