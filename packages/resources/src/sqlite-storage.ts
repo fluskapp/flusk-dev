@@ -1,0 +1,44 @@
+import type { StorageAdapter } from './storage.js';
+import { getDb } from './sqlite/connection.js';
+import { runMigrations } from './sqlite/migrations.js';
+import * as LLMCallRepo from './sqlite/repositories/llm-call/index.js';
+import * as AnalyzeSessionRepo from './sqlite/repositories/analyze-session/index.js';
+import * as ProfileSessionRepo from './sqlite/repositories/profile-session/index.js';
+import * as PatternRepo from './sqlite/repositories/performance-pattern/index.js';
+
+/**
+ * Create a SQLite-backed storage adapter.
+ * Runs migrations on first call.
+ */
+export function createSqliteStorage(dbPath?: string): StorageAdapter {
+  const db = getDb(dbPath);
+  runMigrations(db);
+
+  return {
+    mode: 'sqlite',
+    llmCalls: {
+      create: (data) => LLMCallRepo.create(db, data),
+      findById: (id) => LLMCallRepo.findById(db, id),
+      findByPromptHash: (hash) => LLMCallRepo.findByPromptHash(db, hash),
+      list: (limit, offset) => LLMCallRepo.list(db, limit, offset),
+      countByModel: () => LLMCallRepo.countByModel(db),
+      sumCost: () => LLMCallRepo.sumCost(db),
+    },
+    analyzeSessions: {
+      create: (data) => AnalyzeSessionRepo.create(db, data),
+      findById: (id) => AnalyzeSessionRepo.findById(db, id),
+      list: (limit, offset) => AnalyzeSessionRepo.list(db, limit, offset),
+      update: (id, data) => AnalyzeSessionRepo.update(db, id, data),
+    },
+    profileSessions: {
+      create: (data) => ProfileSessionRepo.create(db, data),
+      findById: (id) => ProfileSessionRepo.findById(db, id),
+      list: (limit, offset) => ProfileSessionRepo.list(db, limit, offset),
+    },
+    patterns: {
+      create: (data) => PatternRepo.create(db, data),
+      findByProfileId: (id) => PatternRepo.findByProfileId(db, id),
+      list: (limit, offset) => PatternRepo.list(db, limit, offset),
+    },
+  };
+}

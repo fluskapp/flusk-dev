@@ -1,0 +1,73 @@
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { getDb, closeDb } from '../connection.js';
+import { runMigrations } from '../migrations.js';
+import * as LLMCallRepo from '../repositories/llm-call/index.js';
+
+describe('SQLite LLM Call Repository', () => {
+  beforeEach(() => {
+    const db = getDb(':memory:');
+    runMigrations(db);
+  });
+
+  afterEach(() => {
+    closeDb();
+  });
+
+  const sampleData = {
+    provider: 'openai',
+    model: 'gpt-4',
+    prompt: 'Hello world',
+    promptHash: 'a'.repeat(64),
+    tokens: { input: 10, output: 20, total: 30 },
+    cost: 0.05,
+    response: 'Hi there',
+    cached: false,
+    consentGiven: true,
+    consentPurpose: 'optimization' as const,
+  };
+
+  it('should create and find by id', () => {
+    const db = getDb();
+    const created = LLMCallRepo.create(db, sampleData);
+    expect(created.id).toBeDefined();
+    expect(created.provider).toBe('openai');
+
+    const found = LLMCallRepo.findById(db, created.id);
+    expect(found).not.toBeNull();
+    expect(found!.model).toBe('gpt-4');
+  });
+
+  it('should find by prompt hash', () => {
+    const db = getDb();
+    LLMCallRepo.create(db, sampleData);
+    const found = LLMCallRepo.findByPromptHash(db, 'a'.repeat(64));
+    expect(found).not.toBeNull();
+    expect(found!.prompt).toBe('Hello world');
+  });
+
+  it('should list with pagination', () => {
+    const db = getDb();
+    LLMCallRepo.create(db, sampleData);
+    LLMCallRepo.create(db, { ...sampleData, model: 'claude-3' });
+    const all = LLMCallRepo.list(db, 10, 0);
+    expect(all.length).toBe(2);
+  });
+
+  it('should count by model', () => {
+    const db = getDb();
+    LLMCallRepo.create(db, sampleData);
+    LLMCallRepo.create(db, sampleData);
+    LLMCallRepo.create(db, { ...sampleData, model: 'claude-3' });
+    const counts = LLMCallRepo.countByModel(db);
+    expect(counts.find((c) => c.model === 'gpt-4')?.count).toBe(2);
+    expect(counts.find((c) => c.model === 'claude-3')?.count).toBe(1);
+  });
+
+  it('should sum cost', () => {
+    const db = getDb();
+    LLMCallRepo.create(db, { ...sampleData, cost: 0.10 });
+    LLMCallRepo.create(db, { ...sampleData, cost: 0.25 });
+    const total = LLMCallRepo.sumCost(db);
+    expect(total).toBeCloseTo(0.35);
+  });
+});

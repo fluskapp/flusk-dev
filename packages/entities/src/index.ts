@@ -86,6 +86,12 @@ export {
   type PerformancePatternEntity
 } from './performance-pattern.entity.js';
 
+// AnalyzeSession entity exports
+export {
+  AnalyzeSessionEntitySchema,
+  type AnalyzeSessionEntity
+} from './analyze-session.entity.js';
+
 // PromptVersion entity exports
 export {
   PromptVersionEntitySchema,

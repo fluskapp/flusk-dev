@@ -73,6 +73,13 @@ export {
 } from './performance-pattern.types.js';
 
 export {
+  type AnalyzeSessionEntity as AnalyzeSessionEntityType,
+  type AnalyzeSessionInsert, type AnalyzeSessionUpdate, type AnalyzeSessionQuery,
+  AnalyzeSessionEntityJSONSchema, AnalyzeSessionInsertSchema,
+  AnalyzeSessionUpdateSchema, AnalyzeSessionQuerySchema,
+} from './analyze-session.types.js';
+
+export {
   type PromptVersionEntity as PromptVersionEntityType,
   type PromptVersionInsert, type PromptVersionUpdate, type PromptVersionQuery,
   PromptVersionEntityJSONSchema, PromptVersionInsertSchema, PromptVersionUpdateSchema, PromptVersionQuerySchema

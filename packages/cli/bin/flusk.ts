@@ -36,6 +36,7 @@ import { generateProfileCommand } from '../src/commands/generate-profile.js';
 import { generateFastifyPluginCommand } from '../src/commands/generate-fastify-plugin.js';
 import { generateOtelHookCommand } from '../src/commands/generate-otel-hook.js';
 import { generateDetectorCommand } from '../src/commands/generate-detector.js';
+import { generateSqliteRepoCommand } from '../src/commands/generate-sqlite-repo.js';
 
 const program = new Command();
 
@@ -95,5 +96,8 @@ program.addCommand(generateProfileCommand);
 program.addCommand(generateFastifyPluginCommand);
 program.addCommand(generateOtelHookCommand);
 program.addCommand(generateDetectorCommand);
+
+// SQLite repository generator
+program.addCommand(generateSqliteRepoCommand);
 
 program.parse(process.argv);

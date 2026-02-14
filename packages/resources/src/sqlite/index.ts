@@ -1,0 +1,11 @@
+/**
+ * SQLite module barrel — connection, migrations, repositories
+ */
+
+export { getDb, closeDb } from './connection.js';
+export { runMigrations } from './migrations.js';
+
+export * as SqliteLLMCallRepo from './repositories/llm-call/index.js';
+export * as SqliteAnalyzeSessionRepo from './repositories/analyze-session/index.js';
+export * as SqliteProfileSessionRepo from './repositories/profile-session/index.js';
+export * as SqlitePerformancePatternRepo from './repositories/performance-pattern/index.js';

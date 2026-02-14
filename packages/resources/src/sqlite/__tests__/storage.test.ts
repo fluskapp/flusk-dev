@@ -1,0 +1,38 @@
+import { describe, it, expect, afterEach } from 'vitest';
+import { closeDb } from '../connection.js';
+import { createSqliteStorage } from '../../sqlite-storage.js';
+
+describe('Storage adapter factory', () => {
+  afterEach(() => {
+    closeDb();
+  });
+
+  it('should create a sqlite storage adapter', () => {
+    const storage = createSqliteStorage(':memory:');
+    expect(storage.mode).toBe('sqlite');
+    expect(storage.llmCalls).toBeDefined();
+    expect(storage.analyzeSessions).toBeDefined();
+    expect(storage.profileSessions).toBeDefined();
+    expect(storage.patterns).toBeDefined();
+  });
+
+  it('should perform CRUD through the adapter', () => {
+    const storage = createSqliteStorage(':memory:');
+    const call = storage.llmCalls.create({
+      provider: 'openai',
+      model: 'gpt-4',
+      prompt: 'test',
+      promptHash: 'b'.repeat(64),
+      tokens: { input: 1, output: 1, total: 2 },
+      cost: 0.01,
+      response: 'ok',
+      cached: false,
+      consentGiven: true,
+      consentPurpose: 'optimization',
+    });
+    expect(call.id).toBeDefined();
+
+    const found = storage.llmCalls.findById(call.id);
+    expect(found).not.toBeNull();
+  });
+});

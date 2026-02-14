@@ -1,0 +1,15 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { LLMCallEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Find LLM call by id
+ */
+export function findById(
+  db: DatabaseSync,
+  id: string,
+): LLMCallEntity | null {
+  const stmt = db.prepare('SELECT * FROM llm_calls WHERE id = ?');
+  const row = stmt.get(id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
+}

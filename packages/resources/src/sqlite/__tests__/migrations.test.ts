@@ -1,0 +1,36 @@
+import { describe, it, expect, afterEach } from 'vitest';
+import { getDb, closeDb } from '../connection.js';
+import { runMigrations } from '../migrations.js';
+
+describe('SQLite migrations', () => {
+  afterEach(() => {
+    closeDb();
+  });
+
+  it('should create all tables', () => {
+    const db = getDb(':memory:');
+    runMigrations(db);
+
+    const tables = db
+      .prepare("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+      .all() as Array<{ name: string }>;
+
+    const names = tables.map((t) => t.name);
+    expect(names).toContain('llm_calls');
+    expect(names).toContain('profile_sessions');
+    expect(names).toContain('performance_patterns');
+    expect(names).toContain('analyze_sessions');
+    expect(names).toContain('_migrations');
+  });
+
+  it('should be idempotent', () => {
+    const db = getDb(':memory:');
+    runMigrations(db);
+    runMigrations(db);
+
+    const migrations = db
+      .prepare('SELECT * FROM _migrations')
+      .all() as Array<{ name: string }>;
+    expect(migrations.length).toBe(4);
+  });
+});

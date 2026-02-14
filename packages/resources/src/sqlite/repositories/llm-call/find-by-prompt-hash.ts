@@ -1,0 +1,17 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { LLMCallEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Find most recent LLM call by prompt hash (cache lookup)
+ */
+export function findByPromptHash(
+  db: DatabaseSync,
+  hash: string,
+): LLMCallEntity | null {
+  const stmt = db.prepare(
+    'SELECT * FROM llm_calls WHERE prompt_hash = ? ORDER BY created_at DESC LIMIT 1',
+  );
+  const row = stmt.get(hash) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
+}

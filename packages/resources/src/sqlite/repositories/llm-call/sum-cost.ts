@@ -1,0 +1,10 @@
+import type { DatabaseSync } from 'node:sqlite';
+
+/**
+ * Sum total cost of all LLM calls
+ */
+export function sumCost(db: DatabaseSync): number {
+  const stmt = db.prepare('SELECT COALESCE(SUM(cost), 0) as total FROM llm_calls');
+  const row = stmt.get() as { total: number };
+  return row.total;
+}

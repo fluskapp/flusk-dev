@@ -1,0 +1,35 @@
+import { describe, it, expect, afterEach } from 'vitest';
+import { getDb, closeDb } from '../connection.js';
+
+describe('SQLite connection', () => {
+  afterEach(() => {
+    closeDb();
+  });
+
+  it('should create an in-memory database', () => {
+    const db = getDb(':memory:');
+    expect(db).toBeDefined();
+    db.exec('CREATE TABLE test (id INTEGER PRIMARY KEY)');
+    db.exec('INSERT INTO test (id) VALUES (1)');
+    const row = db.prepare('SELECT * FROM test').get() as { id: number };
+    expect(row.id).toBe(1);
+  });
+
+  it('should return the same singleton instance', () => {
+    const db1 = getDb(':memory:');
+    const db2 = getDb(':memory:');
+    expect(db1).toBe(db2);
+  });
+
+  it('should reset singleton on closeDb', () => {
+    getDb(':memory:');
+    closeDb();
+    const db2 = getDb(':memory:');
+    // After close + reopen, we get a working db
+    db2.exec('CREATE TABLE reset_test (id INTEGER)');
+    const tables = db2
+      .prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='reset_test'")
+      .all() as Array<{ name: string }>;
+    expect(tables.length).toBe(1);
+  });
+});

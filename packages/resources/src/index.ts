@@ -1,3 +1,14 @@
+// SQLite storage
+export { getDb, closeDb } from './sqlite/connection.js';
+export { runMigrations } from './sqlite/migrations.js';
+export * as SqliteLLMCallRepo from './sqlite/repositories/llm-call/index.js';
+export * as SqliteAnalyzeSessionRepo from './sqlite/repositories/analyze-session/index.js';
+export * as SqliteProfileSessionRepo from './sqlite/repositories/profile-session/index.js';
+export * as SqlitePerformancePatternRepo from './sqlite/repositories/performance-pattern/index.js';
+export type { StorageAdapter } from './storage.js';
+export { createSqliteStorage } from './sqlite-storage.js';
+export { createStorage } from './create-storage.js';
+
 // Database pool (deprecated — use @fastify/postgres instead)
 export { getPool, closePool } from './db/pool.js';
 

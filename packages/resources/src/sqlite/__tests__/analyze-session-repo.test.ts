@@ -1,0 +1,54 @@
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import { getDb, closeDb } from '../connection.js';
+import { runMigrations } from '../migrations.js';
+import * as AnalyzeSessionRepo from '../repositories/analyze-session/index.js';
+
+describe('SQLite Analyze Session Repository', () => {
+  beforeEach(() => {
+    const db = getDb(':memory:');
+    runMigrations(db);
+  });
+
+  afterEach(() => {
+    closeDb();
+  });
+
+  const sampleData = {
+    script: './app.js',
+    durationMs: 60000,
+    totalCalls: 10,
+    totalCost: 1.50,
+    modelsUsed: ['gpt-4', 'claude-3'],
+    startedAt: '2026-01-01T00:00:00',
+    completedAt: undefined,
+  };
+
+  it('should create and find by id', () => {
+    const db = getDb();
+    const created = AnalyzeSessionRepo.create(db, sampleData);
+    expect(created.id).toBeDefined();
+    expect(created.script).toBe('./app.js');
+
+    const found = AnalyzeSessionRepo.findById(db, created.id);
+    expect(found).not.toBeNull();
+    expect(found!.totalCost).toBe(1.50);
+  });
+
+  it('should list sessions', () => {
+    const db = getDb();
+    AnalyzeSessionRepo.create(db, sampleData);
+    AnalyzeSessionRepo.create(db, { ...sampleData, script: './other.js' });
+    const all = AnalyzeSessionRepo.list(db);
+    expect(all.length).toBe(2);
+  });
+
+  it('should update completedAt', () => {
+    const db = getDb();
+    const created = AnalyzeSessionRepo.create(db, sampleData);
+    const updated = AnalyzeSessionRepo.update(db, created.id, {
+      completedAt: '2026-01-01T00:01:00',
+    });
+    expect(updated).not.toBeNull();
+    expect(updated!.completedAt).toBe('2026-01-01T00:01:00');
+  });
+});
