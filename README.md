@@ -93,6 +93,46 @@ That's it. No accounts, no API keys, no config files. Flusk intercepts every LLM
 - **Webhook alerts** — push budget notifications to Slack, PagerDuty, or any HTTP endpoint
 - **CI integration** — fail builds that exceed cost budgets
 
+### Live Monitoring
+
+Flusk isn't just a one-shot analyzer. In **server mode** or with the **TUI dashboard**, you get real-time visibility into your LLM operations as they happen.
+
+#### What you see in real-time
+
+| Metric | Description | Why it matters |
+|--------|-------------|----------------|
+| **Cost per second** | Rolling cost rate across all models | Spot runaway loops instantly |
+| **Active calls** | Currently in-flight LLM requests | See concurrency and queuing issues |
+| **Token throughput** | Input/output tokens per minute | Understand prompt efficiency |
+| **Model distribution** | Which models are being called right now | Catch wrong model usage live |
+| **Duplicate rate** | % of prompts that are near-duplicates | Find caching opportunities in real-time |
+| **Latency (p50/p95/p99)** | Response time per model | Detect provider degradation |
+| **Budget burn rate** | Projected daily/monthly spend at current pace | Know if you'll blow budget before you do |
+| **Error rate** | Failed/retried LLM calls | Catch API issues before users notice |
+
+#### Key Use Cases
+
+**🔍 Debug a cost spike in production**
+Your bill doubled overnight. Run Flusk against your production app and immediately see which agent, model, or endpoint is responsible. Filter by agent label to isolate the problem.
+
+**🚨 Catch runaway AI agents**
+An autonomous agent stuck in a loop can burn hundreds of dollars in minutes. Flusk's budget alerts + live cost-per-second monitoring catch this before it gets expensive.
+
+**📊 Compare model performance before switching**
+Thinking about moving from GPT-4 to Claude 3.5 Sonnet? Run both side by side with Flusk, compare cost, latency, and token usage per call. Make data-driven model decisions.
+
+**🔄 Optimize prompt caching**
+Flusk detects duplicate and near-duplicate prompts automatically. See exactly which prompts repeat, how often, and how much you'd save with caching. Then implement caching and verify the savings.
+
+**👥 Multi-agent cost allocation**
+Running multiple AI agents (support bot, content writer, code assistant)? Label each with `--agent` and get per-agent cost breakdowns. Allocate LLM spend to the right team or product.
+
+**⚡ CI cost gates**
+Add Flusk to your CI pipeline. If a PR introduces a new LLM call pattern that exceeds your cost budget, the build fails. Prevent cost regressions before they ship.
+
+**📈 Track cost trends over time**
+Browse historical analysis sessions. See if your optimizations actually reduced costs. Spot gradual cost creep before it becomes a problem.
+
 ### Reports & Dev Tools
 
 Flusk generates reports in multiple formats so they fit your existing workflow:
@@ -119,19 +159,35 @@ flusk analyze ./app.js -o report.json -f json
 flusk report --compare customer-support content-writer
 ```
 
-### Observability Integrations (Planned)
+### Observability Integrations
 
-Flusk is built on OpenTelemetry, which means export to any OTLP-compatible backend is on the roadmap:
+Export LLM cost data to your existing observability stack. All integrations use standard OTLP — no vendor lock-in.
 
-| Platform | Status | Description |
-|----------|--------|-------------|
-| **Datadog** | 🔜 Next sprint | Export LLM cost metrics as custom metrics |
-| **Logz.io** | 🔜 Next sprint | Ship cost traces to your existing Logz.io stack |
-| **Coralogix** | 🔜 Next sprint | Real-time cost alerting via Coralogix pipelines |
-| **Grafana / Prometheus** | 🔜 Planned | OTLP → Prometheus metrics endpoint |
-| **New Relic** | 🔜 Planned | OTLP native export |
+| Platform | Status | Setup |
+|----------|--------|-------|
+| **Grafana Tempo** | ✅ Supported | `FLUSK_EXPORT=grafana FLUSK_GRAFANA_API_KEY=xxx` |
+| **Datadog** | ✅ Supported | `FLUSK_EXPORT=datadog FLUSK_DATADOG_API_KEY=xxx` |
+| **New Relic** | ✅ Supported | `FLUSK_EXPORT=newrelic FLUSK_NEWRELIC_API_KEY=xxx` |
+| **Custom OTLP** | ✅ Supported | `FLUSK_EXPORT=custom FLUSK_CUSTOM_ENDPOINT=http://...` |
 
-> Since Flusk already emits OpenTelemetry spans and metrics, adding these integrations is a matter of configuring the OTLP exporter — no code changes in your app.
+Export to multiple platforms simultaneously:
+
+```bash
+FLUSK_EXPORT=grafana,datadog \
+FLUSK_GRAFANA_API_KEY=xxx \
+FLUSK_DATADOG_API_KEY=xxx \
+flusk analyze ./app.js
+```
+
+Manage integrations via CLI:
+
+```bash
+flusk export setup grafana --api-key xxx   # Configure
+flusk export test grafana                   # Send test span
+flusk export list                           # Show active targets
+```
+
+> **Multi-export:** Flusk always writes to local SQLite AND your configured platforms in parallel. You never lose local data.
 
 ## API Reference
 
@@ -180,8 +236,8 @@ Local Analysis Engine
     ▼
 Reports (stdout / markdown / json / TUI dashboard)
     │
-    ▼  (planned)
-OTLP Export → Datadog / Logz.io / Coralogix / Grafana
+    ▼  (optional, parallel)
+OTLP Export → Grafana Tempo / Datadog / New Relic / Custom
 ```
 
 **Zero intrusion.** No wrappers, no monkey-patching, no SDK to import. Flusk hooks into the Node.js runtime via OpenTelemetry auto-instrumentation and captures LLM calls at the HTTP layer. Your code stays unchanged.
@@ -216,6 +272,11 @@ flusk init                       # Create .flusk.config.js
 
 # Dashboard
 flusk dashboard                  # Interactive TUI (7 screens)
+
+# Integrations
+flusk export setup <platform>    # Configure Grafana/Datadog/New Relic
+flusk export test <platform>     # Send test span
+flusk export list                # Show active export targets
 ```
 
 ## Configuration
@@ -259,9 +320,8 @@ See the [Self-Hosting Guide](./docs/self-hosting.md).
 - [x] Performance profiling with [@platformatic/flame](https://github.com/platformatic/flame)
 - [x] TUI dashboard (7 interactive screens)
 - [x] Schema-driven generator framework (90% generated code)
-- [ ] **Datadog integration** (OTLP export)
-- [ ] **Logz.io integration** (OTLP export)
-- [ ] **Coralogix integration** (OTLP export)
+- [x] **Observability integrations** — Grafana, Datadog, New Relic (OTLP export)
+- [x] Multi-export (SQLite + external platforms in parallel)
 - [ ] VS Code extension
 - [ ] GitHub Action for CI cost gates
 - [ ] Prompt optimization (semantic dedup)
