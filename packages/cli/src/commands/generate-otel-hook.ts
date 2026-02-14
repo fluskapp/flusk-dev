@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk g:hook <name>
  * Scaffolds an OTel SpanProcessor hook
  */

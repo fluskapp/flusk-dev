@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * WebSocket live feed route for streaming spans to CLI
  */
 import type { FastifyInstance } from 'fastify';

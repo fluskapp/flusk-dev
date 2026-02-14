@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { generateSqliteRepo } from '../generators/sqlite-repo.generator.js';

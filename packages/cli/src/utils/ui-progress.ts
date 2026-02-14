@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Flusk CLI UI Progress & Spinner utilities
  */
 

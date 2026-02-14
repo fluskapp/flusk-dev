@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk history
  * Show past analyze sessions from SQLite
  */

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Input type for normalizeProvider function
  */
 export type ProviderInput = string;

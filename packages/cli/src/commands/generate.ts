@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import { Command } from 'commander';
 import { resolve, basename } from 'node:path';
 import { existsSync, readdirSync } from 'node:fs';

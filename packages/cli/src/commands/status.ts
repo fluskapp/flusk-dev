@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk status — overview of generated file health.
  *
  * WHY: Developers need a quick way to see which generated files

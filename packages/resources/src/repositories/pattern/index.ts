@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Pattern Repository — CRUD for detected repetitive prompt patterns.
  * All functions accept a Pool instance as first parameter.
  */

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Pattern filter options for organization queries
  */
 export interface PatternFilters {

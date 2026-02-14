@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 export { classifyComplexity } from './classify-complexity.function.js';
 export type { ComplexityLevel, ClassifyComplexityInput, ClassifyComplexityOutput } from './classify-complexity.function.js';
 

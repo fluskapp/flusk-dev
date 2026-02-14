@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import { TraceEntity } from '@flusk/types';
 
 const VALID_STATUSES = ['running', 'completed', 'failed'] as const;

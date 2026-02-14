@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Feature generator - scaffolds a complete feature across all packages
  * Creates: entity + types + business-logic + repository + migration + routes + plugin + hooks + tests
  */

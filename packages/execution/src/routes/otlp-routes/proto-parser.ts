@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Register content-type parser for application/x-protobuf
  * Decodes OTLP protobuf trace requests
  */

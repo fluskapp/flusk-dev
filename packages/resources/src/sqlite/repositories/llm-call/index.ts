@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * SQLite LLM Call Repository barrel
  */
 

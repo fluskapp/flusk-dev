@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Reserved words that cannot be used as field or entity names.
  *
  * WHY: These clash with SQL keywords, TypeScript keywords,

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Package.json and .env.example validators
  */
 

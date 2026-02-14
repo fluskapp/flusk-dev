@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Trait registry — register, lookup, and resolve trait chains.
  *
  * WHY: Traits have dependencies on each other (soft-delete needs crud).

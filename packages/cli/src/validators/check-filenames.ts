@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Check: non-kebab-case filenames
  */
 

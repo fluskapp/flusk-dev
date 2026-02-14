@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * LLM provider configurations
  */
 export { BEDROCK_PRICING } from './bedrock.pricing.js';

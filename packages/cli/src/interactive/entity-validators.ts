@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Entity validation utilities for interactive prompts
  */
 

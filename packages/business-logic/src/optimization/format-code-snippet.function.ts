@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Format generated code snippets with proper indentation and comments
  * Pure function — no I/O
  */

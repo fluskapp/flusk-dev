@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Flusk CLI UI Utilities
  *
  * Provides consistent UI components for CLI commands following the

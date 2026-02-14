@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk dashboard
  * Launches interactive TUI dashboard
  */

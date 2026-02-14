@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Sensible + Under Pressure plugin — httpErrors helpers and backpressure/health.
  */
 import fp from 'fastify-plugin';

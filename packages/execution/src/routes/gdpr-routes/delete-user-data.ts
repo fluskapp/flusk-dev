@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { logAudit } from '@flusk/resources';
 import { DeleteParams } from './types.js';

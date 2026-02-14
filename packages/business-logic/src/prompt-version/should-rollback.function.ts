@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Determine if the active version should be rolled back
  * to the previous version based on quality degradation
  */

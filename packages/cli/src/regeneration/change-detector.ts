@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Detect which generated files are stale and need regeneration.
  *
  * WHY: Avoid regenerating everything on every run. By comparing

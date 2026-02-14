@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Report generator — formats analyze session data into markdown/JSON
  */
 import chalk from 'chalk';

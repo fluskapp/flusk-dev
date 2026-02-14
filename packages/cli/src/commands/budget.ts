@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk budget — show budget status with progress bars
  */
 import { Command } from 'commander';

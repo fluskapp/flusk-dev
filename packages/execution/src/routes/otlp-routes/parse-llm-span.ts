@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Parse an OTel span with GenAI semantic conventions into a Flusk LLM call
  */
 import type { OtlpSpan, ParsedLlmCall } from './types.js';

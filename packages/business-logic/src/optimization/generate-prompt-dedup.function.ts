@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Generate prompt deduplication/normalization code
  * Pure function — no I/O
  */

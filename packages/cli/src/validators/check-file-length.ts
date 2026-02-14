@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Check: files over 100 lines
  */
 

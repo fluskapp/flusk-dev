@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * YAML file reader — loads and parses a single entity YAML.
  *
  * WHY: Separated from validation so we can report parse errors

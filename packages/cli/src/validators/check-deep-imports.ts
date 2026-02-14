@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Check: deep imports from @flusk/* packages
  * e.g., `@flusk/entities/foo` instead of `@flusk/entities`
  */

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Routing decision types — Insert + Query variants
  * Note: No Update variant — routing decisions are immutable once recorded
  */

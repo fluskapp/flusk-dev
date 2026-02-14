@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Fastify plugin recipe — scaffolds plugin + test.
  *
  * WHY: Wraps the existing fastify-plugin generator into

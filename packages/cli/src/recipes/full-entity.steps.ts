@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Individual steps for the full-entity recipe.
  *
  * WHY: Each step is isolated for testability and the 100-line rule.

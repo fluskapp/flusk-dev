@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Entity schema parser — loads YAML and returns typed EntitySchema.
  *
  * WHY: This is the main entry point for loading entity definitions.

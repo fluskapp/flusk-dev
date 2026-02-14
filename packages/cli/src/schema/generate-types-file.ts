@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Types file generator — creates @flusk/types variant files.
  *
  * WHY: Each entity needs Insert/Update/Query schema variants

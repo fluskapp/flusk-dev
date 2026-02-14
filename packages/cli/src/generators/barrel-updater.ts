@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Barrel export updater - appends exports to index.ts files
  * Idempotent: skips if export already exists
  */

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * flusk infra:logs - View logs from Docker infrastructure services
  */
 

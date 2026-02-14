@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Time-range trait — generates findByTimeRange + date indexes.
  *
  * WHY: Many entities need time-based queries (analytics, logs).

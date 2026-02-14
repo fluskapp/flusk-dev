@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Render a prompt template by replacing {{variable}} placeholders
  * Pure function — no I/O, no side effects
  */

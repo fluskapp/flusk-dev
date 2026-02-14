@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Test Generator Helpers - File analysis and type detection
  */
 

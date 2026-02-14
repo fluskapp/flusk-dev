@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Extract attribute values from OTel span attributes
  */
 import type { OtlpAttribute } from './types.js';

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Recipe execution engine — runs steps sequentially with logging.
  *
  * WHY: Centralizes step orchestration, timing, dry-run, and rollback

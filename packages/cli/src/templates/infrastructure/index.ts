@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Infrastructure Templates
  * Export all infrastructure template generators
  */

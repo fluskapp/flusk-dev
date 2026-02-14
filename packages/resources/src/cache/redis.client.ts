@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import Redis from 'ioredis';
 import { getLogger } from '@flusk/logger';
 

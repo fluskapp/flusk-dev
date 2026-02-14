@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Prompt Version Repository — CRUD for immutable prompt versions.
  * All functions accept a Pool instance as first parameter.
  */

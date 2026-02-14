@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { Pool } from 'pg';
 import { ProfileSessionEntity, LLMCallEntity, HotspotEntry } from '@flusk/entities';
 

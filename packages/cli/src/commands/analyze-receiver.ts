@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Ephemeral OTLP receiver — local HTTP server for span ingestion
  * Binds to random port, accepts POST /v1/traces, writes to SQLite
  */

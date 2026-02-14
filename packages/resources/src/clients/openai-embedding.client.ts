@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * OpenAI Embedding Client
  * Generates text embeddings using text-embedding-3-small
  */

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * TUI Hook: useProfiles — fetch profile sessions from API
  */
 

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * SQL generation helpers for storage-specific trait output.
  *
  * WHY: SQLite and Postgres have different SQL syntax for common

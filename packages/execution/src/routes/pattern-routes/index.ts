@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { FastifyInstance } from 'fastify';
 import { registerListPatterns } from './list-patterns.js';
 import { registerGetPattern } from './get-pattern.js';

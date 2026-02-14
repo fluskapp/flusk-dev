@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Singleton logger instance
  */
 import type pino from 'pino';

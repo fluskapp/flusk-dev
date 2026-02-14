@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { DatabaseSync } from 'node:sqlite';
 import type { ProfileSessionEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';

@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { ProfileSessionEntity, Severity } from '@flusk/entities';
 import type { CorrelationResult } from './correlate-with-traces.function.js';
 import { detectHotPathCalls } from './detect-hot-path-calls.function.js';

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk profile compare <id1> <id2>
  * Side-by-side comparison of two profile sessions
  */

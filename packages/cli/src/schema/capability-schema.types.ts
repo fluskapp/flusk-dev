@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Capability schema types for entity YAML definitions.
  *
  * WHY: Capabilities drive trait-based code generation.

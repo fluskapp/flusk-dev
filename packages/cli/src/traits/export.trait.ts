@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Export trait — generates CSV and JSON export utilities.
  *
  * WHY: Many entities need data export for reporting or

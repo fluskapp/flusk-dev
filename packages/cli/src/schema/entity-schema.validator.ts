@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Entity schema validator — orchestrates all validation rules.
  *
  * WHY: Single entry point for validation. Runs shape checks,

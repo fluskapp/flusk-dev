@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Check budget status against limits and usage
  */
 import type { BudgetLimits, BudgetPeriod, BudgetStatus, UsageData } from './budget.types.js';

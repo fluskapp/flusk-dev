@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Schema system barrel — public API for entity YAML schemas.
  */
 

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Create entity command - interactive entity schema creation
  */
 

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Schema validator constants
  */
 

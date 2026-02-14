@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk g:provider <name>
  * Scaffolds LLM provider integration (pricing, span config, test)
  */

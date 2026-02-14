@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Repository test template sections
  * Individual test section generators for repository tests
  */

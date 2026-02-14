@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * TypeBox entity schema generator from YAML.
  *
  * WHY: Generates the @flusk/entities TypeBox schema file

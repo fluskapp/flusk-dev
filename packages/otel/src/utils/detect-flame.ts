@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Auto-detection of @platformatic/flame availability
  * Dynamically imports flame; gracefully returns false if not installed
  */

@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import { llmCall } from '@flusk/business-logic';
 
 const { calculateCost: businessCalculateCost } = llmCall;

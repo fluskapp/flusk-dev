@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Soft-delete trait — uses deletedAt instead of hard deletes.
  *
  * WHY: Some entities need data retention (auditing, compliance).

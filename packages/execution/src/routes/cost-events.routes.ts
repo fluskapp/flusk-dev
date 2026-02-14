@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
 import { costEventBus, type CostEvent } from '../events/cost-event-bus.js'
 

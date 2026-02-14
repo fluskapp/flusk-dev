@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Package generator - creates a new monorepo package
  */
 

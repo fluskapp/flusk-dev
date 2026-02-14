@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Budget module barrel
  */
 export { checkBudget } from './check-budget.function.js';

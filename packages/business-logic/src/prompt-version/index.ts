@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 export { validatePromptVersion } from './validate-prompt-version.function.js';
 export { compareVersions } from './compare-versions.function.js';
 export type { VersionMetrics, CompareResult } from './compare-versions.function.js';

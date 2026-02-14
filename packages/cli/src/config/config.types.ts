@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Flusk configuration schema
  */
 

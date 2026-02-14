@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import { LLMCallEntity } from '@flusk/entities';
 
 /**

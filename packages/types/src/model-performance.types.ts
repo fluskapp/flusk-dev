@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Model performance types — Upsert + Query variants
  * Note: Uses Upsert instead of Insert/Update because model_performance
  * has a UNIQUE(model, prompt_category) constraint with ON CONFLICT logic

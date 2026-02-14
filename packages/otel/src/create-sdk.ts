@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Creates and configures the OpenTelemetry NodeSDK for Flusk.
  * Auto-detects local vs server mode for exporter selection.
  */

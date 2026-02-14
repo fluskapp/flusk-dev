@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Generate model-swap code when a cheaper model works for certain prompts
  * Pure function — no I/O
  */

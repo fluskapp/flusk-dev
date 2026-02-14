@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Trait composition engine — merges multiple trait outputs into files.
  *
  * WHY: Each trait produces code sections independently. The composer

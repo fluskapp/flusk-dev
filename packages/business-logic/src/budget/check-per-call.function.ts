@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Check if a single LLM call exceeds the per-call cost threshold
  */
 import type { PerCallAlert } from './budget.types.js';

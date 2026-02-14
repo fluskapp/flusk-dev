@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Profile Upload Client — POSTs profile data to /v1/profiles
  * Uses undici.request() following existing client patterns
  */

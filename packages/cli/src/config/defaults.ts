@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Default configuration values
  */
 import type { FluskConfig } from './config.types.js';

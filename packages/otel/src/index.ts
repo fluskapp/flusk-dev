@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * @flusk/otel — Zero-touch OpenTelemetry auto-instrumentation for Flusk
  *
  * Re-exports for programmatic access. Most users just need:

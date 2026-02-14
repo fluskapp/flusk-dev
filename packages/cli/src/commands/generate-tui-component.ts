@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk g:tui-component <name>
  * Generates a TUI Ink component
  */

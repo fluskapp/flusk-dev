@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { LLMCallEntity, TokenUsage } from '@flusk/entities';
 import { toISOString } from '../../shared/map-row.js';
 

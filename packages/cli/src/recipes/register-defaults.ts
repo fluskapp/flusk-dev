@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Register all built-in recipes at startup.
  *
  * WHY: Centralizes recipe registration so the CLI and tests

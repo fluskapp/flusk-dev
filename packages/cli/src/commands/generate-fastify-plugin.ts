@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk g:fastify-plugin <name>
  * Scaffolds a Fastify plugin with fp wrapper
  */

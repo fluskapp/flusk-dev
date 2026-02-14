@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk route <name>
  * Creates a standalone route without full feature scaffolding
  */

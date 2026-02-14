@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { DatabaseSync } from 'node:sqlite';
 
 export interface ModelCount {

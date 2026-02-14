@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Semantic validation rules for entity schemas.
  *
  * WHY: Shape validation catches structural issues. Semantic

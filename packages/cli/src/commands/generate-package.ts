@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk package <name>
  * Creates a new package in the monorepo
  */

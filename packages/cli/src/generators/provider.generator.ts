@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Provider generator - scaffolds LLM provider integration files
  * Creates: pricing config, span parser constants, test file
  */

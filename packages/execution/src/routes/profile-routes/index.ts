@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { FastifyInstance } from 'fastify';
 import { createProfileRoute } from './create-profile.js';
 import { listProfilesRoute } from './list-profiles.js';

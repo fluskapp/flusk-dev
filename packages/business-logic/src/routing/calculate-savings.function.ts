@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Calculate cost savings from routing to a cheaper model
  * Pure function — no I/O
  */

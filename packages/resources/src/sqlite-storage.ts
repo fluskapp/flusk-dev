@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { StorageAdapter } from './storage.js';
 import { getDb } from './sqlite/connection.js';
 import { runMigrations } from './sqlite/migrations.js';

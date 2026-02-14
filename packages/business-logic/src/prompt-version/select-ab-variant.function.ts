@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Select which prompt version to serve in an A/B test
  * Based on traffic split percentage for the candidate version
  */

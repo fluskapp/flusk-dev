@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Span Repository — CRUD for trace spans.
  * All functions accept a Pool instance as first parameter.
  */

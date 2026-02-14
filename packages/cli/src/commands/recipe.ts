@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk recipe <name> [options]
  *
  * WHY: Single entry point for running any recipe. Supports

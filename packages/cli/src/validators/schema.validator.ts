@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Schema validator - validates TypeBox entity schemas
  */
 

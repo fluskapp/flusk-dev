@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Resolve the correct span exporter based on FLUSK_MODE.
  * Local mode (default): SqliteSpanExporter → writes to ~/.flusk/data.db
  * Server mode: OTLPTraceExporter → HTTP to Flusk server

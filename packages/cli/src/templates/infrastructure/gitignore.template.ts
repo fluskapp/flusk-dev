@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Template for .gitignore generation
  * Comprehensive ignore patterns for Node.js/TypeScript Flusk projects
  */

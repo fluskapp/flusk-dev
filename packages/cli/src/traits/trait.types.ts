@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Core types for the trait-based code generation system.
  *
  * WHY: Traits are composable units of code generation. Each trait

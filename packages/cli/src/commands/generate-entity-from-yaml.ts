@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk generate entity --from <yaml>
  *
  * WHY: This is the primary user-facing command for schema-first

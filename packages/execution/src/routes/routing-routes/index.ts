@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { FastifyInstance } from 'fastify';
 import { registerRoutePrompt } from './route-prompt.js';
 import { registerGetPerformance } from './get-performance.js';

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Validate Config Command - flusk validate:config
  */
 

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Dependency graph builder and circular dependency detector.
  *
  * WHY: Entities reference each other via relations. We need

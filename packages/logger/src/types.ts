@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Logger configuration types
  */
 

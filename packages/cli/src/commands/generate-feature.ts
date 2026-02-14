@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * CLI command: flusk generate feature <name>
  * Scaffolds a complete feature across all packages
  */

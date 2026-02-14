@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Decide whether this call should be A/B tested
  * Pure function — no I/O
  */

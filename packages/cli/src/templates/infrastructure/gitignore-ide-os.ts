@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Gitignore IDE, OS, and project-specific sections
  */
 

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * flusk infra:down - Stop Docker infrastructure services
  */
 

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Config barrel
  */
 export { loadConfig, mergeConfig } from './load-config.js';

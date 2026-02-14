@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Profile Session Repository — CRUD operations for profiling sessions.
  * All functions accept a Pool instance as first parameter.
  */

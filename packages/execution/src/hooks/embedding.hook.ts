@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { Pool } from 'pg';
 import { getLogger } from '@flusk/logger';
 import { OpenAIEmbeddingClient } from '@flusk/resources';

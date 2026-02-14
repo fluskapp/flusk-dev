@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Registers all built-in traits in the global registry.
  *
  * WHY: Traits must be registered before resolution. This module

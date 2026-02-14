@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import { scryptSync } from 'crypto';
 
 /** AES-256-GCM encryption constants */

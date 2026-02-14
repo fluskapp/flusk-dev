@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Shared row-to-entity date conversion — handles both Postgres Date objects and SQLite strings.
  */
 export function toISOString(value: unknown): string {

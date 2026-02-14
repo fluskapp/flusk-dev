@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * AWS Bedrock span detection config for OTLP parsing
  */
 export const BEDROCK_SYSTEM_VALUES = [

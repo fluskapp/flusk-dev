@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * WizardPrompter implementation using @clack/prompts.
  */
 

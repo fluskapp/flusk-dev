@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Regeneration system barrel — safe incremental code regeneration.
  */
 

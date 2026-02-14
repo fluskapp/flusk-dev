@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * SQLite Profile Session Repository barrel
  */
 

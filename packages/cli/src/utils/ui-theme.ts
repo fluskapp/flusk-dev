@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Flusk CLI UI Theme
  * Brand colors, chalk helpers, and status icons
  *

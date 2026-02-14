@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { Pool } from 'pg';
 import type { ModelPerformanceEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';

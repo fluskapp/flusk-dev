@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Entity schema registry — loads all YAMLs and provides lookup.
  *
  * WHY: The registry is the runtime catalog of all entities.

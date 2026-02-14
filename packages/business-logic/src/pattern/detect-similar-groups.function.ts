@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Group LLM calls by semantic similarity using pre-computed embeddings
  * Works alongside exact-hash detection for near-duplicate discovery
  */

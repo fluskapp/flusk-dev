@@ -1,3 +1,4 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
 // Base entity exports
 export { BaseEntitySchema, type BaseEntity } from './base.entity.js';
 

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Budget check logic extracted from analyze command.
  */
 import chalk from 'chalk';

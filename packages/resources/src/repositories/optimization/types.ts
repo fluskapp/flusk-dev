@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 export interface OptimizationRow {
   id: string;
   organization_id: string;

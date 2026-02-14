@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * AWS Bedrock provider pricing (USD per 1M tokens)
  * On-demand pricing as of February 2026
  */

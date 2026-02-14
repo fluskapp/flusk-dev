@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * flusk infra:status - Check health status of Docker infrastructure services
  */
 

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Input for generateDowngrade function
  */
 export interface GenerateDowngradeInput {

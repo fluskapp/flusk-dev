@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { generateDockerfile } from '../generators/dockerfile.generator.js';

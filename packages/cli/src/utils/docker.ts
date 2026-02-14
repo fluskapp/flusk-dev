@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Docker utility functions for infrastructure management
  */
 

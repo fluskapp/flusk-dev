@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Traits system barrel — public API for trait-based code generation.
  */
 

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * SQLite Analyze Session Repository barrel
  */
 

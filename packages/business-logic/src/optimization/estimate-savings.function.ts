@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Estimate monthly savings from an optimization
  * Pure function — no I/O
  */

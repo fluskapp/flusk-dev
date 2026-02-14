@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import { DatabaseSync } from 'node:sqlite';
 import { join } from 'node:path';
 import { mkdirSync } from 'node:fs';

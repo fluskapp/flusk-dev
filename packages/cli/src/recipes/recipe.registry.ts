@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Registry of available recipes — register + lookup by name.
  *
  * WHY: Decouples recipe definitions from the CLI layer.

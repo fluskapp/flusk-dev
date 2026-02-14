@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import { Pool } from 'pg';
 import { getLogger } from '@flusk/logger';
 

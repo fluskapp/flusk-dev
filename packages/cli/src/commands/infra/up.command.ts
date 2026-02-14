@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * flusk infra:up - Start Docker infrastructure services
  */
 

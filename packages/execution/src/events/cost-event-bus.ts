@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import { EventEmitter } from 'node:events'
 
 export interface CostEvent {

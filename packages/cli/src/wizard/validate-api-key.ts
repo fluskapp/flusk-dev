@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Validate API keys by making minimal API calls.
  * Uses native fetch — no extra dependencies.
  */

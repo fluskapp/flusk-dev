@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * flusk infra:reset - Reset Docker infrastructure (stop, remove volumes, restart)
  */
 

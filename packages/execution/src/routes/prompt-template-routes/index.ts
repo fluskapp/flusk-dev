@@ -1,3 +1,5 @@
+/** @generated — DO NOT EDIT. Regenerate via flusk CLI. */
+
 import type { FastifyInstance } from 'fastify';
 import { promptTemplateCrudRoutes } from './crud.routes.js';
 import { promptTemplateActionRoutes } from './action.routes.js';

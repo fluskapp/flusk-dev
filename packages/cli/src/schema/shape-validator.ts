@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Shape validator — checks that parsed YAML matches EntitySchema shape.
  *
  * WHY: We validate shape before business rules. This catches

@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Parse an OTel ReadableSpan into the shape for SQLite LLM call storage.
  * Returns null if the span is not a GenAI span.
  */

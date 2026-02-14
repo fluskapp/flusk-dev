@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Feature test generator - creates unit test stubs for a feature
  */
 

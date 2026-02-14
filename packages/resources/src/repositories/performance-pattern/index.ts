@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Performance Pattern Repository — CRUD for detected patterns.
  * All functions accept a Pool instance as first parameter.
  */

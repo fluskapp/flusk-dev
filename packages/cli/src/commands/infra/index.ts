@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Infrastructure management commands
  * Export all infra subcommands
  */

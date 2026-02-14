@@ -1,4 +1,4 @@
-/**
+/** @generated —
  * Validate PromptVersion fields
  * Pure function — no side effects, no I/O
  */
