@@ -1,4 +1,3 @@
-/** @generated from BudgetAlert YAML — Traits: crud, time-range, aggregation */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { BudgetAlertEntitySchema } from '@flusk/entities';

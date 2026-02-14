@@ -1,4 +1,3 @@
-/** @generated from Trace YAML — Traits: crud */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { TraceEntitySchema } from '@flusk/entities';

@@ -1,4 +1,3 @@
-/** @generated from PromptVersion YAML — Traits: crud */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { PromptVersionEntitySchema } from '@flusk/entities';

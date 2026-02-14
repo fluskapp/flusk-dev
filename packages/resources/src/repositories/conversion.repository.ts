@@ -1,4 +1,3 @@
-/** @generated from Conversion YAML — Traits: crud */
 
 import type { ConversionEntity } from '@flusk/entities';
 import type { DatabaseSync } from 'node:sqlite';

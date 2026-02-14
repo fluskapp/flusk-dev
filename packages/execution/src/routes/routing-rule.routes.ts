@@ -1,4 +1,3 @@
-/** @generated from RoutingRule YAML — Traits: crud */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { RoutingRuleEntitySchema } from '@flusk/entities';

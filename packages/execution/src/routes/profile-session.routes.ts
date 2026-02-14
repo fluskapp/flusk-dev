@@ -1,4 +1,3 @@
-/** @generated from ProfileSession YAML — Traits: crud, time-range */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { ProfileSessionEntitySchema } from '@flusk/entities';

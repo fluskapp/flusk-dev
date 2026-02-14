@@ -1,4 +1,3 @@
-/** @generated from Conversion YAML — Traits: crud */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { ConversionEntitySchema } from '@flusk/entities';

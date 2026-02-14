@@ -1,4 +1,3 @@
-/** @generated from Optimization YAML — Traits: crud */
 
 import type { OptimizationEntity } from '@flusk/entities';
 import type { DatabaseSync } from 'node:sqlite';

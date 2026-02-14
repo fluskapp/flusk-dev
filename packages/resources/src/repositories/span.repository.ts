@@ -1,4 +1,3 @@
-/** @generated from Span YAML — Traits: crud */
 
 import type { SpanEntity } from '@flusk/entities';
 import type { DatabaseSync } from 'node:sqlite';

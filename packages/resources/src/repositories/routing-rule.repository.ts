@@ -1,4 +1,3 @@
-/** @generated from RoutingRule YAML — Traits: crud */
 
 import type { RoutingRuleEntity } from '@flusk/entities';
 import type { DatabaseSync } from 'node:sqlite';

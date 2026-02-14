@@ -1,4 +1,3 @@
-/** @generated from BudgetAlert YAML — Traits: crud, time-range, aggregation */
 
 import type { BudgetAlertEntity } from '@flusk/entities';
 import type { DatabaseSync } from 'node:sqlite';

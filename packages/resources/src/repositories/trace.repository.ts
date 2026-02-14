@@ -1,4 +1,3 @@
-/** @generated from Trace YAML — Traits: crud */
 
 import type { TraceEntity } from '@flusk/entities';
 import type { DatabaseSync } from 'node:sqlite';

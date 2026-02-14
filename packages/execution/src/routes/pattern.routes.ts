@@ -1,4 +1,3 @@
-/** @generated from Pattern YAML — Traits: crud */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { PatternEntitySchema } from '@flusk/entities';

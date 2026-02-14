@@ -1,4 +1,3 @@
-/** @generated from Span YAML — Traits: crud */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { SpanEntitySchema } from '@flusk/entities';

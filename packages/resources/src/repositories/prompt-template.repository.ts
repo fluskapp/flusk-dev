@@ -1,4 +1,3 @@
-/** @generated from PromptTemplate YAML — Traits: crud */
 
 import type { PromptTemplateEntity } from '@flusk/entities';
 import type { DatabaseSync } from 'node:sqlite';

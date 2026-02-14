@@ -44,4 +44,3 @@ export type { AuditLogEntry } from './audit/audit-log.repository.js';
 
 export * as BudgetAlertRepository from './repositories/budget-alert.repository.js';
 
-export * as AnalyzeSessionRepository from './repositories/analyze-session.repository.js';

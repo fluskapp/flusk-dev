@@ -1,4 +1,3 @@
-/** @generated from AnalyzeSession YAML — Traits: crud, time-range */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { AnalyzeSessionEntitySchema } from '@flusk/entities';

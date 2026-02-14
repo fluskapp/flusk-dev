@@ -1,4 +1,3 @@
-/** @generated from PromptTemplate YAML — Traits: crud */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { PromptTemplateEntitySchema } from '@flusk/entities';

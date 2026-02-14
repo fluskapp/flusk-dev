@@ -1,4 +1,3 @@
-/** @generated from Pattern YAML — Traits: crud */
 
 import type { PatternEntity } from '@flusk/entities';
 import type { DatabaseSync } from 'node:sqlite';

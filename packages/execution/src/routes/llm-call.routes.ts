@@ -1,4 +1,3 @@
-/** @generated from LLMCall YAML — Traits: crud, aggregation, time-range */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { LLMCallEntitySchema } from '@flusk/entities';

@@ -1,10 +1,28 @@
+import { Type, Static } from '@sinclair/typebox';
+
 // Base entity exports
 export { BaseEntitySchema, type BaseEntity } from './base.entity.js';
 
+// Shared sub-schemas (not in entity files but expected by consumers)
+export const TokenUsageSchema = Type.Object({
+  input: Type.Number({ minimum: 0 }),
+  output: Type.Number({ minimum: 0 }),
+  total: Type.Number({ minimum: 0 }),
+});
+export type TokenUsage = Static<typeof TokenUsageSchema>;
+
+export const HotspotEntrySchema = Type.Object({
+  functionName: Type.String(),
+  filePath: Type.String(),
+  cpuPercent: Type.Number(),
+  samples: Type.Integer(),
+});
+export type HotspotEntry = Static<typeof HotspotEntrySchema>;
+
+export type ModelsUsed = string[];
+
 // LLM call entity exports
 export {
-  TokenUsageSchema,
-  type TokenUsage,
   LLMCallEntitySchema,
   type LLMCallEntity
 } from './llm-call.entity.js';
@@ -19,15 +37,6 @@ export {
 export {
   ConversionEntitySchema,
   type ConversionEntity,
-  ConversionTypeSchema,
-  type ConversionType,
-  ConversionStatusSchema,
-  type ConversionStatus,
-  ConversionConfigSchema,
-  type ConversionConfig,
-  CacheConfigSchema,
-  DowngradeConfigSchema,
-  RemoveConfigSchema
 } from './conversion.entity.js';
 
 // Routing entity exports
@@ -72,16 +81,12 @@ export {
 
 // ProfileSession entity exports
 export {
-  HotspotEntrySchema,
-  type HotspotEntry,
   ProfileSessionEntitySchema,
   type ProfileSessionEntity
 } from './profile-session.entity.js';
 
 // PerformancePattern entity exports
 export {
-  SeveritySchema,
-  type Severity,
   PerformancePatternEntitySchema,
   type PerformancePatternEntity
 } from './performance-pattern.entity.js';
@@ -90,15 +95,12 @@ export {
 export {
   AnalyzeSessionEntitySchema,
   type AnalyzeSessionEntity,
-  type ModelsUsed
 } from './analyze-session.entity.js';
 
 // PromptVersion entity exports
 export {
   PromptVersionEntitySchema,
-  PromptVersionMetricsSchema,
   type PromptVersionEntity,
-  type PromptVersionMetrics
 } from './prompt-version.entity.js';
 
 // BudgetAlert entity exports

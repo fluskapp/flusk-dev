@@ -1,4 +1,3 @@
-/** @generated from Optimization YAML — Traits: crud */
 import type { FastifyInstance } from 'fastify';
 import { Type } from '@sinclair/typebox';
 import { OptimizationEntitySchema } from '@flusk/entities';
