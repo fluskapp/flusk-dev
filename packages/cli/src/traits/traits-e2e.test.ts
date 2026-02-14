@@ -80,6 +80,58 @@ describe('Traits E2E', () => {
     assert.ok(repo.includes('BEGIN CUSTOM'), 'Should have custom section');
   });
 
+  test('generates rowToEntity with proper type conversions', () => {
+    const yamlPath = join(tempDir, 'invoice.entity.yaml');
+    writeFileSync(yamlPath, YAML_WITH_TRAITS);
+    runEntityPipeline(yamlPath, tempDir);
+
+    const repoPath = join(tempDir,
+      'packages/resources/src/sqlite/repositories/invoice.repository.ts');
+    const repo = readFileSync(repoPath, 'utf-8');
+
+    assert.ok(repo.includes('rowToEntity'), 'Should have rowToEntity mapper');
+    assert.ok(repo.includes('toISOString(row.created_at)'), 'Should map created_at');
+    assert.ok(repo.includes('toISOString(row.updated_at)'), 'Should map updated_at');
+    assert.ok(repo.includes('row.customer_name as string'), 'Should snake→camel');
+    assert.ok(repo.includes('Record<string, unknown>'), 'Should type rows properly');
+  });
+
+  test('generates create with type conversions for json/boolean', () => {
+    const yaml = `
+name: Widget
+storage: [sqlite]
+fields:
+  label:
+    type: string
+    required: true
+  active:
+    type: boolean
+    required: true
+  metadata:
+    type: json
+    required: true
+  note:
+    type: string
+capabilities:
+  crud: true
+`;
+    const yamlPath = join(tempDir, 'widget.entity.yaml');
+    writeFileSync(yamlPath, yaml);
+    runEntityPipeline(yamlPath, tempDir);
+
+    const repoPath = join(tempDir,
+      'packages/resources/src/sqlite/repositories/widget.repository.ts');
+    const repo = readFileSync(repoPath, 'utf-8');
+
+    assert.ok(repo.includes('Boolean(row.active)'), 'rowToEntity should convert boolean');
+    assert.ok(repo.includes('JSON.parse(row.metadata as string)'), 'rowToEntity should parse JSON');
+    assert.ok(repo.includes('data.active ? 1 : 0'), 'create should convert bool→int');
+    assert.ok(repo.includes('JSON.stringify(data.metadata)'), 'create should stringify JSON');
+    assert.ok(repo.includes('data.note ?? null'), 'create should handle optional');
+    assert.ok(repo.includes('(row.note as string) ?? undefined'), 'rowToEntity should handle optional');
+    assert.ok(repo.includes('convertValueForDb'), 'update should use convertValueForDb');
+  });
+
   test('generates route file with all trait routes', () => {
     const yamlPath = join(tempDir, 'invoice.entity.yaml');
     writeFileSync(yamlPath, YAML_WITH_TRAITS);
