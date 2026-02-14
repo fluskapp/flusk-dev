@@ -4,7 +4,14 @@
   "private": true,
   "type": "module",
   "description": "Open-source LLM cost optimization platform — zero-code tracking via OpenTelemetry",
-  "keywords": ["llm", "opentelemetry", "cost-optimization", "openai", "anthropic", "observability"],
+  "keywords": [
+    "llm",
+    "opentelemetry",
+    "cost-optimization",
+    "openai",
+    "anthropic",
+    "observability"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/AdirBenYossef/flusk.git"
@@ -56,5 +63,6 @@
     "ioredis": "^5.3.2",
     "pg": "^8.11.3",
     "pnpm": "^10.28.2"
-  }
+  },
+  "packageManager": "pnpm@10.26.1"
 }
