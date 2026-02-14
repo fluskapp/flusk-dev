@@ -50,9 +50,18 @@ function fieldToTypeBox(field: FieldSchema): string {
 /** Build the options object string for TypeBox */
 function buildTypeBoxOptions(field: FieldSchema): string {
   const parts: string[] = [];
-  if (field.description) parts.push(`description: '${field.description}'`);
-  if (field.min !== undefined) parts.push(`minimum: ${field.min}`);
-  if (field.max !== undefined) parts.push(`maximum: ${field.max}`);
+  if (field.description) {
+    const escaped = field.description.replace(/'/g, "\\'");
+    parts.push(`description: '${escaped}'`);
+  }
+  const isStringType = field.type === 'string' || field.type === 'email'
+    || field.type === 'uuid' || field.type === 'date';
+  if (field.min !== undefined) {
+    parts.push(isStringType ? `minLength: ${field.min}` : `minimum: ${field.min}`);
+  }
+  if (field.max !== undefined) {
+    parts.push(isStringType ? `maxLength: ${field.max}` : `maximum: ${field.max}`);
+  }
   if (field.default !== undefined) {
     const val = typeof field.default === 'string'
       ? `'${field.default}'` : String(field.default);

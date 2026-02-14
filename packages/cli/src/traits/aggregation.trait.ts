@@ -24,18 +24,25 @@ export function createAggregationTrait(): Trait {
 
 /** Generate aggregation code sections */
 function generateAggregation(ctx: TraitContext): TraitOutput {
-  const { schema, tableName, camelName } = ctx;
+  const { schema, storageTarget: st, tableName } = ctx;
   const n = schema.name;
   const numericFields = Object.entries(schema.fields)
     .filter(([, f]) => f.type === 'number' || f.type === 'integer')
     .map(([name]) => name);
 
+  // DB type imports handled by crud trait; aggregation only needs them standalone
+  const dbImport = st === 'postgres'
+    ? `import type { Pool } from 'pg';`
+    : `import type { DatabaseSync } from 'node:sqlite';`;
+
+  const fnBody = st === 'postgres'
+    ? buildPgAggregation(n, tableName, numericFields)
+    : buildSqliteAggregation(n, tableName, numericFields);
+
   return {
     traitName: 'aggregation',
     repository: {
-      imports: [
-        `import type { DatabaseSync } from 'node:sqlite';`,
-      ],
+      imports: [dbImport],
       types: [
         `/** Aggregation options for ${n} */`,
         `export interface ${n}AggregateOptions {`,
@@ -49,8 +56,48 @@ function generateAggregation(ctx: TraitContext): TraitOutput {
         `  group?: string;`,
         `}`,
       ],
+      functions: [fnBody],
+      sql: [],
+      routes: [],
+    },
+    route: {
+      imports: [],
+      types: [],
       functions: [
-        `/** Run an aggregate query on ${n} */
+        `  /** Aggregation route for ${n} */`,
+        `  fastify.get('/aggregate', async (req) => {`,
+        `    const opts = req.query as unknown as ${n}AggregateOptions;`,
+        `    return aggregate(req.db, opts);`,
+        `  });`,
+      ],
+      sql: [],
+      routes: [],
+    },
+    migration: emptySection(),
+  };
+}
+
+function buildPgAggregation(n: string, tableName: string, _numericFields: string[]): string {
+  return `/** Run an aggregate query on ${n} */
+export async function aggregate(
+  pool: Pool,
+  opts: ${n}AggregateOptions,
+): Promise<${n}AggregateResult[]> {
+  const col = opts.field.replace(/[^a-z_]/gi, '');
+  const fn = opts.op.toUpperCase();
+  const groupCol = opts.groupBy?.replace(/[^a-z_]/gi, '');
+  const select = groupCol
+    ? \`\${groupCol} as "group", \${fn}(\${col}) as value\`
+    : \`\${fn}(\${col}) as value\`;
+  const groupClause = groupCol ? \`GROUP BY \${groupCol}\` : '';
+  const sql = \`SELECT \${select} FROM ${tableName} \${groupClause}\`;
+  const result = await pool.query(sql);
+  return result.rows as ${n}AggregateResult[];
+}`;
+}
+
+function buildSqliteAggregation(n: string, tableName: string, _numericFields: string[]): string {
+  return `/** Run an aggregate query on ${n} */
 export function aggregate${n}s(
   db: DatabaseSync, opts: ${n}AggregateOptions,
 ): ${n}AggregateResult[] {
@@ -63,24 +110,5 @@ export function aggregate${n}s(
   const groupClause = groupCol ? \`GROUP BY \${groupCol}\` : '';
   const sql = \`SELECT \${select} FROM ${tableName} \${groupClause}\`;
   return db.prepare(sql).all() as ${n}AggregateResult[];
-}`,
-      ],
-      sql: [],
-      routes: [],
-    },
-    route: {
-      imports: [],
-      types: [],
-      functions: [
-        `/** Aggregation route for ${n} */`,
-        `app.get('/${camelName}s/aggregate', async (req) => {`,
-        `  const opts = req.query as unknown as ${n}AggregateOptions;`,
-        `  return aggregate${n}s(req.db, opts);`,
-        `});`,
-      ],
-      sql: [],
-      routes: [],
-    },
-    migration: emptySection(),
-  };
+}`;
 }

@@ -1,6 +1,6 @@
 name: PerformancePattern
 description: Detected performance patterns from profiling data combined with LLM call analysis
-storage: [sqlite]
+storage: [postgres]
 
 fields:
   profileSessionId:

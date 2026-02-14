@@ -1,6 +1,6 @@
 name: LLMCall
 description: A single LLM API call with cost tracking and deduplication
-storage: [sqlite]
+storage: [postgres]
 
 fields:
   provider:

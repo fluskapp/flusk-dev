@@ -22,30 +22,29 @@ export function createTimeRangeTrait(): Trait {
 
 /** Generate time-range query code sections */
 function generateTimeRange(ctx: TraitContext): TraitOutput {
-  const { schema, storageTarget: st, tableName, camelName } = ctx;
+  const { schema, storageTarget: st, tableName } = ctx;
   const n = schema.name;
   const p1 = placeholder(st, 1);
   const p2 = placeholder(st, 2);
+
+  const dbType = st === 'postgres' ? 'Pool' : 'DatabaseSync';
+  const dbImport = st === 'postgres'
+    ? `import type { Pool } from 'pg';`
+    : `import type { DatabaseSync } from 'node:sqlite';`;
+
+  const fnBody = st === 'postgres'
+    ? buildPgTimeRange(n, tableName, dbType)
+    : buildSqliteTimeRange(n, tableName, p1, p2, dbType);
 
   return {
     traitName: 'time-range',
     repository: {
       imports: [
+        dbImport,
         `import type { ${n}Entity } from '@flusk/types';`,
-        `import type { DatabaseSync } from 'node:sqlite';`,
       ],
       types: [],
-      functions: [
-        `/** Find ${n} records within a time range */
-export function find${n}sByTimeRange(
-  db: DatabaseSync, from: string, to: string,
-): ${n}Entity[] {
-  const stmt = db.prepare(
-    \`SELECT * FROM ${tableName} WHERE created_at >= ${p1} AND created_at <= ${p2} ORDER BY created_at DESC\`
-  );
-  return stmt.all(from, to) as ${n}Entity[];
-}`,
-      ],
+      functions: [fnBody],
       sql: [],
       routes: [],
     },
@@ -53,11 +52,11 @@ export function find${n}sByTimeRange(
       imports: [],
       types: [],
       functions: [
-        `/** Time-range query route for ${n} */`,
-        `app.get('/${camelName}s/by-time-range', async (req) => {`,
-        `  const { from, to } = req.query as { from: string; to: string };`,
-        `  return find${n}sByTimeRange(req.db, from, to);`,
-        `});`,
+        `  /** Time-range query route for ${n} */`,
+        `  fastify.get('/by-time-range', async (req) => {`,
+        `    const { from, to } = req.query as { from: string; to: string };`,
+        `    return findByTimeRange(req.db, from, to);`,
+        `  });`,
       ],
       sql: [],
       routes: [],
@@ -66,4 +65,33 @@ export function find${n}sByTimeRange(
       `CREATE INDEX IF NOT EXISTS idx_${tableName}_created_at ON ${tableName}(created_at);`,
     ]),
   };
+}
+
+function buildPgTimeRange(n: string, tableName: string, _dbType: string): string {
+  return `/** Find ${n} records within a time range */
+export async function findByTimeRange(
+  pool: Pool,
+  from: string,
+  to: string,
+): Promise<${n}Entity[]> {
+  const result = await pool.query(
+    \`SELECT * FROM ${tableName} WHERE created_at >= $1 AND created_at <= $2 ORDER BY created_at DESC\`,
+    [from, to],
+  );
+  return result.rows.map(rowToEntity);
+}`;
+}
+
+function buildSqliteTimeRange(
+  n: string, tableName: string, p1: string, p2: string, dbType: string,
+): string {
+  return `/** Find ${n} records within a time range */
+export function find${n}sByTimeRange(
+  db: ${dbType}, from: string, to: string,
+): ${n}Entity[] {
+  const stmt = db.prepare(
+    \`SELECT * FROM ${tableName} WHERE created_at >= ${p1} AND created_at <= ${p2} ORDER BY created_at DESC\`
+  );
+  return stmt.all(from, to) as ${n}Entity[];
+}`;
 }

@@ -66,7 +66,7 @@ export const composeTraitsStep: RecipeStep = {
     for (const target of targets) {
       const composed = composeTraits(schema, target);
       const repoDir = resolve(ctx.projectRoot,
-        `packages/resources/src/${target}/repositories`);
+        'packages/resources/src/repositories');
       files.push(writeRecipeFile(ctx, repoDir, `${kebab}.repository.ts`,
         composed.repository));
       if (composed.route) {

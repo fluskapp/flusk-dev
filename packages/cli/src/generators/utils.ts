@@ -26,6 +26,11 @@ export function toPascalCase(str: string): string {
  */
 export function toCamelCase(str: string): string {
   const pascal = toPascalCase(str);
+  // Handle leading acronyms: "LLMCall" → "llmCall", "HTTPServer" → "httpServer"
+  const match = pascal.match(/^([A-Z]+)([A-Z][a-z])/);
+  if (match) {
+    return match[1].toLowerCase() + pascal.slice(match[1].length);
+  }
   return pascal.charAt(0).toLowerCase() + pascal.slice(1);
 }
 
@@ -35,8 +40,8 @@ export function toCamelCase(str: string): string {
  */
 export function toKebabCase(str: string): string {
   return str
-    .replace(/([a-z])([A-Z])/g, '$1-$2')
-    .replace(/([A-Z])([A-Z][a-z])/g, '$1-$2')
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
     .toLowerCase();
 }
 

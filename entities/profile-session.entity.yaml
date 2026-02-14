@@ -1,6 +1,6 @@
 name: ProfileSession
 description: Captures profiling session data from @platformatic/flame integration
-storage: [sqlite]
+storage: [postgres]
 
 fields:
   name:
