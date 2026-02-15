@@ -3,18 +3,16 @@
   "version": "0.1.0",
   "description": "Database repositories, cache clients, and I/O operations for Flusk",
   "type": "module",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
-    ".": "./src/index.ts",
-    "./db/pool": "./src/db/pool.ts",
-    "./repositories/llm-call": "./src/repositories/llm-call/index.ts",
-    "./repositories/pattern": "./src/repositories/pattern/index.ts",
-    "./repositories/conversion": "./src/repositories/conversion/index.ts",
-    "./cache/redis.client": "./src/cache/redis.client.ts",
-    "./clients/*": "./src/clients/*.ts",
-    "./repositories/trace": "./src/repositories/trace.repository.ts",
-    "./repositories/span": "./src/repositories/span.repository.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
+  "files": ["dist", "README.md"],
+  "publishConfig": { "access": "public" },
   "scripts": {
     "build": "tsc",
     "clean": "rm -rf dist"

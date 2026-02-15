@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "type": "module",
   "description": "Fastify routes, plugins, and hooks for Flusk platform",
-  "main": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./src/index.ts",
-      "default": "./dist/index.js"
-    },
-    "./src/routes/otlp-routes/*": "./src/routes/otlp-routes/*"
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
   },
+  "files": ["dist", "README.md"],
+  "publishConfig": { "access": "public" },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",

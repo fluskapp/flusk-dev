@@ -12,9 +12,8 @@
       "require": "./dist/register.cjs"
     }
   },
-  "files": [
-    "dist"
-  ],
+  "files": ["dist", "README.md"],
+  "publishConfig": { "access": "public" },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
