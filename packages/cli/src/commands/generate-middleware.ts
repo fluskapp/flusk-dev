@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateMiddleware } from '../generators/middleware.generator.js';
+import { generateMiddleware } from '@flusk/forge';
 
 export const generateMiddlewareCommand = new Command('g:middleware')
   .description('Generate a Fastify middleware function')

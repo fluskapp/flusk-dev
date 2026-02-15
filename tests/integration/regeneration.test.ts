@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { smartMerge } from '../../packages/cli/src/regeneration/smart-merge.js';
-import { computeHash } from '../../packages/cli/src/regeneration/yaml-hash.js';
+import { smartMerge } from '../../packages/forge/src/regeneration/smart-merge.js';
+import { computeHash } from '../../packages/forge/src/regeneration/yaml-hash.js';
 import {
   BEGIN_GENERATED, END_GENERATED,
   BEGIN_CUSTOM, END_CUSTOM,
-} from '../../packages/cli/src/regeneration/region-markers.js';
+} from '../../packages/forge/src/regeneration/region-markers.js';
 
 describe('Regeneration system (no Docker)', () => {
   it('smartMerge preserves CUSTOM regions', () => {

@@ -8,8 +8,7 @@ import ora from 'ora';
 import { resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 import { createEntityInteractive } from '../interactive/entity.prompts.js';
-import { generateEntitySchema } from '../generators/entity-schema.generator.js';
-import { toKebabCase } from '../generators/utils.js';
+import { generateEntitySchema, toKebabCase } from '@flusk/forge';
 
 export const createEntityCommand = new Command('create:entity')
   .description('Create a new entity schema interactively')

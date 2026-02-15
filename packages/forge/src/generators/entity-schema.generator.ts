@@ -6,7 +6,7 @@ import { resolve } from 'node:path';
 import { writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { toKebabCase } from './utils.js';
-import type { EntityDefinition, FieldDefinition } from '../interactive/entity.prompts.js';
+import type { EntityDefinition, FieldDefinition } from '../types/entity.types.js';
 
 export interface GeneratorResult {
   path: string;

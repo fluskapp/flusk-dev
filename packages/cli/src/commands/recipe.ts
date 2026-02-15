@@ -7,10 +7,7 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { registerDefaultRecipes } from '../recipes/register-defaults.js';
-import { getRecipe, listRecipes } from '../recipes/recipe.registry.js';
-import { runRecipe } from '../recipes/recipe.runner.js';
-import { createContext } from '../recipes/recipe.helpers.js';
+import { registerDefaultRecipes, getRecipe, listRecipes, runRecipe, createContext } from '@flusk/forge';
 
 export const recipeCommand = new Command('recipe')
   .description('Run a code generation recipe')
@@ -59,7 +56,7 @@ function printRecipeList(): void {
   console.log('');
 }
 
-function printResult(result: import('../recipes/recipe.types.js').RecipeResult): void {
+function printResult(result: import('@flusk/forge').RecipeResult): void {
   for (const step of result.stepLogs) {
     const icon = step.skipped ? '⏭️' : '✅';
     console.log(`${icon} ${step.stepName} (${step.durationMs}ms, ${step.fileCount} files)`);

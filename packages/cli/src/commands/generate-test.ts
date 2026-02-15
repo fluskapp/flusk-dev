@@ -7,7 +7,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import path from 'path';
-import { generateTest } from '../generators/test.generator.js';
+import { generateTest } from '@flusk/forge';
 
 export const generateTestCommand = new Command('g:test')
   .description('Generate comprehensive test file for a source file')

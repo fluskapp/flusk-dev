@@ -2,10 +2,7 @@ import { Command } from 'commander';
 import { resolve, basename } from 'node:path';
 import { existsSync, readdirSync } from 'node:fs';
 import chalk from 'chalk';
-import { generateTypes } from '../generators/types.generator.js';
-import { generateResources } from '../generators/resources.generator.js';
-import { generateBusinessLogic } from '../generators/business-logic.generator.js';
-import { generateExecution } from '../generators/execution.generator.js';
+import { generateTypes, generateResources, generateBusinessLogic, generateExecution } from '@flusk/forge';
 
 export const generateCommand = new Command('g')
   .aliases(['generate'])

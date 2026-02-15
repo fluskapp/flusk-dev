@@ -5,7 +5,7 @@
 import { test, describe } from 'node:test';
 import assert from 'node:assert';
 import { generateEntitySchemaContent } from './entity-schema.generator.js';
-import type { EntityDefinition } from '../interactive/entity.prompts.js';
+import type { EntityDefinition } from '../types/entity.types.js';
 
 describe('Entity Schema Generator', () => {
   describe('generateEntitySchemaContent', () => {

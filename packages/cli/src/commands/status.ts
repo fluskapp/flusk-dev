@@ -9,8 +9,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { readFileSync } from 'node:fs';
-import { detectChanges, DEFAULT_SCAN_DIRS } from '../regeneration/change-detector.js';
-import { extractCustomSections } from '../regeneration/region-parser.js';
+import { detectChanges, DEFAULT_SCAN_DIRS, extractCustomSections } from '@flusk/forge';
 
 export const statusCommand = new Command('status')
   .description('Show generation status: stale files, custom sections')

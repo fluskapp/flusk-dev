@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateTuiHook } from '../generators/tui/index.js';
+import { generateTuiHook } from '@flusk/forge';
 
 export const generateTuiHookCommand = new Command('g:tui-hook')
   .description('Generate a TUI React hook')

@@ -5,7 +5,7 @@ import { mkdir } from 'node:fs/promises';
 import chalk from 'chalk';
 import { exec } from 'node:child_process';
 import { promisify } from 'node:util';
-import { generateInfrastructure, generateInitDbScript } from '../generators/infrastructure.generator.js';
+import { generateInfrastructure, generateInitDbScript } from '@flusk/forge';
 
 const execAsync = promisify(exec);
 

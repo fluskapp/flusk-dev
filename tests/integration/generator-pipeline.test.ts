@@ -2,11 +2,11 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { mkdtempSync, writeFileSync, readFileSync, existsSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { parseEntitySchema } from '../../packages/cli/src/schema/entity-schema.parser.js';
-import { validateEntitySchema } from '../../packages/cli/src/schema/entity-schema.validator.js';
-import { generateTypeBoxContent } from '../../packages/cli/src/schema/generate-typebox.js';
-import { generateMigrationSql } from '../../packages/cli/src/schema/generate-migration.js';
-import { runEntityPipeline } from '../../packages/cli/src/schema/generate-entity-pipeline.js';
+import { parseEntitySchema } from '../../packages/forge/src/schema/entity-schema.parser.js';
+import { validateEntitySchema } from '../../packages/forge/src/schema/entity-schema.validator.js';
+import { generateTypeBoxContent } from '../../packages/forge/src/schema/generate-typebox.js';
+import { generateMigrationSql } from '../../packages/forge/src/schema/generate-migration.js';
+import { runEntityPipeline } from '../../packages/forge/src/schema/generate-entity-pipeline.js';
 
 const PROJECT_ROOT = join(import.meta.dirname, '../..');
 

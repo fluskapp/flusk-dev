@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateFeature } from '../generators/feature.generator.js';
+import { generateFeature } from '@flusk/forge';
 
 export const generateFeatureCommand = new Command('feature')
   .description('Scaffold a complete feature across all packages')

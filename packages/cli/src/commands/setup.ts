@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { resolve } from 'node:path';
-import { setupWizard, clackPrompter } from '../wizard/index.js';
+import { setupWizard, clackPrompter } from '@flusk/forge';
 
 export const setupCommand = new Command('setup')
   .description('Interactive onboarding wizard — set up API keys, infrastructure, and demo')

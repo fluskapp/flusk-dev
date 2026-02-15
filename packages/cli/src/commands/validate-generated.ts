@@ -9,8 +9,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { createLogger } from '@flusk/logger';
-import { detectChanges, DEFAULT_SCAN_DIRS } from '../regeneration/change-detector.js';
-import { detectTampering } from '../validation/tampering-detector.js';
+import { detectChanges, DEFAULT_SCAN_DIRS, detectTampering } from '@flusk/forge';
 
 const logger = createLogger({ name: 'cmd:validate-generated' });
 

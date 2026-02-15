@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateProfile } from '../generators/profile.generator.js';
+import { generateProfile } from '@flusk/forge';
 
 export const generateProfileCommand = new Command('g:profile')
   .description('Scaffold performance profiling config and scripts')

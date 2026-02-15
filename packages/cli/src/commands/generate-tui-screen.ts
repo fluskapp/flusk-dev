@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateTuiScreen } from '../generators/tui/index.js';
+import { generateTuiScreen } from '@flusk/forge';
 
 export const generateTuiScreenCommand = new Command('g:tui-screen')
   .description('Generate a TUI Ink screen')

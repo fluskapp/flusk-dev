@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generatePackage } from '../generators/package.generator.js';
+import { generatePackage } from '@flusk/forge';
 
 export const generatePackageCommand = new Command('package')
   .description('Create a new package in the monorepo')

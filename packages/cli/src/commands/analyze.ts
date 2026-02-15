@@ -12,7 +12,7 @@ import { writeFile } from 'node:fs/promises';
 import { createSqliteStorage } from '@flusk/resources';
 import { startReceiver } from './analyze-receiver.js';
 import { generateReport } from './analyze-report.js';
-import { loadConfig } from '../config/index.js';
+import { loadConfig } from '@flusk/forge';
 import { createLogger } from '@flusk/logger';
 import { runBudgetCheck } from './analyze-budget.js';
 

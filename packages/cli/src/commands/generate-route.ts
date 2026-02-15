@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateStandaloneRoute } from '../generators/route.generator.js';
+import { generateStandaloneRoute } from '@flusk/forge';
 
 export const generateRouteCommand = new Command('route')
   .description('Create a standalone route (no entity/repo/business-logic)')

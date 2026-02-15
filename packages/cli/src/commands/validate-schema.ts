@@ -3,7 +3,7 @@
  */
 
 import { Command } from 'commander';
-import { validateSchemas } from '../validators/schema.validator.js';
+import { validateSchemas } from '@flusk/forge';
 import { formatError, formatSuccess, formatWarning, formatErrorWithFix } from '../utils/ui.js';
 import ora from 'ora';
 

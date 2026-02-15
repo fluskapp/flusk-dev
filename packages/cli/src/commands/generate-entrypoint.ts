@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateEntrypoint } from '../generators/entrypoint.generator.js';
+import { generateEntrypoint } from '@flusk/forge';
 
 export const generateEntrypointCommand = new Command('g:entrypoint')
   .description('Generate docker-entrypoint.sh script')

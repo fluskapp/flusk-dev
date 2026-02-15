@@ -11,9 +11,7 @@ import chalk from 'chalk';
 import { resolve } from 'node:path';
 import { readFileSync, existsSync, writeFileSync } from 'node:fs';
 import { createLogger } from '@flusk/logger';
-import { detectChanges, DEFAULT_SCAN_DIRS } from '../regeneration/change-detector.js';
-import { smartMerge } from '../regeneration/smart-merge.js';
-import { runEntityPipeline } from '../schema/generate-entity-pipeline.js';
+import { detectChanges, DEFAULT_SCAN_DIRS, smartMerge, runEntityPipeline } from '@flusk/forge';
 
 const logger = createLogger({ name: 'cmd:regenerate' });
 

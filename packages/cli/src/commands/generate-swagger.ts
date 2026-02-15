@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateSwagger } from '../generators/swagger.generator.js';
+import { generateSwagger } from '@flusk/forge';
 
 export const generateSwaggerCommand = new Command('g:swagger')
   .description('Generate Swagger/OpenAPI plugin')

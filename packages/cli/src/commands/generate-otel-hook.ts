@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateOtelHook } from '../generators/otel-hook.generator.js';
+import { generateOtelHook } from '@flusk/forge';
 
 export const generateOtelHookCommand = new Command('g:hook')
   .description('Generate an OTel SpanProcessor hook')

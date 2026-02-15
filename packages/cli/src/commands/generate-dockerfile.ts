@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateDockerfile } from '../generators/dockerfile.generator.js';
+import { generateDockerfile } from '@flusk/forge';
 
 export const generateDockerfileCommand = new Command('g:dockerfile')
   .description('Generate a production Dockerfile')

@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateWatt } from '../generators/watt.generator.js';
+import { generateWatt } from '@flusk/forge';
 
 export const generateWattCommand = new Command('g:watt')
   .description('Generate Platformatic Watt config (watt.json)')

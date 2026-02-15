@@ -5,7 +5,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { createSqliteStorage } from '@flusk/resources';
 import { budget as budgetLogic } from '@flusk/business-logic';
-import { loadConfig } from '../config/index.js';
+import { loadConfig } from '@flusk/forge';
 import { createLogger } from '@flusk/logger';
 
 const log = createLogger({ name: 'budget' });

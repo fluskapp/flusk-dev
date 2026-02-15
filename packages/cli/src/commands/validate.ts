@@ -5,7 +5,7 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { runValidation } from '../validators/run-validation.js';
+import { runValidation } from '@flusk/forge';
 
 export const validateCommand = new Command('validate')
   .description('Enforce project conventions across the codebase')

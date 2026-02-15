@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateService } from '../generators/service.generator.js';
+import { generateService } from '@flusk/forge';
 
 export const generateServiceCommand = new Command('g:service')
   .description('Generate a service class with dependency injection')

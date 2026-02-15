@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateProvider } from '../generators/provider.generator.js';
+import { generateProvider } from '@flusk/forge';
 
 export const generateProviderCommand = new Command('g:provider')
   .description('Scaffold an LLM provider integration')

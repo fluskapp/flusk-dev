@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateDetector } from '../generators/detector.generator.js';
+import { generateDetector } from '@flusk/forge';
 
 export const generateDetectorCommand = new Command('g:detector')
   .description('Generate a pattern detector function')

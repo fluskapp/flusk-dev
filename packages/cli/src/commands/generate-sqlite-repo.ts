@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateSqliteRepo } from '../generators/sqlite-repo.generator.js';
+import { generateSqliteRepo } from '@flusk/forge';
 
 export const generateSqliteRepoCommand = new Command('g:sqlite-repo')
   .description('Generate a SQLite repository (node:sqlite)')

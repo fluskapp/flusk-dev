@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateDockerCompose } from '../generators/docker-compose.generator.js';
+import { generateDockerCompose } from '@flusk/forge';
 
 export const generateDockerComposeCommand = new Command('g:docker-compose')
   .description('Generate docker-compose.yml with all services')

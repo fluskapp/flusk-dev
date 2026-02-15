@@ -7,7 +7,7 @@
 import { Command } from 'commander';
 import { resolve } from 'node:path';
 import chalk from 'chalk';
-import { runEntityPipeline } from '../schema/generate-entity-pipeline.js';
+import { runEntityPipeline } from '@flusk/forge';
 
 export const generateEntityFromYamlCommand = new Command('generate:entity')
   .description('Generate entity files from YAML schema')

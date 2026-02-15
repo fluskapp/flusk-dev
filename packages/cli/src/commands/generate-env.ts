@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateEnv } from '../generators/env.generator.js';
+import { generateEnv } from '@flusk/forge';
 
 export const generateEnvCommand = new Command('g:env')
   .description('Generate .env.example with all environment variables')

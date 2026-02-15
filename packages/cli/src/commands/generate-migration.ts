@@ -9,7 +9,7 @@ import chalk from 'chalk';
 import { resolve } from 'node:path';
 import { readdir, writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { getMigrationNumber, toTableName } from '../generators/utils.js';
+import { getMigrationNumber, toTableName } from '@flusk/forge';
 
 export const generateMigrationCommand = new Command('migrate-new')
   .description('Create a new SQL migration file')

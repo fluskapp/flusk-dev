@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateTuiApp } from '../generators/tui/index.js';
+import { generateTuiApp } from '@flusk/forge';
 
 export const generateTuiAppCommand = new Command('g:tui-app')
   .description('Generate the root TUI app with navigation')

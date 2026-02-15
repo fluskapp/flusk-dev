@@ -4,20 +4,10 @@
 
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { toKebabCase } from '../generators/utils.js';
+import { toKebabCase } from '@flusk/forge';
+import type { FieldDefinition } from '@flusk/forge';
 
-export interface FieldDefinition {
-  name: string;
-  type: 'String' | 'Integer' | 'Number' | 'Boolean' | 'UUID' | 'Date' | 'Email';
-  required: boolean;
-  unique: boolean;
-  description?: string;
-}
-
-export interface EntityDefinition {
-  name: string;
-  fields: FieldDefinition[];
-}
+export type { FieldDefinition, EntityDefinition } from '@flusk/forge';
 
 /**
  * Validate entity name (must be PascalCase)

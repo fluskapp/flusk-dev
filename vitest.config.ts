@@ -8,6 +8,7 @@ export default defineConfig({
     ],
     exclude: [
       'packages/cli/**',
+      'packages/forge/**',
       '**/node_modules/**',
       'tests/integration/api.test.ts',
       'tests/integration/similarity.test.ts',

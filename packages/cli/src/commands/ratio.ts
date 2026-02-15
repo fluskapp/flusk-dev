@@ -8,7 +8,7 @@
 
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { computeRatio } from '../validation/ratio-calculator.js';
+import { computeRatio } from '@flusk/forge';
 
 const TARGET_PERCENT = 90;
 

@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generateTuiComponent } from '../generators/tui/index.js';
+import { generateTuiComponent } from '@flusk/forge';
 
 export const generateTuiComponentCommand = new Command('g:tui-component')
   .description('Generate a TUI Ink component')

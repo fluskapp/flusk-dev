@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { generatePlugin } from '../generators/plugin.generator.js';
+import { generatePlugin } from '@flusk/forge';
 
 export const generatePluginCommand = new Command('g:plugin')
   .description('Generate a Fastify plugin with encapsulation')
