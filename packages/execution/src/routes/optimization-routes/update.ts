@@ -36,6 +36,7 @@ export function registerUpdateRoute(fastify: FastifyInstance): void {
     ) => {
       const { status } = request.body as { status: string };
       const updated = OptimizationRepository.updateOptimization(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial update cast
         fastify.db, request.params.id, { status } as any
       );
       if (!updated) return reply.code(404).send({ error: 'Not found' });

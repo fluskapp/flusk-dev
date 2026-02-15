@@ -10,6 +10,7 @@ import { TraceRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
 const CreateTraceSchema = Type.Omit(TraceEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
 const TraceResponseSchema = TraceEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
@@ -29,6 +30,7 @@ export async function traceRoutes(
       tags: ['Trace'],
     },
   }, async (request, reply) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
     const created = TraceRepository.createTrace(fastify.db, request.body as any);
     return reply.code(201).send(created);
   });
@@ -67,6 +69,7 @@ export async function traceRoutes(
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
     const updated = TraceRepository.updateTrace(fastify.db, id, request.body as any);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);

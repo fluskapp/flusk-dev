@@ -31,6 +31,7 @@ export class SqliteSpanExporter implements SpanExporter {
       for (const span of spans) {
         const parsed = parseReadableSpan(span);
         if (!parsed) continue;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- parseReadableSpan returns dynamic shape matching LLMCallEntity
         this.storage.llmCalls.create(parsed as any);
         count++;
       }

@@ -10,6 +10,7 @@ import { ConversionRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
 const CreateConversionSchema = Type.Omit(ConversionEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
 const ConversionResponseSchema = ConversionEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
@@ -31,6 +32,7 @@ export async function conversionRoutes(
       tags: ['Conversion'],
     },
   }, async (request, reply) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
     const created = await ConversionRepository.create(pool, request.body as any);
     return reply.code(201).send(created);
   });
@@ -68,6 +70,7 @@ export async function conversionRoutes(
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
     const updated = await ConversionRepository.update(pool, id, request.body as any);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);

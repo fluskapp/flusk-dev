@@ -67,6 +67,7 @@ export function registerCreateLLMCall(fastify: FastifyInstance): void {
           provider: created.provider,
           model: created.model,
           cost: created.cost,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any -- totalTokens may exist on response
           totalTokens: (created as any).totalTokens ?? 0,
           timestamp: new Date().toISOString(),
         },

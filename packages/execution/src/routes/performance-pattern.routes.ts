@@ -10,6 +10,7 @@ import { PerformancePatternRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
 const CreatePerformancePatternSchema = Type.Omit(PerformancePatternEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
 const PerformancePatternResponseSchema = PerformancePatternEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
@@ -31,6 +32,7 @@ export async function performancePatternRoutes(
       tags: ['PerformancePattern'],
     },
   }, async (request, reply) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
     const created = await PerformancePatternRepository.create(pool, request.body as any);
     return reply.code(201).send(created);
   });

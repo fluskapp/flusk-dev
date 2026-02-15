@@ -34,14 +34,17 @@ export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): Nod
       '@opentelemetry/instrumentation-fs': { enabled: false },
       '@opentelemetry/instrumentation-dns': { enabled: false },
       '@opentelemetry/instrumentation-net': { enabled: false },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- openai instrumentation config not in auto-instrumentations type defs yet
       ...({ '@opentelemetry/instrumentation-openai': { captureContent: config.captureContent } } as any),
     }),
   ];
 
   return new NodeSDK({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NodeSDK constructor types are overly strict for custom exporters
     traceExporter: traceExporter as any,
     resource,
     instrumentations,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NodeSDK expects specific SpanProcessor array type
     spanProcessors: opts?.spanProcessors as any,
   });
 }

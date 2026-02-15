@@ -10,6 +10,7 @@ import { PatternRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
 const CreatePatternSchema = Type.Omit(PatternEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
 const PatternResponseSchema = PatternEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
@@ -31,6 +32,7 @@ export async function patternRoutes(
       tags: ['Pattern'],
     },
   }, async (request, reply) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
     const created = await PatternRepository.create(pool, request.body as any);
     return reply.code(201).send(created);
   });

@@ -30,13 +30,16 @@ export async function createProfileRoute(app: FastifyInstance): Promise<void> {
       type: body.type as string,
       durationMs: body.durationMs as number,
       totalSamples: (body.totalSamples as number) ?? totalSamples,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic profile data
       hotspots: hotspots as any,
       markdownRaw: (body.markdownRaw as string) ?? '',
       pprofPath: (body.pprofPath as string) ?? '',
       flamegraphPath: (body.flamegraphPath as string) ?? '',
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic profile data
       traceIds: (body.traceIds as any) ?? [],
       organizationId: body.organizationId as string | undefined,
       startedAt: (body.startedAt as string) ?? new Date().toISOString(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic profile data shape
     } as any);
 
     app.eventBus?.emit('profile:completed', entity);
