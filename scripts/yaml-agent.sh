@@ -13,7 +13,7 @@
 
 set -euo pipefail
 
-ENTITIES_DIR="entities"
+ENTITIES_DIR="packages/schema/entities"
 RECIPE_RUNNER="run-recipe.mjs"
 
 case "${1:-help}" in

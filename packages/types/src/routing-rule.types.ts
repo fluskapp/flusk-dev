@@ -3,6 +3,8 @@
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
 
+// --- BEGIN GENERATED ---
+
 import { Type, Static } from '@sinclair/typebox';
 import { RoutingRuleEntitySchema } from '@flusk/entities';
 
@@ -26,3 +28,7 @@ export type RoutingRuleUpdate = Static<typeof RoutingRuleUpdateSchema>;
 export const RoutingRuleQuerySchema = Type.Partial(RoutingRuleEntitySchema);
 
 export type RoutingRuleQuery = Static<typeof RoutingRuleQuerySchema>;
+// --- END GENERATED ---
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

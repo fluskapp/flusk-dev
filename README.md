@@ -593,7 +593,7 @@ Flusk has a strict philosophy about AI-assisted development:
 90% of the Flusk codebase is **generated from YAML schema files**. Entities, types, repositories, routes, migrations, and tests — all defined in YAML and produced by our generator framework.
 
 ```yaml
-# entities/budget-alert.yaml — AI can edit this
+# packages/schema/entities/budget-alert.yaml — AI can edit this
 name: budget-alert
 table: budget_alerts
 traits: [crud, soft-delete, time-range]
@@ -607,7 +607,7 @@ fields:
 ```
 
 ```bash
-flusk recipe full-entity --from entities/budget-alert.yaml
+flusk recipe full-entity --from packages/schema/entities/budget-alert.yaml
 # → Generates: entity, types, repository, routes, migrations, tests
 ```
 
@@ -615,7 +615,7 @@ flusk recipe full-entity --from entities/budget-alert.yaml
 
 | Layer | Who can change it | Process |
 |-------|-------------------|---------|
-| **YAML schemas** (`entities/*.yaml`) | AI agents + humans | Direct commits, PRs |
+| **YAML schemas** (`packages/schema/entities/*.yaml`) | AI agents + humans | Direct commits, PRs |
 | **Generated code** (`@generated` header) | Nobody — run generators | `flusk recipe full-entity` |
 | **Custom code** (`// BEGIN CUSTOM` sections) | Humans only | PRs with code review |
 | **Core framework** (generators, traits, recipes) | Humans only | PRs with code review |
@@ -632,7 +632,7 @@ flusk recipe full-entity --from entities/budget-alert.yaml
 
 If you're using AI to contribute:
 
-1. **Only edit files in `entities/*.yaml`**
+1. **Only edit files in `packages/schema/entities/*.yaml`**
 2. Run `flusk recipe full-entity` to generate code
 3. If you need to change **how** code is generated, that's a **framework PR** — written by a human
 4. Never add `@generated` headers manually
@@ -665,10 +665,10 @@ pnpm lint
 
 ```bash
 # Edit a YAML schema
-vim entities/budget-alert.yaml
+vim packages/schema/entities/budget-alert.yaml
 
 # Generate all code from it
-flusk recipe full-entity --from entities/budget-alert.yaml
+flusk recipe full-entity --from packages/schema/entities/budget-alert.yaml
 
 # Check generator health
 flusk ratio          # Coverage report

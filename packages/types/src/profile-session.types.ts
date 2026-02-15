@@ -3,6 +3,8 @@
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
 
+// --- BEGIN GENERATED ---
+
 import { Type, Static } from '@sinclair/typebox';
 import { ProfileSessionEntitySchema } from '@flusk/entities';
 
@@ -26,3 +28,7 @@ export type ProfileSessionUpdate = Static<typeof ProfileSessionUpdateSchema>;
 export const ProfileSessionQuerySchema = Type.Partial(ProfileSessionEntitySchema);
 
 export type ProfileSessionQuery = Static<typeof ProfileSessionQuerySchema>;
+// --- END GENERATED ---
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

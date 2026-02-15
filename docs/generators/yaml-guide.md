@@ -6,9 +6,9 @@
 - Change YAML → run `flusk regenerate` → all code updates automatically
 
 ## Quick Start
-Create `entities/<entity-name>.entity.yaml` and run:
+Create `packages/schema/entities/<entity-name>.entity.yaml` and run:
 ```bash
-flusk recipe full-entity --from entities/<name>.entity.yaml
+flusk recipe full-entity --from packages/schema/entities/<name>.entity.yaml
 ```
 
 ## Schema Reference
@@ -134,7 +134,7 @@ capabilities:
 ```
 
 ### Full Entity
-See `entities/llm-call.entity.yaml` for a complete example with:
+See `packages/schema/entities/llm-call.entity.yaml` for a complete example with:
 - Multiple field types (string, number, boolean, json)
 - Indexed fields for aggregation
 - Default values

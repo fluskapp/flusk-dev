@@ -3,6 +3,8 @@
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
 
+// --- BEGIN GENERATED ---
+
 import { Type, Static } from '@sinclair/typebox';
 import { PromptTemplateEntitySchema } from '@flusk/entities';
 
@@ -26,3 +28,7 @@ export type PromptTemplateUpdate = Static<typeof PromptTemplateUpdateSchema>;
 export const PromptTemplateQuerySchema = Type.Partial(PromptTemplateEntitySchema);
 
 export type PromptTemplateQuery = Static<typeof PromptTemplateQuerySchema>;
+// --- END GENERATED ---
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

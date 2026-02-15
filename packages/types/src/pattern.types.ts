@@ -3,6 +3,8 @@
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
 
+// --- BEGIN GENERATED ---
+
 import { Type, Static } from '@sinclair/typebox';
 import { PatternEntitySchema } from '@flusk/entities';
 
@@ -26,3 +28,7 @@ export type PatternUpdate = Static<typeof PatternUpdateSchema>;
 export const PatternQuerySchema = Type.Partial(PatternEntitySchema);
 
 export type PatternQuery = Static<typeof PatternQuerySchema>;
+// --- END GENERATED ---
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

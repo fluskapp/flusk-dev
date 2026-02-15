@@ -3,6 +3,8 @@
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
 
+// --- BEGIN GENERATED ---
+
 import { Type, Static } from '@sinclair/typebox';
 import { BudgetAlertEntitySchema } from '@flusk/entities';
 
@@ -26,3 +28,7 @@ export type BudgetAlertUpdate = Static<typeof BudgetAlertUpdateSchema>;
 export const BudgetAlertQuerySchema = Type.Partial(BudgetAlertEntitySchema);
 
 export type BudgetAlertQuery = Static<typeof BudgetAlertQuerySchema>;
+// --- END GENERATED ---
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

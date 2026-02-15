@@ -3,6 +3,8 @@
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
 
+// --- BEGIN GENERATED ---
+
 import { Type, Static } from '@sinclair/typebox';
 import { SpanEntitySchema } from '@flusk/entities';
 
@@ -26,3 +28,7 @@ export type SpanUpdate = Static<typeof SpanUpdateSchema>;
 export const SpanQuerySchema = Type.Partial(SpanEntitySchema);
 
 export type SpanQuery = Static<typeof SpanQuerySchema>;
+// --- END GENERATED ---
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

@@ -3,6 +3,8 @@
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
 
+// --- BEGIN GENERATED ---
+
 import { Type, Static } from '@sinclair/typebox';
 import { LLMCallEntitySchema } from '@flusk/entities';
 
@@ -26,3 +28,7 @@ export type LLMCallUpdate = Static<typeof LLMCallUpdateSchema>;
 export const LLMCallQuerySchema = Type.Partial(LLMCallEntitySchema);
 
 export type LLMCallQuery = Static<typeof LLMCallQuerySchema>;
+// --- END GENERATED ---
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

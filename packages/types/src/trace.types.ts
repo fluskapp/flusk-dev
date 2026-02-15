@@ -3,6 +3,8 @@
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
 
+// --- BEGIN GENERATED ---
+
 import { Type, Static } from '@sinclair/typebox';
 import { TraceEntitySchema } from '@flusk/entities';
 
@@ -26,3 +28,7 @@ export type TraceUpdate = Static<typeof TraceUpdateSchema>;
 export const TraceQuerySchema = Type.Partial(TraceEntitySchema);
 
 export type TraceQuery = Static<typeof TraceQuerySchema>;
+// --- END GENERATED ---
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

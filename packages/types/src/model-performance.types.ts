@@ -3,6 +3,8 @@
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
 
+// --- BEGIN GENERATED ---
+
 import { Type, Static } from '@sinclair/typebox';
 import { ModelPerformanceEntitySchema } from '@flusk/entities';
 
@@ -26,3 +28,7 @@ export type ModelPerformanceUpdate = Static<typeof ModelPerformanceUpdateSchema>
 export const ModelPerformanceQuerySchema = Type.Partial(ModelPerformanceEntitySchema);
 
 export type ModelPerformanceQuery = Static<typeof ModelPerformanceQuerySchema>;
+// --- END GENERATED ---
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

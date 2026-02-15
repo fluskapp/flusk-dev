@@ -3,6 +3,8 @@
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
 
+// --- BEGIN GENERATED ---
+
 import { Type, Static } from '@sinclair/typebox';
 import { ConversionEntitySchema } from '@flusk/entities';
 
@@ -26,3 +28,7 @@ export type ConversionUpdate = Static<typeof ConversionUpdateSchema>;
 export const ConversionQuerySchema = Type.Partial(ConversionEntitySchema);
 
 export type ConversionQuery = Static<typeof ConversionQuerySchema>;
+// --- END GENERATED ---
+
+// --- BEGIN CUSTOM ---
+// --- END CUSTOM ---

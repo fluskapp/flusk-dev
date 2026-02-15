@@ -15,7 +15,7 @@ When the schema is the source of truth, code is just a projection of it. Change 
 
 ### What Gets Generated
 
-From a single `entities/foo.entity.yaml`:
+From a single `packages/schema/entities/foo.entity.yaml`:
 
 | Output | Package | Description |
 |--------|---------|-------------|
@@ -35,10 +35,10 @@ With `full-entity` recipe, also:
 
 ```bash
 # Generate from a single YAML (entity + types + migration)
-flusk generate entity --from entities/llm-call.entity.yaml
+flusk generate entity --from packages/schema/entities/llm-call.entity.yaml
 
 # Full recipe — generates 8+ files
-flusk recipe full-entity --from entities/llm-call.entity.yaml
+flusk recipe full-entity --from packages/schema/entities/llm-call.entity.yaml
 
 # List all recipes
 flusk recipe list
