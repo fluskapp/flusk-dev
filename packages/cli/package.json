@@ -52,6 +52,7 @@
     "pg": "^8.13.1",
     "undici": "^7.21.0",
     "validator": "^13.12.0",
+    "tsx": "^4.21.0",
     "yaml": "^2.8.2"
   },
   "devDependencies": {
@@ -63,7 +64,6 @@
     "@types/validator": "^13.12.2",
     "ink": "^5.2.1",
     "react": "^19.2.4",
-    "tsx": "^4.21.0",
     "typescript": "^5.7.0"
   }
 }

@@ -78,6 +78,18 @@ export const analyzeCommand = new Command('analyze')
     log.info({ exitCode, calls: totalCalls }, 'Analysis complete');
   });
 
+function getOtelRegisterUrl(): string {
+  // Resolve @flusk/otel to a file:// URL in the parent process where
+  // pnpm workspace symlinks are available. The child process receives
+  // the absolute file:// URL so it doesn't need workspace resolution.
+  try {
+    return import.meta.resolve('@flusk/otel');
+  } catch {
+    // Fallback: resolve relative to this file in the monorepo
+    return new URL('../../../otel/src/register.ts', import.meta.url).href;
+  }
+}
+
 function spawnChild(
   script: string, mode: string, port?: number, agent?: string,
 ) {
@@ -88,9 +100,16 @@ function spawnChild(
     ...(port ? { FLUSK_ENDPOINT: `http://127.0.0.1:${port}` } : {}),
     ...(agent ? { FLUSK_AGENT: agent, FLUSK_AGENT_LABEL: agent } : {}),
   };
-  return spawn('node', ['--import', '@flusk/otel', resolve(script)], {
-    stdio: 'inherit', env,
-  });
+
+  const otelRegister = getOtelRegisterUrl();
+
+  // Use tsx/esm loader so the child process can handle TypeScript sources
+  // (e.g. the otel register file and user .ts scripts), then load OTel.
+  return spawn('node', [
+    '--import', 'tsx/esm',
+    '--import', otelRegister,
+    resolve(script),
+  ], { stdio: 'inherit', env });
 }
 
 function waitForCompletion(
