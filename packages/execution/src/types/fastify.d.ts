@@ -6,7 +6,6 @@
 // --- BEGIN GENERATED ---
 import type { EventEmitter } from 'node:events';
 import type { DatabaseSync } from 'node:sqlite';
-import type { Pool } from 'pg';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
