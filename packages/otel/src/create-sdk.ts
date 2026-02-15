@@ -7,6 +7,7 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node';
 import { BedrockInstrumentation } from '@traceloop/instrumentation-bedrock';
+import { OpenAIInstrumentation } from '@traceloop/instrumentation-openai';
 import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
@@ -29,6 +30,7 @@ export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): Nod
 
   const instrumentations = [
     new BedrockInstrumentation(),
+    new OpenAIInstrumentation(),
     getNodeAutoInstrumentations({
       '@opentelemetry/instrumentation-undici': { enabled: true },
       '@opentelemetry/instrumentation-fs': { enabled: false },

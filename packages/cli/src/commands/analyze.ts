@@ -13,6 +13,7 @@ import chalk from 'chalk';
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
 import { writeFile } from 'node:fs/promises';
+import { writeFileSync, mkdirSync } from 'node:fs';
 import { createSqliteStorage } from '@flusk/resources';
 import { startReceiver } from './analyze-receiver.js';
 import { generateReport } from './analyze-report.js';
@@ -93,6 +94,8 @@ function getOtelRegisterUrl(): string {
 function spawnChild(
   script: string, mode: string, port?: number, agent?: string,
 ) {
+  // Resolve the otel register path relative to this file
+  const otelRegister = getOtelRegisterUrl().replace('file://', '');
   const env: Record<string, string> = {
     ...process.env as Record<string, string>,
     FLUSK_MODE: mode,
@@ -101,15 +104,22 @@ function spawnChild(
     ...(agent ? { FLUSK_AGENT: agent, FLUSK_AGENT_LABEL: agent } : {}),
   };
 
-  const otelRegister = getOtelRegisterUrl();
+  // Create a thin wrapper that loads OTel THEN the user script.
+  // Using tsx as runtime ensures TypeScript support and proper module resolution.
+  // We avoid node --import because getNodeAutoInstrumentations deadlocks in loader context.
+  const scriptPath = resolve(script);
+  const wrapperPath = resolve(process.env.HOME ?? '~', '.flusk', '_analyze-wrapper.mjs');
+  mkdirSync(resolve(process.env.HOME ?? '~', '.flusk'), { recursive: true });
+  writeFileSync(wrapperPath, [
+    `await import('${otelRegister}');`,
+    `await import('${scriptPath}');`,
+  ].join('\n'));
 
-  // Use tsx/esm loader so the child process can handle TypeScript sources
-  // (e.g. the otel register file and user .ts scripts), then load OTel.
-  return spawn('node', [
-    '--import', 'tsx/esm',
-    '--import', otelRegister,
-    resolve(script),
-  ], { stdio: 'inherit', env });
+  // Run from otel package dir so pnpm workspace deps (@opentelemetry/*) resolve correctly
+  const otelPkgDir = resolve(otelRegister, '..', '..');
+  return spawn('npx', ['tsx', wrapperPath], {
+    stdio: 'inherit', env, cwd: otelPkgDir,
+  });
 }
 
 function waitForCompletion(

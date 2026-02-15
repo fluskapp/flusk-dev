@@ -408,6 +408,9 @@ importers:
       '@traceloop/instrumentation-bedrock':
         specifier: ^0.22.6
         version: 0.22.6
+      '@traceloop/instrumentation-openai':
+        specifier: ^0.22.5
+        version: 0.22.5
       fastify:
         specifier: ^5.0.0
         version: 5.7.4
@@ -1654,6 +1657,10 @@ packages:
 
   '@traceloop/instrumentation-bedrock@0.22.6':
     resolution: {integrity: sha512-w04CAPjibwkVrj+xgqLJPzJmDMa10xQIR6FmE7a+AtyRGhPdldxKZ6nkz6OCqUVWxPPWB704SEpwACc0tg31aw==}
+    engines: {node: '>=14'}
+
+  '@traceloop/instrumentation-openai@0.22.5':
+    resolution: {integrity: sha512-RAB3cY6UeaVwKqBysi956H16jz4KXGBTXGMzsh1FUptiMAEPBzlvv39fMDxiuWRH9Z+/Haf3E3LEfKDqJvfyAg==}
     engines: {node: '>=14'}
 
   '@ts-morph/common@0.11.1':
@@ -3050,6 +3057,9 @@ packages:
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
     engines: {node: '>=10'}
+
+  js-tiktoken@1.0.21:
+    resolution: {integrity: sha512-biOj/6M5qdgx5TKjDnFT1ymSpM5tbd3ylwDtrQvFQSu0Z7bBYko2dF+W/aUkXUPuk6IVpRxk/3Q2sHOzGlS36g==}
 
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
@@ -5783,6 +5793,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@traceloop/instrumentation-openai@0.22.5':
+    dependencies:
+      '@opentelemetry/api': 1.9.0
+      '@opentelemetry/core': 2.5.1(@opentelemetry/api@1.9.0)
+      '@opentelemetry/instrumentation': 0.203.0(@opentelemetry/api@1.9.0)
+      '@opentelemetry/semantic-conventions': 1.39.0
+      '@traceloop/ai-semantic-conventions': 0.22.5
+      js-tiktoken: 1.0.21
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - supports-color
+
   '@ts-morph/common@0.11.1':
     dependencies:
       fast-glob: 3.3.3
@@ -7432,6 +7454,10 @@ snapshots:
       '@isaacs/cliui': 9.0.0
 
   joycon@3.1.1: {}
+
+  js-tiktoken@1.0.21:
+    dependencies:
+      base64-js: 1.5.1
 
   js-tokens@10.0.0: {}
 

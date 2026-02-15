@@ -15,10 +15,19 @@ import { setupAutoFlame } from './utils/auto-register-flame.js';
 // --- BEGIN CUSTOM ---
 const logger = getLogger().child({ module: 'otel-register' });
 const config = loadConfig();
-const spanProcessors = await setupAutoFlame();
-const sdk = createSdk(config, { spanProcessors });
 
+// Start SDK synchronously (no top-level await — needed for --import compatibility)
+const sdk = createSdk(config);
 sdk.start();
+
+// Async flame setup runs in background after SDK is already active
+setupAutoFlame().then((spanProcessors) => {
+  if (spanProcessors.length > 0) {
+    logger.info(`Flame profiling enabled with ${spanProcessors.length} processor(s)`);
+  }
+}).catch((err: unknown) => {
+  logger.warn({ err }, 'Flame auto-setup failed (non-fatal)');
+});
 
 process.on('SIGTERM', () => {
   sdk.shutdown().catch((err: unknown) => logger.error({ err }, 'shutdown failed'));

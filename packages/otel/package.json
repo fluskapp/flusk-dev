@@ -36,6 +36,7 @@
     "@opentelemetry/sdk-trace-base": "^2.5.1",
     "@opentelemetry/semantic-conventions": "^1.30.0",
     "@traceloop/instrumentation-bedrock": "^0.22.6",
+    "@traceloop/instrumentation-openai": "^0.22.5",
     "fastify": "^5.0.0",
     "fastify-plugin": "^5.0.0"
   },
