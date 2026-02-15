@@ -21,7 +21,7 @@ describe('regeneration e2e', () => {
 
   test('generate → add custom → change YAML → regenerate preserves custom', () => {
     const yamlContent = 'name: Foo\nfields:\n  title: string\n';
-    const yamlPath = 'entities/foo.yaml';
+    const yamlPath = 'packages/schema/entities/foo.yaml';
     const header = buildFileHeader(yamlPath, yamlContent);
     const generated = wrapGenerated('const create = () => {};', 'crud');
     const custom = emptyCustomSection('repo');
@@ -44,7 +44,7 @@ describe('regeneration e2e', () => {
   });
 
   test('dry-run: detectChanges finds stale files', () => {
-    const yamlDir = join(tmpDir, 'entities');
+    const yamlDir = join(tmpDir, 'packages/schema/entities');
     mkdirSync(yamlDir, { recursive: true });
     const yamlPath = join(yamlDir, 'bar.yaml');
     writeFileSync(yamlPath, 'name: Bar\nversion: 1\n', 'utf-8');
@@ -54,7 +54,7 @@ describe('regeneration e2e', () => {
     const oldHash = computeHash('name: Bar\nversion: 0\n');
     const genFile = [
       '/**',
-      ` * @generated from entities/bar.yaml`,
+      ` * @generated from packages/schema/entities/bar.yaml`,
       ` * Hash: ${oldHash}`,
       ` * Generated: 2025-01-01T00:00:00.000Z`,
       ' * DO NOT EDIT generated sections — changes will be overwritten.',
@@ -66,14 +66,14 @@ describe('regeneration e2e', () => {
     const report = detectChanges(tmpDir, ['packages/entities/src']);
     assert.strictEqual(report.total, 1);
     assert.strictEqual(report.stale.length, 1);
-    assert.strictEqual(report.stale[0].yamlPath, 'entities/bar.yaml');
+    assert.strictEqual(report.stale[0].yamlPath, 'packages/schema/entities/bar.yaml');
   });
 
   test('file header round-trip', () => {
-    const header = buildFileHeader('entities/test.yaml', 'content');
+    const header = buildFileHeader('packages/schema/entities/test.yaml', 'content');
     const parsed = parseFileHeader(header);
     assert.ok(parsed);
-    assert.strictEqual(parsed.yamlPath, 'entities/test.yaml');
+    assert.strictEqual(parsed.yamlPath, 'packages/schema/entities/test.yaml');
     assert.strictEqual(parsed.yamlHash, computeHash('content'));
   });
 

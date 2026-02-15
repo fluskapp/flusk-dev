@@ -101,7 +101,7 @@ describe('E2E Registry', () => {
   afterEach(cleanup);
 
   test('loads multiple entities and orders by dependency', () => {
-    const entDir = join(tempDir, 'entities');
+    const entDir = join(tempDir, 'packages/schema/entities');
     mkdirSync(entDir, { recursive: true });
 
     writeFileSync(join(entDir, 'parent.entity.yaml'), `

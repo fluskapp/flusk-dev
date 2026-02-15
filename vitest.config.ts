@@ -1,6 +1,24 @@
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  coverage: {
+    provider: 'v8',
+    include: [
+      'packages/*/src/**/*.ts',
+    ],
+    exclude: [
+      'packages/forge/**',
+      'packages/schema/**',
+      'packages/cli/**',
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/*.test.ts',
+      '**/*.d.ts',
+      '**/index.ts',
+    ],
+    reporter: ['text', 'text-summary', 'lcov'],
+    reportsDirectory: './coverage',
+  },
   test: {
     include: [
       'packages/**/src/**/*.test.ts',

@@ -2,7 +2,7 @@
 
 ## You are a YAML-only agent.
 
-You modify **ONLY** files in `entities/*.yaml`. Everything else is generated automatically.
+You modify **ONLY** files in `packages/schema/entities/*.yaml`. Everything else is generated automatically.
 
 ## Your workflow
 
@@ -12,12 +12,12 @@ You modify **ONLY** files in `entities/*.yaml`. Everything else is generated aut
 
 ### Step 1: Edit YAML
 
-You may ONLY create or edit files matching `entities/*.entity.yaml`.
+You may ONLY create or edit files matching `packages/schema/entities/*.entity.yaml`.
 
 **Creating a new entity:**
 ```bash
 ./scripts/yaml-agent.sh create <entity-name>
-# Then edit entities/<entity-name>.entity.yaml
+# Then edit packages/schema/entities/<entity-name>.entity.yaml
 ```
 
 **Modifying an existing entity:**
@@ -28,7 +28,7 @@ You may ONLY create or edit files matching `entities/*.entity.yaml`.
 
 ### Step 2: Run generator
 ```bash
-./scripts/yaml-agent.sh generate entities/<name>.entity.yaml
+./scripts/yaml-agent.sh generate packages/schema/entities/<name>.entity.yaml
 ```
 
 ### Step 3: Verify
@@ -39,7 +39,7 @@ pnpm lint   # Must be clean
 
 ### Step 4: Commit
 ```bash
-git add entities/<name>.entity.yaml    # The YAML you edited
+git add packages/schema/entities/<name>.entity.yaml    # The YAML you edited
 git add packages/                       # Generated files
 git commit -m "feat: <description>"
 ```
@@ -51,12 +51,12 @@ git commit -m "feat: <description>"
 ❌ Add `@generated` headers to existing files
 ❌ Modify `scripts/`, `.github/`, `docs/` 
 ❌ Change generator code (`packages/cli/src/`)
-❌ Delete files outside `entities/`
+❌ Delete files outside `packages/schema/entities/`
 
 ## What you CAN do
 
-✅ Create new `entities/*.entity.yaml` files
-✅ Edit existing `entities/*.entity.yaml` files
+✅ Create new `packages/schema/entities/*.entity.yaml` files
+✅ Edit existing `packages/schema/entities/*.entity.yaml` files
 ✅ Run `./scripts/yaml-agent.sh generate|regenerate|validate|diff`
 ✅ Run `pnpm test` and `pnpm lint`
 ✅ Read any file for reference (but not edit)

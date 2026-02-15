@@ -16,7 +16,8 @@ and generates performance profiles.
 
 ```
 packages/
-  entities/       → TypeBox schemas (source of truth)
+  schema/         → Entity YAML definitions (source of truth)
+  entities/       → TypeBox schemas (generated from schema)
   types/          → Derived TS types (Insert, Update, Query)
   business-logic/ → Pure functions, NO I/O
   resources/      → SQLite + Postgres repos, clients, migrations
@@ -111,8 +112,8 @@ pnpm lint       # ESLint
 ## Code Generation Rules
 
 - **NEVER** edit files with `@generated` header directly
-- To change an entity: edit `entities/<name>.entity.yaml` then run `flusk regenerate`
-- To add a new entity: create YAML in `entities/`, run `flusk recipe full-entity --from <yaml>`
+- To change an entity: edit `packages/schema/entities/<name>.entity.yaml` then run `flusk regenerate`
+- To add a new entity: create YAML in `packages/schema/entities/`, run `flusk recipe full-entity --from <yaml>`
 - To add behavior: add capability to YAML, run `flusk regenerate`
 - Only `// --- BEGIN CUSTOM ---` sections may be hand-edited
 - Run `flusk validate-generated` before committing
@@ -123,13 +124,13 @@ pnpm lint       # ESLint
 - See `docs/generators/yaml-guide.md` for complete reference
 - Every field needs: type, description. Add required/index/default as needed.
 - Custom queries go in `queries:` block — use `returns: single|list|scalar|raw`
-- After creating/editing YAML: `flusk recipe full-entity --from entities/<name>.entity.yaml`
+- After creating/editing YAML: `flusk recipe full-entity --from packages/schema/entities/<name>.entity.yaml`
 
 ## Important Rules
 
 1. Keep files under 100 lines
 2. Business logic must be pure — no DB, no HTTP
-3. Entity changes flow from `entities/*.entity.yaml` (source of truth)
+3. Entity changes flow from `packages/schema/entities/*.entity.yaml` (source of truth)
 4. Use `.js` extensions in imports (ESM)
 5. Don't edit `@generated` files — regenerate with CLI
 6. Use `@flusk/logger` for all logging
@@ -139,7 +140,7 @@ pnpm lint       # ESLint
 
 For entity work, AI agents operate in **YAML-only mode**:
 - Read `docs/generators/agent-instructions.md` for full rules
-- Edit ONLY `entities/*.entity.yaml` files
+- Edit ONLY `packages/schema/entities/*.entity.yaml` files
 - Run `./scripts/yaml-agent.sh generate <yaml>` to produce code
 - NEVER edit `.ts` files directly (except CUSTOM sections)
 - Use `./scripts/yaml-agent.sh diff <yaml>` to preview changes

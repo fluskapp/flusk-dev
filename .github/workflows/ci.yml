@@ -12,6 +12,16 @@ jobs:
           cache: pnpm
       - run: pnpm install
       - run: pnpm lint
+      - name: Check generated files
+        run: pnpm exec tsx scripts/check-generated.ts
       - run: pnpm build
       - run: pnpm test
+      - run: pnpm test:coverage
+      - name: Coverage Summary
+        run: cat coverage/coverage-summary.json | node -e "const s=JSON.parse(require('fs').readFileSync('/dev/stdin','utf8')); console.log('Lines:', s.total.lines.pct + '%', 'Branches:', s.total.branches.pct + '%')"
+      - name: Generator ratio
+        run: |
+          total=$(find packages -name "*.ts" -o -name "*.tsx" | grep -v node_modules | grep -v dist | grep -v "packages/forge" | grep -v "packages/schema" | wc -l)
+          gen=$(find packages -name "*.ts" -o -name "*.tsx" | grep -v node_modules | grep -v dist | grep -v "packages/forge" | grep -v "packages/schema" | xargs grep -l "BEGIN GENERATED" 2>/dev/null | wc -l)
+          echo "Generator ratio: $gen/$total ($(( gen * 100 / total ))%)"
       - run: pnpm exec tsx scripts/qa-validate.ts

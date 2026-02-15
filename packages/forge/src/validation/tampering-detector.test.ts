@@ -15,7 +15,7 @@ describe('detectTampering', () => {
     const dir = join(tmp, 'src');
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, 'foo.ts'), [
-      '/** @generated from entities/foo.yaml',
+      '/** @generated from packages/schema/entities/foo.yaml',
       ' * Hash: abc123',
       ' */',
       '// --- BEGIN GENERATED (do not edit) ---',
@@ -34,7 +34,7 @@ describe('detectTampering', () => {
     mkdirSync(dir, { recursive: true });
     const fakeHash = 'a'.repeat(64);
     writeFileSync(join(dir, 'bar.ts'),
-      `/** @generated from entities/foo.yaml\n * Hash: ${fakeHash}\n */\n` + 'x'.repeat(300));
+      `/** @generated from packages/schema/entities/foo.yaml\n * Hash: ${fakeHash}\n */\n` + 'x'.repeat(300));
 
     const result = detectTampering(tmp, ['src']);
     assert.strictEqual(result.length, 1);

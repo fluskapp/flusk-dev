@@ -8,8 +8,8 @@ Recipes are ordered pipelines of generator steps. One command → many files.
 Generates all files for an entity from a YAML schema.
 
 ```bash
-flusk recipe full-entity --from entities/llm-call.entity.yaml
-flusk recipe full-entity --from entities/llm-call.entity.yaml --dry-run
+flusk recipe full-entity --from packages/schema/entities/llm-call.entity.yaml
+flusk recipe full-entity --from packages/schema/entities/llm-call.entity.yaml --dry-run
 ```
 
 **Produces:** TypeBox schema, types, SQLite migration, repository (with traits), routes, barrel exports.
@@ -44,7 +44,7 @@ flusk recipe list
 Add `--dry-run` to any recipe to preview without writing files:
 
 ```bash
-flusk recipe full-entity --from entities/user.entity.yaml --dry-run
+flusk recipe full-entity --from packages/schema/entities/user.entity.yaml --dry-run
 ```
 
 ## Creating Custom Recipes

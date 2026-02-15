@@ -5,7 +5,7 @@
 # Usage: ./scripts/yaml-agent.sh <action> [args]
 #
 # Actions:
-#   create <entity-name>  — creates empty YAML template in entities/
+#   create <entity-name>  — creates empty YAML template in packages/schema/entities/
 #   generate <yaml-path>  — runs full-entity recipe from YAML
 #   regenerate            — regenerates all stale entities
 #   validate              — checks all generated files match YAMLs

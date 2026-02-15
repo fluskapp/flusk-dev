@@ -55,7 +55,7 @@ YAML File
 - Delegates to shape-validator, semantic-rules, dependency-graph
 
 ### Registry (`entity-schema.registry.ts`)
-- Loads all `.entity.yaml` files from `entities/` directory
+- Loads all `.entity.yaml` files from `packages/schema/entities/` directory
 - Validates all schemas together
 - Builds dependency-ordered list (topological sort)
 - Writes `_registry.yaml` for human reference

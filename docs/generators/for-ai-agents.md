@@ -10,11 +10,11 @@
 ## Workflows
 
 ### Change an entity
-1. Edit `entities/<name>.entity.yaml`
+1. Edit `packages/schema/entities/<name>.entity.yaml`
 2. Run `flusk regenerate`
 
 ### Add a new entity
-1. Create YAML in `entities/`
+1. Create YAML in `packages/schema/entities/`
 2. Run `flusk recipe full-entity --from <yaml>`
 
 ### Add behavior to an entity
@@ -29,7 +29,7 @@
 ## File Structure
 
 ```
-entities/*.entity.yaml    → Source of truth
+packages/schema/entities/*.entity.yaml → Source of truth
 packages/entities/src/    → Generated TypeBox schemas
 packages/types/src/       → Generated TS types
 packages/resources/src/   → Generated repos + migrations
