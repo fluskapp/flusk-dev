@@ -31,7 +31,7 @@ function groupByModel(calls: LLMCallEntity[]): ModelSummary[] {
   for (const c of calls) {
     const existing = map.get(c.model) ?? { model: c.model, calls: 0, tokens: 0, cost: 0 };
     existing.calls++;
-    existing.tokens += c.tokens.total;
+    existing.tokens += (c.tokens as { total: number }).total;
     existing.cost += c.cost;
     map.set(c.model, existing);
   }
@@ -71,7 +71,7 @@ function generateMarkdownReport(data: ReportData, color: boolean): string {
   const green = color ? chalk.bold.green : identity;
   const models = groupByModel(calls);
   const totalCost = calls.reduce((s, call) => s + call.cost, 0);
-  const totalTokens = calls.reduce((s, call) => s + call.tokens.total, 0);
+  const totalTokens = calls.reduce((s, call) => s + (call.tokens as { total: number }).total, 0);
   const dupes = findDuplicates(calls);
   const lines: string[] = [];
 

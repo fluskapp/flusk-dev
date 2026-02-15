@@ -4,6 +4,7 @@
  */
 
 import React, { useState } from 'react';
+// @ts-ignore ink types use exports field
 import { render, Box, Text, useInput } from 'ink';
 import { Header } from './components/header.js';
 import { OverviewScreen } from './screens/overview.js';

@@ -9,7 +9,7 @@ import { resolve } from 'node:path';
 import { existsSync } from 'node:fs';
 import { createLogger } from '@flusk/logger';
 
-const log = createLogger('init-config');
+const log = createLogger({ name: 'init-config' });
 
 export const initConfigCommand = new Command('init-config')
   .description('Create a .flusk.config.js file interactively')

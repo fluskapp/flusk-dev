@@ -8,7 +8,7 @@ import type { OtlpTraceRequest } from '@flusk/execution';
 import type { StorageAdapter } from '@flusk/resources';
 import { createLogger } from '@flusk/logger';
 
-const log = createLogger('analyze-receiver');
+const log = createLogger({ name: 'analyze-receiver' });
 
 export interface ReceiverHandle {
   port: number;
@@ -30,7 +30,7 @@ export function startReceiver(storage: StorageAdapter): Promise<ReceiverHandle> 
         res.writeHead(200, { 'content-type': 'application/json' });
         res.end('{}');
       } catch (err) {
-        log.error('Failed to process traces', { error: err });
+        log.error({ error: err }, 'Failed to process traces');
         res.writeHead(400);
         res.end('Bad Request');
       }
@@ -67,7 +67,7 @@ function processTraces(body: OtlpTraceRequest, storage: StorageAdapter): number 
           storage.llmCalls.create(callData);
           count++;
         } catch (err) {
-          log.error('Failed to ingest span', { error: err });
+          log.error({ error: err }, 'Failed to ingest span');
         }
       }
     }

@@ -16,7 +16,7 @@ import { loadConfig } from '../config/index.js';
 import { createLogger } from '@flusk/logger';
 import { runBudgetCheck } from './analyze-budget.js';
 
-const log = createLogger('analyze');
+const log = createLogger({ name: 'analyze' });
 
 export const analyzeCommand = new Command('analyze')
   .description('Analyze LLM costs of a script in real-time')
@@ -71,7 +71,7 @@ export const analyzeCommand = new Command('analyze')
     }
 
     runBudgetCheck(config, storage, calls);
-    log.info('Analysis complete', { exitCode, calls: totalCalls });
+    log.info({ exitCode, calls: totalCalls }, 'Analysis complete');
   });
 
 function spawnChild(

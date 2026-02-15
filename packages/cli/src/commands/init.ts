@@ -122,7 +122,7 @@ export const initCommand = new Command('init')
           console.log(chalk.cyan('\n📦 Installing dependencies (this may take a minute)...'));
           await execAsync('pnpm install', { cwd: targetDir });
           console.log(chalk.green('✅ Installed dependencies'));
-        } catch (_error) {
+        } catch (error) {
           if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
             console.log(chalk.yellow('⚠️  pnpm not found, skipping dependency installation'));
             console.log(chalk.yellow('   Install pnpm globally: npm install -g pnpm'));
@@ -148,7 +148,7 @@ export const initCommand = new Command('init')
       console.log(chalk.gray('  flusk g <entity>       Generate code from entity'));
       console.log();
 
-    } catch (_error) {
+    } catch (error) {
       console.error(chalk.red('\n❌ Failed to initialize project:'));
       console.error(chalk.red(`   ${(error as Error).message}`));
 

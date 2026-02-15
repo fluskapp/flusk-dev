@@ -8,7 +8,7 @@ import { createLogger } from '@flusk/logger';
 import type { FluskConfig } from './config.types.js';
 import { DEFAULT_CONFIG } from './defaults.js';
 
-const log = createLogger('config');
+const log = createLogger({ name: 'config' });
 
 const CONFIG_FILES = [
   '.flusk.config.ts',
@@ -29,7 +29,7 @@ export async function loadConfig(cwd?: string): Promise<FluskConfig> {
       const userConfig = mod.default ?? mod;
       return mergeConfig(DEFAULT_CONFIG, userConfig);
     } catch (err) {
-      log.error(`Failed to load ${filename}`, { error: err });
+      log.error({ error: err }, `Failed to load ${filename}`);
       throw new Error(`Failed to load ${filename}: ${(err as Error).message}`);
     }
   }

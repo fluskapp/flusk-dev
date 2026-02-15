@@ -16,6 +16,7 @@ export const profileRunCommand = new Command('run')
   .argument('[script]', 'Script to profile', './dist/index.js')
   .option('-d, --duration <seconds>', 'Duration in seconds', '30')
   .action(async (script: string, opts) => {
+    // @ts-expect-error no types for @platformatic/flame
     const { startProfiling } = await import('@platformatic/flame');
     console.log(chalk.blue(`🔥 Profiling ${script} for ${opts.duration}s`));
     await startProfiling({
@@ -30,6 +31,7 @@ export const profileGenerateCommand = new Command('generate')
   .argument('<pprof-file>', 'Path to .pprof file')
   .option('-o, --output <dir>', 'Output directory', './profiles')
   .action(async (pprofFile: string, opts) => {
+    // @ts-expect-error no types for @platformatic/flame
     const flame = await import('@platformatic/flame');
     const { generateFlamegraph, generateMarkdown } = flame;
     const outputDir = resolve(opts.output);

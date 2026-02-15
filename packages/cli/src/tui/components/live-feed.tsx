@@ -4,6 +4,7 @@
  */
 
 import React from 'react';
+// @ts-ignore ink types use exports field
 import { Box, Text } from 'ink';
 import type { FeedEvent } from '../hooks/use-live-feed.js';
 

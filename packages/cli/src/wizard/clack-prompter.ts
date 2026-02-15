@@ -22,7 +22,7 @@ export const clackPrompter: WizardPrompter = {
     const result = await p.text({
       message: opts.message,
       placeholder: opts.placeholder,
-      validate: opts.validate,
+      validate: opts.validate as ((value: string | undefined) => string | Error | undefined) | undefined,
     });
     return assertNotCancelled(result);
   },
@@ -35,21 +35,19 @@ export const clackPrompter: WizardPrompter = {
     return assertNotCancelled(result);
   },
 
-  async select(opts) {
-    const result = await p.select({
+  select<T extends string>(opts: { message: string; options: { value: T; label: string; hint?: string }[] }): Promise<T> {
+    return p.select({
       message: opts.message,
-      options: opts.options,
-    });
-    return assertNotCancelled(result) as string;
+      options: opts.options as { value: string; label: string; hint?: string }[],
+    }).then((result) => assertNotCancelled(result) as T);
   },
 
-  async multiselect(opts) {
-    const result = await p.multiselect({
+  multiselect<T extends string>(opts: { message: string; options: { value: T; label: string; hint?: string }[]; required?: boolean }): Promise<T[]> {
+    return p.multiselect({
       message: opts.message,
-      options: opts.options,
+      options: opts.options as { value: string; label: string; hint?: string }[],
       required: opts.required,
-    });
-    return assertNotCancelled(result) as string[];
+    }).then((result) => assertNotCancelled(result) as T[]);
   },
 
   spinner(): ProgressHandle {

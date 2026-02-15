@@ -66,7 +66,7 @@ export const profileReportCommand = new Command('report')
     console.log(chalk.blue(`\n🔥 Profile: ${chalk.bold(profile.name)}`));
     console.log(chalk.dim(`   Type: ${profile.type} | Duration: ${profile.durationMs}ms | Samples: ${profile.totalSamples}\n`));
     console.log(chalk.bold('Hotspots'));
-    console.log(formatHotspots(profile.hotspots || []));
+    console.log(formatHotspots((profile.hotspots || []) as Hotspot[]));
 
     const corrRes = await request(
       `${opts.endpoint}/v1/profiles/${sessionId}/correlations`, { headers },

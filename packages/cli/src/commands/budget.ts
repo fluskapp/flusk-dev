@@ -8,7 +8,7 @@ import { budget as budgetLogic } from '@flusk/business-logic';
 import { loadConfig } from '../config/index.js';
 import { createLogger } from '@flusk/logger';
 
-const log = createLogger('budget');
+const log = createLogger({ name: 'budget' });
 
 export const budgetCommand = new Command('budget')
   .description('Show budget status and alerts')

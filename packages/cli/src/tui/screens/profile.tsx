@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+// @ts-ignore ink types use exports field
 import { Box, Text, useInput } from 'ink';
 import { useProfiles } from '../hooks/use-profiles.js';
 import type { CorrelationData } from '../hooks/use-profiles.js';

@@ -10,6 +10,7 @@ import type { Trait, TraitContext, TraitOutput } from './trait.types.js';
 import { emptySection } from './section-helpers.js';
 import { toSnakeCase, toPascalCase } from '../generators/utils.js';
 import { placeholder } from './sql-helpers.js';
+import type { StorageTarget } from '../schema/index.js';
 
 /** Create the aggregation trait instance */
 export function createAggregationTrait(): Trait {
@@ -33,7 +34,7 @@ function buildCountBy(name: string, typeName: string, snakeCol: string, tableNam
 
 function buildSumFns(name: string, snakeCol: string, tableName: string, st: string, dbType: string, n: string): string[] {
   const pascal = toPascalCase(name);
-  const p1 = placeholder(st, 1);
+  const p1 = placeholder(st as StorageTarget, 1);
   const lines: string[] = [];
   if (st === 'postgres') {
     lines.push(`/** Sum total ${name} of all ${n} records */`, `export async function sum${pascal}(pool: ${dbType}): Promise<number> {`, `  const result = await pool.query('SELECT COALESCE(SUM(${snakeCol}), 0) as total FROM ${tableName}');`, `  return (result.rows[0] as { total: number }).total;`, `}`, `/** Sum ${name} since a given ISO date */`, `export async function sum${pascal}Since(pool: ${dbType}, since: string): Promise<number> {`, `  const result = await pool.query('SELECT COALESCE(SUM(${snakeCol}), 0) as total FROM ${tableName} WHERE created_at >= ${p1}', [since]);`, `  return (result.rows[0] as { total: number }).total;`, `}`);
