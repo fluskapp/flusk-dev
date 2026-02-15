@@ -20,6 +20,8 @@ import { registerApiRoutes } from './routes/register-routes.js';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+import rateLimit from '@fastify/rate-limit';
+
 export interface CreateAppOptions {
   logger?: boolean;
   requireAuth?: boolean;
@@ -65,6 +67,13 @@ export async function createApp(
   await app.register(import('@fastify/websocket'));
   await app.register(swaggerPlugin);
 
+  // Rate limiting
+  const globalMax = Number(process.env.FLUSK_RATE_LIMIT_MAX) || 100;
+  await app.register(rateLimit, {
+    max: globalMax,
+    timeWindow: '1 minute',
+  });
+
   app.setErrorHandler(errorHandler);
 
   if (cors) {
@@ -87,10 +96,28 @@ export async function createApp(
   }
 
   // OTLP ingestion (authenticated via x-flusk-api-key header)
-  await app.register(otlpRoutes, { prefix: '/v1' });
+  await app.register(
+    async (scope) => {
+      await scope.register(rateLimit, {
+        max: 500,
+        timeWindow: '1 minute',
+      });
+      await scope.register(otlpRoutes);
+    },
+    { prefix: '/v1' },
+  );
 
   // Feature routes under /api/v1
-  await app.register(registerApiRoutes, { prefix: '/api/v1' });
+  await app.register(
+    async (scope) => {
+      await scope.register(rateLimit, {
+        max: 30,
+        timeWindow: '1 minute',
+      });
+      await scope.register(registerApiRoutes);
+    },
+    { prefix: '/api/v1' },
+  );
 
   return app;
 }
