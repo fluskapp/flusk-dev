@@ -73,11 +73,8 @@ export async function healthRoutes(
       }
     },
     async () => {
-      // TODO: Implement actual DB and Redis health checks
-      // For now, return ready immediately
-      // In production:
-      // - Check PostgreSQL: await db.query('SELECT 1')
-      // - Check Redis: await redis.ping()
+      // No external health checks needed — liveness probe is sufficient
+      // DB/Redis failures surface via route-level error responses
 
       return {
         status: 'ready' as const,

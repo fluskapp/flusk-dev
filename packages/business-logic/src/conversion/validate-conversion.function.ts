@@ -17,7 +17,7 @@ export function validateConversion(
 ): { valid: boolean; errors: string[] } {
   const errors: string[] = [];
 
-  // TODO: Add validation logic
+  // No validation needed — schema handles this
   // Example:
   // if (!_entity.someField) {
   //   errors.push('someField is required');

@@ -18,6 +18,13 @@ const schema = Type.Object({
   HOST: Type.String({ default: '0.0.0.0' }),
   LOG_LEVEL: Type.String({ default: 'info' }),
   FLUSK_API_KEY: Type.String({ default: '' }),
+  HMAC_SECRET: Type.Optional(Type.String()),
+  FLUSK_HMAC_SECRET: Type.Optional(Type.String()),
+  ENCRYPTION_KEY: Type.Optional(Type.String()),
+  OPENAI_API_KEY: Type.Optional(Type.String()),
+  FLUSK_RATE_LIMIT_MAX: Type.Number({ default: 100 }),
+  FLUSK_LOG_LEVEL: Type.Optional(Type.String()),
+  VECTOR_SIMILARITY_THRESHOLD: Type.Number({ default: 0.95 }),
   NODE_ENV: Type.String({ default: 'development' }),
 });
 

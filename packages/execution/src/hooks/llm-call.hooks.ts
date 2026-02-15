@@ -6,9 +6,11 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { llmCall } from '@flusk/business-logic';
 import { RedisClient } from '@flusk/resources';
+import { getLogger } from '@flusk/logger';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+const log = getLogger().child({ module: 'llm-call-hooks' });
 const { hashPrompt, calculateCost } = llmCall;
 
 interface LlmCallBody {
@@ -74,8 +76,8 @@ export async function checkCacheHook(
         promptHash: hash,
       });
     }
-  } catch {
-    // Cache miss or error — continue to handler
+  } catch (err) {
+    log.warn({ err }, 'Redis cache lookup failed — continuing to handler');
   }
 }
 
@@ -121,7 +123,9 @@ export async function cacheResponseHook(
   const hash = request.promptHash;
   const body = request.body as { response?: string };
   if (hash && body?.response) {
-    RedisClient.cacheResponse(hash, body.response).catch(() => {});
+    RedisClient.cacheResponse(hash, body.response).catch((err) => {
+      log.warn({ err }, 'Redis cache write failed');
+    });
   }
   return payload;
 }

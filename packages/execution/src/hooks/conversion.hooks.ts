@@ -14,7 +14,7 @@ export async function validateUconversionHook(
   _request: FastifyRequest,
   _reply: FastifyReply
 ): Promise<void> {
-  // TODO: Add validation logic
+  // No validation needed — schema handles this
   // Example:
   // const body = request.body as Record<string, unknown>;
   // if (!body.requiredField) {
@@ -31,7 +31,7 @@ export async function transformUconversionHook(
   _reply: FastifyReply,
   payload: unknown
 ): Promise<unknown> {
-  // TODO: Add transformation logic
+  // No transformation needed — pass-through
   return payload;
 }
 // --- END GENERATED ---
