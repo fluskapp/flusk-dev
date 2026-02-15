@@ -20,6 +20,7 @@ import { registerApiRoutes } from './routes/register-routes.js';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
 
 export interface CreateAppOptions {
@@ -50,6 +51,17 @@ export async function createApp(
     requestIdHeader: 'x-request-id',
     trustProxy: true,
   }).withTypeProvider<TypeBoxTypeProvider>();
+
+  // Security headers
+  await app.register(helmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+      },
+    },
+  });
 
   // 1. Config
   await app.register(configPlugin);

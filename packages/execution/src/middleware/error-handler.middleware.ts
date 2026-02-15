@@ -53,14 +53,18 @@ export async function errorHandler(
   // Map error code for client
   const errorCode = mapErrorCode(error);
 
+  const isProduction = process.env.NODE_ENV === 'production';
+
   // Build structured error response
   const response: ErrorResponse = {
     error: {
-      message: error.message || 'Internal Server Error',
+      message: isProduction && statusCode >= 500
+        ? 'Internal Server Error'
+        : (error.message || 'Internal Server Error'),
       code: errorCode,
       statusCode,
-      // Include validation details if present
-      ...(error.validation && { details: error.validation })
+      // Include validation details if present (never in production for 500s)
+      ...(error.validation && !(isProduction && statusCode >= 500) && { details: error.validation })
     }
   };
 
