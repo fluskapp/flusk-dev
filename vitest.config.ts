@@ -16,7 +16,7 @@ export default defineConfig({
       '**/*.d.ts',
       '**/index.ts',
     ],
-    reporter: ['text', 'text-summary', 'lcov'],
+    reporter: ['text', 'text-summary', 'json-summary', 'lcov'],
     reportsDirectory: './coverage',
   },
   test: {
