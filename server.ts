@@ -18,7 +18,8 @@ async function start() {
     process.env.REDIS_URL = 'redis://localhost:6379';
   }
 
-  const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:3000';
+  const corsOriginRaw = process.env.FLUSK_CORS_ORIGIN || process.env.CORS_ORIGIN || 'http://localhost:3000';
+  const corsOrigin = corsOriginRaw.includes(',') ? corsOriginRaw.split(',').map(s => s.trim()) : corsOriginRaw;
   const app = await createApp({
     logger: true,
     requireAuth: true,

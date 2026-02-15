@@ -4,55 +4,24 @@
  */
 
 // --- BEGIN GENERATED ---
-export interface FluskClientConfig {
-  apiKey: string
-  baseUrl?: string
-}
-
-export interface ConversionSuggestion {
-  id: string
-  organizationId: string
-  callSignature: string
-  frequency: number
-  totalCost: number
-  potentialSavings: number
-  confidence: number
-  suggestedAutomation: string
-  status: 'pending' | 'approved' | 'rejected' | 'implemented'
-  createdAt: string
-  updatedAt: string
-}
-
-export interface OptimizationSuggestion {
-  id: string
-  organizationId: string
-  type: 'cache-config' | 'model-swap' | 'prompt-dedup' | 'batch-merge'
-  title: string
-  description: string
-  estimatedSavingsPerMonth: number
-  generatedCode: string
-  language: 'typescript' | 'python' | 'json'
-  status: 'suggested' | 'applied' | 'dismissed'
-  sourcePatternId: string | null
-  createdAt: string
-}
-
-export interface RouteOptions {
-  ruleId: string
-  prompt: string
-  tokenCount: number
-  originalModel: string
-}
-
-export interface RouteResult {
-  selectedModel: string
-  reason: string
-  complexity: string
-  expectedQuality: number
-}
+export type {
+  FluskClientConfig,
+  ConversionSuggestion,
+  OptimizationSuggestion,
+  RouteOptions,
+  RouteResult,
+} from './client.types.js';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+import type {
+  FluskClientConfig,
+  ConversionSuggestion,
+  OptimizationSuggestion,
+  RouteOptions,
+  RouteResult,
+} from './client.types.js';
+
 export class FluskClient {
   private readonly apiKey: string
   private readonly baseUrl: string
@@ -62,130 +31,69 @@ export class FluskClient {
     this.baseUrl = config.baseUrl || 'https://api.flusk.ai'
   }
 
-  /**
-   * Get conversion suggestions for optimizing LLM calls
-   */
+  private authHeaders(extra?: Record<string, string>): Record<string, string> {
+    return { Authorization: `Bearer ${this.apiKey}`, ...extra }
+  }
+
+  private jsonHeaders(): Record<string, string> {
+    return this.authHeaders({ 'Content-Type': 'application/json' })
+  }
+
+  private async fetchOrThrow<T>(url: string, init: RequestInit, label: string): Promise<T> {
+    const response = await fetch(url, init)
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`${label} failed: ${response.status} ${errorText}`)
+    }
+    return response.json() as Promise<T>
+  }
+
   async getSuggestions(organizationId?: string): Promise<ConversionSuggestion[]> {
     const url = new URL(`${this.baseUrl}/api/v1/conversions/suggestions`)
-    if (organizationId) {
-      url.searchParams.set('organizationId', organizationId)
-    }
-
-    const response = await fetch(url.toString(), {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`Failed to get suggestions: ${response.status} ${errorText}`)
-    }
-
-    return response.json() as Promise<ConversionSuggestion[]>
+    if (organizationId) url.searchParams.set('organizationId', organizationId)
+    return this.fetchOrThrow(url.toString(), { method: 'GET', headers: this.authHeaders() }, 'getSuggestions')
   }
 
-  /**
-   * Get optimization suggestions for the organization
-   */
   async getOptimizations(): Promise<OptimizationSuggestion[]> {
-    const response = await fetch(`${this.baseUrl}/api/v1/optimizations/generate`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify({}),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`Failed to get optimizations: ${response.status} ${errorText}`)
-    }
-
-    return response.json() as Promise<OptimizationSuggestion[]>
+    return this.fetchOrThrow(`${this.baseUrl}/api/v1/optimizations/generate`, {
+      method: 'POST', headers: this.jsonHeaders(), body: JSON.stringify({}),
+    }, 'getOptimizations')
   }
 
-  /**
-   * Get generated code for a specific optimization
-   */
   async getOptimizationCode(id: string): Promise<{ code: string; language: string }> {
-    const response = await fetch(`${this.baseUrl}/api/v1/optimizations/${id}/code`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`Failed to get optimization code: ${response.status} ${errorText}`)
-    }
-
-    return response.json() as Promise<{ code: string; language: string }>
+    return this.fetchOrThrow(`${this.baseUrl}/api/v1/optimizations/${id}/code`, {
+      method: 'GET', headers: this.authHeaders(),
+    }, 'getOptimizationCode')
   }
 
-  /**
-   * Render a prompt template with variables (uses A/B test variant selection)
-   */
   async renderPrompt(
     templateId: string,
     variables: Record<string, string>,
     abTest?: { candidateVersionId: string; trafficPercent: number }
   ): Promise<{ rendered: string; versionId: string; isCandidate?: boolean }> {
-    if (abTest) {
-      const response = await fetch(`${this.baseUrl}/api/v1/prompt-templates/${templateId}/ab-test`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.apiKey}` },
-        body: JSON.stringify({ ...abTest, variables }),
-      })
-      if (!response.ok) throw new Error(`renderPrompt failed: ${response.status} ${await response.text()}`)
-      return response.json() as Promise<{ rendered: string; versionId: string; isCandidate?: boolean }>
-    }
-    const response = await fetch(`${this.baseUrl}/api/v1/prompt-templates/${templateId}/render`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify({ variables }),
-    })
-    if (!response.ok) throw new Error(`renderPrompt failed: ${response.status} ${await response.text()}`)
-    return response.json() as Promise<{ rendered: string; versionId: string; isCandidate?: boolean }>
+    const url = abTest
+      ? `${this.baseUrl}/api/v1/prompt-templates/${templateId}/ab-test`
+      : `${this.baseUrl}/api/v1/prompt-templates/${templateId}/render`
+    const body = abTest ? { ...abTest, variables } : { variables }
+    return this.fetchOrThrow(url, {
+      method: 'POST', headers: this.jsonHeaders(), body: JSON.stringify(body),
+    }, 'renderPrompt')
   }
 
-  /**
-   * Report metrics for a prompt version after a call
-   */
   async reportPromptMetrics(
     versionId: string,
     metrics: { quality: number; latencyMs: number; cost: number }
   ): Promise<void> {
     const response = await fetch(`${this.baseUrl}/api/v1/prompt-versions/${versionId}/metrics`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.apiKey}` },
-      body: JSON.stringify(metrics),
+      method: 'PATCH', headers: this.jsonHeaders(), body: JSON.stringify(metrics),
     })
     if (!response.ok) throw new Error(`reportPromptMetrics failed: ${response.status} ${await response.text()}`)
   }
 
-  /**
-   * Ask Flusk which model to use for a given prompt (opt-in routing)
-   */
   async route(options: RouteOptions): Promise<RouteResult> {
-    const response = await fetch(`${this.baseUrl}/api/v1/route`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.apiKey}`,
-      },
-      body: JSON.stringify(options),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`Routing failed: ${response.status} ${errorText}`)
-    }
-
-    return response.json() as Promise<RouteResult>
+    return this.fetchOrThrow(`${this.baseUrl}/api/v1/route`, {
+      method: 'POST', headers: this.jsonHeaders(), body: JSON.stringify(options),
+    }, 'Routing')
   }
 }
 // --- END CUSTOM ---

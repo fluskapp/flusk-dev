@@ -20,8 +20,11 @@ async function getApp(): Promise<FastifyInstance> {
     return cachedApp;
   }
 
+  const corsOriginRaw = process.env.FLUSK_CORS_ORIGIN || process.env.CORS_ORIGIN || 'http://localhost:3000';
+  const corsOrigin = corsOriginRaw.includes(',') ? corsOriginRaw.split(',').map(s => s.trim()) : corsOriginRaw;
   const app = await createApp({
     logger: process.env.NODE_ENV !== 'production',
+    cors: { origin: corsOrigin, credentials: true },
   });
 
   cachedApp = app;
