@@ -1,1 +1,18 @@
-// TODO: Unsupported query type for updateStatus
+import type { DatabaseSync } from 'node:sqlite';
+import type { ConversionEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Update conversion status
+ */
+export function updateStatus(
+  db: DatabaseSync,
+  id: string,
+  status: ConversionEntity['status'],
+): ConversionEntity | null {
+  const stmt = db.prepare(
+    `UPDATE conversions SET status = ? WHERE id = ? RETURNING *`,
+  );
+  const row = stmt.get(status, id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
+}

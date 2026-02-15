@@ -29,4 +29,5 @@ export { clientRecipe } from './client.recipe.js';
 export { otelHookRecipe } from './otel-hook.recipe.js';
 export { loggerRecipe } from './logger.recipe.js';
 export { sdkProviderRecipe } from './sdk-provider.recipe.js';
+export { sqliteRepoRecipe } from './sqlite-repo.recipe.js';
 export { registerDefaultRecipes, resetDefaultRecipes } from './register-defaults.js';

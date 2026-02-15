@@ -1,1 +1,18 @@
-// TODO: Unsupported query type for updateOccurrence
+import type { DatabaseSync } from 'node:sqlite';
+import type { PatternEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Increment occurrence count and update last-seen timestamp
+ */
+export function updateOccurrence(
+  db: DatabaseSync,
+  id: string,
+  lastSeenAt: string,
+): PatternEntity | null {
+  const stmt = db.prepare(
+    `UPDATE patterns SET occurrence_count = occurrence_count + 1, last_seen_at = ? WHERE id = ? RETURNING *`,
+  );
+  const row = stmt.get(lastSeenAt, id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
+}
