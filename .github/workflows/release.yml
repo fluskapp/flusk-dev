@@ -5,6 +5,7 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 jobs:
   release:
+    if: ${{ vars.ENABLE_PUBLISH == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
