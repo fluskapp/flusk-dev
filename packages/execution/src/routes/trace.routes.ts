@@ -4,13 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type } from '@sinclair/typebox';
+import { Type, type TSchema } from '@sinclair/typebox';
 import { TraceEntitySchema } from '@flusk/entities';
 import { TraceRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-const CreateTraceSchema = Type.Omit(TraceEntitySchema, ['id', 'createdAt', 'updatedAt']);
+const CreateTraceSchema = Type.Omit(TraceEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
 const TraceResponseSchema = TraceEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -19,34 +19,29 @@ const ListQuerySchema = Type.Object({
   offset: Type.Optional(Type.Integer({ minimum: 0 })),
 });
 
-/**
- * Register Trace routes
- */
 export async function traceRoutes(
   fastify: FastifyInstance,
 ): Promise<void> {
   fastify.post('/', {
     schema: {
       body: CreateTraceSchema,
-      response: { 201: TraceResponseSchema },
+      response: { 201: TraceResponseSchema as unknown as TSchema },
       tags: ['Trace'],
-      description: 'Create a new Trace record',
     },
   }, async (request, reply) => {
-    const created = await TraceRepository.create(request.body);
+    const created = TraceRepository.createTrace(fastify.db, request.body as any);
     return reply.code(201).send(created);
   });
 
   fastify.get('/:id', {
     schema: {
       params: IdParamsSchema,
-      response: { 200: TraceResponseSchema, 404: NotFoundSchema },
+      response: { 200: TraceResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['Trace'],
-      description: 'Get a Trace by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const entity = await TraceRepository.findById(id);
+    const entity = TraceRepository.findTraceById(fastify.db, id);
     if (!entity) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(entity);
   });
@@ -54,13 +49,12 @@ export async function traceRoutes(
   fastify.get('/', {
     schema: {
       querystring: ListQuerySchema,
-      response: { 200: Type.Array(TraceResponseSchema) },
+      response: { 200: Type.Array(TraceResponseSchema as unknown as TSchema) },
       tags: ['Trace'],
-      description: 'List Trace records',
     },
   }, async (request, reply) => {
     const { limit, offset } = request.query as { limit?: number; offset?: number };
-    const items = await TraceRepository.list(limit, offset);
+    const items = TraceRepository.listTraces(fastify.db, limit, offset);
     return reply.code(200).send(items);
   });
 
@@ -68,13 +62,12 @@ export async function traceRoutes(
     schema: {
       params: IdParamsSchema,
       body: Type.Partial(CreateTraceSchema),
-      response: { 200: TraceResponseSchema, 404: NotFoundSchema },
+      response: { 200: TraceResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['Trace'],
-      description: 'Update a Trace by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const updated = await TraceRepository.update(id, request.body);
+    const updated = TraceRepository.updateTrace(fastify.db, id, request.body as any);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });
@@ -84,11 +77,10 @@ export async function traceRoutes(
       params: IdParamsSchema,
       response: { 204: Type.Null(), 404: NotFoundSchema },
       tags: ['Trace'],
-      description: 'Delete a Trace by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const deleted = await TraceRepository.delete(id);
+    const deleted = TraceRepository.deleteTrace(fastify.db, id);
     if (!deleted) return reply.code(404).send({ error: 'Not found' });
     return reply.code(204).send();
   });

@@ -45,6 +45,7 @@ export function registerListPatterns(fastify: FastifyInstance): void {
       if (query.organizationId) {
         // Filter by organization
         patterns = await PatternRepository.findByOrganization(
+          fastify.pg.pool,
           query.organizationId,
           {
             minOccurrences: query.minOccurrences,
@@ -57,6 +58,7 @@ export function registerListPatterns(fastify: FastifyInstance): void {
       } else {
         // Get all patterns
         patterns = await PatternRepository.findMany(
+          fastify.pg.pool,
           query.limit || 100,
           query.offset || 0
         );

@@ -32,14 +32,14 @@ function rowToEntity(row: Record<string, unknown>): TraceEntity {
     totalTokens: row.total_tokens as number,
     totalLatencyMs: row.total_latency_ms as number,
     callCount: row.call_count as number,
-    status: row.status as string,
+    status: row.status as TraceEntity['status'],
     startedAt: toISOString(row.started_at),
     completedAt: row.completed_at != null ? toISOString(row.completed_at) : undefined,
   };
 }
 
 function toSnake(s: string): string { return s.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase(); }
-function convertValueForDb(key: string, value: unknown): unknown {
+function convertValueForDb(_key: string, value: unknown): unknown {
   return value ?? null;
 }
 
@@ -64,7 +64,7 @@ export function updateTrace(db: DatabaseSync, id: string, data: UpdateTraceInput
   const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
   if (keys.length === 0) return findTraceById(db, id);
   const sets = keys.map((k) => `${toSnake(k)} = ?`).join(', ');
-  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));
+  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data])) as (string | number | null)[];
   const stmt = db.prepare(`UPDATE traces SET ${sets} WHERE id = ? RETURNING *`);
   const row = stmt.get(...vals, id) as Record<string, unknown> | undefined;
   return row ? rowToEntity(row) : null;

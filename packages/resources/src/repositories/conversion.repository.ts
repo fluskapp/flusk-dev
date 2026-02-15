@@ -28,8 +28,8 @@ function rowToEntity(row: Record<string, unknown>): ConversionEntity {
     updatedAt: toISOString(row.updated_at),
     patternId: row.pattern_id as string,
     organizationId: row.organization_id as string,
-    conversionType: row.conversion_type as string,
-    status: row.status as string,
+    conversionType: row.conversion_type as ConversionEntity['conversionType'],
+    status: row.status as ConversionEntity['status'],
     estimatedSavings: row.estimated_savings as number,
     config: JSON.parse(row.config as string),
   };
@@ -62,7 +62,7 @@ export function updateConversion(db: DatabaseSync, id: string, data: UpdateConve
   const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
   if (keys.length === 0) return findConversionById(db, id);
   const sets = keys.map((k) => `${toSnake(k)} = ?`).join(', ');
-  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));
+  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data])) as (string | number | null)[];
   const stmt = db.prepare(`UPDATE conversions SET ${sets} WHERE id = ? RETURNING *`);
   const row = stmt.get(...vals, id) as Record<string, unknown> | undefined;
   return row ? rowToEntity(row) : null;

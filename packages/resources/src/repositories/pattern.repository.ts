@@ -65,7 +65,7 @@ export function updatePattern(db: DatabaseSync, id: string, data: UpdatePatternI
   const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
   if (keys.length === 0) return findPatternById(db, id);
   const sets = keys.map((k) => `${toSnake(k)} = ?`).join(', ');
-  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));
+  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data])) as (string | number | null)[];
   const stmt = db.prepare(`UPDATE patterns SET ${sets} WHERE id = ? RETURNING *`);
   const row = stmt.get(...vals, id) as Record<string, unknown> | undefined;
   return row ? rowToEntity(row) : null;

@@ -10,6 +10,7 @@ import type { ModelPerformanceEntity } from '@flusk/entities';
 export function rowToEntity(row: Record<string, unknown>): ModelPerformanceEntity {
   return {
     id: row.id as string,
+    createdAt: (row.created_at as Date).toISOString(),
     model: row.model as string,
     promptCategory: row.prompt_category as string,
     avgQuality: Number(row.avg_quality),

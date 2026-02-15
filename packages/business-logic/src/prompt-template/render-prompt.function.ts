@@ -28,7 +28,7 @@ export function renderPrompt(
   const rendered = content.replace(/\{\{(\w+)\}\}/g, (_match, varName) => {
     usedVars.add(varName);
     if (varName in variables) {
-      return variables[varName];
+      return variables[varName]!;
     }
     missingVariables.push(varName);
     return `{{${varName}}}`;

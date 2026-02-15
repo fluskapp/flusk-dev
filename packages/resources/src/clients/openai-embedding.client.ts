@@ -56,7 +56,7 @@ export async function generateEmbedding(
   };
 
   return {
-    embedding: data.data[0].embedding,
+    embedding: data.data[0]!.embedding,
     model: MODEL,
     dimensions: DIMENSIONS,
   };

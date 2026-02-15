@@ -4,13 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type } from '@sinclair/typebox';
+import { Type, type TSchema } from '@sinclair/typebox';
 import { ConversionEntitySchema } from '@flusk/entities';
 import { ConversionRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-const CreateConversionSchema = Type.Omit(ConversionEntitySchema, ['id', 'createdAt', 'updatedAt']);
+const CreateConversionSchema = Type.Omit(ConversionEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
 const ConversionResponseSchema = ConversionEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -19,34 +19,31 @@ const ListQuerySchema = Type.Object({
   offset: Type.Optional(Type.Integer({ minimum: 0 })),
 });
 
-/**
- * Register Conversion routes
- */
 export async function conversionRoutes(
   fastify: FastifyInstance,
 ): Promise<void> {
+  const pool = fastify.pg.pool;
+
   fastify.post('/', {
     schema: {
       body: CreateConversionSchema,
-      response: { 201: ConversionResponseSchema },
+      response: { 201: ConversionResponseSchema as unknown as TSchema },
       tags: ['Conversion'],
-      description: 'Create a new Conversion record',
     },
   }, async (request, reply) => {
-    const created = await ConversionRepository.create(request.body);
+    const created = await ConversionRepository.create(pool, request.body as any);
     return reply.code(201).send(created);
   });
 
   fastify.get('/:id', {
     schema: {
       params: IdParamsSchema,
-      response: { 200: ConversionResponseSchema, 404: NotFoundSchema },
+      response: { 200: ConversionResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['Conversion'],
-      description: 'Get a Conversion by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const entity = await ConversionRepository.findById(id);
+    const entity = await ConversionRepository.findById(pool, id);
     if (!entity) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(entity);
   });
@@ -54,13 +51,11 @@ export async function conversionRoutes(
   fastify.get('/', {
     schema: {
       querystring: ListQuerySchema,
-      response: { 200: Type.Array(ConversionResponseSchema) },
+      response: { 200: Type.Array(ConversionResponseSchema as unknown as TSchema) },
       tags: ['Conversion'],
-      description: 'List Conversion records',
     },
-  }, async (request, reply) => {
-    const { limit, offset } = request.query as { limit?: number; offset?: number };
-    const items = await ConversionRepository.list(limit, offset);
+  }, async (_request, reply) => {
+    const items = await ConversionRepository.findSuggested(pool, '');
     return reply.code(200).send(items);
   });
 
@@ -68,13 +63,12 @@ export async function conversionRoutes(
     schema: {
       params: IdParamsSchema,
       body: Type.Partial(CreateConversionSchema),
-      response: { 200: ConversionResponseSchema, 404: NotFoundSchema },
+      response: { 200: ConversionResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['Conversion'],
-      description: 'Update a Conversion by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const updated = await ConversionRepository.update(id, request.body);
+    const updated = await ConversionRepository.update(pool, id, request.body as any);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });
@@ -84,11 +78,10 @@ export async function conversionRoutes(
       params: IdParamsSchema,
       response: { 204: Type.Null(), 404: NotFoundSchema },
       tags: ['Conversion'],
-      description: 'Delete a Conversion by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const deleted = await ConversionRepository.delete(id);
+    const deleted = await ConversionRepository.deleteById(pool, id);
     if (!deleted) return reply.code(404).send({ error: 'Not found' });
     return reply.code(204).send();
   });

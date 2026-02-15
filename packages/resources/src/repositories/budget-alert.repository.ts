@@ -29,7 +29,7 @@ function rowToEntity(row: Record<string, unknown>): BudgetAlertEntity {
     id: row.id as string,
     createdAt: toISOString(row.created_at),
     updatedAt: toISOString(row.updated_at),
-    alertType: row.alert_type as string,
+    alertType: row.alert_type as BudgetAlertEntity['alertType'],
     threshold: row.threshold as number,
     actual: row.actual as number,
     model: (row.model as string) ?? undefined,
@@ -66,7 +66,7 @@ export function updateBudgetAlert(db: DatabaseSync, id: string, data: UpdateBudg
   const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
   if (keys.length === 0) return findBudgetAlertById(db, id);
   const sets = keys.map((k) => `${toSnake(k)} = ?`).join(', ');
-  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));
+  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data])) as (string | number | null)[];
   const stmt = db.prepare(`UPDATE budget_alerts SET ${sets} WHERE id = ? RETURNING *`);
   const row = stmt.get(...vals, id) as Record<string, unknown> | undefined;
   return row ? rowToEntity(row) : null;
@@ -91,7 +91,7 @@ export function findBudgetAlertsByTimeRange(
 /** Count BudgetAlert records grouped by model */
 export function countByModel(db: DatabaseSync): BudgetAlertModelCount[] {
   const stmt = db.prepare('SELECT model, COUNT(*) as count FROM budget_alerts GROUP BY model ORDER BY count DESC');
-  return stmt.all() as BudgetAlertModelCount[];
+  return stmt.all() as unknown as BudgetAlertModelCount[];
 }
 
 /** Sum total threshold of all BudgetAlert records */
@@ -126,7 +126,7 @@ export function aggregateBudgetAlerts(db: DatabaseSync, opts: BudgetAlertAggrega
   const groupCol = opts.groupBy?.replace(/[^a-z_]/gi, '');
   const select = groupCol ? `${groupCol} as "group", ${fn}(${col}) as value` : `COALESCE(${fn}(${col}), 0) as value`;
   const groupClause = groupCol ? `GROUP BY ${groupCol}` : '';
-  return db.prepare(`SELECT ${select} FROM budget_alerts ${groupClause}`).all() as BudgetAlertAggregateResult[];
+  return db.prepare(`SELECT ${select} FROM budget_alerts ${groupClause}`).all() as unknown as BudgetAlertAggregateResult[];
 }
 
 // --- BEGIN CUSTOM ---

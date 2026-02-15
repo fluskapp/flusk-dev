@@ -17,27 +17,27 @@ export async function createProfileRoute(app: FastifyInstance): Promise<void> {
     const body = request.body as Record<string, unknown>;
     const pool = app.pg.pool;
 
-    const hotspots = body.markdownRaw
-      ? profileSession.parseFlameMarkdown(body.markdownRaw)
-      : body.hotspots ?? [];
+    const hotspots: Array<{ samples: number }> = body.markdownRaw
+      ? profileSession.parseFlameMarkdown(body.markdownRaw as string)
+      : (body.hotspots as Array<{ samples: number }>) ?? [];
 
     const totalSamples = hotspots.reduce(
       (sum: number, h: { samples: number }) => sum + h.samples, 0
     );
 
     const entity = await ProfileSessionRepository.create(pool, {
-      name: body.name,
-      type: body.type,
-      durationMs: body.durationMs,
-      totalSamples: body.totalSamples ?? totalSamples,
-      hotspots,
-      markdownRaw: body.markdownRaw ?? '',
-      pprofPath: body.pprofPath ?? '',
-      flamegraphPath: body.flamegraphPath ?? '',
-      traceIds: body.traceIds ?? [],
-      organizationId: body.organizationId,
-      startedAt: body.startedAt ?? new Date().toISOString(),
-    });
+      name: body.name as string,
+      type: body.type as string,
+      durationMs: body.durationMs as number,
+      totalSamples: (body.totalSamples as number) ?? totalSamples,
+      hotspots: hotspots as any,
+      markdownRaw: (body.markdownRaw as string) ?? '',
+      pprofPath: (body.pprofPath as string) ?? '',
+      flamegraphPath: (body.flamegraphPath as string) ?? '',
+      traceIds: (body.traceIds as any) ?? [],
+      organizationId: body.organizationId as string | undefined,
+      startedAt: (body.startedAt as string) ?? new Date().toISOString(),
+    } as any);
 
     app.eventBus?.emit('profile:completed', entity);
     return reply.status(201).send(entity);

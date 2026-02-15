@@ -23,7 +23,7 @@ export function decrypt(ciphertext: string, encryptionKey?: string): string {
   const parts = ciphertext.split(':');
   if (parts.length !== 4) throw new Error('Invalid encrypted data format');
 
-  const [saltB64, ivB64, authTagB64, encryptedData] = parts;
+  const [saltB64, ivB64, authTagB64, encryptedData] = parts as [string, string, string, string];
   const salt = Buffer.from(saltB64, 'base64');
   const iv = Buffer.from(ivB64, 'base64');
   const authTag = Buffer.from(authTagB64, 'base64');
@@ -32,7 +32,7 @@ export function decrypt(ciphertext: string, encryptionKey?: string): string {
   const decipher = createDecipheriv(ALGORITHM, derivedKey, iv);
   decipher.setAuthTag(authTag);
 
-  let plaintext = decipher.update(encryptedData, 'base64', 'utf8');
+  let plaintext: string = decipher.update(encryptedData, 'base64', 'utf8');
   plaintext += decipher.final('utf8');
   return plaintext;
 }

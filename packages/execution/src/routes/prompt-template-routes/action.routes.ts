@@ -11,8 +11,6 @@ import { promptTemplate, promptVersion } from '@flusk/business-logic';
 
 // --- BEGIN CUSTOM ---
 export async function promptTemplateActionRoutes(fastify: FastifyInstance): Promise<void> {
-  const pool = fastify.pg.pool;
-
   fastify.post('/:id/render', {
     schema: {
       params: Type.Object({ id: Type.String({ format: 'uuid' }) }),
@@ -21,13 +19,13 @@ export async function promptTemplateActionRoutes(fastify: FastifyInstance): Prom
   }, async (request: FastifyRequest<{
     Params: { id: string }; Body: { variables: Record<string, string> }
   }>, reply: FastifyReply) => {
-    const template = await PromptTemplateRepository.findById(pool, request.params.id);
+    const template = PromptTemplateRepository.findPromptTemplateById(fastify.db, request.params.id);
     if (!template) return reply.code(404).send({ error: 'Template not found' });
     if (!template.activeVersionId) return reply.code(400).send({ error: 'No active version' });
-    const version = await PromptVersionRepository.findById(pool, template.activeVersionId);
+    const version = PromptVersionRepository.findPromptVersionById(fastify.db, template.activeVersionId);
     if (!version) return reply.code(404).send({ error: 'Active version not found' });
     const result = promptTemplate.renderPrompt(
-      version.content, request.body.variables, template.variables
+      version.content, request.body.variables, template.variables as string[] | undefined
     );
     return reply.send({ ...result, versionId: version.id });
   });
@@ -45,7 +43,7 @@ export async function promptTemplateActionRoutes(fastify: FastifyInstance): Prom
     Params: { id: string };
     Body: { candidateVersionId: string; trafficPercent: number; variables: Record<string, string> }
   }>, reply: FastifyReply) => {
-    const template = await PromptTemplateRepository.findById(pool, request.params.id);
+    const template = PromptTemplateRepository.findPromptTemplateById(fastify.db, request.params.id);
     if (!template?.activeVersionId) {
       return reply.code(400).send({ error: 'Template has no active version' });
     }
@@ -53,10 +51,10 @@ export async function promptTemplateActionRoutes(fastify: FastifyInstance): Prom
     const abResult = promptVersion.selectABVariant(
       template.activeVersionId, body.candidateVersionId, body.trafficPercent
     );
-    const version = await PromptVersionRepository.findById(pool, abResult.selectedVersionId);
+    const version = PromptVersionRepository.findPromptVersionById(fastify.db, abResult.selectedVersionId);
     if (!version) return reply.code(404).send({ error: 'Version not found' });
     const rendered = promptTemplate.renderPrompt(
-      version.content, body.variables, template.variables
+      version.content, body.variables, template.variables as string[] | undefined
     );
     return reply.send({ ...abResult, ...rendered });
   });

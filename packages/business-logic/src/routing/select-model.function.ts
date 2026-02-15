@@ -56,7 +56,7 @@ export function selectModel(input: SelectModelInput): SelectModelOutput {
     };
   }
 
-  const best = candidates[0];
+  const best = candidates[0]!;
   return {
     selectedModel: best.model,
     reason: 'cheapest-qualifying',

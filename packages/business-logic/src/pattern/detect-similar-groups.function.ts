@@ -32,9 +32,9 @@ function cosineSimilarity(a: number[], b: number[]): number {
   let normA = 0;
   let normB = 0;
   for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    normA += a[i] * a[i];
-    normB += b[i] * b[i];
+    dot += a[i]! * b[i]!;
+    normA += a[i]! * a[i]!;
+    normB += b[i]! * b[i]!;
   }
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
@@ -57,16 +57,16 @@ export function detectSimilarGroups(
   for (let i = 0; i < calls.length; i++) {
     if (assigned.has(i)) continue;
 
-    const group: SimilarCallInput[] = [calls[i]];
+    const group: SimilarCallInput[] = [calls[i]!];
     assigned.add(i);
     let simSum = 0;
     let simCount = 0;
 
     for (let j = i + 1; j < calls.length; j++) {
       if (assigned.has(j)) continue;
-      const sim = cosineSimilarity(calls[i].embedding, calls[j].embedding);
+      const sim = cosineSimilarity(calls[i]!.embedding, calls[j]!.embedding);
       if (sim >= threshold) {
-        group.push(calls[j]);
+        group.push(calls[j]!);
         assigned.add(j);
         simSum += sim;
         simCount++;
@@ -75,7 +75,7 @@ export function detectSimilarGroups(
 
     if (group.length >= 2) {
       groups.push({
-        centroidId: calls[i].id,
+        centroidId: calls[i]!.id,
         calls: group,
         totalCost: group.reduce((s, c) => s + c.cost, 0),
         avgSimilarity: simCount > 0 ? simSum / simCount : 1,

@@ -4,13 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type } from '@sinclair/typebox';
+import { Type, type TSchema } from '@sinclair/typebox';
 import { PromptTemplateEntitySchema } from '@flusk/entities';
 import { PromptTemplateRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-const CreatePromptTemplateSchema = Type.Omit(PromptTemplateEntitySchema, ['id', 'createdAt', 'updatedAt']);
+const CreatePromptTemplateSchema = Type.Omit(PromptTemplateEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
 const PromptTemplateResponseSchema = PromptTemplateEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -19,34 +19,29 @@ const ListQuerySchema = Type.Object({
   offset: Type.Optional(Type.Integer({ minimum: 0 })),
 });
 
-/**
- * Register PromptTemplate routes
- */
 export async function promptTemplateRoutes(
   fastify: FastifyInstance,
 ): Promise<void> {
   fastify.post('/', {
     schema: {
       body: CreatePromptTemplateSchema,
-      response: { 201: PromptTemplateResponseSchema },
+      response: { 201: PromptTemplateResponseSchema as unknown as TSchema },
       tags: ['PromptTemplate'],
-      description: 'Create a new PromptTemplate record',
     },
   }, async (request, reply) => {
-    const created = await PromptTemplateRepository.create(request.body);
+    const created = PromptTemplateRepository.createPromptTemplate(fastify.db, request.body as any);
     return reply.code(201).send(created);
   });
 
   fastify.get('/:id', {
     schema: {
       params: IdParamsSchema,
-      response: { 200: PromptTemplateResponseSchema, 404: NotFoundSchema },
+      response: { 200: PromptTemplateResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['PromptTemplate'],
-      description: 'Get a PromptTemplate by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const entity = await PromptTemplateRepository.findById(id);
+    const entity = PromptTemplateRepository.findPromptTemplateById(fastify.db, id);
     if (!entity) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(entity);
   });
@@ -54,13 +49,12 @@ export async function promptTemplateRoutes(
   fastify.get('/', {
     schema: {
       querystring: ListQuerySchema,
-      response: { 200: Type.Array(PromptTemplateResponseSchema) },
+      response: { 200: Type.Array(PromptTemplateResponseSchema as unknown as TSchema) },
       tags: ['PromptTemplate'],
-      description: 'List PromptTemplate records',
     },
   }, async (request, reply) => {
     const { limit, offset } = request.query as { limit?: number; offset?: number };
-    const items = await PromptTemplateRepository.list(limit, offset);
+    const items = PromptTemplateRepository.listPromptTemplates(fastify.db, limit, offset);
     return reply.code(200).send(items);
   });
 
@@ -68,13 +62,12 @@ export async function promptTemplateRoutes(
     schema: {
       params: IdParamsSchema,
       body: Type.Partial(CreatePromptTemplateSchema),
-      response: { 200: PromptTemplateResponseSchema, 404: NotFoundSchema },
+      response: { 200: PromptTemplateResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['PromptTemplate'],
-      description: 'Update a PromptTemplate by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const updated = await PromptTemplateRepository.update(id, request.body);
+    const updated = PromptTemplateRepository.updatePromptTemplate(fastify.db, id, request.body as any);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });
@@ -84,11 +77,10 @@ export async function promptTemplateRoutes(
       params: IdParamsSchema,
       response: { 204: Type.Null(), 404: NotFoundSchema },
       tags: ['PromptTemplate'],
-      description: 'Delete a PromptTemplate by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const deleted = await PromptTemplateRepository.delete(id);
+    const deleted = PromptTemplateRepository.deletePromptTemplate(fastify.db, id);
     if (!deleted) return reply.code(404).send({ error: 'Not found' });
     return reply.code(204).send();
   });

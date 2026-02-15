@@ -30,7 +30,7 @@ export function registerGetCodeRoute(fastify: FastifyInstance): void {
       request: FastifyRequest<{ Params: { id: string } }>,
       reply: FastifyReply
     ) => {
-      const entity = await OptimizationRepository.findById(fastify.pg.pool, request.params.id);
+      const entity = OptimizationRepository.findOptimizationById(fastify.db, request.params.id);
       if (!entity) return reply.code(404).send({ error: 'Not found' });
       return reply.code(200).send({
         code: entity.generatedCode,

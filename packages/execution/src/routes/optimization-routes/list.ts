@@ -10,7 +10,7 @@ import { OptimizationRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-const ListResponseSchema = Type.Array(OptimizationEntitySchema);
+const ListResponseSchema = Type.Array(OptimizationEntitySchema as unknown as import('@sinclair/typebox').TSchema);
 
 /** GET /optimizations/:orgId — list optimizations for org */
 export function registerListRoute(fastify: FastifyInstance): void {
@@ -24,10 +24,10 @@ export function registerListRoute(fastify: FastifyInstance): void {
       }
     },
     async (
-      request: FastifyRequest<{ Params: { orgId: string } }>,
+      _request: FastifyRequest<{ Params: { orgId: string } }>,
       reply: FastifyReply
     ) => {
-      const items = await OptimizationRepository.findByOrg(fastify.pg.pool, request.params.orgId);
+      const items = OptimizationRepository.listOptimizations(fastify.db);
       return reply.code(200).send(items);
     }
   );

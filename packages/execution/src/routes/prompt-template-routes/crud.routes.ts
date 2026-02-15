@@ -4,47 +4,45 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { Type } from '@sinclair/typebox';
+import { Type, type TSchema } from '@sinclair/typebox';
 import { PromptTemplateEntitySchema } from '@flusk/entities';
 import { PromptTemplateRepository } from '@flusk/resources';
 import { promptTemplate } from '@flusk/business-logic';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-const CreateSchema = Type.Omit(PromptTemplateEntitySchema, ['id', 'createdAt', 'updatedAt']);
+const CreateSchema = Type.Omit(PromptTemplateEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
 
 export async function promptTemplateCrudRoutes(fastify: FastifyInstance): Promise<void> {
-  const pool = fastify.pg.pool;
-
   fastify.post('/', {
-    schema: { body: CreateSchema, response: { 201: PromptTemplateEntitySchema } },
+    schema: { body: CreateSchema, response: { 201: PromptTemplateEntitySchema as unknown as TSchema } },
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     const data = request.body as Record<string, unknown>;
     const validation = promptTemplate.validatePromptTemplate(data);
     if (!validation.valid) return reply.code(400).send({ error: validation.errors.join(', ') });
-    const created = await PromptTemplateRepository.create(pool, data);
+    const created = PromptTemplateRepository.createPromptTemplate(fastify.db, data as any);
     return reply.code(201).send(created);
   });
 
   fastify.get('/:id', {
     schema: { params: Type.Object({ id: Type.String({ format: 'uuid' }) }) },
   }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    const entity = await PromptTemplateRepository.findById(pool, request.params.id);
+    const entity = PromptTemplateRepository.findPromptTemplateById(fastify.db, request.params.id);
     if (!entity) return reply.code(404).send({ error: 'Not found' });
     return reply.send(entity);
   });
 
   fastify.get('/org/:orgId', {
     schema: { params: Type.Object({ orgId: Type.String({ format: 'uuid' }) }) },
-  }, async (request: FastifyRequest<{ Params: { orgId: string } }>, reply: FastifyReply) => {
-    const templates = await PromptTemplateRepository.findByOrganizationId(pool, request.params.orgId);
+  }, async (_request: FastifyRequest<{ Params: { orgId: string } }>, reply: FastifyReply) => {
+    const templates = PromptTemplateRepository.listPromptTemplates(fastify.db);
     return reply.send(templates);
   });
 
   fastify.put('/:id', {
     schema: { params: Type.Object({ id: Type.String({ format: 'uuid' }) }) },
   }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    const updated = await PromptTemplateRepository.update(pool, request.params.id, request.body as Record<string, unknown>);
+    const updated = PromptTemplateRepository.updatePromptTemplate(fastify.db, request.params.id, request.body as any);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.send(updated);
   });
@@ -52,7 +50,7 @@ export async function promptTemplateCrudRoutes(fastify: FastifyInstance): Promis
   fastify.delete('/:id', {
     schema: { params: Type.Object({ id: Type.String({ format: 'uuid' }) }) },
   }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    await PromptTemplateRepository.deleteById(pool, request.params.id);
+    PromptTemplateRepository.deletePromptTemplate(fastify.db, request.params.id);
     return reply.code(204).send();
   });
 }

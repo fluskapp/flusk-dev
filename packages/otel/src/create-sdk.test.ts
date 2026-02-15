@@ -30,6 +30,7 @@ const config: FluskOtelConfig = {
   endpoint: 'https://otel.flusk.dev',
   projectName: 'my-app',
   captureContent: true,
+  exportTargets: [],
 };
 
 describe('createSdk', () => {
@@ -40,7 +41,7 @@ describe('createSdk', () => {
 
   it('disables noisy instrumentations (fs, dns, net)', () => {
     createSdk(config);
-    const opts = mockGetInstr.mock.calls[0]![0] as Record<string, unknown>;
+    const opts = (mockGetInstr.mock.calls[0] as unknown[])[0] as Record<string, unknown>;
     expect(opts['@opentelemetry/instrumentation-fs']).toEqual({ enabled: false });
     expect(opts['@opentelemetry/instrumentation-dns']).toEqual({ enabled: false });
     expect(opts['@opentelemetry/instrumentation-net']).toEqual({ enabled: false });
@@ -48,7 +49,7 @@ describe('createSdk', () => {
 
   it('enables OpenAI instrumentation with captureContent', () => {
     createSdk(config);
-    const opts = mockGetInstr.mock.calls[0]![0] as Record<string, unknown>;
+    const opts = (mockGetInstr.mock.calls[0] as unknown[])[0] as Record<string, unknown>;
     expect(opts['@opentelemetry/instrumentation-openai']).toEqual({ captureContent: true });
   });
 });

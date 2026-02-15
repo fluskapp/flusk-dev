@@ -19,7 +19,7 @@ describe('auto-profile.hook', () => {
     };
 
     const processor = createAutoProfileProcessor({ profiler });
-    processor.onStart(makeMockSpan('openai.chat', 'trace-123'));
+    processor.onStart(makeMockSpan('openai.chat', 'trace-123'), {} as any);
 
     expect(profiler.start).toHaveBeenCalledWith(['trace-123']);
   });
@@ -32,7 +32,7 @@ describe('auto-profile.hook', () => {
     };
 
     const processor = createAutoProfileProcessor({ profiler });
-    processor.onStart(makeMockSpan('http.request', 'trace-456'));
+    processor.onStart(makeMockSpan('http.request', 'trace-456'), {} as any);
 
     expect(profiler.start).not.toHaveBeenCalled();
   });
@@ -45,7 +45,7 @@ describe('auto-profile.hook', () => {
     };
 
     const processor = createAutoProfileProcessor({ profiler });
-    processor.onStart(makeMockSpan('openai.chat', 'trace-789'));
+    processor.onStart(makeMockSpan('openai.chat', 'trace-789'), {} as any);
 
     expect(profiler.start).not.toHaveBeenCalled();
   });

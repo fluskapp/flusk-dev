@@ -5,64 +5,59 @@
 // --- BEGIN GENERATED ---
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { Type } from '@sinclair/typebox';
-import { PromptVersionRepository, PromptTemplateRepository } from '@flusk/resources';
-import { promptVersion } from '@flusk/business-logic';
+import { PromptTemplateRepository, PromptVersionRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
 export async function promptVersionActionRoutes(fastify: FastifyInstance): Promise<void> {
-  const pool = fastify.pg.pool;
-
   fastify.post('/:id/activate', {
     schema: { params: Type.Object({ id: Type.String({ format: 'uuid' }) }) },
   }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    const version = await PromptVersionRepository.findById(pool, request.params.id);
+    const version = PromptVersionRepository.findPromptVersionById(fastify.db, request.params.id);
     if (!version) return reply.code(404).send({ error: 'Version not found' });
-    await PromptVersionRepository.update(pool, version.id, { status: 'active' });
-    await PromptTemplateRepository.update(pool, version.templateId, { activeVersionId: version.id });
-    return reply.send({ activated: true, versionId: version.id });
+    PromptVersionRepository.updatePromptVersion(fastify.db, version.id, { status: 'active' } as any);
+    PromptTemplateRepository.updatePromptTemplate(fastify.db, version.templateId, { activeVersionId: version.id } as any);
+    return reply.send({ activated: true });
   });
 
   fastify.post('/:id/rollback', {
     schema: { params: Type.Object({ id: Type.String({ format: 'uuid' }) }) },
   }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    const current = await PromptVersionRepository.findById(pool, request.params.id);
-    if (!current) return reply.code(404).send({ error: 'Version not found' });
-    const versions = await PromptVersionRepository.findByTemplateId(pool, current.templateId);
-    const previous = versions
-      .filter((v) => v.version < current.version)
-      .sort((a, b) => b.version - a.version)[0];
-    if (!previous) return reply.code(400).send({ error: 'No previous version' });
-    const decision = promptVersion.shouldRollback(current.metrics, previous.metrics);
-    if (!decision.shouldRollback) {
-      return reply.send({ rolledBack: false, reason: decision.reason });
-    }
-    await PromptVersionRepository.update(pool, current.id, { status: 'rolled-back' });
-    await PromptVersionRepository.update(pool, previous.id, { status: 'active' });
-    await PromptTemplateRepository.update(pool, current.templateId, { activeVersionId: previous.id });
-    return reply.send({ rolledBack: true, reason: decision.reason, newActiveVersionId: previous.id });
+    const version = PromptVersionRepository.findPromptVersionById(fastify.db, request.params.id);
+    if (!version) return reply.code(404).send({ error: 'Version not found' });
+    const allVersions = PromptVersionRepository.listPromptVersions(fastify.db);
+    const templateVersions = allVersions
+      .filter((v: any) => v.templateId === version.templateId)
+      .sort((a: any, b: any) => b.version - a.version);
+    if (templateVersions.length < 2) return reply.code(400).send({ error: 'No previous version' });
+    const prev = templateVersions[1] as any;
+    PromptVersionRepository.updatePromptVersion(fastify.db, version.id, { status: 'archived' } as any);
+    PromptVersionRepository.updatePromptVersion(fastify.db, prev.id, { status: 'active' } as any);
+    PromptTemplateRepository.updatePromptTemplate(fastify.db, version.templateId, { activeVersionId: prev.id } as any);
+    return reply.send({ rolledBackTo: prev.id });
   });
 
-  fastify.patch('/:id/metrics', {
+  fastify.post('/:id/compare', {
     schema: {
       params: Type.Object({ id: Type.String({ format: 'uuid' }) }),
-      body: Type.Object({ quality: Type.Number(), latencyMs: Type.Number(), cost: Type.Number() }),
+      body: Type.Object({ compareWithId: Type.String({ format: 'uuid' }) }),
     },
   }, async (request: FastifyRequest<{
-    Params: { id: string }; Body: { quality: number; latencyMs: number; cost: number }
+    Params: { id: string }; Body: { compareWithId: string }
   }>, reply: FastifyReply) => {
-    const version = await PromptVersionRepository.findById(pool, request.params.id);
-    if (!version) return reply.code(404).send({ error: 'Not found' });
-    const { metrics } = version;
-    const n = metrics.sampleCount;
-    const newMetrics = {
-      avgQuality: (metrics.avgQuality * n + request.body.quality) / (n + 1),
-      avgLatencyMs: (metrics.avgLatencyMs * n + request.body.latencyMs) / (n + 1),
-      avgCost: (metrics.avgCost * n + request.body.cost) / (n + 1),
-      sampleCount: n + 1,
-    };
-    const updated = await PromptVersionRepository.update(pool, version.id, { metrics: newMetrics });
-    return reply.send(updated);
+    const versionA = PromptVersionRepository.findPromptVersionById(fastify.db, request.params.id);
+    if (!versionA) return reply.code(404).send({ error: 'Version not found' });
+    return reply.send({ versionA });
+  });
+
+  fastify.post('/:id/metrics', {
+    schema: { params: Type.Object({ id: Type.String({ format: 'uuid' }) }) },
+  }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+    const version = PromptVersionRepository.findPromptVersionById(fastify.db, request.params.id);
+    if (!version) return reply.code(404).send({ error: 'Version not found' });
+    const metrics = request.body as Record<string, unknown>;
+    PromptVersionRepository.updatePromptVersion(fastify.db, version.id, { metrics } as any);
+    return reply.send({ updated: true });
   });
 }
 // --- END CUSTOM ---

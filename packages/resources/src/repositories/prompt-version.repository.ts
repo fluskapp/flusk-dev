@@ -30,7 +30,7 @@ function rowToEntity(row: Record<string, unknown>): PromptVersionEntity {
     version: row.version as number,
     content: row.content as string,
     metrics: JSON.parse(row.metrics as string),
-    status: row.status as string,
+    status: row.status as PromptVersionEntity['status'],
   };
 }
 
@@ -61,7 +61,7 @@ export function updatePromptVersion(db: DatabaseSync, id: string, data: UpdatePr
   const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
   if (keys.length === 0) return findPromptVersionById(db, id);
   const sets = keys.map((k) => `${toSnake(k)} = ?`).join(', ');
-  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));
+  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data])) as (string | number | null)[];
   const stmt = db.prepare(`UPDATE prompt_versions SET ${sets} WHERE id = ? RETURNING *`);
   const row = stmt.get(...vals, id) as Record<string, unknown> | undefined;
   return row ? rowToEntity(row) : null;

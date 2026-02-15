@@ -3,7 +3,7 @@
  */
 
 // --- BEGIN GENERATED ---
-import { Type } from '@sinclair/typebox';
+import { Type, type TSchema } from '@sinclair/typebox';
 import { TokenUsageSchema } from '@flusk/entities';
 // --- END GENERATED ---
 
@@ -16,7 +16,7 @@ export const CreateLLMCallSchema = Type.Object({
   provider: Type.String({ minLength: 1, description: 'LLM provider (e.g., openai, anthropic)' }),
   model: Type.String({ minLength: 1, description: 'Model identifier (e.g., gpt-4, claude-3-opus)' }),
   prompt: Type.String({ description: 'Full prompt text sent to the LLM' }),
-  tokens: TokenUsageSchema,
+  tokens: TokenUsageSchema as unknown as TSchema,
   response: Type.String({ description: 'Full response text from the LLM' })
 });
 
@@ -29,7 +29,7 @@ export const LLMCallResponseSchema = Type.Object({
   model: Type.String(),
   prompt: Type.String(),
   promptHash: Type.String({ minLength: 64, maxLength: 64 }),
-  tokens: TokenUsageSchema,
+  tokens: TokenUsageSchema as unknown as TSchema,
   cost: Type.Number({ minimum: 0 }),
   response: Type.String(),
   cached: Type.Boolean(),

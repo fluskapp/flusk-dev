@@ -30,21 +30,19 @@ export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): Nod
   const instrumentations = [
     new BedrockInstrumentation(),
     getNodeAutoInstrumentations({
-      '@opentelemetry/instrumentation-openai': {
-        captureContent: config.captureContent,
-      },
       '@opentelemetry/instrumentation-undici': { enabled: true },
       '@opentelemetry/instrumentation-fs': { enabled: false },
       '@opentelemetry/instrumentation-dns': { enabled: false },
       '@opentelemetry/instrumentation-net': { enabled: false },
+      ...({ '@opentelemetry/instrumentation-openai': { captureContent: config.captureContent } } as any),
     }),
   ];
 
   return new NodeSDK({
-    traceExporter,
+    traceExporter: traceExporter as any,
     resource,
     instrumentations,
-    spanProcessors: opts?.spanProcessors,
+    spanProcessors: opts?.spanProcessors as any,
   });
 }
 // --- END CUSTOM ---

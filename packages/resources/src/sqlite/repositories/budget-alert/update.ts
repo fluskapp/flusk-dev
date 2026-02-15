@@ -11,16 +11,16 @@ export function update(
   data: Partial<Omit<BudgetAlertEntity, 'id' | 'createdAt' | 'updatedAt'>>,
 ): BudgetAlertEntity | null {
   const sets: string[] = [];
-  const values: unknown[] = [];
+  const values: (string | number | null)[] = [];
   for (const [key, value] of Object.entries(data)) {
     if (value === undefined) continue;
     const snake = key.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
     if (Array.isArray(value) || (typeof value === 'object' && value !== null)) {
       sets.push(`${snake} = ?`);
-      values.push(JSON.stringify(value));
+      values.push(JSON.stringify(value) as string);
     } else {
       sets.push(`${snake} = ?`);
-      values.push(value);
+      values.push(value as string | number | null);
     }
   }
   if (sets.length === 0) return null;

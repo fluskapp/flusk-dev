@@ -27,19 +27,19 @@ function rowToEntity(row: Record<string, unknown>): OptimizationEntity {
     createdAt: toISOString(row.created_at),
     updatedAt: toISOString(row.updated_at),
     organizationId: row.organization_id as string,
-    optimizationType: row.optimization_type as string,
+    optimizationType: row.optimization_type as OptimizationEntity['optimizationType'],
     title: row.title as string,
     description: row.description as string,
     estimatedSavingsPerMonth: row.estimated_savings_per_month as number,
     generatedCode: row.generated_code as string,
-    language: row.language as string,
-    status: row.status as string,
+    language: row.language as OptimizationEntity['language'],
+    status: row.status as OptimizationEntity['status'],
     sourcePatternId: (row.source_pattern_id as string) ?? undefined,
   };
 }
 
 function toSnake(s: string): string { return s.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase(); }
-function convertValueForDb(key: string, value: unknown): unknown {
+function convertValueForDb(_key: string, value: unknown): unknown {
   return value ?? null;
 }
 
@@ -64,7 +64,7 @@ export function updateOptimization(db: DatabaseSync, id: string, data: UpdateOpt
   const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
   if (keys.length === 0) return findOptimizationById(db, id);
   const sets = keys.map((k) => `${toSnake(k)} = ?`).join(', ');
-  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));
+  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data])) as (string | number | null)[];
   const stmt = db.prepare(`UPDATE optimizations SET ${sets} WHERE id = ? RETURNING *`);
   const row = stmt.get(...vals, id) as Record<string, unknown> | undefined;
   return row ? rowToEntity(row) : null;

@@ -17,7 +17,7 @@ export function registerProtoParser(app: FastifyInstance): void {
       const { ProtobufTraceSerializer } = await import(
         '@opentelemetry/otlp-transformer'
       );
-      return ProtobufTraceSerializer.deserialize(body);
+      return ProtobufTraceSerializer.deserializeResponse(body);
     }
   );
 }

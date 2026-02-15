@@ -16,7 +16,7 @@ export function rowToEntity(row: Record<string, unknown>): PerformancePatternEnt
     updatedAt: toISOString(row.updated_at),
     profileSessionId: row.profile_session_id as string,
     pattern: row.pattern as string,
-    severity: row.severity as string,
+    severity: row.severity as PerformancePatternEntity['severity'],
     description: row.description as string,
     suggestion: row.suggestion as string,
     metadata: (typeof row.metadata === 'string'

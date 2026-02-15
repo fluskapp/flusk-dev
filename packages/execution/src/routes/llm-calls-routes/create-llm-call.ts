@@ -16,6 +16,7 @@ hashPromptHook,
   calculateCostHook,
   cacheResponseHook
 } from '../../hooks/llm-call.hooks.js';
+import type { TSchema } from '@sinclair/typebox';
 import { CreateLLMCallSchema, LLMCallResponseSchema, CachedResponseSchema } from './schemas.js';
 
 /**
@@ -30,8 +31,8 @@ export function registerCreateLLMCall(fastify: FastifyInstance): void {
       schema: {
         body: CreateLLMCallSchema,
         response: {
-          201: LLMCallResponseSchema,
-          200: CachedResponseSchema
+          201: LLMCallResponseSchema as unknown as TSchema,
+          200: CachedResponseSchema as unknown as TSchema
         },
         tags: ['LLM Calls'],
         description: 'Create a new LLM call record or return cached response'
@@ -66,7 +67,7 @@ export function registerCreateLLMCall(fastify: FastifyInstance): void {
           provider: created.provider,
           model: created.model,
           cost: created.cost,
-          totalTokens: created.totalTokens,
+          totalTokens: (created as any).totalTokens ?? 0,
           timestamp: new Date().toISOString(),
         },
       });

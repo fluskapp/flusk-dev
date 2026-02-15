@@ -10,7 +10,7 @@ import { SqliteSpanExporter } from '../exporters/sqlite-exporter.js';
 import { createLogger } from '@flusk/logger';
 import type { FluskOtelConfig } from '../config.js';
 
-const log = createLogger('resolve-exporter');
+const log = createLogger({ name: 'resolve-exporter' });
 
 export type FluskMode = 'local' | 'server';
 // --- END GENERATED ---
@@ -39,7 +39,7 @@ export function resolveExporter(config: FluskOtelConfig): SpanExporter {
     primary = new OTLPTraceExporter({
       url: `${config.endpoint}/v1/traces`,
       headers: { 'x-flusk-api-key': config.apiKey },
-    });
+    }) as unknown as SpanExporter;
   }
 
   if (!config.exportTargets?.length) return primary;

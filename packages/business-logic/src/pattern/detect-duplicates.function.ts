@@ -83,8 +83,8 @@ export function detectDuplicates(
     groups.push({
       promptHash,
       occurrenceCount: groupCalls.length,
-      firstSeenAt: sorted[0].createdAt,
-      lastSeenAt: sorted[sorted.length - 1].createdAt,
+      firstSeenAt: sorted[0]!.createdAt,
+      lastSeenAt: sorted[sorted.length - 1]!.createdAt,
       samplePrompts,
       totalCost,
       avgCost,

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 
 vi.mock('@opentelemetry/exporter-trace-otlp-http', () => {
   class OTLPTraceExporter { constructor(public opts: any) {} }
@@ -24,6 +24,7 @@ const config = {
   endpoint: 'https://otel.flusk.dev',
   projectName: 'test',
   captureContent: true,
+  exportTargets: [],
 };
 
 describe('resolveMode', () => {

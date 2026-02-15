@@ -4,13 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type } from '@sinclair/typebox';
+import { Type, type TSchema } from '@sinclair/typebox';
 import { ProfileSessionEntitySchema } from '@flusk/entities';
 import { ProfileSessionRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-const CreateProfileSessionSchema = Type.Omit(ProfileSessionEntitySchema, ['id', 'createdAt', 'updatedAt']);
+const CreateProfileSessionSchema = Type.Omit(ProfileSessionEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
 const ProfileSessionResponseSchema = ProfileSessionEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -19,34 +19,31 @@ const ListQuerySchema = Type.Object({
   offset: Type.Optional(Type.Integer({ minimum: 0 })),
 });
 
-/**
- * Register ProfileSession routes
- */
 export async function profileSessionRoutes(
   fastify: FastifyInstance,
 ): Promise<void> {
+  const pool = fastify.pg.pool;
+
   fastify.post('/', {
     schema: {
       body: CreateProfileSessionSchema,
-      response: { 201: ProfileSessionResponseSchema },
+      response: { 201: ProfileSessionResponseSchema as unknown as TSchema },
       tags: ['ProfileSession'],
-      description: 'Create a new ProfileSession record',
     },
   }, async (request, reply) => {
-    const created = await ProfileSessionRepository.create(request.body);
+    const created = await ProfileSessionRepository.create(pool, request.body as any);
     return reply.code(201).send(created);
   });
 
   fastify.get('/:id', {
     schema: {
       params: IdParamsSchema,
-      response: { 200: ProfileSessionResponseSchema, 404: NotFoundSchema },
+      response: { 200: ProfileSessionResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['ProfileSession'],
-      description: 'Get a ProfileSession by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const entity = await ProfileSessionRepository.findById(id);
+    const entity = await ProfileSessionRepository.findById(pool, id);
     if (!entity) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(entity);
   });
@@ -54,13 +51,12 @@ export async function profileSessionRoutes(
   fastify.get('/', {
     schema: {
       querystring: ListQuerySchema,
-      response: { 200: Type.Array(ProfileSessionResponseSchema) },
+      response: { 200: Type.Array(ProfileSessionResponseSchema as unknown as TSchema) },
       tags: ['ProfileSession'],
-      description: 'List ProfileSession records',
     },
   }, async (request, reply) => {
     const { limit, offset } = request.query as { limit?: number; offset?: number };
-    const items = await ProfileSessionRepository.list(limit, offset);
+    const items = await ProfileSessionRepository.list(pool, limit, offset);
     return reply.code(200).send(items);
   });
 
@@ -68,13 +64,12 @@ export async function profileSessionRoutes(
     schema: {
       params: IdParamsSchema,
       body: Type.Partial(CreateProfileSessionSchema),
-      response: { 200: ProfileSessionResponseSchema, 404: NotFoundSchema },
+      response: { 200: ProfileSessionResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['ProfileSession'],
-      description: 'Update a ProfileSession by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const updated = await ProfileSessionRepository.update(id, request.body);
+    const updated = await ProfileSessionRepository.update(pool, id, request.body as any);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });
@@ -84,19 +79,17 @@ export async function profileSessionRoutes(
       params: IdParamsSchema,
       response: { 204: Type.Null(), 404: NotFoundSchema },
       tags: ['ProfileSession'],
-      description: 'Delete a ProfileSession by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const deleted = await ProfileSessionRepository.delete(id);
+    const deleted = await ProfileSessionRepository.hardDelete(pool, id);
     if (!deleted) return reply.code(404).send({ error: 'Not found' });
     return reply.code(204).send();
   });
 
-  /** Time-range query route for ProfileSession */
   fastify.get('/by-time-range', async (req) => {
     const { from, to } = req.query as { from: string; to: string };
-    return ProfileSessionRepository.findProfileSessionsByTimeRange(fastify.db, from, to);
+    return ProfileSessionRepository.findByTimeRange(pool, from, to);
   });
 }
 

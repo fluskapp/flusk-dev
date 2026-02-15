@@ -12,5 +12,5 @@ export function countByModel(db: DatabaseSync): ModelCount[] {
   const stmt = db.prepare(
     'SELECT model, COUNT(*) as count FROM llm_calls GROUP BY model ORDER BY count DESC',
   );
-  return stmt.all() as ModelCount[];
+  return stmt.all() as unknown as ModelCount[];
 }

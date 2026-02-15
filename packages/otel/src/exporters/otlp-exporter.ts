@@ -6,7 +6,7 @@ import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import type { SpanExporter } from '@opentelemetry/sdk-trace-base';
 import { createLogger } from '@flusk/logger';
 
-const log = createLogger('otlp-exporter');
+const log = createLogger({ name: 'otlp-exporter' });
 
 export type OtlpPlatform = 'grafana' | 'datadog' | 'newrelic' | 'custom';
 
@@ -50,5 +50,5 @@ export function createOtlpExporter(config: OtlpExporterConfig): SpanExporter {
   }
 
   log.info(`OTLP exporter: ${config.platform} → ${endpoint}`);
-  return new OTLPTraceExporter({ url: endpoint, headers });
+  return new OTLPTraceExporter({ url: endpoint, headers }) as unknown as SpanExporter;
 }

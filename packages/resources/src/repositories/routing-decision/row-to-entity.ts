@@ -17,6 +17,7 @@ export function rowToEntity(row: Record<string, unknown>): RoutingDecisionEntity
     reason: row.reason as string,
     costSaved: Number(row.cost_saved),
     createdAt: (row.created_at as Date).toISOString(),
+    updatedAt: (row.updated_at as Date).toISOString(),
   };
 }
 // --- END CUSTOM ---

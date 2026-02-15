@@ -6,7 +6,7 @@ import type { SpanExporter, ReadableSpan } from '@opentelemetry/sdk-trace-base';
 import { ExportResultCode, type ExportResult } from '@opentelemetry/core';
 import { createLogger } from '@flusk/logger';
 
-const log = createLogger('multi-exporter');
+const log = createLogger({ name: 'multi-exporter' });
 
 export class MultiSpanExporter implements SpanExporter {
   private exporters: SpanExporter[];

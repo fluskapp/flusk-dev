@@ -23,23 +23,6 @@ export interface CostEvent {
  * In-process event bus for real-time cost tracking
  * SSE clients subscribe, LLM call creation emits
  */
-class CostEventBus extends EventEmitter {
-  emit(event: 'cost', data: CostEvent): boolean
-  emit(event: string, ...args: unknown[]): boolean {
-    return super.emit(event, ...args)
-  }
-
-  on(event: 'cost', listener: (data: CostEvent) => void): this
-  on(event: string, listener: (...args: unknown[]) => void): this {
-    return super.on(event, listener)
-  }
-
-  off(event: 'cost', listener: (data: CostEvent) => void): this
-  off(event: string, listener: (...args: unknown[]) => void): this {
-    return super.off(event, listener)
-  }
-}
-
-export const costEventBus = new CostEventBus()
+export const costEventBus = new EventEmitter()
 costEventBus.setMaxListeners(100)
 // --- END CUSTOM ---

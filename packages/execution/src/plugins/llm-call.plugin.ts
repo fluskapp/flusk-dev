@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
-import { llmcallRoutes } from '../routes/llm-call.routes.js';
+import { llmCallRoutes } from '../routes/llm-call.routes.js';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
@@ -17,7 +17,7 @@ async function llmcallPlugin(
   fastify: FastifyInstance
 ): Promise<void> {
   // Register routes under /llm-calls prefix
-  await fastify.register(llmcallRoutes, { prefix: '/llm-calls' });
+  await fastify.register(llmCallRoutes, { prefix: '/llm-calls' });
 
   fastify.log.info('LLMCall plugin registered');
 }

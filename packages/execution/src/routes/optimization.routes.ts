@@ -4,13 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type } from '@sinclair/typebox';
+import { Type, type TSchema } from '@sinclair/typebox';
 import { OptimizationEntitySchema } from '@flusk/entities';
 import { OptimizationRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-const CreateOptimizationSchema = Type.Omit(OptimizationEntitySchema, ['id', 'createdAt', 'updatedAt']);
+const CreateOptimizationSchema = Type.Omit(OptimizationEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
 const OptimizationResponseSchema = OptimizationEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -19,34 +19,29 @@ const ListQuerySchema = Type.Object({
   offset: Type.Optional(Type.Integer({ minimum: 0 })),
 });
 
-/**
- * Register Optimization routes
- */
 export async function optimizationRoutes(
   fastify: FastifyInstance,
 ): Promise<void> {
   fastify.post('/', {
     schema: {
       body: CreateOptimizationSchema,
-      response: { 201: OptimizationResponseSchema },
+      response: { 201: OptimizationResponseSchema as unknown as TSchema },
       tags: ['Optimization'],
-      description: 'Create a new Optimization record',
     },
   }, async (request, reply) => {
-    const created = await OptimizationRepository.create(request.body);
+    const created = OptimizationRepository.createOptimization(fastify.db, request.body as any);
     return reply.code(201).send(created);
   });
 
   fastify.get('/:id', {
     schema: {
       params: IdParamsSchema,
-      response: { 200: OptimizationResponseSchema, 404: NotFoundSchema },
+      response: { 200: OptimizationResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['Optimization'],
-      description: 'Get a Optimization by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const entity = await OptimizationRepository.findById(id);
+    const entity = OptimizationRepository.findOptimizationById(fastify.db, id);
     if (!entity) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(entity);
   });
@@ -54,13 +49,12 @@ export async function optimizationRoutes(
   fastify.get('/', {
     schema: {
       querystring: ListQuerySchema,
-      response: { 200: Type.Array(OptimizationResponseSchema) },
+      response: { 200: Type.Array(OptimizationResponseSchema as unknown as TSchema) },
       tags: ['Optimization'],
-      description: 'List Optimization records',
     },
   }, async (request, reply) => {
     const { limit, offset } = request.query as { limit?: number; offset?: number };
-    const items = await OptimizationRepository.list(limit, offset);
+    const items = OptimizationRepository.listOptimizations(fastify.db, limit, offset);
     return reply.code(200).send(items);
   });
 
@@ -68,13 +62,12 @@ export async function optimizationRoutes(
     schema: {
       params: IdParamsSchema,
       body: Type.Partial(CreateOptimizationSchema),
-      response: { 200: OptimizationResponseSchema, 404: NotFoundSchema },
+      response: { 200: OptimizationResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['Optimization'],
-      description: 'Update a Optimization by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const updated = await OptimizationRepository.update(id, request.body);
+    const updated = OptimizationRepository.updateOptimization(fastify.db, id, request.body as any);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });
@@ -84,11 +77,10 @@ export async function optimizationRoutes(
       params: IdParamsSchema,
       response: { 204: Type.Null(), 404: NotFoundSchema },
       tags: ['Optimization'],
-      description: 'Delete a Optimization by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const deleted = await OptimizationRepository.delete(id);
+    const deleted = OptimizationRepository.deleteOptimization(fastify.db, id);
     if (!deleted) return reply.code(404).send({ error: 'Not found' });
     return reply.code(204).send();
   });

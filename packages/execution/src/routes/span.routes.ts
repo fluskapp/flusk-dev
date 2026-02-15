@@ -4,13 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type } from '@sinclair/typebox';
+import { Type, type TSchema } from '@sinclair/typebox';
 import { SpanEntitySchema } from '@flusk/entities';
 import { SpanRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-const CreateSpanSchema = Type.Omit(SpanEntitySchema, ['id', 'createdAt', 'updatedAt']);
+const CreateSpanSchema = Type.Omit(SpanEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
 const SpanResponseSchema = SpanEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -19,34 +19,29 @@ const ListQuerySchema = Type.Object({
   offset: Type.Optional(Type.Integer({ minimum: 0 })),
 });
 
-/**
- * Register Span routes
- */
 export async function spanRoutes(
   fastify: FastifyInstance,
 ): Promise<void> {
   fastify.post('/', {
     schema: {
       body: CreateSpanSchema,
-      response: { 201: SpanResponseSchema },
+      response: { 201: SpanResponseSchema as unknown as TSchema },
       tags: ['Span'],
-      description: 'Create a new Span record',
     },
   }, async (request, reply) => {
-    const created = await SpanRepository.create(request.body);
+    const created = SpanRepository.createSpan(fastify.db, request.body as any);
     return reply.code(201).send(created);
   });
 
   fastify.get('/:id', {
     schema: {
       params: IdParamsSchema,
-      response: { 200: SpanResponseSchema, 404: NotFoundSchema },
+      response: { 200: SpanResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['Span'],
-      description: 'Get a Span by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const entity = await SpanRepository.findById(id);
+    const entity = SpanRepository.findSpanById(fastify.db, id);
     if (!entity) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(entity);
   });
@@ -54,13 +49,12 @@ export async function spanRoutes(
   fastify.get('/', {
     schema: {
       querystring: ListQuerySchema,
-      response: { 200: Type.Array(SpanResponseSchema) },
+      response: { 200: Type.Array(SpanResponseSchema as unknown as TSchema) },
       tags: ['Span'],
-      description: 'List Span records',
     },
   }, async (request, reply) => {
     const { limit, offset } = request.query as { limit?: number; offset?: number };
-    const items = await SpanRepository.list(limit, offset);
+    const items = SpanRepository.listSpans(fastify.db, limit, offset);
     return reply.code(200).send(items);
   });
 
@@ -68,13 +62,12 @@ export async function spanRoutes(
     schema: {
       params: IdParamsSchema,
       body: Type.Partial(CreateSpanSchema),
-      response: { 200: SpanResponseSchema, 404: NotFoundSchema },
+      response: { 200: SpanResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['Span'],
-      description: 'Update a Span by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const updated = await SpanRepository.update(id, request.body);
+    const updated = SpanRepository.updateSpan(fastify.db, id, request.body as any);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });
@@ -84,11 +77,10 @@ export async function spanRoutes(
       params: IdParamsSchema,
       response: { 204: Type.Null(), 404: NotFoundSchema },
       tags: ['Span'],
-      description: 'Delete a Span by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const deleted = await SpanRepository.delete(id);
+    const deleted = SpanRepository.deleteSpan(fastify.db, id);
     if (!deleted) return reply.code(404).send({ error: 'Not found' });
     return reply.code(204).send();
   });

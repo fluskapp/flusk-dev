@@ -9,7 +9,7 @@ import { createLogger } from '@flusk/logger';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-const log = createLogger('webhook');
+const log = createLogger({ name: 'webhook' });
 
 export interface WebhookPayload {
   text: string;
@@ -21,13 +21,13 @@ export async function sendWebhook(
 ): Promise<void> {
   try {
     await request(url, {
-      method: 'POST',
+      method: 'POST' as const,
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify(payload),
     });
-    log.info('Webhook sent', { url: url.slice(0, 40) + '...' });
+    log.info({ url: url.slice(0, 40) + '...' }, 'Webhook sent');
   } catch (err) {
-    log.error('Webhook failed', { error: err });
+    log.error({ error: err }, 'Webhook failed');
   }
 }
 

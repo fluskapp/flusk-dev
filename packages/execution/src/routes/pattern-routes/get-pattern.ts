@@ -35,7 +35,7 @@ export function registerGetPattern(fastify: FastifyInstance): void {
     async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const { id } = request.params;
 
-      const pattern = await PatternRepository.findById(id);
+      const pattern = await PatternRepository.findById(fastify.pg.pool, id);
 
       if (!pattern) {
         return reply.code(404).send({ error: 'Pattern not found' });

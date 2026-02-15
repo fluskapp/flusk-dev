@@ -54,7 +54,7 @@ export function registerGetByOrganization(fastify: FastifyInstance): void {
         offset?: number;
       };
 
-      const patterns = await PatternRepository.findByOrganization(orgId, query);
+      const patterns = await PatternRepository.findByOrganization(fastify.pg.pool, orgId, query);
 
       return reply.code(200).send({
         patterns,

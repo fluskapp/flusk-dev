@@ -35,8 +35,8 @@ export function registerUpdateRoute(fastify: FastifyInstance): void {
       reply: FastifyReply
     ) => {
       const { status } = request.body as { status: string };
-      const updated = await OptimizationRepository.update(
-        fastify.pg.pool, request.params.id, { status }
+      const updated = OptimizationRepository.updateOptimization(
+        fastify.db, request.params.id, { status } as any
       );
       if (!updated) return reply.code(404).send({ error: 'Not found' });
       return reply.code(200).send(updated);

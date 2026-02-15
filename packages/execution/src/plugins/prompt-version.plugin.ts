@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
-import { promptversionRoutes } from '../routes/prompt-version.routes.js';
+import { promptVersionRoutes } from '../routes/prompt-version.routes.js';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
@@ -17,7 +17,7 @@ async function promptversionPlugin(
   fastify: FastifyInstance
 ): Promise<void> {
   // Register routes under /prompt-versions prefix
-  await fastify.register(promptversionRoutes, { prefix: '/prompt-versions' });
+  await fastify.register(promptVersionRoutes, { prefix: '/prompt-versions' });
 
   fastify.log.info('PromptVersion plugin registered');
 }

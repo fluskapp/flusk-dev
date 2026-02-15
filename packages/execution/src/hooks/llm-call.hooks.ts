@@ -116,8 +116,8 @@ export async function calculateCostHook(
 export async function cacheResponseHook(
   request: FastifyRequest,
   _reply: FastifyReply,
-  payload: string
-): Promise<string> {
+  payload: unknown
+): Promise<unknown> {
   const hash = request.promptHash;
   const body = request.body as { response?: string };
   if (hash && body?.response) {

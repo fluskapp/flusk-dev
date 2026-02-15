@@ -6,7 +6,7 @@
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
 import fp from 'fastify-plugin';
-import { prompttemplateRoutes } from '../routes/prompt-template.routes.js';
+import { promptTemplateRoutes } from '../routes/prompt-template.routes.js';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
@@ -17,7 +17,7 @@ async function prompttemplatePlugin(
   fastify: FastifyInstance
 ): Promise<void> {
   // Register routes under /prompt-templates prefix
-  await fastify.register(prompttemplateRoutes, { prefix: '/prompt-templates' });
+  await fastify.register(promptTemplateRoutes, { prefix: '/prompt-templates' });
 
   fastify.log.info('PromptTemplate plugin registered');
 }

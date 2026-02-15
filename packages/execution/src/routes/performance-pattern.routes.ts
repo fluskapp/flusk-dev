@@ -4,13 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type } from '@sinclair/typebox';
+import { Type, type TSchema } from '@sinclair/typebox';
 import { PerformancePatternEntitySchema } from '@flusk/entities';
 import { PerformancePatternRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-const CreatePerformancePatternSchema = Type.Omit(PerformancePatternEntitySchema, ['id', 'createdAt', 'updatedAt']);
+const CreatePerformancePatternSchema = Type.Omit(PerformancePatternEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
 const PerformancePatternResponseSchema = PerformancePatternEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -19,48 +19,44 @@ const ListQuerySchema = Type.Object({
   offset: Type.Optional(Type.Integer({ minimum: 0 })),
 });
 
-/**
- * Register PerformancePattern routes
- */
 export async function performancePatternRoutes(
   fastify: FastifyInstance,
 ): Promise<void> {
+  const pool = fastify.pg.pool;
+
   fastify.post('/', {
     schema: {
       body: CreatePerformancePatternSchema,
-      response: { 201: PerformancePatternResponseSchema },
+      response: { 201: PerformancePatternResponseSchema as unknown as TSchema },
       tags: ['PerformancePattern'],
-      description: 'Create a new PerformancePattern record',
     },
   }, async (request, reply) => {
-    const created = await PerformancePatternRepository.create(request.body);
+    const created = await PerformancePatternRepository.create(pool, request.body as any);
     return reply.code(201).send(created);
   });
 
   fastify.get('/:id', {
     schema: {
       params: IdParamsSchema,
-      response: { 200: PerformancePatternResponseSchema, 404: NotFoundSchema },
+      response: { 200: PerformancePatternResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['PerformancePattern'],
-      description: 'Get a PerformancePattern by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const entity = await PerformancePatternRepository.findById(id);
-    if (!entity) return reply.code(404).send({ error: 'Not found' });
-    return reply.code(200).send(entity);
+    const items = await PerformancePatternRepository.findByProfileId(pool, id);
+    if (!items.length) return reply.code(404).send({ error: 'Not found' });
+    return reply.code(200).send(items[0]);
   });
 
   fastify.get('/', {
     schema: {
       querystring: ListQuerySchema,
-      response: { 200: Type.Array(PerformancePatternResponseSchema) },
+      response: { 200: Type.Array(PerformancePatternResponseSchema as unknown as TSchema) },
       tags: ['PerformancePattern'],
-      description: 'List PerformancePattern records',
     },
   }, async (request, reply) => {
     const { limit, offset } = request.query as { limit?: number; offset?: number };
-    const items = await PerformancePatternRepository.list(limit, offset);
+    const items = await PerformancePatternRepository.list(pool, limit, offset);
     return reply.code(200).send(items);
   });
 
@@ -68,15 +64,12 @@ export async function performancePatternRoutes(
     schema: {
       params: IdParamsSchema,
       body: Type.Partial(CreatePerformancePatternSchema),
-      response: { 200: PerformancePatternResponseSchema, 404: NotFoundSchema },
+      response: { 200: PerformancePatternResponseSchema as unknown as TSchema, 404: NotFoundSchema },
       tags: ['PerformancePattern'],
-      description: 'Update a PerformancePattern by ID',
     },
-  }, async (request, reply) => {
-    const { id } = request.params as { id: string };
-    const updated = await PerformancePatternRepository.update(id, request.body);
-    if (!updated) return reply.code(404).send({ error: 'Not found' });
-    return reply.code(200).send(updated);
+  }, async (_request, reply) => {
+    // No update in PerformancePatternRepository
+    return reply.code(404).send({ error: 'Not supported' });
   });
 
   fastify.delete('/:id', {
@@ -84,11 +77,10 @@ export async function performancePatternRoutes(
       params: IdParamsSchema,
       response: { 204: Type.Null(), 404: NotFoundSchema },
       tags: ['PerformancePattern'],
-      description: 'Delete a PerformancePattern by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const deleted = await PerformancePatternRepository.delete(id);
+    const deleted = await PerformancePatternRepository.hardDelete(pool, id);
     if (!deleted) return reply.code(404).send({ error: 'Not found' });
     return reply.code(204).send();
   });

@@ -10,7 +10,7 @@ import { createSqliteStorage, closeDb, type StorageAdapter } from '@flusk/resour
 import { createLogger } from '@flusk/logger';
 import { parseReadableSpan } from './parse-readable-span.js';
 
-const log = createLogger('sqlite-exporter');
+const log = createLogger({ name: 'sqlite-exporter' });
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
@@ -31,13 +31,13 @@ export class SqliteSpanExporter implements SpanExporter {
       for (const span of spans) {
         const parsed = parseReadableSpan(span);
         if (!parsed) continue;
-        this.storage.llmCalls.create(parsed);
+        this.storage.llmCalls.create(parsed as any);
         count++;
       }
       if (count > 0) log.debug(`Exported ${count} GenAI spans to SQLite`);
       resultCallback({ code: ExportResultCode.SUCCESS });
     } catch (err) {
-      log.error('Failed to export spans', { error: err });
+      log.error({ error: err }, 'Failed to export spans');
       resultCallback({ code: ExportResultCode.FAILED });
     }
   }

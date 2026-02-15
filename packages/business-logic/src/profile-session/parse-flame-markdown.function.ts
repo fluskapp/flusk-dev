@@ -22,10 +22,10 @@ export function parseFlameMarkdown(markdown: string): HotspotEntry[] {
     const match = rowRegex.exec(line.trim());
     if (match) {
       hotspots.push({
-        functionName: match[1].trim(),
-        filePath: match[2].trim(),
-        cpuPercent: parseFloat(match[3]),
-        samples: parseInt(match[4], 10),
+        functionName: match[1]!.trim(),
+        filePath: match[2]!.trim(),
+        cpuPercent: parseFloat(match[3]!),
+        samples: parseInt(match[4]!, 10),
       });
     }
   }

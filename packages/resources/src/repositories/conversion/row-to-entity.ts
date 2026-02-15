@@ -29,8 +29,8 @@ export function rowToEntity(row: ConversionRow): ConversionEntity {
     updatedAt: row.updated_at.toISOString(),
     patternId: row.pattern_id,
     organizationId: row.organization_id,
-    conversionType: row.conversion_type,
-    status: row.status,
+    conversionType: row.conversion_type as ConversionEntity['conversionType'],
+    status: row.status as ConversionEntity['status'],
     estimatedSavings: parseFloat(row.estimated_savings),
     config: row.config
   };

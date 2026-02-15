@@ -69,12 +69,12 @@ export function scoreSuggestions(
 
 function extractCpuImpact(msg: string): number {
   const match = msg.match(/(\d+(?:\.\d+)?)%\s*CPU/);
-  return match ? parseFloat(match[1]) / 100 : 0;
+  return match ? parseFloat(match[1]!) / 100 : 0;
 }
 
 function extractCostImpact(msg: string): number {
   const match = msg.match(/\$(\d+(?:\.\d+)?)/);
-  return match ? Math.min(parseFloat(match[1]), 1) : 0;
+  return match ? Math.min(parseFloat(match[1]!), 1) : 0;
 }
 
 function extractCpuFromMeta(meta: Record<string, unknown>): number {
