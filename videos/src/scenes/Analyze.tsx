@@ -4,6 +4,7 @@ import { COLORS, fullScreen, terminalBox } from "../styles";
 
 export const Analyze: React.FC = () => {
   const frame = useCurrentFrame();
+  const zoom = interpolate(frame, [0, 90], [0.95, 1.05], { extrapolateRight: "clamp" });
 
   const command = "npx @flusk/cli analyze ./app.js";
   const typedChars = Math.min(
@@ -24,7 +25,7 @@ export const Analyze: React.FC = () => {
 
   return (
     <AbsoluteFill style={fullScreen}>
-      <div style={terminalBox}>
+      <div style={{ ...terminalBox, transform: `scale(${zoom})` }}>
         <div style={{ fontSize: 14, color: COLORS.gray, marginBottom: 16 }}>
           ● ● ● Terminal
         </div>

@@ -1,6 +1,7 @@
 import React from "react";
 import { AbsoluteFill, interpolate, useCurrentFrame } from "remotion";
 import { COLORS, fullScreen, terminalBox } from "../styles";
+import { spring, useVideoConfig } from "remotion";
 
 const rows = [
   { model: "gpt-5.2", calls: "47", tokens: "125,340", cost: "$3.76" },
@@ -16,6 +17,7 @@ const suggestions = [
 
 export const Report: React.FC = () => {
   const frame = useCurrentFrame();
+  const zoom = interpolate(frame, [0, 105], [1.08, 1], { extrapolateRight: "clamp" });
 
   const headerOpacity = interpolate(frame, [0, 10], [0, 1], {
     extrapolateRight: "clamp",
@@ -23,7 +25,7 @@ export const Report: React.FC = () => {
 
   return (
     <AbsoluteFill style={fullScreen}>
-      <div style={{ ...terminalBox, maxWidth: 1200 }}>
+      <div style={{ ...terminalBox, maxWidth: 1200, transform: `scale(${zoom})` }}>
         <div
           style={{
             fontSize: 24,
