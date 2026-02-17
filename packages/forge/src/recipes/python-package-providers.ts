@@ -6,7 +6,7 @@
  */
 
 import { resolve } from 'node:path';
-import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises';
+import { readdir, readFile, mkdir } from 'node:fs/promises';
 import { parse as parseYaml } from 'yaml';
 import type { RecipeStep, StepResult } from './recipe.types.js';
 import type { ProviderYaml } from '../generators/provider-yaml.types.js';
