@@ -157,6 +157,7 @@ For entity work, AI agents operate in **YAML-only mode**:
 8. **OTel SDK must be shut down explicitly** — Call `sdk.shutdown()` on `beforeExit` or spans won't flush.
 9. **OpenAI SDK v6 breaks traceloop instrumentation** — Use custom instrumentation (`openai-v6.ts`), not `@traceloop/instrumentation-openai`.
 10. **`@changesets/changelog-github` needs GitHub API token** — Use `@changesets/cli/changelog` (built-in) to avoid token requirements.
+11. **Provider SDKs must be added as deps** — When generating a new provider, add the SDK as `devDependencies` (for build/types) + `peerDependencies` with `optional: true` (users install only what they use). Dynamic `import()` alone isn't enough — TypeScript needs type declarations at build time.
 
 ## AI Agent Behavioral Rules
 
