@@ -126,6 +126,15 @@ pnpm lint       # ESLint
 - Custom queries go in `queries:` block — use `returns: single|list|scalar|raw`
 - After creating/editing YAML: `flusk recipe full-entity --from packages/schema/entities/<name>.entity.yaml`
 
+## Python Package (flusk-py)
+
+- `flusk recipe python-package` regenerates **all** Python code from YAML
+- **Never edit `flusk-py/` directly** — it is 100% generated
+- Python files use `# --- BEGIN GENERATED ---` markers
+- `flusk-py/.gitignore` excludes `__pycache__`
+- Same SQLite schema as TypeScript — cross-language compatible
+- To test: `cd flusk-py && pytest`
+
 ## Important Rules
 
 1. Keep files under 100 lines

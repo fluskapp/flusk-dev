@@ -2,14 +2,24 @@
 
 ## Prerequisites
 
-- **Node.js** ≥ 22
+- **Node.js** ≥ 22 (for the Node.js package), or
+- **Python** ≥ 3.11 (for the Python package)
 
 That's it. No databases, no Docker, no API keys.
 
 ## 1. Analyze your app
 
+**Node.js:**
+
 ```bash
 npx @flusk/cli analyze ./my-app.js
+```
+
+**Python:**
+
+```bash
+pip install flusk
+flusk analyze ./agent.py
 ```
 
 Flusk instruments your app via OpenTelemetry, captures every LLM call
@@ -109,6 +119,12 @@ built into Node.js 22+. No setup required.
 
 For teams that need persistent monitoring, upgrade to **Postgres + Redis**
 via [Self-Hosting](./self-hosting.md).
+
+## Python-specific notes
+
+The Python CLI has the same commands (`analyze`, `report`, `history`, `purge`). Data is stored in the same SQLite database (`~/.flusk/data.db`), so you can analyze a Python app and view the report from the Node.js CLI — or vice versa.
+
+See the [Python Guide](./generators/python-guide.md) for more details.
 
 ## Next steps
 
