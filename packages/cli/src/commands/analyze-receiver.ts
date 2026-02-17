@@ -21,10 +21,18 @@ export interface ReceiverHandle {
   getCallCount: () => number;
 }
 
-export function startReceiver(storage: StorageAdapter, sessionId?: string, redact?: boolean): Promise<ReceiverHandle> {
+export function startReceiver(storage: StorageAdapter, sessionId?: string, redact?: boolean, authToken?: string): Promise<ReceiverHandle> {
   let callCount = 0;
 
   const server = createServer(async (req, res) => {
+    if (authToken) {
+      const provided = req.headers['authorization']?.replace('Bearer ', '');
+      if (provided !== authToken) {
+        res.writeHead(401);
+        res.end('Unauthorized');
+        return;
+      }
+    }
     if (req.method === 'POST' && req.url === '/v1/traces') {
       const chunks: Buffer[] = [];
       for await (const chunk of req) chunks.push(chunk as Buffer);

@@ -14,6 +14,7 @@ import { spawn } from 'node:child_process';
 import { resolve, normalize } from 'node:path';
 import { writeFile } from 'node:fs/promises';
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { randomBytes } from 'node:crypto';
 import { createSqliteStorage } from '@flusk/resources';
 import { startReceiver } from './analyze-receiver.js';
 import { generateReport } from './analyze-report.js';
@@ -43,7 +44,16 @@ export const analyzeCommand = new Command('analyze')
       totalCost: 0, modelsUsed: [], startedAt: new Date().toISOString(),
     });
     const redact = !!opts.redact;
-    const receiver = mode === 'server' ? await startReceiver(storage, session.id, redact) : null;
+    const authToken = randomBytes(16).toString('hex');
+    const receiver = mode === 'server' ? await startReceiver(storage, session.id, redact, authToken) : null;
+
+    // Validate script file exists before spawning
+    const scriptPath = resolve(normalize(script));
+    if (!existsSync(scriptPath)) {
+      console.error(chalk.red(`❌ Script not found: ${scriptPath}`));
+      console.error(chalk.dim('Please provide a valid path to the script to analyze.'));
+      process.exit(1);
+    }
 
     console.log(chalk.cyan(`🔍 Analyzing ${script}...`));
     if (receiver) console.log(chalk.dim(`   OTLP receiver on port ${receiver.port}`));
@@ -51,7 +61,7 @@ export const analyzeCommand = new Command('analyze')
     if (duration > 0) console.log(chalk.dim(`   Duration: ${duration}s`));
     if (redact) console.log(chalk.dim('   Redact mode — prompts/completions will not be stored'));
 
-    const child = spawnChild(script, mode, receiver?.port, agentLabel, session.id, redact);
+    const child = spawnChild(script, mode, receiver?.port, agentLabel, session.id, redact, receiver ? authToken : undefined);
     const exitCode = await waitForCompletion(child, duration);
     if (receiver) await receiver.close();
 
@@ -94,7 +104,7 @@ function getOtelRegisterUrl(): string {
 }
 
 function spawnChild(
-  script: string, mode: string, port?: number, agent?: string, sessionId?: string, redact?: boolean,
+  script: string, mode: string, port?: number, agent?: string, sessionId?: string, redact?: boolean, authToken?: string,
 ) {
   // Resolve the otel register path relative to this file
   const otelRegister = getOtelRegisterUrl().replace('file://', '');
@@ -106,6 +116,7 @@ function spawnChild(
     ...(agent ? { FLUSK_AGENT: agent, FLUSK_AGENT_LABEL: agent } : {}),
     ...(sessionId ? { FLUSK_SESSION_ID: sessionId } : {}),
     ...(redact ? { FLUSK_REDACT: '1' } : {}),
+    ...(authToken ? { FLUSK_AUTH_TOKEN: authToken } : {}),
   };
 
   // Validate and sanitize the user-provided script path to prevent path traversal
@@ -147,11 +158,16 @@ function waitForCompletion(
 ): Promise<number> {
   return new Promise((resolve) => {
     let timer: ReturnType<typeof setTimeout> | undefined;
-    const cleanup = (code: number) => { if (timer) clearTimeout(timer); resolve(code); };
+    const sigintHandler = () => { child.kill('SIGTERM'); };
+    const cleanup = (code: number) => {
+      if (timer) clearTimeout(timer);
+      process.removeListener('SIGINT', sigintHandler);
+      resolve(code);
+    };
     child.on('exit', (code) => cleanup(code ?? 1));
     child.on('error', () => cleanup(1));
     if (duration > 0) timer = setTimeout(() => { child.kill('SIGTERM'); }, duration * 1000);
-    process.on('SIGINT', () => { child.kill('SIGTERM'); });
+    process.on('SIGINT', sigintHandler);
   });
 }
 // --- END GENERATED ---
