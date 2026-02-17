@@ -38,7 +38,7 @@ dependencies = [
 dev = ["pytest>=8.0", "ruff>=0.4", "mypy>=1.10"]
 
 [project.scripts]
-flusk = "flusk.cli.main:app"
+flusk = "flusk.cli.main:cli"
 
 [project.urls]
 Homepage = "https://github.com/flusk-io/flusk"

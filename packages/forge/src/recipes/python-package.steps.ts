@@ -96,7 +96,7 @@ export const initFilesStep: RecipeStep = {
     const entityMods = await listModules(resolve(root, 'entities'));
     const entityModsNoBase = entityMods.filter((m) => m !== 'base');
     await generateRootInit(root, entityModsNoBase);
-    for (const d of ['storage', 'storage/sqlite', 'cli']) {
+    for (const d of ['storage', 'storage/sqlite']) {
       await generateEmptyInit(resolve(root, d));
     }
     await writeFile(resolve(root, 'py.typed'), '', 'utf-8');
