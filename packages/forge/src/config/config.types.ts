@@ -17,6 +17,7 @@ export interface FluskAlertsConfig {
 export interface FluskStorageConfig {
   path?: string;
   mode?: 'sqlite' | 'postgres';
+  retentionDays?: number;
 }
 
 export interface FluskProfilingConfig {

@@ -48,4 +48,14 @@ export function closeDb(): void {
 }
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---
+import { hardenPermissions } from './harden-permissions.js';
+
+/**
+ * Wrapper that ensures db files have restricted permissions after creation.
+ */
+export function getSecureDb(path?: string): DatabaseSync {
+  const db = getDb(path);
+  hardenPermissions(path || DB_PATH);
+  return db;
+}
 // --- END CUSTOM ---

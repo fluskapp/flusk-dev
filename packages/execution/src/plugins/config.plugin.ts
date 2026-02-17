@@ -33,5 +33,17 @@ export const plugin = fp(async (app) => {
     schema: Type.Strict(schema),
     dotenv: true,
   });
+
+  const hmac = process.env.HMAC_SECRET || process.env.FLUSK_HMAC_SECRET;
+  if (!hmac) {
+    throw new Error(
+      'HMAC_SECRET or FLUSK_HMAC_SECRET must be set in server mode. ' +
+      'Generate one with: openssl rand -hex 32',
+    );
+  }
+
+  if (!process.env.ENCRYPTION_KEY) {
+    app.log.warn('ENCRYPTION_KEY is not set — data-at-rest encryption disabled');
+  }
 }, { name: 'flusk-config' });
 // --- END CUSTOM ---

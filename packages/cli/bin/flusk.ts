@@ -148,6 +148,10 @@ program.addCommand(exportCommand);
 // Marketing automation
 program.addCommand(marketingCommand);
 
+// Data retention
+import { purgeCommand } from '../src/commands/purge.js';
+program.addCommand(purgeCommand);
+
 program.parse(process.argv);
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---

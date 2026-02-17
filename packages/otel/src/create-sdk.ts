@@ -15,6 +15,7 @@ import type { FluskOtelConfig } from './config.js';
 import { resolveExporter } from './utils/resolve-exporter.js';
 import { patchAnthropic } from './instrumentations/anthropic.js';
 import { patchGoogle } from './instrumentations/google.js';
+import { SanitizeSpanProcessor } from './processors/sanitize-span-processor.js';
 
 export interface CreateSdkOptions {
   spanProcessors?: SpanProcessor[];
@@ -51,7 +52,7 @@ export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): Nod
     resource,
     instrumentations,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NodeSDK expects specific SpanProcessor array type
-    spanProcessors: opts?.spanProcessors as any,
+    spanProcessors: [new SanitizeSpanProcessor(), ...(opts?.spanProcessors ?? [])] as any,
   });
 }
 // --- END CUSTOM ---

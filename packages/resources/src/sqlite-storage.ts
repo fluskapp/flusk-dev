@@ -13,12 +13,15 @@ import * as PatternRepo from './sqlite/repositories/performance-pattern/index.js
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+import { hardenPermissions } from './sqlite/harden-permissions.js';
+
 /**
  * Create a SQLite-backed storage adapter.
  * Runs migrations on first call.
  */
 export function createSqliteStorage(dbPath?: string): StorageAdapter {
   const db = getDb(dbPath);
+  hardenPermissions(dbPath ?? process.env.HOME + '/.flusk/data.db');
   runMigrations(db);
 
   return {
