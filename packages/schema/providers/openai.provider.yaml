@@ -1,0 +1,21 @@
+# OpenAI provider definition for Flusk generator
+name: openai
+displayName: OpenAI
+sdkPackage: openai
+clientClass: OpenAI
+methods:
+  - name: chat.completions.create
+    path: chat.completions.create
+    streamParam: stream
+spans:
+  system: openai
+  modelPrefixes: ["gpt-", "o1-", "o3-", "o4-"]
+apiUrls: ["api.openai.com"]
+models:
+  gpt-4o: { input: 2.50, output: 10.0 }
+  gpt-4o-mini: { input: 0.15, output: 0.60 }
+  gpt-4-turbo: { input: 10.0, output: 30.0 }
+  o1: { input: 15.0, output: 60.0 }
+  o3: { input: 10.0, output: 40.0 }
+  o3-mini: { input: 1.10, output: 4.40 }
+  o4-mini: { input: 1.10, output: 4.40 }

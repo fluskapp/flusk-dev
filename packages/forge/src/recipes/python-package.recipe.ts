@@ -13,9 +13,10 @@ import {
   copyMigrationsStep,
   initFilesStep,
 } from './python-package.steps.js';
+import { providerStep } from './python-package-providers.js';
 
 export const pythonPackageRecipe: Recipe = {
   name: 'python-package',
   description: 'Generate complete Python package from entity YAMLs',
-  steps: [pyprojectStep, parseEntitiesStep, generateAllStep, copyMigrationsStep, initFilesStep],
+  steps: [pyprojectStep, parseEntitiesStep, generateAllStep, copyMigrationsStep, providerStep, initFilesStep],
 };

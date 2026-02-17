@@ -1,0 +1,15 @@
+name: test-provider
+displayName: Test Provider
+sdkPackage: test-sdk
+clientClass: TestClient
+methods:
+  - name: generate
+    path: TestClient.prototype.generate
+    streamParam: stream
+spans:
+  system: test-provider
+  modelPrefixes: ["test-"]
+apiUrls: ["api.test-provider.com"]
+models:
+  test-model-small: { input: 1.0, output: 2.0 }
+  test-model-large: { input: 10.0, output: 20.0 }

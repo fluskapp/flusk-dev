@@ -1,0 +1,22 @@
+name: test-widget
+description: A test entity for snapshot testing
+tableName: test_widgets
+fields:
+  name:
+    type: string
+    required: true
+    description: Widget name
+  count:
+    type: integer
+    default: 0
+  active:
+    type: boolean
+    default: true
+  metadata:
+    type: json
+    default: {}
+  score:
+    type: number
+  created_by:
+    type: uuid
+traits: [crud, soft-delete]
