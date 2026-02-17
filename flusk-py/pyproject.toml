@@ -1,14 +1,4 @@
-/**
- * Python pyproject.toml generator.
- *
- * WHY: Generates a complete pyproject.toml with all dependencies,
- * build config, ruff, and pytest settings.
- */
-
-import { resolve } from 'node:path';
-import { writeFile, mkdir } from 'node:fs/promises';
-
-const TEMPLATE = `[build-system]
+[build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
@@ -58,15 +48,3 @@ select = ["E", "F", "I", "N", "UP", "B"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
-`;
-
-/** Generate pyproject.toml */
-export async function generatePyproject(
-  projectRoot: string,
-): Promise<{ path: string; content: string }> {
-  const outDir = resolve(projectRoot, 'flusk-py');
-  await mkdir(outDir, { recursive: true });
-  const filePath = resolve(outDir, 'pyproject.toml');
-  await writeFile(filePath, TEMPLATE, 'utf-8');
-  return { path: 'flusk-py/pyproject.toml', content: TEMPLATE };
-}

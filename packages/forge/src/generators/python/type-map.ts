@@ -34,16 +34,25 @@ export const PYTHON_IMPORTS: Record<string, string> = {
 /** Build Pydantic Field() kwargs from a FieldSchema */
 export function buildFieldKwargs(field: FieldSchema): string {
   const args: string[] = [];
+  const isMutable = field.type === 'json' || field.type === 'array';
   if (field.default !== undefined) {
-    const val = typeof field.default === 'string'
-      ? `"${field.default}"` : String(field.default);
-    args.push(`default=${val}`);
+    if (isMutable) {
+      const factory = field.type === 'json' ? 'dict' : 'list';
+      args.push(`default_factory=${factory}`);
+    } else {
+      const val = typeof field.default === 'boolean'
+        ? (field.default ? 'True' : 'False')
+        : typeof field.default === 'string'
+          ? `"${field.default}"` : String(field.default);
+      args.push(`default=${val}`);
+    }
   }
   if (field.description) {
     args.push(`description="${field.description}"`);
   }
-  if (field.min !== undefined) args.push(`ge=${field.min}`);
-  if (field.max !== undefined) args.push(`le=${field.max}`);
+  const isNumeric = ['integer', 'number'].includes(field.type);
+  if (field.min !== undefined) args.push(isNumeric ? `ge=${field.min}` : `min_length=${field.min}`);
+  if (field.max !== undefined) args.push(isNumeric ? `le=${field.max}` : `max_length=${field.max}`);
   return args.length > 0 ? `Field(${args.join(', ')})` : '';
 }
 

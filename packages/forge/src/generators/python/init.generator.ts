@@ -41,6 +41,29 @@ export async function generateEmptyInit(dir: string): Promise<void> {
   await writeFile(resolve(dir, '__init__.py'), '', 'utf-8');
 }
 
+/** Generate root __init__.py with version and key imports */
+export async function generateRootInit(
+  dir: string,
+  entityNames: string[],
+): Promise<void> {
+  await mkdir(dir, { recursive: true });
+  const imports = entityNames.map(
+    (n) => `from flusk.entities.${n} import *  # noqa: F403`,
+  );
+  const content = [
+    '# --- BEGIN GENERATED ---',
+    '"""Flusk — LLM cost optimization."""',
+    '',
+    '__version__ = "0.1.0"',
+    '',
+    'from flusk.entities.base import FluskBaseModel',
+    ...imports,
+    '# --- END GENERATED ---',
+    '',
+  ].join('\n');
+  await writeFile(resolve(dir, '__init__.py'), content, 'utf-8');
+}
+
 /** Scan directory for .py modules (excluding __init__) */
 export async function listModules(dir: string): Promise<string[]> {
   const files = await readdir(dir);

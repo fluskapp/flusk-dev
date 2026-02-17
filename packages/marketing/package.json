@@ -23,7 +23,8 @@
     "@octokit/rest": "^21.1.0",
     "commander": "^12.1.0",
     "fs-extra": "^11.2.0",
-    "openai": "^4.77.0"
+    "openai": "^4.77.0",
+    "twitter-api-v2": "^1.29.0"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",

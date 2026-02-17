@@ -6,15 +6,12 @@
  */
 
 import type { EntitySchema } from '../../schema/entity-schema.types.js';
-import { toSnakeCase, toKebabCase, toTableName } from '../../generators/utils.js';
+import { toKebabCase, toTableName } from '../../generators/utils.js';
 
 /** Generate repository file content */
 export function renderRepositoryTemplate(schema: EntitySchema): string {
   const kebab = toKebabCase(schema.name);
   const table = toTableName(kebab);
-  const snakeFields = Object.keys(schema.fields).map(toSnakeCase);
-  const _columns = ['id', ...snakeFields, 'created_at', 'updated_at'];
-  const _placeholders = snakeFields.map((c) => `:${c}`);
   const hasSoftDelete = schema.capabilities?.['soft-delete'];
   const deleteClause = hasSoftDelete
     ? `"UPDATE ${table} SET deleted_at = :now WHERE id = :id"`
@@ -26,7 +23,10 @@ export function renderRepositoryTemplate(schema: EntitySchema): string {
     '',
     'import sqlite3',
     'from datetime import datetime, timezone',
+    'from pathlib import Path',
     'from typing import Any',
+    '',
+    `_MIGRATION = "${kebab}.sql"`,
     '',
     '',
     `class ${schema.name}Repository:`,
@@ -35,6 +35,15 @@ export function renderRepositoryTemplate(schema: EntitySchema): string {
     '    def __init__(self, db: sqlite3.Connection) -> None:',
     '        self._db = db',
     '        self._db.row_factory = sqlite3.Row',
+    '',
+    '    @staticmethod',
+    '    def _get_migration_path() -> Path:',
+    '        return Path(__file__).parent.parent / "migrations" / _MIGRATION',
+    '',
+    '    def ensure_tables(self) -> None:',
+    '        """Read and execute the SQL migration file."""',
+    '        sql = self._get_migration_path().read_text(encoding="utf-8")',
+    '        self._db.executescript(sql)',
     '',
     '    def find_by_id(self, id: str) -> dict[str, Any] | None:',
     `        row = self._db.execute("SELECT * FROM ${table} WHERE id = ?", (id,)).fetchone()`,
@@ -48,16 +57,16 @@ export function renderRepositoryTemplate(schema: EntitySchema): string {
     '        now = datetime.now(timezone.utc).isoformat()',
     '        data.setdefault("created_at", now)',
     '        data.setdefault("updated_at", now)',
-    `        cols = ", ".join(data.keys())`,
-    `        vals = ", ".join(f":{k}" for k in data.keys())`,
-    `        self._db.execute(f"INSERT INTO ${table} ({'{'}cols{'}'}) VALUES ({'{'}vals{'}'})", data)`,
+    '        cols = ", ".join(data.keys())',
+    '        vals = ", ".join(f":{k}" for k in data.keys())',
+    `        self._db.execute(f"INSERT INTO ${table} ({cols}) VALUES ({vals})", data)`,
     '        self._db.commit()',
     '        return self.find_by_id(data["id"]) or data',
     '',
     `    def update(self, id: str, data: dict[str, Any]) -> dict[str, Any] | None:`,
     '        data["updated_at"] = datetime.now(timezone.utc).isoformat()',
-    `        sets = ", ".join(f"{k} = :{k}" for k in data.keys())`,
-    `        self._db.execute(f"UPDATE ${table} SET {'{'}sets{'}'} WHERE id = :id", {**data, "id": id})`,
+    '        sets = ", ".join(f"{k} = :{k}" for k in data.keys())',
+    `        self._db.execute(f"UPDATE ${table} SET {sets} WHERE id = :id", {**data, "id": id})`,
     '        self._db.commit()',
     '        return self.find_by_id(id)',
     '',

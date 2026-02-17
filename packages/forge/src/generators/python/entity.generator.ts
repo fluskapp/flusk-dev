@@ -8,7 +8,7 @@
 import { resolve } from 'node:path';
 import { writeFile, mkdir } from 'node:fs/promises';
 import type { EntitySchema } from '../../schema/entity-schema.types.js';
-import { renderEntityTemplate } from '../../templates/python/entity.template.js';
+import { renderEntityTemplate, renderBaseEntityTemplate } from '../../templates/python/entity.template.js';
 import { toSnakeCase, toKebabCase } from '../utils.js';
 
 const ENTITY_DIR = 'flusk-py/src/flusk/entities';
@@ -27,4 +27,15 @@ export async function generatePythonEntity(
   await writeFile(resolve(outDir, fileName), content, 'utf-8');
 
   return { path: `${ENTITY_DIR}/${fileName}`, content };
+}
+
+/** Generate the base entity module */
+export async function generateBaseEntity(
+  projectRoot: string,
+): Promise<{ path: string; content: string }> {
+  const outDir = resolve(projectRoot, ENTITY_DIR);
+  await mkdir(outDir, { recursive: true });
+  const content = renderBaseEntityTemplate();
+  await writeFile(resolve(outDir, 'base.py'), content, 'utf-8');
+  return { path: `${ENTITY_DIR}/base.py`, content };
 }
