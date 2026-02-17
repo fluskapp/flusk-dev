@@ -35,7 +35,7 @@ export const Report: React.FC = () => {
             opacity: headerOpacity,
           }}
         >
-          Flusk Cost Report
+          Flusk Cost Report — Session: <span style={{ color: COLORS.cyan }}>a3f8c1</span>
         </div>
 
         {/* Table header */}

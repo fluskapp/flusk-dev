@@ -9,7 +9,7 @@ export const Install: React.FC = () => {
     extrapolateRight: "clamp",
   });
 
-  const command = "npm install @flusk/cli";
+  const command = "npx @flusk/cli analyze ./app.js";
   const typedChars = Math.min(
     command.length,
     Math.floor(interpolate(frame, [10, 45], [0, command.length], {
@@ -58,9 +58,9 @@ export const Install: React.FC = () => {
             opacity: successOpacity,
           }}
         >
-          <div>added 3 packages in 2.1s</div>
+          <div>⏳ Instrumenting ./app.js...</div>
           <div style={{ color: COLORS.green, marginTop: 8 }}>
-            ✓ @flusk/cli installed
+            ✓ Analysis complete — report saved to flusk-report.json
           </div>
         </div>
       </div>

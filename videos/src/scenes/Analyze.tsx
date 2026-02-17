@@ -6,7 +6,7 @@ export const Analyze: React.FC = () => {
   const frame = useCurrentFrame();
   const zoom = interpolate(frame, [0, 90], [0.95, 1.05], { extrapolateRight: "clamp" });
 
-  const command = "npx @flusk/cli analyze ./app.js";
+  const command = "npx @flusk/cli analyze ./app.js --redact";
   const typedChars = Math.min(
     command.length,
     Math.floor(interpolate(frame, [5, 40], [0, command.length], {
@@ -17,6 +17,7 @@ export const Analyze: React.FC = () => {
   const scanLines = [
     "⏳ Instrumenting with OpenTelemetry...",
     "🔍 Intercepting LLM API calls...",
+    "🔒 --redact mode: PII & secrets stripped",
     "📊 Captured 182 calls across 3 models",
     "💡 Analyzing patterns & cost optimization...",
   ];

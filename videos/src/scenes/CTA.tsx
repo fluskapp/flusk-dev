@@ -64,9 +64,35 @@ export const CTA: React.FC = () => {
 
       <div
         style={{
+          display: "flex",
+          gap: 20,
+          marginTop: 32,
+          opacity: cmdOpacity,
+          alignItems: "center",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 14,
+            color: COLORS.bg,
+            backgroundColor: COLORS.green,
+            padding: "4px 14px",
+            borderRadius: 12,
+            fontWeight: 700,
+          }}
+        >
+          v0.2.0
+        </div>
+        <span style={{ fontSize: 16, color: COLORS.gray }}>
+          16 bugs fixed · security hardening · session filtering
+        </span>
+      </div>
+
+      <div
+        style={{
           fontSize: 20,
           color: COLORS.gray,
-          marginTop: 32,
+          marginTop: 20,
           opacity: cmdOpacity,
         }}
       >

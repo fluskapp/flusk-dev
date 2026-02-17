@@ -63,6 +63,22 @@ export const Hero: React.FC = () => {
       >
         Open-source LLM cost intelligence for Node.js
       </div>
+
+      <div
+        style={{
+          fontSize: 18,
+          color: COLORS.bg,
+          backgroundColor: COLORS.green,
+          padding: "6px 18px",
+          borderRadius: 20,
+          marginTop: 24,
+          fontWeight: 700,
+          opacity: subtitleOpacity,
+          letterSpacing: 1,
+        }}
+      >
+        v0.2.0
+      </div>
     </AbsoluteFill>
   );
 };
