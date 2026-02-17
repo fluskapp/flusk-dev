@@ -17,7 +17,7 @@
 </p>
 
 <p align="center">
-  <video src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/demo.mp4" width="720" controls></video>
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/demo.gif" alt="Flusk Demo" width="720" />
 </p>
 
 <p align="center">
