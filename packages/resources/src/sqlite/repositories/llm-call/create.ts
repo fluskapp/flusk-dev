@@ -20,25 +20,29 @@ export function create(
       provider, model, prompt, prompt_hash, tokens, cost, response,
       cached, agent_label, organization_id, consent_given,
       consent_purpose, session_id
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (
+      :provider, :model, :prompt, :promptHash, :tokens, :cost, :response,
+      :cached, :agentLabel, :organizationId, :consentGiven,
+      :consentPurpose, :sessionId
+    )
     RETURNING *
   `);
 
-  const row = stmt.get(
-    data.provider,
-    data.model,
-    data.prompt,
-    data.promptHash,
-    JSON.stringify(data.tokens),
-    data.cost,
-    data.response,
-    data.cached ? 1 : 0,
-    data.agentLabel ?? null,
-    data.organizationId ?? null,
-    data.consentGiven ? 1 : 0,
-    data.consentPurpose,
-    (data as Record<string, unknown>).sessionId ?? null,
-  ) as Record<string, unknown>;
+  const row = stmt.get({
+    provider: data.provider,
+    model: data.model,
+    prompt: data.prompt,
+    promptHash: data.promptHash,
+    tokens: JSON.stringify(data.tokens),
+    cost: data.cost,
+    response: data.response,
+    cached: data.cached ? 1 : 0,
+    agentLabel: data.agentLabel ?? null,
+    organizationId: data.organizationId ?? null,
+    consentGiven: data.consentGiven ? 1 : 0,
+    consentPurpose: data.consentPurpose,
+    sessionId: data.sessionId ?? null,
+  }) as Record<string, unknown>;
 
   return rowToEntity(row);
 }

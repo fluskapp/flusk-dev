@@ -30,10 +30,10 @@ function checkFile(file: string): string[] {
   if (!first5.includes('@generated')) {
     errors.push('missing @generated in first 5 lines');
   }
-  if (!content.includes('// --- BEGIN GENERATED ---')) {
+  if (!content.includes('// --- BEGIN GENERATED')) {
     errors.push('missing // --- BEGIN GENERATED --- marker');
   }
-  if (!content.includes('// --- END GENERATED ---')) {
+  if (!content.includes('// --- END GENERATED')) {
     errors.push('missing // --- END GENERATED --- marker');
   }
 

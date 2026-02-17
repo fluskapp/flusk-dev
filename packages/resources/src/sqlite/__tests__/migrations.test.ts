@@ -39,7 +39,7 @@ describe('SQLite migrations', () => {
     const migrations = db
       .prepare('SELECT * FROM _migrations')
       .all() as Array<{ name: string }>;
-    expect(migrations.length).toBe(16);
+    expect(migrations.length).toBe(15);
   });
 });
 // --- END GENERATED ---

@@ -75,6 +75,11 @@ fields:
     description: Purpose of data processing (optimization, analytics, training)
     default: "optimization"
 
+  sessionId:
+    type: string
+    description: Analysis session ID for filtering results by run
+    index: true
+
 capabilities:
   crud: true
   aggregation: true
@@ -119,3 +124,27 @@ queries:
     type: raw-sql
     sql: "SELECT COALESCE(SUM(cost), 0) as total FROM llm_calls WHERE created_at >= :since"
     returns: scalar
+
+  - name: listBySessionId
+    description: List LLM calls filtered by session ID
+    params:
+      sessionId: { type: string }
+    where: "session_id = :sessionId"
+    order: "created_at DESC"
+    returns: list
+
+  - name: sumCostBySessionId
+    description: Sum total cost of LLM calls for a specific session
+    params:
+      sessionId: { type: string }
+    type: raw-sql
+    sql: "SELECT COALESCE(SUM(cost), 0) as total FROM llm_calls WHERE session_id = :sessionId"
+    returns: scalar
+
+  - name: countByModelBySessionId
+    description: Count LLM calls grouped by model for a specific session
+    params:
+      sessionId: { type: string }
+    type: raw-sql
+    sql: "SELECT model, COUNT(*) as count FROM llm_calls WHERE session_id = :sessionId GROUP BY model ORDER BY count DESC"
+    returns: raw
