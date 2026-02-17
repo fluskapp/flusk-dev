@@ -61,7 +61,7 @@ function parseGenAiSpan(span: ReadableSpan): Record<string, unknown> | null {
   const input = getNumAttr(span, 'gen_ai.usage.input_tokens');
   const output = getNumAttr(span, 'gen_ai.usage.output_tokens');
   const tokens = { input, output, total: input + output };
-  const promptHash = createHash('sha256').update(prompt + model).digest('hex');
+  const promptHash = createHash('sha256').update(prompt).digest('hex');
   const { costUsd } = calculateCost({ providerName: provider, modelName: model, tokenUsage: tokens });
 
   return {
@@ -138,7 +138,7 @@ function parseHttpLlmSpan(span: ReadableSpan): Record<string, unknown> | null {
   }
 
   const tokens = { input: inputTokens, output: outputTokens, total: inputTokens + outputTokens };
-  const promptHash = createHash('sha256').update(prompt + model).digest('hex');
+  const promptHash = createHash('sha256').update(prompt).digest('hex');
   const { costUsd } = calculateCost({ providerName: provider, modelName: model, tokenUsage: tokens });
 
   return {
