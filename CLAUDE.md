@@ -145,6 +145,19 @@ For entity work, AI agents operate in **YAML-only mode**:
 - NEVER edit `.ts` files directly (except CUSTOM sections)
 - Use `./scripts/yaml-agent.sh diff <yaml>` to preview changes
 
+## Hard-Won Lessons (from real failures)
+
+1. **SQL files MUST use SQL comments (`--`)** — SQLite can't parse JS-style `/** */` comments. Generator output needs `--` only.
+2. **SQL migration ordering matters** — Traits SQL files can sort alphabetically before main table SQL, causing index creation on non-existent tables. Name migrations carefully (e.g., `001-`, `002-`).
+3. **Subagents WILL hand-write code by default** — Every subagent task MUST explicitly say: "Use generators. Do NOT hand-write code. Run `flusk g feature <name>` or edit YAML + regenerate."
+4. **`pnpm version` ≠ `pnpm run version`** — In CI, `pnpm version` runs the built-in npm command (prints Node version). Use `pnpm run version` for changesets.
+5. **`check-generated.ts` matches prefix** — It checks `// --- BEGIN GENERATED` (prefix), not exact string. Don't add variants without testing.
+6. **13+ positional args hit TypeScript overload limits** — Use named params (object argument) for functions with many parameters.
+7. **GitHub strips `<video>` tags** — Use GIF in README, full MP4 on GitHub Releases.
+8. **OTel SDK must be shut down explicitly** — Call `sdk.shutdown()` on `beforeExit` or spans won't flush.
+9. **OpenAI SDK v6 breaks traceloop instrumentation** — Use custom instrumentation (`openai-v6.ts`), not `@traceloop/instrumentation-openai`.
+10. **`@changesets/changelog-github` needs GitHub API token** — Use `@changesets/cli/changelog` (built-in) to avoid token requirements.
+
 ## AI Agent Behavioral Rules
 
 These rules are **non-negotiable** for any AI agent working on this repo:
