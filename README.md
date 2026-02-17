@@ -40,6 +40,16 @@ LLM APIs are a black box of spending. You ship a feature, costs spike, and you d
 
 **Flusk gives you that visibility.** One command, zero config, fully local. Think of it as the missing **cost observability layer** between your app and the LLM providers.
 
+<table>
+<tr>
+<td align="center"><strong>Before Flusk</strong></td>
+<td align="center"><strong>After Flusk</strong></td>
+</tr>
+<tr>
+<td><img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/before-after.png" alt="Before vs After Flusk" width="720" /></td>
+</tr>
+</table>
+
 ## Quick Start
 
 ```bash
@@ -78,12 +88,24 @@ That's it. No accounts, no API keys, no config files. Flusk intercepts every LLM
 
 ### Cost Tracking
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/cost-tracking.png" alt="Cost Tracking" width="720" />
+</p>
+
 - **Per-model breakdown** — see exactly what each model costs you (OpenAI, Anthropic, AWS Bedrock)
 - **Per-call cost** — every LLM call logged with input/output tokens and calculated cost
 - **Multi-agent tracking** — label different agents (`--agent customer-support`) and compare spending
 - **Historical trends** — browse past analysis sessions and track cost over time
 
 ### Waste Detection
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/duplicate-detection.png" alt="Duplicate Detection" width="720" />
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/model-optimization.png" alt="Model Optimization" width="720" />
+</p>
 
 - **Duplicate prompt detection** — finds identical or near-identical prompts hitting the API
 - **Model downgrade suggestions** — flags calls where a cheaper model would produce the same quality
@@ -92,12 +114,20 @@ That's it. No accounts, no API keys, no config files. Flusk intercepts every LLM
 
 ### Budget Controls
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/budget-alerts.png" alt="Budget Alerts" width="720" />
+</p>
+
 - **Daily & monthly limits** — set spending caps and get alerts before you blow the budget
 - **Per-call thresholds** — flag any single call above a cost limit
 - **Webhook alerts** — push budget notifications to Slack, PagerDuty, or any HTTP endpoint
 - **CI integration** — fail builds that exceed cost budgets
 
 ### Live Monitoring
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/tui-dashboard.png" alt="TUI Dashboard" width="720" />
+</p>
 
 Flusk isn't just a one-shot analyzer. In **server mode** or with the **TUI dashboard**, you get real-time visibility into your LLM operations as they happen.
 
@@ -139,6 +169,10 @@ Browse historical analysis sessions. See if your optimizations actually reduced 
 
 ### Reports & Dev Tools
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/screenshot-report.png" alt="Report Output" width="720" />
+</p>
+
 Flusk generates reports in multiple formats so they fit your existing workflow:
 
 | Format | Command | Use Case |
@@ -164,6 +198,10 @@ flusk report --compare customer-support content-writer
 ```
 
 ### Observability Integrations
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/export-integration.png" alt="Export & Integrations" width="720" />
+</p>
 
 Export LLM cost data to your existing observability stack. All integrations use standard OTLP — no vendor lock-in.
 
@@ -247,6 +285,10 @@ OTLP Export → Grafana Tempo / Datadog / New Relic / Custom
 **Zero intrusion.** No wrappers, no monkey-patching, no SDK to import. Flusk hooks into the Node.js runtime via OpenTelemetry auto-instrumentation and captures LLM calls at the HTTP layer. Your code stays unchanged.
 
 ## Supported Providers
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/multi-provider.png" alt="Multi-Provider Support" width="720" />
+</p>
 
 | Provider | Models | Status |
 |----------|--------|--------|
@@ -702,6 +744,10 @@ flusk validate-generated  # Freshness check
 ---
 
 ## Security
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/security-privacy.png" alt="Security & Privacy" width="720" />
+</p>
 
 Report vulnerabilities to **adir@flusk.app**. See [SECURITY.md](SECURITY.md).
 
