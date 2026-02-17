@@ -1,5 +1,25 @@
 # @flusk/business-logic
 
+## 0.1.3
+
+### Patch Changes
+
+- ### New Providers
+
+  - Anthropic SDK instrumentation (monkey-patches Messages.create, streaming support)
+  - Google Gemini SDK instrumentation (generateContent + generateContentStream)
+  - Provider SDKs as optional peer dependencies
+
+  ### Bug Fixes
+
+  - Fixed top-level await in register.ts — graceful error handling on init failure
+  - Fixed TUI generators referencing non-existent screen files — auto-discovers screens dynamically
+
+  ### Generator Upgrade
+
+  - Provider generator now produces full instrumentation from YAML schema (instrumentations, pricing, span-config, tests, auto-registration)
+  - New provider YAML schema at `packages/schema/providers/`
+
 ## 0.1.2
 
 ### Patch Changes

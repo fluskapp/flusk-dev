@@ -1,6 +1,6 @@
 {
   "name": "@flusk/otel",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Zero-touch OpenTelemetry auto-instrumentation for Flusk — node --require @flusk/otel",
   "type": "module",
   "main": "./src/register.ts",
