@@ -37,6 +37,7 @@
     "@flusk/forge": "workspace:*",
     "@flusk/execution": "workspace:*",
     "@flusk/logger": "workspace:*",
+    "@flusk/marketing": "workspace:*",
     "@flusk/resources": "workspace:*",
     "@platformatic/flame": "1.6.0",
     "@sinclair/typebox": "^0.34.48",

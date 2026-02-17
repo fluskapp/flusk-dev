@@ -38,6 +38,7 @@ import { generateTuiAppCommand } from '../src/commands/generate-tui-app.js';
 import { profileCommand } from '../src/commands/profile.js';
 import { generateProfileCommand } from '../src/commands/generate-profile.js';
 import { generateFastifyPluginCommand } from '../src/commands/generate-fastify-plugin.js';
+import { marketingCommand } from '../src/commands/marketing.js';
 import { generateOtelHookCommand } from '../src/commands/generate-otel-hook.js';
 import { generateDetectorCommand } from '../src/commands/generate-detector.js';
 import { generateSqliteRepoCommand } from '../src/commands/generate-sqlite-repo.js';
@@ -143,6 +144,9 @@ program.addCommand(guardCommand);
 
 // Observability platform exports
 program.addCommand(exportCommand);
+
+// Marketing automation
+program.addCommand(marketingCommand);
 
 program.parse(process.argv);
 // --- END GENERATED ---
