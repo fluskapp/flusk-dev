@@ -8,8 +8,28 @@
  */
 import { Command } from 'commander';
 import chalk from 'chalk';
+import { resolve } from 'node:path';
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 
 const VALID_PLATFORMS = ['grafana', 'datadog', 'newrelic'] as const;
+
+function getConfigPath(): string {
+  return resolve(process.env.HOME ?? '~', '.flusk', 'config.json');
+}
+
+function loadExportConfig(): Record<string, unknown> {
+  const p = getConfigPath();
+  if (existsSync(p)) {
+    try { return JSON.parse(readFileSync(p, 'utf-8')); } catch { /* ignore */ }
+  }
+  return {};
+}
+
+function saveExportConfig(config: Record<string, unknown>): void {
+  const p = getConfigPath();
+  mkdirSync(resolve(p, '..'), { recursive: true });
+  writeFileSync(p, JSON.stringify(config, null, 2), 'utf-8');
+}
 
 const setupCommand = new Command('setup')
   .description('Interactive setup for export targets')
@@ -21,14 +41,21 @@ const setupCommand = new Command('setup')
       console.error(chalk.red(`Unknown platform: ${platform}. Use: ${VALID_PLATFORMS.join(', ')}`));
       process.exit(1);
     }
-    console.log(chalk.green(`✅ ${platform} export configured`));
+
+    // Persist configuration to disk
+    const config = loadExportConfig();
+    const exports = (config.exports as Record<string, unknown>) ?? {};
+    exports[platform] = {
+      endpoint: opts.endpoint || null,
+      apiKey: opts.apiKey || null,
+      configuredAt: new Date().toISOString(),
+    };
+    config.exports = exports;
+    saveExportConfig(config);
+
+    console.log(chalk.green(`✅ ${platform} export configured and saved to ${getConfigPath()}`));
     console.log(chalk.dim(`Endpoint: ${opts.endpoint || 'default'}`));
     console.log(chalk.dim(`API Key: ${opts.apiKey ? '***' + opts.apiKey.slice(-4) : 'not set'}`));
-    console.log('');
-    console.log('Set these environment variables:');
-    console.log(chalk.cyan(`  FLUSK_EXPORT=${platform}`));
-    if (opts.apiKey) console.log(chalk.cyan(`  FLUSK_${platform.toUpperCase()}_API_KEY=${opts.apiKey}`));
-    if (opts.endpoint) console.log(chalk.cyan(`  FLUSK_${platform.toUpperCase()}_ENDPOINT=${opts.endpoint}`));
   });
 
 const testCommand = new Command('test')
@@ -36,10 +63,56 @@ const testCommand = new Command('test')
   .argument('<platform>', 'Platform to test')
   .option('--api-key <key>', 'API key')
   .option('--endpoint <url>', 'Custom endpoint')
-  .action(async (platform: string) => {
-    console.log(chalk.dim(`Sending test span to ${platform}...`));
-    console.log(chalk.green(`✅ Test span sent to ${platform}`));
-    console.log(chalk.dim('Check your platform dashboard for the test trace.'));
+  .action(async (platform: string, opts: { apiKey?: string; endpoint?: string }) => {
+    const config = loadExportConfig();
+    const platformConfig = (config.exports as Record<string, { endpoint?: string; apiKey?: string }>)?.[platform];
+    const endpoint = opts.endpoint || platformConfig?.endpoint;
+    const apiKey = opts.apiKey || platformConfig?.apiKey;
+
+    if (!endpoint) {
+      console.error(chalk.red(`No endpoint configured for ${platform}. Run: flusk export setup ${platform} --endpoint <url>`));
+      process.exit(1);
+    }
+
+    console.log(chalk.dim(`Sending test span to ${platform} at ${endpoint}...`));
+
+    const testPayload = {
+      resourceSpans: [{
+        resource: { attributes: [{ key: 'service.name', value: { stringValue: 'flusk-test' } }] },
+        scopeSpans: [{
+          scope: { name: 'flusk-export-test' },
+          spans: [{
+            traceId: Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+            spanId: Array.from({ length: 16 }, () => Math.floor(Math.random() * 16).toString(16)).join(''),
+            name: 'flusk.export.test',
+            kind: 1,
+            startTimeUnixNano: String(Date.now() * 1_000_000),
+            endTimeUnixNano: String((Date.now() + 100) * 1_000_000),
+            attributes: [
+              { key: 'flusk.test', value: { boolValue: true } },
+            ],
+          }],
+        }],
+      }],
+    };
+
+    try {
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
+      const res = await fetch(endpoint + '/v1/traces', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(testPayload),
+      });
+      if (res.ok) {
+        console.log(chalk.green(`✅ Test span sent to ${platform} (HTTP ${res.status})`));
+        console.log(chalk.dim('Check your platform dashboard for the test trace.'));
+      } else {
+        console.error(chalk.red(`❌ Failed to send test span: HTTP ${res.status} ${res.statusText}`));
+      }
+    } catch (err: any) {
+      console.error(chalk.red(`❌ Failed to send test span: ${err?.message}`));
+    }
   });
 
 const listCommand = new Command('list')
