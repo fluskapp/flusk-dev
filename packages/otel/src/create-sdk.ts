@@ -13,6 +13,7 @@ import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
 import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import type { FluskOtelConfig } from './config.js';
 import { resolveExporter } from './utils/resolve-exporter.js';
+import { patchAnthropic } from './instrumentations/anthropic.js';
 
 export interface CreateSdkOptions {
   spanProcessors?: SpanProcessor[];
@@ -21,6 +22,7 @@ export interface CreateSdkOptions {
 
 // --- BEGIN CUSTOM ---
 export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): NodeSDK {
+    patchAnthropic();
   const traceExporter = resolveExporter(config);
 
   const resource = new Resource({
