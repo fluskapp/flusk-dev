@@ -36,7 +36,7 @@ export * as RedisClient from './cache/redis.client.js';
 export * as PricingClient from './clients/pricing.client.js';
 export * as OpenAIEmbeddingClient from './clients/openai-embedding.client.js';
 export { ProfileUploadClient } from './clients/profile-upload.client.js';
-export * as WebhookClient from './clients/webhook.client.js';
+export { WebhookClient, sendWebhook, fireAndForget as fireAndForgetWebhook } from './clients/webhook.client.js';
 export type { ProfileUploadPayload, ProfileUploadResult } from './clients/profile-upload.client.js';
 
 // Encryption exports (GDPR)

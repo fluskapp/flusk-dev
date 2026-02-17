@@ -11,21 +11,30 @@ const FLUSK_DIR = join(homedir(), '.flusk');
 const DB_PATH = join(FLUSK_DIR, 'data.db');
 
 let _db: DatabaseSync | null = null;
+let _dbPath: string | null = null;
 
 /**
  * Get or create the SQLite database connection singleton.
  * Pass ':memory:' for in-memory testing.
+ * Throws if called with a different path after initial connection.
  */
 export function getDb(path?: string): DatabaseSync {
-  if (!_db) {
-    const dbPath = path || DB_PATH;
-    if (dbPath !== ':memory:') {
-      mkdirSync(FLUSK_DIR, { recursive: true });
+  const dbPath = path || DB_PATH;
+  if (_db) {
+    if (path !== undefined && _dbPath !== dbPath) {
+      throw new Error(
+        `SQLite connection already open for "${_dbPath}" — cannot reopen for "${dbPath}". Call closeDb() first.`,
+      );
     }
-    _db = new DatabaseSync(dbPath);
-    _db.exec('PRAGMA journal_mode=WAL');
-    _db.exec('PRAGMA foreign_keys=ON');
+    return _db;
   }
+  if (dbPath !== ':memory:') {
+    mkdirSync(FLUSK_DIR, { recursive: true });
+  }
+  _db = new DatabaseSync(dbPath);
+  _dbPath = dbPath;
+  _db.exec('PRAGMA journal_mode=WAL');
+  _db.exec('PRAGMA foreign_keys=ON');
   return _db;
 }
 
@@ -35,6 +44,7 @@ export function getDb(path?: string): DatabaseSync {
 export function closeDb(): void {
   _db?.close();
   _db = null;
+  _dbPath = null;
 }
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---

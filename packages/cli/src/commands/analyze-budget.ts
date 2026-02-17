@@ -42,7 +42,9 @@ export function runBudgetCheck(
   if (config.alerts?.onBudgetExceeded === 'block') {
     console.log(chalk.red.bold('\n🛑 BUDGET EXCEEDED — onBudgetExceeded is set to "block"'));
   }
-  WebhookClient.fireAndForget(config.alerts?.webhook, budgetStatus.alerts);
+  if (config.alerts?.webhook) {
+    new WebhookClient(config.alerts.webhook).fireAndForget(budgetStatus.alerts);
+  }
 }
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---

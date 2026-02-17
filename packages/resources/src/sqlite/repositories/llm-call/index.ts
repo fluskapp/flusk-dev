@@ -20,4 +20,7 @@ export { sumCost } from './sum-cost.js';
 export { sumCostSince } from './sum-cost-since.js';
 export { countByModel } from './count-by-model.js';
 export { countDuplicates } from './count-duplicates.js';
+export { listBySessionId } from './list-by-session.js';
+export { sumCostBySessionId } from './sum-cost-by-session.js';
+export { countByModelBySessionId } from './count-by-model-by-session.js';
 // --- END CUSTOM ---

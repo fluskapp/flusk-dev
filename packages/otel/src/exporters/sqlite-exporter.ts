@@ -32,8 +32,15 @@ export class SqliteSpanExporter implements SpanExporter {
         log.debug({ spanName: span.name }, 'Processing span');
         const parsed = parseReadableSpan(span);
         if (!parsed) continue;
+        const sessionId = process.env['FLUSK_SESSION_ID'] || undefined;
+        const redact = process.env['FLUSK_REDACT'] === '1';
+        const data = parsed as Record<string, unknown>;
+        if (redact) {
+          data.prompt = '[REDACTED]';
+          data.response = '[REDACTED]';
+        }
         // eslint-disable-next-line @typescript-eslint/no-explicit-any -- parseReadableSpan returns dynamic shape matching LLMCallEntity
-        this.storage.llmCalls.create(parsed as any);
+        this.storage.llmCalls.create({ ...(data as any), sessionId });
         count++;
       }
       if (count > 0) log.debug(`Exported ${count} GenAI spans to SQLite`);

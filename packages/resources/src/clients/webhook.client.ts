@@ -15,20 +15,41 @@ export interface WebhookPayload {
   text: string;
 }
 
-export async function sendWebhook(
+export class WebhookClient {
+  private url: string;
+
+  constructor(url: string) {
+    this.url = url;
+  }
+
+  async send(payload: WebhookPayload): Promise<void> {
+    try {
+      await request(this.url, {
+        method: 'POST' as const,
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      log.info({ url: this.url.slice(0, 40) + '...' }, 'Webhook sent');
+    } catch (err) {
+      log.error({ error: err }, 'Webhook failed');
+    }
+  }
+
+  fireAndForget(alerts: string[]): void {
+    if (alerts.length === 0) return;
+    const text = `🚨 Flusk Budget Alert\n${alerts.map((a) => `• ${a}`).join('\n')}`;
+    void this.send({ text });
+  }
+}
+
+/**
+ * Convenience: standalone fire-and-forget (backwards compat)
+ */
+export function sendWebhook(
   url: string,
   payload: WebhookPayload,
 ): Promise<void> {
-  try {
-    await request(url, {
-      method: 'POST' as const,
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify(payload),
-    });
-    log.info({ url: url.slice(0, 40) + '...' }, 'Webhook sent');
-  } catch (err) {
-    log.error({ error: err }, 'Webhook failed');
-  }
+  return new WebhookClient(url).send(payload);
 }
 
 export function fireAndForget(
@@ -36,7 +57,6 @@ export function fireAndForget(
   alerts: string[],
 ): void {
   if (!url || alerts.length === 0) return;
-  const text = `🚨 Flusk Budget Alert\n${alerts.map((a) => `• ${a}`).join('\n')}`;
-  void sendWebhook(url, { text });
+  new WebhookClient(url).fireAndForget(alerts);
 }
 // --- END CUSTOM ---

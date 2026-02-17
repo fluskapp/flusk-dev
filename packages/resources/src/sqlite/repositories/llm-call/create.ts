@@ -19,8 +19,8 @@ export function create(
     INSERT INTO llm_calls (
       provider, model, prompt, prompt_hash, tokens, cost, response,
       cached, agent_label, organization_id, consent_given,
-      consent_purpose
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      consent_purpose, session_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     RETURNING *
   `);
 
@@ -37,6 +37,7 @@ export function create(
     data.organizationId ?? null,
     data.consentGiven ? 1 : 0,
     data.consentPurpose,
+    (data as Record<string, unknown>).sessionId ?? null,
   ) as Record<string, unknown>;
 
   return rowToEntity(row);

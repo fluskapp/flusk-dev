@@ -36,7 +36,7 @@ export const reportCommand = new Command('report')
       return;
     }
 
-    const calls = storage.llmCalls.list(10_000, 0);
+    const calls = storage.llmCalls.listBySessionId(session.id, 10_000, 0);
     const report = generateReport(
       { session, calls },
       { format: opts.format as 'markdown' | 'json', color: !opts.output },

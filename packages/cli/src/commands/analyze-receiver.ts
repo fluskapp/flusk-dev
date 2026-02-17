@@ -21,7 +21,7 @@ export interface ReceiverHandle {
   getCallCount: () => number;
 }
 
-export function startReceiver(storage: StorageAdapter): Promise<ReceiverHandle> {
+export function startReceiver(storage: StorageAdapter, sessionId?: string, redact?: boolean): Promise<ReceiverHandle> {
   let callCount = 0;
 
   const server = createServer(async (req, res) => {
@@ -30,7 +30,7 @@ export function startReceiver(storage: StorageAdapter): Promise<ReceiverHandle> 
       for await (const chunk of req) chunks.push(chunk as Buffer);
       try {
         const body = JSON.parse(Buffer.concat(chunks).toString()) as OtlpTraceRequest;
-        callCount += processTraces(body, storage);
+        callCount += processTraces(body, storage, sessionId, redact);
         res.writeHead(200, { 'content-type': 'application/json' });
         res.end('{}');
       } catch (err) {
@@ -59,7 +59,7 @@ export function startReceiver(storage: StorageAdapter): Promise<ReceiverHandle> 
   });
 }
 
-function processTraces(body: OtlpTraceRequest, storage: StorageAdapter): number {
+function processTraces(body: OtlpTraceRequest, storage: StorageAdapter, sessionId?: string, redact?: boolean): number {
   let count = 0;
   for (const rs of body.resourceSpans) {
     for (const ss of rs.scopeSpans) {
@@ -68,7 +68,11 @@ function processTraces(body: OtlpTraceRequest, storage: StorageAdapter): number 
         try {
           const parsed = parseLlmSpan(span);
           const callData = mapSpanToLlmCall(parsed);
-          storage.llmCalls.create(callData);
+          if (redact) {
+            callData.prompt = '[REDACTED]';
+            callData.response = '[REDACTED]';
+          }
+          storage.llmCalls.create({ ...callData, sessionId });
           count++;
         } catch (err) {
           log.error({ error: err }, 'Failed to ingest span');

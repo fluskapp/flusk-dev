@@ -11,9 +11,9 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { spawn } from 'node:child_process';
-import { resolve } from 'node:path';
+import { resolve, isAbsolute, normalize } from 'node:path';
 import { writeFile } from 'node:fs/promises';
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { createSqliteStorage } from '@flusk/resources';
 import { startReceiver } from './analyze-receiver.js';
 import { generateReport } from './analyze-report.js';
@@ -31,32 +31,34 @@ export const analyzeCommand = new Command('analyze')
   .option('-f, --format <format>', 'Report format (markdown|json)', 'markdown')
   .option('-a, --agent <name>', 'Label for multi-agent tracking')
   .option('-m, --mode <mode>', 'Export mode (local|server)', 'local')
+  .option('--redact', 'Redact prompt/completion text from storage (security)')
   .action(async (script: string, opts) => {
     const duration = parseInt(opts.duration, 10);
     const config = await loadConfig();
     const mode = opts.mode as 'local' | 'server';
     const agentLabel = opts.agent || config.agent || process.env.FLUSK_AGENT;
     const storage = createSqliteStorage(config.storage?.path);
-    const receiver = mode === 'server' ? await startReceiver(storage) : null;
+    const session = storage.analyzeSessions.create({
+      script, durationMs: duration * 1000, totalCalls: 0,
+      totalCost: 0, modelsUsed: [], startedAt: new Date().toISOString(),
+    });
+    const redact = !!opts.redact;
+    const receiver = mode === 'server' ? await startReceiver(storage, session.id, redact) : null;
 
     console.log(chalk.cyan(`🔍 Analyzing ${script}...`));
     if (receiver) console.log(chalk.dim(`   OTLP receiver on port ${receiver.port}`));
     else console.log(chalk.dim('   Local mode — direct SQLite export'));
     if (duration > 0) console.log(chalk.dim(`   Duration: ${duration}s`));
+    if (redact) console.log(chalk.dim('   Redact mode — prompts/completions will not be stored'));
 
-    const session = storage.analyzeSessions.create({
-      script, durationMs: duration * 1000, totalCalls: 0,
-      totalCost: 0, modelsUsed: [], startedAt: new Date().toISOString(),
-    });
-
-    const child = spawnChild(script, mode, receiver?.port, agentLabel);
+    const child = spawnChild(script, mode, receiver?.port, agentLabel, session.id, redact);
     const exitCode = await waitForCompletion(child, duration);
     if (receiver) await receiver.close();
 
-    const calls = storage.llmCalls.list(10_000, 0);
-    const totalCost = storage.llmCalls.sumCost();
-    const models = storage.llmCalls.countByModel().map((m) => m.model);
-    const totalCalls = receiver ? receiver.getCallCount() : calls.length;
+    const calls = storage.llmCalls.listBySessionId(session.id, 10_000, 0);
+    const totalCost = storage.llmCalls.sumCostBySessionId(session.id);
+    const models = storage.llmCalls.countByModelBySessionId(session.id).map((m) => m.model);
+    const totalCalls = calls.length;
 
     storage.analyzeSessions.update(session.id, {
       completedAt: new Date().toISOString(),
@@ -92,7 +94,7 @@ function getOtelRegisterUrl(): string {
 }
 
 function spawnChild(
-  script: string, mode: string, port?: number, agent?: string,
+  script: string, mode: string, port?: number, agent?: string, sessionId?: string, redact?: boolean,
 ) {
   // Resolve the otel register path relative to this file
   const otelRegister = getOtelRegisterUrl().replace('file://', '');
@@ -102,17 +104,35 @@ function spawnChild(
     FLUSK_SQLITE_PATH: resolve(process.env.HOME ?? '~', '.flusk', 'data.db'),
     ...(port ? { FLUSK_ENDPOINT: `http://127.0.0.1:${port}` } : {}),
     ...(agent ? { FLUSK_AGENT: agent, FLUSK_AGENT_LABEL: agent } : {}),
+    ...(sessionId ? { FLUSK_SESSION_ID: sessionId } : {}),
+    ...(redact ? { FLUSK_REDACT: '1' } : {}),
   };
+
+  // Validate and sanitize the user-provided script path to prevent path traversal
+  const scriptPath = resolve(normalize(script));
+  const cwd = process.cwd();
+  if (!scriptPath.startsWith(cwd) && !scriptPath.startsWith(resolve(process.env.HOME ?? '~'))) {
+    throw new Error(
+      `Script path "${script}" resolves outside the working directory and home directory. ` +
+      `Resolved: "${scriptPath}". This may be a path traversal attempt.`,
+    );
+  }
+  if (!existsSync(scriptPath)) {
+    throw new Error(`Script not found: ${scriptPath}`);
+  }
+
+  // Sanitize paths for safe interpolation into generated JS (prevent injection)
+  const safeScriptPath = scriptPath.replace(/\\/g, '/').replace(/'/g, "\\'");
+  const safeOtelRegister = otelRegister.replace(/\\/g, '/').replace(/'/g, "\\'");
 
   // Create a thin wrapper that loads OTel THEN the user script.
   // Using tsx as runtime ensures TypeScript support and proper module resolution.
   // We avoid node --import because getNodeAutoInstrumentations deadlocks in loader context.
-  const scriptPath = resolve(script);
   const wrapperPath = resolve(process.env.HOME ?? '~', '.flusk', '_analyze-wrapper.mjs');
   mkdirSync(resolve(process.env.HOME ?? '~', '.flusk'), { recursive: true });
   writeFileSync(wrapperPath, [
-    `await import('${otelRegister}');`,
-    `await import('${scriptPath}');`,
+    `await import('${safeOtelRegister}');`,
+    `await import('${safeScriptPath}');`,
   ].join('\n'));
 
   // Run from otel package dir so pnpm workspace deps (@opentelemetry/*) resolve correctly

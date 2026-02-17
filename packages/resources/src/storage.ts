@@ -9,12 +9,15 @@ import type { ModelCount } from './sqlite/repositories/llm-call/count-by-model.j
 
 // --- BEGIN CUSTOM ---
 export interface LLMCallMethods {
-  create: (data: Omit<LLMCallEntity, 'id' | 'createdAt' | 'updatedAt'>) => LLMCallEntity;
+  create: (data: Omit<LLMCallEntity, 'id' | 'createdAt' | 'updatedAt'> & { sessionId?: string }) => LLMCallEntity;
   findById: (id: string) => LLMCallEntity | null;
   findByPromptHash: (hash: string) => LLMCallEntity | null;
   list: (limit?: number, offset?: number) => LLMCallEntity[];
+  listBySessionId: (sessionId: string, limit?: number, offset?: number) => LLMCallEntity[];
   countByModel: () => ModelCount[];
+  countByModelBySessionId: (sessionId: string) => ModelCount[];
   sumCost: () => number;
+  sumCostBySessionId: (sessionId: string) => number;
   sumCostSince: (since: string) => number;
   countDuplicates: () => number;
 }
