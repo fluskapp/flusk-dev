@@ -17,14 +17,8 @@
 </p>
 
 <p align="center">
-  <a href="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/demo.mp4">
-    <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/flusk-logo.png" alt="Watch Demo" width="120" />
-    <br />
-    <strong>▶ Watch Demo Video</strong>
-  </a>
+  <video src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/demo.mp4" width="720" controls></video>
 </p>
-
-https://github.com/user-attachments/assets/demo.mp4
 
 <p align="center">
   <a href="#quick-start">Quick Start</a> •
