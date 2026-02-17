@@ -13,5 +13,5 @@ class PromptTemplate(FluskBaseModel):
     name: str = Field(description="Template name")
     description: str = Field(description="Template description")
     active_version_id: UUID | None = Field(description="Currently active version ID")
-    variables: dict[str, Any] = Field(default_factory=dict, description="Template variable names e.g. ["user_query", "context"]")
+    variables: dict[str, Any] = Field(default_factory=dict, description="Template variable names e.g. [\"user_query\", \"context\"]")
 # --- END GENERATED ---

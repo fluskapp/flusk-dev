@@ -48,7 +48,7 @@ export function buildFieldKwargs(field: FieldSchema): string {
     }
   }
   if (field.description) {
-    args.push(`description="${field.description}"`);
+    args.push(`description="${field.description.replace(/"/g, '\\"')}"`);
   }
   const isNumeric = ['integer', 'number'].includes(field.type);
   if (field.min !== undefined) args.push(isNumeric ? `ge=${field.min}` : `min_length=${field.min}`);
