@@ -1,0 +1,20 @@
+{
+  "name": "flusk-demo-video",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx remotion studio",
+    "build": "npx remotion render src/index.ts DemoVideo out/demo.mp4",
+    "build:gif": "npx remotion render src/index.ts DemoVideo out/demo.gif --image-format=png"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.242",
+    "remotion": "4.0.242",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "typescript": "^5.5.0"
+  }
+}
