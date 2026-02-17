@@ -28,6 +28,7 @@
     "@flusk/business-logic": "workspace:*",
     "@flusk/logger": "workspace:*",
     "@flusk/resources": "workspace:*",
+    "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/auto-instrumentations-node": "^0.56.0",
     "@opentelemetry/core": "^2.5.1",
     "@opentelemetry/exporter-trace-otlp-http": "^0.57.0",

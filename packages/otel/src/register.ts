@@ -10,6 +10,7 @@ import { getLogger } from '@flusk/logger';
 import { loadConfig } from './config.js';
 import { createSdk } from './create-sdk.js';
 import { setupAutoFlame } from './utils/auto-register-flame.js';
+import { patchOpenAI } from './instrumentations/openai-v6.js';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
@@ -19,6 +20,9 @@ const config = loadConfig();
 // Start SDK synchronously (no top-level await — needed for --import compatibility)
 const sdk = createSdk(config);
 sdk.start();
+
+// Patch OpenAI SDK v6 for GenAI span attributes
+patchOpenAI();
 
 // Async flame setup runs in background after SDK is already active
 setupAutoFlame().then((spanProcessors) => {
@@ -36,6 +40,13 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
   sdk.shutdown().catch((err: unknown) => logger.error({ err }, 'shutdown failed'));
 });
+
+// Flush spans before process exits
+process.on('beforeExit', () => {
+  sdk.shutdown().catch((err: unknown) => logger.error({ err }, 'shutdown failed'));
+});
+
+export { sdk };
 
 logger.info({ project: config.projectName }, 'instrumentation active');
 // --- END CUSTOM ---

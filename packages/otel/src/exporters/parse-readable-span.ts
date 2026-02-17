@@ -34,9 +34,26 @@ function detectProvider(model: string, system: string): string {
   return 'other';
 }
 
-export function parseReadableSpan(span: ReadableSpan): Record<string, unknown> | null {
-  if (!isGenAiSpan(span)) return null;
+/**
+ * Detect provider from HTTP URL
+ */
+function detectProviderFromUrl(url: string, userAgent: string): string | null {
+  if (url.includes('api.openai.com')) return 'openai';
+  if (url.includes('api.anthropic.com')) return 'anthropic';
+  if (url.includes('bedrock')) return 'bedrock';
+  // Detect by user-agent (OpenAI SDK sets "OpenAI/JS ..." or "OpenAI/Python ...")
+  if (userAgent.startsWith('OpenAI/')) return 'openai';
+  if (userAgent.includes('anthropic')) return 'anthropic';
+  // Detect by URL path patterns
+  if (url.includes('/chat/completions')) return 'openai';
+  if (url.includes('/v1/messages')) return 'anthropic';
+  return null;
+}
 
+/**
+ * Try to parse a GenAI-attributed span (from traceloop or native OTel GenAI instrumentation)
+ */
+function parseGenAiSpan(span: ReadableSpan): Record<string, unknown> | null {
   const model = getAttr(span, 'gen_ai.response.model') || getAttr(span, 'gen_ai.request.model');
   const system = getAttr(span, 'gen_ai.system');
   const provider = detectProvider(model, system);
@@ -60,5 +77,88 @@ export function parseReadableSpan(span: ReadableSpan): Record<string, unknown> |
     consentGiven: true,
     consentPurpose: 'optimization',
   };
+}
+
+/**
+ * Try to parse an HTTP span targeting a known LLM API endpoint.
+ * Falls back when native GenAI instrumentation isn't available.
+ */
+function parseHttpLlmSpan(span: ReadableSpan): Record<string, unknown> | null {
+  const url = getAttr(span, 'url.full');
+  const statusCode = getNumAttr(span, 'http.response.status_code');
+  if (!url) return null;
+
+  const userAgent = getAttr(span, 'user_agent.original');
+  const provider = detectProviderFromUrl(url, userAgent);
+  if (!provider) return null;
+
+  // Only parse chat completion endpoints
+  if (!url.includes('/chat/completions') && !url.includes('/messages')) return null;
+
+  // Try to extract model from request body captured in span events
+  let model = 'unknown';
+  let prompt = '';
+  let inputTokens = 0;
+  let outputTokens = 0;
+  let response = '';
+
+  // Check span events for request/response bodies
+  for (const event of span.events) {
+    const body = event.attributes?.['http.request.body'] || event.attributes?.['http.request.body.content'];
+    if (typeof body === 'string') {
+      try {
+        const parsed = JSON.parse(body);
+        if (parsed.model) model = parsed.model;
+        if (parsed.messages) {
+          const lastMsg = parsed.messages[parsed.messages.length - 1];
+          if (lastMsg?.content) prompt = typeof lastMsg.content === 'string' ? lastMsg.content : JSON.stringify(lastMsg.content);
+        }
+      } catch { /* ignore */ }
+    }
+    const respBody = event.attributes?.['http.response.body'] || event.attributes?.['http.response.body.content'];
+    if (typeof respBody === 'string') {
+      try {
+        const parsed = JSON.parse(respBody);
+        if (parsed.model) model = parsed.model;
+        if (parsed.usage) {
+          inputTokens = parsed.usage.prompt_tokens || 0;
+          outputTokens = parsed.usage.completion_tokens || 0;
+        }
+        if (parsed.choices?.[0]?.message?.content) {
+          response = parsed.choices[0].message.content;
+        }
+      } catch { /* ignore */ }
+    }
+  }
+
+  // If we couldn't extract a model from events, skip — we likely have a GenAI span for this call
+  if (model === 'unknown') {
+    return null;
+  }
+
+  const tokens = { input: inputTokens, output: outputTokens, total: inputTokens + outputTokens };
+  const promptHash = createHash('sha256').update(prompt + model).digest('hex');
+  const { costUsd } = calculateCost({ providerName: provider, modelName: model, tokenUsage: tokens });
+
+  return {
+    provider,
+    model,
+    prompt,
+    promptHash,
+    tokens,
+    cost: costUsd,
+    response,
+    cached: false,
+    organizationId: process.env['FLUSK_AGENT'] || 'default',
+    consentGiven: true,
+    consentPurpose: 'optimization',
+  };
+}
+
+export function parseReadableSpan(span: ReadableSpan): Record<string, unknown> | null {
+  // Prefer native GenAI spans
+  if (isGenAiSpan(span)) return parseGenAiSpan(span);
+  // Fall back to HTTP span parsing for known LLM endpoints
+  return parseHttpLlmSpan(span);
 }
 // --- END CUSTOM ---
