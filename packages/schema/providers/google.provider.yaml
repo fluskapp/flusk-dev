@@ -1,0 +1,19 @@
+# Google AI (Gemini) provider definition for Flusk generator
+name: google
+displayName: Google AI (Gemini)
+sdkPackage: "@google/generative-ai"
+clientClass: GoogleGenerativeAI
+methods:
+  - name: generateContent
+    path: GenerativeModel.prototype.generateContent
+    streamParam: stream
+spans:
+  system: google
+  modelPrefixes: ["gemini-"]
+apiUrls: ["generativelanguage.googleapis.com"]
+models:
+  gemini-2.5-pro: { input: 1.25, output: 10.0 }
+  gemini-2.5-flash: { input: 0.15, output: 0.60 }
+  gemini-2.0-flash: { input: 0.10, output: 0.40 }
+  gemini-1.5-pro: { input: 1.25, output: 5.0 }
+  gemini-1.5-flash: { input: 0.075, output: 0.30 }

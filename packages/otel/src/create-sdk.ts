@@ -14,6 +14,7 @@ import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
 import type { FluskOtelConfig } from './config.js';
 import { resolveExporter } from './utils/resolve-exporter.js';
 import { patchAnthropic } from './instrumentations/anthropic.js';
+import { patchGoogle } from './instrumentations/google.js';
 
 export interface CreateSdkOptions {
   spanProcessors?: SpanProcessor[];
@@ -23,6 +24,7 @@ export interface CreateSdkOptions {
 // --- BEGIN CUSTOM ---
 export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): NodeSDK {
     patchAnthropic();
+    patchGoogle();
   const traceExporter = resolveExporter(config);
 
   const resource = new Resource({
