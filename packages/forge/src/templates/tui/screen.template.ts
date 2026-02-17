@@ -12,6 +12,7 @@ export function generateTuiScreenTemplate(name: string): string {
  */
 
 import React from 'react';
+// @ts-ignore ink types use exports field
 import { Box, Text } from 'ink';
 import { useApi } from '../hooks/use-api.js';
 
