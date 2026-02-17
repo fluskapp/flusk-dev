@@ -17,6 +17,7 @@ import { otelHookRecipe } from './otel-hook.recipe.js';
 import { loggerRecipe } from './logger.recipe.js';
 import { sdkProviderRecipe } from './sdk-provider.recipe.js';
 import { sqliteRepoRecipe } from './sqlite-repo.recipe.js';
+import { pythonPackageRecipe } from './python-package.recipe.js';
 
 let registered = false;
 
@@ -34,6 +35,7 @@ export function registerDefaultRecipes(): void {
   registerRecipe(loggerRecipe);
   registerRecipe(sdkProviderRecipe);
   registerRecipe(sqliteRepoRecipe);
+  registerRecipe(pythonPackageRecipe);
   registered = true;
 }
 
