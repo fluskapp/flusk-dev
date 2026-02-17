@@ -36,5 +36,6 @@
   "devDependencies": {
     "@types/pg": "^8.10.9",
     "typescript": "^5.3.3"
-  }
+  },
+  "license": "MIT"
 }

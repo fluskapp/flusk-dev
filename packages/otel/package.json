@@ -68,5 +68,6 @@
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
     "@google/generative-ai": "^0.24.1"
-  }
+  },
+  "license": "MIT"
 }
