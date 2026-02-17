@@ -1,5 +1,11 @@
 # @flusk/cli
 
+## 0.2.1
+
+### Patch Changes
+
+- 1365bf8: Update README with screenshots for every section and before/after comparison
+
 ## 0.2.0
 
 ### Minor Changes
