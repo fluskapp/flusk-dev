@@ -1,6 +1,6 @@
 {
   "name": "@flusk/execution",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Fastify routes, plugins, and hooks for Flusk platform",
   "main": "./src/index.ts",
