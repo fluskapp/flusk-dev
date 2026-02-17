@@ -11,7 +11,7 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { spawn } from 'node:child_process';
-import { resolve, isAbsolute, normalize } from 'node:path';
+import { resolve, normalize } from 'node:path';
 import { writeFile } from 'node:fs/promises';
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { createSqliteStorage } from '@flusk/resources';

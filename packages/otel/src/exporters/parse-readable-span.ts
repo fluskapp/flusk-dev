@@ -85,7 +85,7 @@ function parseGenAiSpan(span: ReadableSpan): Record<string, unknown> | null {
  */
 function parseHttpLlmSpan(span: ReadableSpan): Record<string, unknown> | null {
   const url = getAttr(span, 'url.full');
-  const statusCode = getNumAttr(span, 'http.response.status_code');
+  const _statusCode = getNumAttr(span, 'http.response.status_code');
   if (!url) return null;
 
   const userAgent = getAttr(span, 'user_agent.original');
