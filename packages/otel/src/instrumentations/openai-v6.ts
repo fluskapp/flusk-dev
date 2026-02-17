@@ -52,6 +52,35 @@ function patchCompletionsCreate(OpenAI: any): void {
         try {
           const result = await original.call(this, body, options);
 
+          // Handle streaming responses
+          if (body?.stream && result && Symbol.asyncIterator in result) {
+            let inputTokens = 0;
+            let outputTokens = 0;
+            let responseModel = '';
+            const chunks: string[] = [];
+
+            const originalIterator = result[Symbol.asyncIterator].bind(result);
+            result[Symbol.asyncIterator] = async function* () {
+              for await (const chunk of originalIterator()) {
+                if (chunk.model) responseModel = chunk.model;
+                if (chunk.usage) {
+                  inputTokens = chunk.usage.prompt_tokens || 0;
+                  outputTokens = chunk.usage.completion_tokens || 0;
+                }
+                const delta = chunk.choices?.[0]?.delta?.content;
+                if (typeof delta === 'string') chunks.push(delta);
+                yield chunk;
+              }
+              if (responseModel) span.setAttribute('gen_ai.response.model', responseModel);
+              span.setAttribute('gen_ai.usage.input_tokens', inputTokens);
+              span.setAttribute('gen_ai.usage.output_tokens', outputTokens);
+              if (chunks.length > 0) span.setAttribute('gen_ai.completion', chunks.join(''));
+              span.setStatus({ code: SpanStatusCode.OK });
+              span.end();
+            };
+            return result;
+          }
+
           if (result?.model) span.setAttribute('gen_ai.response.model', result.model);
           if (result?.usage) {
             span.setAttribute('gen_ai.usage.input_tokens', result.usage.prompt_tokens || 0);
