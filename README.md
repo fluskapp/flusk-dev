@@ -40,15 +40,9 @@ LLM APIs are a black box of spending. You ship a feature, costs spike, and you d
 
 **Flusk gives you that visibility.** One command, zero config, fully local. Think of it as the missing **cost observability layer** between your app and the LLM providers.
 
-<table>
-<tr>
-<td align="center"><strong>Before Flusk</strong></td>
-<td align="center"><strong>After Flusk</strong></td>
-</tr>
-<tr>
-<td><img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/before-after.png" alt="Before vs After Flusk" width="720" /></td>
-</tr>
-</table>
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/before-after.png" alt="Before vs After Flusk" width="720" />
+</p>
 
 ## Quick Start
 
