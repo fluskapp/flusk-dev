@@ -1,6 +1,6 @@
 {
   "name": "@flusk/resources",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Database repositories, cache clients, and I/O operations for Flusk",
   "type": "module",
   "main": "./src/index.ts",
