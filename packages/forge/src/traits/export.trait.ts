@@ -67,7 +67,7 @@ function buildToCsv(n: string, fields: string[], table: string): string {
   const headers = ['id', ...fields, 'createdAt', 'updatedAt'];
   return `/** Export all ${n} records as CSV string */
 export function export${n}sToCsv(db: DatabaseSync): string {
-  const rows = db.prepare('SELECT * FROM ${table}').all() as ${n}Entity[];
+  const rows = db.prepare('SELECT * FROM ${table}').all() as unknown as ${n}Entity[];
   const header = '${headers.join(',')}';
   const lines = rows.map((r) =>
     [${headers.map((h) => `r.${h} ?? ''`).join(', ')}].join(',')
@@ -80,6 +80,6 @@ export function export${n}sToCsv(db: DatabaseSync): string {
 function buildToJson(n: string, table: string): string {
   return `/** Export all ${n} records as JSON array */
 export function export${n}sToJson(db: DatabaseSync): ${n}Entity[] {
-  return db.prepare('SELECT * FROM ${table}').all() as ${n}Entity[];
+  return db.prepare('SELECT * FROM ${table}').all() as unknown as ${n}Entity[];
 }`;
 }

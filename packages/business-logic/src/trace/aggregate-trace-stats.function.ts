@@ -25,7 +25,7 @@ export function aggregateTraceStats(spans: SpanEntity[]): TraceStats {
     totalCost: completedSpans.reduce((sum, s) => sum + s.cost, 0),
     totalTokens: completedSpans.reduce((sum, s) => sum + s.tokens, 0),
     totalLatencyMs: completedSpans.reduce((sum, s) => sum + s.latencyMs, 0),
-    callCount: completedSpans.filter((s) => s.type === 'llm').length,
+    callCount: completedSpans.filter((s) => s.spanType === 'llm').length,
   };
 }
 // --- END CUSTOM ---

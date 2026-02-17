@@ -31,6 +31,12 @@ function buildFieldMapping(camel: string, snake: string, field: FieldSchema): st
       ? `${camel}: row.${snake} != null ? toISOString(row.${snake}) : undefined,`
       : `${camel}: toISOString(row.${snake}),`;
   }
+  if (field.type === 'enum' && field.values) {
+    const union = field.values.map((v: string) => `'${v}'`).join(' | ');
+    return opt
+      ? `${camel}: (row.${snake} as ${union}) ?? undefined,`
+      : `${camel}: row.${snake} as ${union},`;
+  }
   const cast = field.type === 'number' || field.type === 'integer' ? 'number' : 'string';
   return opt
     ? `${camel}: (row.${snake} as ${cast}) ?? undefined,`
@@ -70,11 +76,12 @@ export function buildHelpers(fields: [string, FieldSchema][]): string {
   const checks: string[] = [];
   if (jsonF.length > 0) checks.push(`  if (new Set([${jsonF.join(', ')}]).has(key)) return JSON.stringify(value);`);
   if (boolF.length > 0) checks.push(`  if (new Set([${boolF.join(', ')}]).has(key)) return value ? 1 : 0;`);
+  const keyParam = checks.length > 0 ? 'key' : '_key';
   return [
     `function toSnake(s: string): string { return s.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase(); }`,
-    `function convertValueForDb(key: string, value: unknown): unknown {`,
+    `function convertValueForDb(${keyParam}: string, value: unknown): null | number | bigint | string {`,
     ...checks,
-    `  return value ?? null;`,
+    `  return (value ?? null) as null | number | bigint | string;`,
     `}`,
   ].join('\n');
 }
@@ -132,7 +139,7 @@ export function buildUpdate(n: string, t: string): string {
     `  const sets = keys.map((k) => \`\${toSnake(k)} = ?\`).join(', ');`,
     `  const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));`,
     `  const stmt = db.prepare(\`UPDATE ${t} SET \${sets} WHERE id = ? RETURNING *\`);`,
-    `  const row = stmt.get(...vals, id) as Record<string, unknown> | undefined;`,
+    `  const row = stmt.get(...(vals as (null | number | bigint | string)[]), id) as Record<string, unknown> | undefined;`,
     `  return row ? rowToEntity(row) : null;`,
     `}`,
   ].join('\n');

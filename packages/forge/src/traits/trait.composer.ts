@@ -85,9 +85,6 @@ function mergeSection(
     imports.join('\n'),
     types,
     functions,
-    '',
-    '// --- BEGIN CUSTOM ---',
-    '// --- END CUSTOM ---',
   ].filter(Boolean).join('\n\n');
 }
 
@@ -113,9 +110,6 @@ function mergeRouteSection(
     `): Promise<void> {`,
     functions,
     `}`,
-    '',
-    '// --- BEGIN CUSTOM ---',
-    '// --- END CUSTOM ---',
   ].filter((line) => line !== undefined).join('\n');
 }
 

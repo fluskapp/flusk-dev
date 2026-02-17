@@ -12,7 +12,7 @@ describe('validateSpan', () => {
     const result = validateSpan({
       traceId: '123e4567-e89b-12d3-a456-426614174000',
       name: 'llm-call-1',
-      type: 'llm',
+      spanType: 'llm',
       status: 'running',
       startedAt: new Date().toISOString(),
     });
@@ -33,7 +33,7 @@ describe('validateSpan', () => {
   it('rejects invalid type', () => {
     const result = validateSpan({
       traceId: '123e4567-e89b-12d3-a456-426614174000',
-      name: 'test', type: 'invalid' as any,
+      name: 'test', spanType: 'invalid' as any,
       status: 'running', startedAt: new Date().toISOString(),
     });
     expect(result.valid).toBe(false);

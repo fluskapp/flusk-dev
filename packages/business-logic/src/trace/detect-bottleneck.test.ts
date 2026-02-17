@@ -11,7 +11,7 @@ import { SpanEntity } from '@flusk/types';
 function makeSpan(overrides: Partial<SpanEntity> = {}): SpanEntity {
   return {
     id: 'span-1', traceId: 'trace-1', parentSpanId: undefined,
-    type: 'llm' as const, name: 'test', input: undefined, output: undefined,
+    spanType: 'llm' as const, name: 'test', input: undefined, output: undefined,
     cost: 0.01, tokens: 100, latencyMs: 500, status: 'completed',
     startedAt: '2026-01-01T00:00:00Z', completedAt: '2026-01-01T00:00:01Z',
     createdAt: '2026-01-01T00:00:00Z', updatedAt: '2026-01-01T00:00:01Z',

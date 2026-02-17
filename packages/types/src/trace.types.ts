@@ -1,9 +1,15 @@
 /**
+ * @generated from packages/schema/entities/trace.entity.yaml
+ * Hash: 5a83b15898453b0db68e839b0be2387736e00bfa748d24a8b1fc755f781e2010
+ * Generated: 2026-02-17T11:06:33.220Z
+ * DO NOT EDIT generated sections — changes will be overwritten.
+ */
+
+// --- BEGIN GENERATED (do not edit) [types] ---
+/**
  * @generated from Trace YAML schema
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
-
-// --- BEGIN GENERATED ---
 
 import { Type, Static } from '@sinclair/typebox';
 import { TraceEntitySchema } from '@flusk/entities';
@@ -28,7 +34,5 @@ export type TraceUpdate = Static<typeof TraceUpdateSchema>;
 export const TraceQuerySchema = Type.Partial(TraceEntitySchema);
 
 export type TraceQuery = Static<typeof TraceQuerySchema>;
-// --- END GENERATED ---
 
-// --- BEGIN CUSTOM ---
-// --- END CUSTOM ---
+// --- END GENERATED ---

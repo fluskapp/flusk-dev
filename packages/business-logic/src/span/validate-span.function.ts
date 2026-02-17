@@ -20,9 +20,9 @@ export function validateSpan(
 
   if (!entity.traceId) errors.push('traceId is required');
   if (!entity.name) errors.push('name is required');
-  if (!entity.type) {
+  if (!entity.spanType) {
     errors.push('type is required');
-  } else if (!(VALID_TYPES as readonly string[]).includes(entity.type)) {
+  } else if (!(VALID_TYPES as readonly string[]).includes(entity.spanType)) {
     errors.push('type must be llm, tool, retrieval, or chain');
   }
   if (!entity.status) {

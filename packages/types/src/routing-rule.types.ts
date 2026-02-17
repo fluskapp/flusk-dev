@@ -1,9 +1,15 @@
 /**
+ * @generated from packages/schema/entities/routing-rule.entity.yaml
+ * Hash: 94a48e390eaeccd07dd1c7507f29087d88cbf6395055664162e8314ad0141ca6
+ * Generated: 2026-02-17T11:06:33.203Z
+ * DO NOT EDIT generated sections — changes will be overwritten.
+ */
+
+// --- BEGIN GENERATED (do not edit) [types] ---
+/**
  * @generated from RoutingRule YAML schema
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
-
-// --- BEGIN GENERATED ---
 
 import { Type, Static } from '@sinclair/typebox';
 import { RoutingRuleEntitySchema } from '@flusk/entities';
@@ -28,7 +34,5 @@ export type RoutingRuleUpdate = Static<typeof RoutingRuleUpdateSchema>;
 export const RoutingRuleQuerySchema = Type.Partial(RoutingRuleEntitySchema);
 
 export type RoutingRuleQuery = Static<typeof RoutingRuleQuerySchema>;
-// --- END GENERATED ---
 
-// --- BEGIN CUSTOM ---
-// --- END CUSTOM ---
+// --- END GENERATED ---

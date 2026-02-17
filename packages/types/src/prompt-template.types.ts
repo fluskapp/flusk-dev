@@ -1,9 +1,15 @@
 /**
+ * @generated from packages/schema/entities/prompt-template.entity.yaml
+ * Hash: 08dcb2aa0bd0520d722f54f25c8de1de0feea40508a65a7a8e08c2de45a7da0a
+ * Generated: 2026-02-17T11:06:33.185Z
+ * DO NOT EDIT generated sections — changes will be overwritten.
+ */
+
+// --- BEGIN GENERATED (do not edit) [types] ---
+/**
  * @generated from PromptTemplate YAML schema
  * DO NOT EDIT — regenerate using: flusk generate entity --from <yaml>
  */
-
-// --- BEGIN GENERATED ---
 
 import { Type, Static } from '@sinclair/typebox';
 import { PromptTemplateEntitySchema } from '@flusk/entities';
@@ -28,7 +34,5 @@ export type PromptTemplateUpdate = Static<typeof PromptTemplateUpdateSchema>;
 export const PromptTemplateQuerySchema = Type.Partial(PromptTemplateEntitySchema);
 
 export type PromptTemplateQuery = Static<typeof PromptTemplateQuerySchema>;
-// --- END GENERATED ---
 
-// --- BEGIN CUSTOM ---
-// --- END CUSTOM ---
+// --- END GENERATED ---

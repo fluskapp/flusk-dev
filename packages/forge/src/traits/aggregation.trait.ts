@@ -27,7 +27,7 @@ function buildCountBy(name: string, typeName: string, snakeCol: string, tableNam
   if (st === 'postgres') {
     lines.push(`/** Count ${n} records grouped by ${name} */`, `export async function countBy${toPascalCase(name)}(pool: ${dbType}): Promise<${typeName}[]> {`, `  const result = await pool.query('SELECT ${snakeCol}, COUNT(*) as count FROM ${tableName} GROUP BY ${snakeCol} ORDER BY count DESC');`, `  return result.rows as ${typeName}[];`, `}`);
   } else {
-    lines.push(`/** Count ${n} records grouped by ${name} */`, `export function countBy${toPascalCase(name)}(db: ${dbType}): ${typeName}[] {`, `  const stmt = db.prepare('SELECT ${snakeCol}, COUNT(*) as count FROM ${tableName} GROUP BY ${snakeCol} ORDER BY count DESC');`, `  return stmt.all() as ${typeName}[];`, `}`);
+    lines.push(`/** Count ${n} records grouped by ${name} */`, `export function countBy${toPascalCase(name)}(db: ${dbType}): ${typeName}[] {`, `  const stmt = db.prepare('SELECT ${snakeCol}, COUNT(*) as count FROM ${tableName} GROUP BY ${snakeCol} ORDER BY count DESC');`, `  return stmt.all() as unknown as ${typeName}[];`, `}`);
   }
   return lines;
 }
@@ -62,7 +62,7 @@ export function aggregate${n}s(db: DatabaseSync, opts: ${n}AggregateOptions): ${
   const groupCol = opts.groupBy?.replace(/[^a-z_]/gi, '');
   const select = groupCol ? \`\${groupCol} as "group", \${fn}(\${col}) as value\` : \`COALESCE(\${fn}(\${col}), 0) as value\`;
   const groupClause = groupCol ? \`GROUP BY \${groupCol}\` : '';
-  return db.prepare(\`SELECT \${select} FROM ${tableName} \${groupClause}\`).all() as ${n}AggregateResult[];
+  return db.prepare(\`SELECT \${select} FROM ${tableName} \${groupClause}\`).all() as unknown as ${n}AggregateResult[];
 }`;
 }
 
