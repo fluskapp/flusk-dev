@@ -39,11 +39,8 @@ describe('architecture guardrails', () => {
   it('register.ts auto-starts the SDK (import side-effect)', () => {
     const source = readFileSync(resolve(otelDir, 'src', 'register.ts'), 'utf-8');
     expect(source).toContain('sdk.start()');
-    // Must call at module level, not inside a function
-    const lines = source.split('\n');
-    const startLine = lines.find((l) => l.includes('sdk.start()'));
-    expect(startLine).toBeDefined();
-    expect(startLine!.startsWith('  ')).toBeFalsy(); // not indented = top-level
+    // Must call at module level (side-effect), not inside a named function
+    expect(source).not.toMatch(/function\s+\w+[^)]*\)\s*\{[^}]*sdk\.start\(\)/s);
   });
 });
 // --- END GENERATED ---

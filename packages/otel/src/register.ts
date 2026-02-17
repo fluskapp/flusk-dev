@@ -15,38 +15,40 @@ import { patchOpenAI } from './instrumentations/openai-v6.js';
 
 // --- BEGIN CUSTOM ---
 const logger = getLogger().child({ module: 'otel-register' });
-const config = loadConfig();
 
-// Start SDK synchronously (no top-level await — needed for --import compatibility)
-const sdk = createSdk(config);
-sdk.start();
+let sdk: ReturnType<typeof createSdk> | undefined;
 
-// Patch OpenAI SDK v6 for GenAI span attributes
-patchOpenAI();
+try {
+  const config = loadConfig();
 
-// Async flame setup runs in background after SDK is already active
-setupAutoFlame().then((spanProcessors) => {
-  if (spanProcessors.length > 0) {
-    logger.info(`Flame profiling enabled with ${spanProcessors.length} processor(s)`);
-  }
-}).catch((err: unknown) => {
-  logger.warn({ err }, 'Flame auto-setup failed (non-fatal)');
-});
+  // Start SDK synchronously (no top-level await — needed for --import compatibility)
+  sdk = createSdk(config);
+  sdk.start();
 
-process.on('SIGTERM', () => {
-  sdk.shutdown().catch((err: unknown) => logger.error({ err }, 'shutdown failed'));
-});
+  // Patch OpenAI SDK v6 for GenAI span attributes
+  patchOpenAI();
 
-process.on('SIGINT', () => {
-  sdk.shutdown().catch((err: unknown) => logger.error({ err }, 'shutdown failed'));
-});
+  // Async flame setup runs in background after SDK is already active
+  setupAutoFlame().then((spanProcessors) => {
+    if (spanProcessors.length > 0) {
+      logger.info(`Flame profiling enabled with ${spanProcessors.length} processor(s)`);
+    }
+  }).catch((err: unknown) => {
+    logger.warn({ err }, 'Flame auto-setup failed (non-fatal)');
+  });
 
-// Flush spans before process exits
-process.on('beforeExit', () => {
-  sdk.shutdown().catch((err: unknown) => logger.error({ err }, 'shutdown failed'));
-});
+  const shutdown = (): void => {
+    sdk?.shutdown().catch((err: unknown) => logger.error({ err }, 'shutdown failed'));
+  };
+
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
+  process.on('beforeExit', shutdown);
+
+  logger.info({ project: config.projectName }, 'instrumentation active');
+} catch (err: unknown) {
+  logger.error({ err }, 'Flusk OTel initialization failed — instrumentation is disabled');
+}
 
 export { sdk };
-
-logger.info({ project: config.projectName }, 'instrumentation active');
 // --- END CUSTOM ---
