@@ -91,11 +91,16 @@ export function calculateCost(input: CalculateCostInput): CalculateCostOutput {
 
   const pricing = PRICING[providerKey as Provider];
 
-  if (!(input.modelName in pricing)) {
+  // Strip date suffixes from versioned model names (e.g., gpt-4o-2024-08-06 → gpt-4o)
+  let modelKey = input.modelName;
+  if (!(modelKey in pricing)) {
+    modelKey = modelKey.replace(/-\d{4}-\d{2}-\d{2}$/, '');
+  }
+  if (!(modelKey in pricing)) {
     return { costUsd: 0 };
   }
 
-  const modelPricing = pricing[input.modelName as keyof typeof pricing] as Pricing;
+  const modelPricing = pricing[modelKey as keyof typeof pricing] as Pricing;
 
   const inputCost = (input.tokenUsage.input / 1_000_000) * modelPricing.input;
   const outputCost = (input.tokenUsage.output / 1_000_000) * modelPricing.output;
