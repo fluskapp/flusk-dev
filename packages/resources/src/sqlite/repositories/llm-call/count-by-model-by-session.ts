@@ -1,3 +1,5 @@
+// @generated
+// --- BEGIN GENERATED ---
 import type { DatabaseSync } from 'node:sqlite';
 import type { ModelCount } from './count-by-model.js';
 
@@ -10,3 +12,4 @@ export function countByModelBySessionId(db: DatabaseSync, sessionId: string): Mo
   );
   return stmt.all(sessionId) as unknown as ModelCount[];
 }
+// --- END GENERATED ---

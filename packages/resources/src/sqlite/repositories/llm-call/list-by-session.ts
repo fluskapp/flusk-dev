@@ -1,3 +1,5 @@
+// @generated
+// --- BEGIN GENERATED ---
 import type { DatabaseSync } from 'node:sqlite';
 import type { LLMCallEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';
@@ -17,3 +19,4 @@ export function listBySessionId(
   const rows = stmt.all(sessionId, limit, offset) as Record<string, unknown>[];
   return rows.map(rowToEntity);
 }
+// --- END GENERATED ---

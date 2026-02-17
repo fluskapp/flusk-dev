@@ -1,3 +1,5 @@
+// @generated
+// --- BEGIN GENERATED ---
 import type { DatabaseSync } from 'node:sqlite';
 
 /**
@@ -10,3 +12,4 @@ export function sumCostBySessionId(db: DatabaseSync, sessionId: string): number 
   const row = stmt.get(sessionId) as { total: number };
   return row.total;
 }
+// --- END GENERATED ---
