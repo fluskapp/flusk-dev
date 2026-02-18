@@ -15,14 +15,11 @@ export async function generatePythonInit(
 ): Promise<{ path: string; content: string }> {
   await mkdir(dir, { recursive: true });
 
-  const exports = modules.map((m) => `"${m}"`).join(', ');
   const imports = modules.map((m) => `from .${m} import *  # noqa: F403`);
 
   const content = [
     '# --- BEGIN GENERATED ---',
     '"""Auto-generated package exports."""',
-    '',
-    `__all__ = [${exports}]`,
     '',
     ...imports,
     '# --- END GENERATED ---',

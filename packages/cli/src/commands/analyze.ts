@@ -142,8 +142,11 @@ function spawnChild(
   const wrapperPath = resolve(process.env.HOME ?? '~', '.flusk', '_analyze-wrapper.mjs');
   mkdirSync(resolve(process.env.HOME ?? '~', '.flusk'), { recursive: true });
   writeFileSync(wrapperPath, [
-    `await import('${safeOtelRegister}');`,
+    `const { sdk } = await import('${safeOtelRegister}');`,
     `await import('${safeScriptPath}');`,
+    `// Wait briefly for any pending async operations, then flush OTel spans`,
+    `await new Promise(r => setTimeout(r, 500));`,
+    `if (sdk) await sdk.shutdown();`,
   ].join('\n'));
 
   // Run from otel package dir so pnpm workspace deps (@opentelemetry/*) resolve correctly
