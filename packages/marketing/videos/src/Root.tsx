@@ -11,6 +11,7 @@ import { Security } from "./scenes/Security";
 import { MultiProvider } from "./scenes/MultiProvider";
 import { TUI } from "./scenes/TUI";
 import { AbsoluteFill } from "remotion";
+import { DemoExplain, AnalyzeGif, ExplainGif } from "./DemoExplain";
 
 const Wrap: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <AbsoluteFill style={{ backgroundColor: "#0a0a0a" }}>{children}</AbsoluteFill>
@@ -32,6 +33,9 @@ export const RemotionRoot: React.FC = () => {
       <Composition id="SecurityScene" component={() => <Wrap><Security /></Wrap>} durationInFrames={120} fps={30} width={1920} height={1080} />
       <Composition id="MultiProviderScene" component={() => <Wrap><MultiProvider /></Wrap>} durationInFrames={150} fps={30} width={1920} height={1080} />
       <Composition id="TUIDashboardScene" component={() => <Wrap><TUI /></Wrap>} durationInFrames={150} fps={30} width={1920} height={1080} />
+      <Composition id="DemoExplain" component={DemoExplain} durationInFrames={1200} fps={30} width={1920} height={1080} />
+      <Composition id="AnalyzeGif" component={AnalyzeGif} durationInFrames={180} fps={30} width={800} height={450} />
+      <Composition id="ExplainGif" component={ExplainGif} durationInFrames={240} fps={30} width={800} height={500} />
     </>
   );
 };
