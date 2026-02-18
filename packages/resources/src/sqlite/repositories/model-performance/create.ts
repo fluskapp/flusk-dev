@@ -1,0 +1,17 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { ModelPerformanceEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Insert a new ModelPerformance record
+ */
+export function create(
+  db: DatabaseSync,
+  data: Omit<ModelPerformanceEntity, 'id' | 'createdAt' | 'updatedAt'>,
+): ModelPerformanceEntity {
+  // TODO: implement INSERT for model_performances
+  void data;
+  const stmt = db.prepare('SELECT 1');
+  const row = stmt.get() as Record<string, unknown>;
+  return rowToEntity(row);
+}

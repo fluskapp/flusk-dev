@@ -1,0 +1,15 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { TraceEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Find Trace by id
+ */
+export function findById(
+  db: DatabaseSync,
+  id: string,
+): TraceEntity | null {
+  const stmt = db.prepare('SELECT * FROM traces WHERE id = ?');
+  const row = stmt.get(id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
+}

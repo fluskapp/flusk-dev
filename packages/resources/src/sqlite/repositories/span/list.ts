@@ -1,0 +1,18 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { SpanEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * List Span records with pagination
+ */
+export function list(
+  db: DatabaseSync,
+  limit = 50,
+  offset = 0,
+): SpanEntity[] {
+  const stmt = db.prepare(
+    'SELECT * FROM spans ORDER BY created_at DESC LIMIT ? OFFSET ?',
+  );
+  const rows = stmt.all(limit, offset) as Record<string, unknown>[];
+  return rows.map(rowToEntity);
+}

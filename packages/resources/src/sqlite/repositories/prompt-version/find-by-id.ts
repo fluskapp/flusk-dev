@@ -1,0 +1,15 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { PromptVersionEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * Find PromptVersion by id
+ */
+export function findById(
+  db: DatabaseSync,
+  id: string,
+): PromptVersionEntity | null {
+  const stmt = db.prepare('SELECT * FROM prompt_versions WHERE id = ?');
+  const row = stmt.get(id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
+}

@@ -1,0 +1,18 @@
+import type { DatabaseSync } from 'node:sqlite';
+import type { RoutingRuleEntity } from '@flusk/entities';
+import { rowToEntity } from './row-to-entity.js';
+
+/**
+ * List RoutingRule records with pagination
+ */
+export function list(
+  db: DatabaseSync,
+  limit = 50,
+  offset = 0,
+): RoutingRuleEntity[] {
+  const stmt = db.prepare(
+    'SELECT * FROM routing_rules ORDER BY created_at DESC LIMIT ? OFFSET ?',
+  );
+  const rows = stmt.all(limit, offset) as Record<string, unknown>[];
+  return rows.map(rowToEntity);
+}
