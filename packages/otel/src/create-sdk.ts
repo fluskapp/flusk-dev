@@ -16,6 +16,9 @@ import { resolveExporter } from './utils/resolve-exporter.js';
 import { patchAnthropic } from './instrumentations/anthropic.js';
 import { patchGoogle } from './instrumentations/google.js';
 import { SanitizeSpanProcessor } from './processors/sanitize-span-processor.js';
+import { patchAzureOpenai } from './instrumentations/azure-openai.js';
+import { patchCohere } from './instrumentations/cohere.js';
+import { patchOpenai } from './instrumentations/openai.js';
 
 export interface CreateSdkOptions {
   spanProcessors?: SpanProcessor[];
@@ -26,6 +29,9 @@ export interface CreateSdkOptions {
 export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): NodeSDK {
     patchAnthropic();
     patchGoogle();
+    patchAzureOpenai();
+    patchCohere();
+    patchOpenai();
   const traceExporter = resolveExporter(config);
 
   const resource = new Resource({

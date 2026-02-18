@@ -42,9 +42,9 @@
     "fastify-plugin": "^5.0.0"
   },
   "peerDependencies": {
-    "@platformatic/flame": "^1.6.0",
     "@anthropic-ai/sdk": "^0.30.0",
-    "@google/generative-ai": "^0.20.0"
+    "@google/generative-ai": "^0.20.0",
+    "@platformatic/flame": "^1.6.0"
   },
   "peerDependenciesMeta": {
     "@platformatic/flame": {
@@ -67,7 +67,8 @@
   ],
   "devDependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
-    "@google/generative-ai": "^0.24.1"
+    "@google/generative-ai": "^0.24.1",
+    "cohere-ai": "^7.20.0"
   },
   "license": "MIT"
 }

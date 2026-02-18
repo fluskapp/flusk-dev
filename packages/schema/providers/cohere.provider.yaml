@@ -1,0 +1,21 @@
+# Cohere provider definition for Flusk generator
+name: cohere
+displayName: Cohere
+sdkPackage: cohere-ai
+clientClass: CohereClient
+methods:
+  - name: chat
+    path: CohereClient.prototype.chat
+    streamParam: stream
+spans:
+  system: cohere
+  modelPrefixes: ["command-", "embed-", "rerank-"]
+apiUrls: ["api.cohere.com"]
+models:
+  command-r-plus: { input: 2.50, output: 10.0 }
+  command-r: { input: 0.50, output: 1.50 }
+  command: { input: 1.00, output: 2.00 }
+  command-light: { input: 0.30, output: 0.60 }
+  embed-english-v3.0: { input: 0.10, output: 0.0 }
+  embed-multilingual-v3.0: { input: 0.10, output: 0.0 }
+  rerank-english-v3.0: { input: 1.00, output: 0.0 }

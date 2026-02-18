@@ -1,17 +1,13 @@
 # --- BEGIN GENERATED ---
-"""OpenAI pricing (USD per 1M tokens)."""
+"""Azure OpenAI pricing (USD per 1M tokens)."""
 
 
-OPENAI_PRICING: dict[str, dict[str, float]] = {
+AZURE_OPENAI_PRICING: dict[str, dict[str, float]] = {
     "gpt-4o": {"input": 2.5, "output": 10},
     "gpt-4o-mini": {"input": 0.15, "output": 0.6},
     "gpt-4-turbo": {"input": 10, "output": 30},
-    "gpt-4.1": {"input": 2, "output": 8},
-    "gpt-4.1-mini": {"input": 0.4, "output": 1.6},
-    "gpt-4.1-nano": {"input": 0.1, "output": 0.4},
+    "gpt-35-turbo": {"input": 0.5, "output": 1.5},
     "o1": {"input": 15, "output": 60},
-    "o1-mini": {"input": 1.1, "output": 4.4},
-    "o1-pro": {"input": 150, "output": 600},
     "o3": {"input": 2, "output": 8},
     "o3-mini": {"input": 1.1, "output": 4.4},
     "o4-mini": {"input": 1.1, "output": 4.4},

@@ -41,6 +41,8 @@ function detectProviderFromUrl(url: string, userAgent: string): string | null {
   if (url.includes('api.openai.com')) return 'openai';
   if (url.includes('api.anthropic.com')) return 'anthropic';
     if (url.includes('generativelanguage.googleapis.com')) return 'google';
+    if (url.includes('openai.azure.com')) return 'azure-openai';
+    if (url.includes('api.cohere.com')) return 'cohere';
   if (url.includes('bedrock')) return 'bedrock';
   // Detect by user-agent (OpenAI SDK sets "OpenAI/JS ..." or "OpenAI/Python ...")
   if (userAgent.startsWith('OpenAI/')) return 'openai';
