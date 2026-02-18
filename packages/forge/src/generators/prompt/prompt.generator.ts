@@ -31,7 +31,7 @@ async function loadSchema(yamlPath: string): Promise<PromptSchema> {
 export function generatePromptTemplateContent(schema: PromptSchema): string {
   const pascal = toPascalCase(schema.name);
   const camel = toCamelCase(schema.name);
-  const params = schema.variables.map(v => `  ${toCamelCase(v.name)}: vars.${toCamelCase(v.name)},`);
+  const _params = schema.variables.map(v => `  ${toCamelCase(v.name)}: vars.${toCamelCase(v.name)},`);
 
   return `// --- BEGIN GENERATED ---
 /**

@@ -64,7 +64,7 @@ export function generateActionIndexContent(schema: ActionSchema): string {
   const pascal = toPascalCase(schema.name);
   const getInputLines = schema.inputs.map(inp => {
     const camel = toCamelCase(inp.name);
-    const required = inp.required ? 'true' : 'false';
+    const _required = inp.required ? 'true' : 'false';
     return `    ${camel}: core.getInput('${inp.name}'${inp.required ? ', { required: true }' : ''}),`;
   });
 
