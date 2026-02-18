@@ -10,6 +10,8 @@ export * as SqliteLLMCallRepo from './sqlite/repositories/llm-call/index.js';
 export * as SqliteAnalyzeSessionRepo from './sqlite/repositories/analyze-session/index.js';
 export * as SqliteProfileSessionRepo from './sqlite/repositories/profile-session/index.js';
 export * as SqlitePerformancePatternRepo from './sqlite/repositories/performance-pattern/index.js';
+export * as SqliteInsightRepo from './sqlite/repositories/insight/index.js';
+export * as SqliteExplainSessionRepo from './sqlite/repositories/explain-session/index.js';
 export type { StorageAdapter } from './storage.js';
 export { createSqliteStorage } from './sqlite-storage.js';
 export { createStorage } from './create-storage.js';

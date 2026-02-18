@@ -1,0 +1,72 @@
+name: Insight
+description: AI-generated optimization insight from flusk explain
+storage: [sqlite]
+
+fields:
+  sessionId:
+    type: string
+    required: true
+    index: true
+    description: Explain session ID this insight belongs to
+
+  category:
+    type: string
+    required: true
+    enum: [cost-hotspot, duplicate-calls, token-waste, model-downgrade, caching-opportunity, error-rate]
+    description: Insight category
+
+  severity:
+    type: string
+    required: true
+    enum: [critical, high, medium, low]
+    description: Severity level
+
+  title:
+    type: string
+    required: true
+    description: Short title of the insight
+    min: 1
+
+  description:
+    type: string
+    required: true
+    description: Detailed explanation of the insight
+
+  currentCost:
+    type: number
+    required: true
+    description: Current cost in USD
+    min: 0
+    default: 0
+
+  projectedCost:
+    type: number
+    required: true
+    description: Projected cost after optimization in USD
+    min: 0
+    default: 0
+
+  savingsPercent:
+    type: number
+    required: true
+    description: Estimated savings percentage
+    min: 0
+    default: 0
+
+  codeSuggestion:
+    type: string
+    description: Optional code suggestion for the optimization
+
+  provider:
+    type: string
+    required: true
+    description: LLM provider related to this insight
+
+  model:
+    type: string
+    required: true
+    description: LLM model related to this insight
+
+capabilities:
+  crud: true
+  time-range: true

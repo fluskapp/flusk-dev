@@ -106,6 +106,28 @@ export {
   BudgetAlertUpdateSchema,
   BudgetAlertQuerySchema
 } from './budget-alert.types.js';
+
+export {
+  type InsightEntity as InsightEntityType,
+  type InsightInsert,
+  type InsightUpdate,
+  type InsightQuery,
+  InsightEntityJSONSchema,
+  InsightInsertSchema,
+  InsightUpdateSchema,
+  InsightQuerySchema,
+} from './insight.types.js';
+
+export {
+  type ExplainSessionEntity as ExplainSessionEntityType,
+  type ExplainSessionInsert,
+  type ExplainSessionUpdate,
+  type ExplainSessionQuery,
+  ExplainSessionEntityJSONSchema,
+  ExplainSessionInsertSchema,
+  ExplainSessionUpdateSchema,
+  ExplainSessionQuerySchema,
+} from './explain-session.types.js';
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---
 // --- END CUSTOM ---

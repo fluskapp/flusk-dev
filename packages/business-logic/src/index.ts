@@ -39,6 +39,9 @@ export { profileSession };
 
 import * as budget from './budget/index.js';
 export { budget };
+
+import * as explain from './explain/index.js';
+export { explain };
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---

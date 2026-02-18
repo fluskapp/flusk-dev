@@ -152,6 +152,10 @@ program.addCommand(marketingCommand);
 import { purgeCommand } from '../src/commands/purge.js';
 program.addCommand(purgeCommand);
 
+// LLM cost explanation
+import { explainCommand } from '../src/commands/explain.js';
+program.addCommand(explainCommand);
+
 program.parse(process.argv);
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---

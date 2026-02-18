@@ -112,6 +112,18 @@ export {
   BudgetAlertEntitySchema,
   type BudgetAlertEntity
 } from './budget-alert.entity.js';
+
+// Insight entity exports
+export {
+  InsightEntitySchema,
+  type InsightEntity,
+} from './insight.entity.js';
+
+// ExplainSession entity exports
+export {
+  ExplainSessionEntitySchema,
+  type ExplainSessionEntity,
+} from './explain-session.entity.js';
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---
 // --- END CUSTOM ---

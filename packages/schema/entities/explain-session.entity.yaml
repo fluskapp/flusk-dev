@@ -1,0 +1,59 @@
+name: ExplainSession
+description: Session tracking for flusk explain runs
+storage: [sqlite]
+
+fields:
+  analyzeSessionId:
+    type: string
+    required: true
+    index: true
+    description: ID of the analyze session that was explained
+
+  llmProvider:
+    type: string
+    required: true
+    description: LLM provider used for the explain call
+
+  llmModel:
+    type: string
+    required: true
+    description: LLM model used for the explain call
+
+  promptTokens:
+    type: integer
+    required: true
+    description: Number of prompt tokens used
+    min: 0
+    default: 0
+
+  completionTokens:
+    type: integer
+    required: true
+    description: Number of completion tokens used
+    min: 0
+    default: 0
+
+  explainCost:
+    type: number
+    required: true
+    description: Cost of the explain LLM call in USD
+    min: 0
+    default: 0
+
+  insightsCount:
+    type: integer
+    required: true
+    description: Number of insights generated
+    min: 0
+    default: 0
+
+  totalSavings:
+    type: number
+    required: true
+    description: Total projected savings across all insights in USD
+    min: 0
+    default: 0
+
+capabilities:
+  crud: true
+  time-range: true
