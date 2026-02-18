@@ -1,5 +1,12 @@
 # @flusk/forge
 
+## 0.2.1
+
+### Patch Changes
+
+- @flusk/execution@0.1.4
+- @flusk/resources@0.2.2
+
 ## 0.2.0
 
 ### Minor Changes

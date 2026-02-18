@@ -1,5 +1,13 @@
 # @flusk/cli
 
+## 0.2.3
+
+### Patch Changes
+
+- @flusk/execution@0.1.4
+- @flusk/resources@0.2.2
+- @flusk/forge@0.2.1
+
 ## 0.2.2
 
 ### Patch Changes

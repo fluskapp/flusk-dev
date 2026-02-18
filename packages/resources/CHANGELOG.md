@@ -1,5 +1,12 @@
 # @flusk/resources
 
+## 0.2.2
+
+### Patch Changes
+
+- Updated dependencies [f5eb699]
+  - @flusk/business-logic@0.1.4
+
 ## 0.2.1
 
 ### Patch Changes
