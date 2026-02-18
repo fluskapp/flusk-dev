@@ -6,7 +6,7 @@
   "description": "Code generation framework for Flusk — YAML to code",
   "scripts": {
     "build": "tsc",
-    "test": "vitest run src/__tests__/",
+    "test": "vitest run src/__tests__/ src/generators/command/__tests__/ src/generators/prompt/__tests__/ src/generators/action/__tests__/",
     "clean": "rm -rf dist",
     "dev": "tsc --watch"
   },

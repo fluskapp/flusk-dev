@@ -1,0 +1,39 @@
+name: analyze
+description: Analyze LLM costs in CI/CD pipelines
+inputs:
+  - name: script
+    description: Path to the script to analyze
+    required: true
+
+  - name: provider
+    description: LLM provider (openai, anthropic, google, local)
+    required: false
+    default: openai
+
+  - name: budget
+    description: Maximum allowed cost in USD
+    required: false
+
+  - name: explain
+    description: Enable cost explanation insights
+    required: false
+    default: "false"
+
+  - name: explain-provider
+    description: Provider for generating explanations
+    required: false
+    default: openai
+
+  - name: token
+    description: Authentication token for the LLM provider
+    required: false
+
+outputs:
+  - name: total-cost
+    description: Total cost of all LLM calls in USD
+
+  - name: total-calls
+    description: Total number of LLM API calls
+
+  - name: insights-json
+    description: JSON array of cost optimization insights

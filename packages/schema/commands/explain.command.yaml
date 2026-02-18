@@ -1,0 +1,50 @@
+name: explain
+description: Explain LLM cost insights and optimization opportunities
+options:
+  - name: provider
+    type: string
+    default: openai
+    enum: [openai, anthropic, google, local]
+    description: LLM provider to analyze
+
+  - name: model
+    type: string
+    required: false
+    description: Specific model to filter by
+
+  - name: db
+    type: string
+    default: ./flusk.db
+    description: Path to the Flusk SQLite database
+
+  - name: format
+    type: string
+    default: text
+    enum: [text, json, markdown]
+    description: Output format
+
+  - name: max-insights
+    type: integer
+    default: 10
+    description: Maximum number of insights to return
+
+  - name: min-severity
+    type: string
+    default: low
+    enum: [critical, high, medium, low]
+    description: Minimum severity threshold for insights
+
+  - name: session
+    type: string
+    required: false
+    description: Filter by session ID
+
+  - name: cost-threshold
+    type: number
+    required: false
+    description: Cost threshold for alerts
+
+  - name: no-code
+    type: boolean
+    default: false
+    description: Exclude code snippets from output

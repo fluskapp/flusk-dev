@@ -49,6 +49,14 @@ export { generatePythonInit } from './generators/python/init.generator.js';
 export { generateEntitySchemaContent, generateEntitySchema } from './generators/entity-schema.generator.js';
 export type { GeneratorResult } from './generators/entity-schema.generator.js';
 
+// New generators (Sprint 1)
+export { generateCommand } from './generators/command/index.js';
+export type { CommandSchema, CommandOption } from './generators/command/index.js';
+export { generatePrompt } from './generators/prompt/index.js';
+export type { PromptSchema, PromptVariable } from './generators/prompt/index.js';
+export { generateAction } from './generators/action/index.js';
+export type { ActionSchema, ActionInput, ActionOutput } from './generators/action/index.js';
+
 // Recipes
 export * from './recipes/index.js';
 
