@@ -1,0 +1,23 @@
+name: Flusk Cost Analysis
+on:
+  pull_request:
+    paths: ['src/**', '*.ts', '*.js']
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install
+      - uses: adirbenyossef/flusk-dev/.github/actions/analyze@main
+        with:
+          script: './src/index.ts'
+          explain: true
+          budget: 100
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

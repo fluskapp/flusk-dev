@@ -1,0 +1,18 @@
+{
+  "name": "@flusk/action-analyze",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --platform=node --target=node20 --outfile=dist/index.js --format=cjs --banner:js='\"use strict\";'",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@actions/core": "^1.11.1",
+    "@actions/github": "^6.0.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.27.0",
+    "vitest": "^3.1.0"
+  }
+}
