@@ -12,6 +12,7 @@ import { Command } from 'commander';
 import chalk from 'chalk';
 import { spawn } from 'node:child_process';
 import { resolve, normalize } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { writeFile } from 'node:fs/promises';
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
@@ -92,15 +93,23 @@ export const analyzeCommand = new Command('analyze')
   });
 
 function getOtelRegisterUrl(): string {
-  // Resolve @flusk/otel to a file:// URL in the parent process where
-  // pnpm workspace symlinks are available. The child process receives
-  // the absolute file:// URL so it doesn't need workspace resolution.
-  try {
-    return import.meta.resolve('@flusk/otel');
-  } catch {
-    // Fallback: resolve relative to this file in the monorepo
-    return new URL('../../../otel/src/register.ts', import.meta.url).href;
+  // Find the otel register.ts by walking up to find the monorepo root
+  // (identified by packages/otel/src/register.ts existing).
+  // This works from both src/ and dist/ layouts.
+  const startDir = (() => {
+    try { return fileURLToPath(new URL('.', import.meta.url)); }
+    catch { return process.cwd(); }
+  })();
+  let dir = startDir;
+  for (let i = 0; i < 10; i++) {
+    const candidate = resolve(dir, 'packages', 'otel', 'src', 'register.ts');
+    if (existsSync(candidate)) return candidate;
+    const parent = resolve(dir, '..');
+    if (parent === dir) break;
+    dir = parent;
   }
+  // Final fallback: assume cwd is monorepo root
+  return resolve(process.cwd(), 'packages', 'otel', 'src', 'register.ts');
 }
 
 function spawnChild(
