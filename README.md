@@ -22,10 +22,6 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/flusk-explain.gif" alt="Flusk Explain" width="720" />
-</p>
-
-<p align="center">
   <a href="#quick-start">Quick Start</a> •
   <a href="#what-you-get">What You Get</a> •
   <a href="#framework-integration-guides">Frameworks</a> •
@@ -121,6 +117,10 @@ That's it. No accounts, no API keys, no config files. Flusk intercepts every LLM
 - **Pattern detection** — surfaces recurring cost patterns across your codebase
 
 ### AI Cost Advisor (`flusk explain`)
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/flusk-explain.gif" alt="Flusk Explain" width="720" />
+</p>
 
 Get AI-powered cost optimization advice with concrete code suggestions:
 
