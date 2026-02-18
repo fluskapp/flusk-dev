@@ -18,7 +18,11 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/demo.gif" alt="Flusk Demo" width="720" />
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/flusk-analyze.gif" alt="Flusk Analyze" width="720" />
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/flusk-explain.gif" alt="Flusk Explain" width="720" />
 </p>
 
 <p align="center">
@@ -115,6 +119,24 @@ That's it. No accounts, no API keys, no config files. Flusk intercepts every LLM
 - **Model downgrade suggestions** — flags calls where a cheaper model would produce the same quality
 - **Token waste analysis** — identifies oversized prompts and unnecessary system messages
 - **Pattern detection** — surfaces recurring cost patterns across your codebase
+
+### AI Cost Advisor (`flusk explain`)
+
+Get AI-powered cost optimization advice with concrete code suggestions:
+
+```bash
+# Analyze and explain — get actionable insights
+flusk analyze ./app.js --explain
+
+# Use a specific provider for explanations
+flusk analyze ./app.js --explain --explain-provider anthropic
+```
+
+Flusk explain reads your cost report and generates:
+- **Why** each cost pattern exists
+- **What** code changes would reduce spend
+- **How much** you'd save with each suggestion
+- **Priority-ranked** recommendations
 
 ### Budget Controls
 
@@ -300,7 +322,8 @@ OTLP Export → Grafana Tempo / Datadog / New Relic / Custom
 | **Anthropic** | Claude Opus 4.6, Sonnet 4.5, Sonnet 4, Haiku 3.5 | ✅ Supported |
 | **Google Gemini** | Gemini 2.5 Pro, Flash, Ultra | ✅ Supported |
 | **AWS Bedrock** | All Bedrock-hosted models | ✅ Supported |
-| **Azure OpenAI** | All Azure-hosted OpenAI models | 🔜 Planned |
+| **Azure OpenAI** | GPT-4o, GPT-4, GPT-3.5 Turbo + 5 more (8 models) | ✅ Supported |
+| **Cohere** | Command R+, Command R, Embed + 4 more (7 models) | ✅ Supported |
 
 ## CLI Commands
 
@@ -309,6 +332,7 @@ OTLP Export → Grafana Tempo / Datadog / New Relic / Custom
 flusk analyze <script>           # Run script and analyze LLM costs
 flusk analyze ./app.js --agent bot  # Track with agent label
 flusk analyze ./app.js -d 120    # Run for 120 seconds
+flusk analyze ./app.js --explain # Get AI cost optimization advice
 
 # Reports
 flusk report [id]                # View or regenerate a report
@@ -682,12 +706,14 @@ See the [Python package README](./flusk-py/README.md) and [Dual-Language Archite
 - [x] **Observability integrations** — Grafana, Datadog, New Relic (OTLP export)
 - [x] Multi-export (SQLite + external platforms in parallel)
 - [ ] VS Code extension
-- [ ] GitHub Action for CI cost gates
+- [x] **GitHub Action** for CI cost gates
 - [ ] Prompt optimization (semantic dedup)
 - [ ] LangChain / LlamaIndex native support
 - [x] **Python support** — same YAML → TypeScript + Python (10 npm + 1 PyPI)
 - [x] **Google Gemini** provider support
-- [ ] Azure OpenAI provider
+- [x] **Azure OpenAI** provider (8 models)
+- [x] **Cohere** provider (7 models)
+- [x] **`flusk explain`** — AI-powered cost optimization advisor
 
 ---
 
