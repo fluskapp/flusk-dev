@@ -11,17 +11,17 @@ const TRACER_NAME = 'flusk-openai-v6';
  * Patch the OpenAI module to add GenAI span attributes.
  * Call this after the OpenAI module is loaded.
  */
-export function patchOpenAI(): void {
+export function patchOpenAI(): Promise<void> {
   try {
     // Dynamic import to avoid hard dependency
-    import('openai').then((mod) => {
+    return import('openai').then((mod) => {
       const OpenAI = mod.default || mod;
       patchCompletionsCreate(OpenAI);
     }).catch(() => {
       // openai not installed — nothing to patch
     });
   } catch {
-    // ignore
+    return Promise.resolve();
   }
 }
 

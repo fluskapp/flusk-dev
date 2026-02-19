@@ -23,7 +23,7 @@
     }
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node scripts/build-bin.mjs",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "test": "node --test --import=tsx src/**/*.test.ts",

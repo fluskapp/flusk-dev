@@ -10,7 +10,7 @@ import { BedrockInstrumentation } from '@traceloop/instrumentation-bedrock';
 import { OpenAIInstrumentation } from '@traceloop/instrumentation-openai';
 import { Resource } from '@opentelemetry/resources';
 import { ATTR_SERVICE_NAME } from '@opentelemetry/semantic-conventions';
-import type { SpanProcessor } from '@opentelemetry/sdk-trace-base';
+import { type SpanProcessor, BatchSpanProcessor } from '@opentelemetry/sdk-trace-base';
 import type { FluskOtelConfig } from './config.js';
 import { resolveExporter } from './utils/resolve-exporter.js';
 import { patchAnthropic } from './instrumentations/anthropic.js';
@@ -52,13 +52,21 @@ export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): Nod
     }),
   ];
 
+  // Build span processors: sanitize + exporter + any custom ones.
+  // NOTE: When spanProcessors is provided, NodeSDK ignores traceExporter.
+  // We must wrap the exporter in a BatchSpanProcessor ourselves.
+  const spanProcessors: SpanProcessor[] = [
+    new SanitizeSpanProcessor(),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exporter types are overly strict
+    new BatchSpanProcessor(traceExporter as any),
+    ...(opts?.spanProcessors ?? []),
+  ];
+
   return new NodeSDK({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NodeSDK constructor types are overly strict for custom exporters
-    traceExporter: traceExporter as any,
     resource,
     instrumentations,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NodeSDK expects specific SpanProcessor array type
-    spanProcessors: [new SanitizeSpanProcessor(), ...(opts?.spanProcessors ?? [])] as any,
+    spanProcessors: spanProcessors as any,
   });
 }
 // --- END CUSTOM ---

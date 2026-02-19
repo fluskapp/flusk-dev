@@ -151,11 +151,12 @@ function spawnChild(
   const wrapperPath = resolve(process.env.HOME ?? '~', '.flusk', '_analyze-wrapper.mjs');
   mkdirSync(resolve(process.env.HOME ?? '~', '.flusk'), { recursive: true });
   writeFileSync(wrapperPath, [
-    `const { sdk } = await import('${safeOtelRegister}');`,
+    `const { sdk, ready } = await import('${safeOtelRegister}');`,
+    `// Wait for async OpenAI monkey-patches to be applied before loading user script`,
+    `if (ready) await ready;`,
     `await import('${safeScriptPath}');`,
-    `// Wait briefly for any pending async operations, then flush OTel spans`,
-    `await new Promise(r => setTimeout(r, 500));`,
-    `if (sdk) await sdk.shutdown();`,
+    `// Flush OTel BatchSpanProcessor — shutdown() calls forceFlush() internally`,
+    `if (sdk) { await sdk.shutdown(); }`,
   ].join('\n'));
 
   // Run from otel package dir so pnpm workspace deps (@opentelemetry/*) resolve correctly

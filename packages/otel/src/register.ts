@@ -17,6 +17,7 @@ import { patchOpenAI } from './instrumentations/openai-v6.js';
 const logger = getLogger().child({ module: 'otel-register' });
 
 let sdk: ReturnType<typeof createSdk> | undefined;
+let ready: Promise<void> = Promise.resolve();
 
 try {
   const config = loadConfig();
@@ -25,8 +26,8 @@ try {
   sdk = createSdk(config);
   sdk.start();
 
-  // Patch OpenAI SDK v6 for GenAI span attributes
-  patchOpenAI();
+  // Patch OpenAI SDK v6 for GenAI span attributes (returns a promise)
+  ready = patchOpenAI();
 
   // Async flame setup runs in background after SDK is already active
   setupAutoFlame().then((spanProcessors) => {
@@ -50,5 +51,5 @@ try {
   logger.error({ err }, 'Flusk OTel initialization failed — instrumentation is disabled');
 }
 
-export { sdk };
+export { sdk, ready };
 // --- END CUSTOM ---
