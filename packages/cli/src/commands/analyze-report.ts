@@ -59,7 +59,7 @@ function fmt(n: number): string {
 }
 
 function usd(n: number): string {
-  return `$${n.toFixed(2)}`;
+  return n < 0.01 ? `$${n.toFixed(4)}` : `$${n.toFixed(2)}`;
 }
 
 function truncate(s: string, max = 50): string {

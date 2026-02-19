@@ -5,7 +5,8 @@
 import '../packages/otel/src/register.js';
 await new Promise(r => setTimeout(r, 500));
 await import('./demo-anthropic.js');
-// Give exporters time to flush
-await new Promise(r => setTimeout(r, 3000));
-console.log('\n✅ Traces flushed. Check Grafana Cloud.');
+// Wait for BatchSpanProcessor to flush (default scheduledDelayMillis = 5000)
+console.log('\nWaiting for span export...');
+await new Promise(r => setTimeout(r, 7000));
+console.log('✅ Traces flushed. Check Grafana Cloud.');
 process.exit(0);

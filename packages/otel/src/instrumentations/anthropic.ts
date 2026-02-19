@@ -32,6 +32,12 @@ function patchMethod(Sdk: any): void {
       async (span) => {
         span.setAttribute('gen_ai.system', 'anthropic');
         span.setAttribute('gen_ai.request.model', model);
+        // Capture prompt content
+        if (body?.messages?.length) {
+          const lastMsg = body.messages[body.messages.length - 1];
+          const content = typeof lastMsg?.content === 'string' ? lastMsg.content : JSON.stringify(lastMsg?.content ?? '');
+          span.setAttribute('gen_ai.prompt', content);
+        }
         try {
           const result = await original.call(this, body, opts);
           if (body?.stream && result?.[Symbol.asyncIterator]) {
@@ -77,5 +83,10 @@ function setResponseAttrs(span: any, result: any): void {
   if (u) {
     span.setAttribute('gen_ai.usage.input_tokens', u.input_tokens ?? u.prompt_tokens ?? 0);
     span.setAttribute('gen_ai.usage.output_tokens', u.output_tokens ?? u.completion_tokens ?? 0);
+  }
+  // Capture completion text
+  if (result?.content?.length) {
+    const text = result.content.map((b: any) => b.type === 'text' ? b.text : '').join('');
+    if (text) span.setAttribute('gen_ai.completion', text);
   }
 }

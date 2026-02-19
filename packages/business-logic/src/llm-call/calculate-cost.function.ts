@@ -94,7 +94,12 @@ export function calculateCost(input: CalculateCostInput): CalculateCostOutput {
   // Strip date suffixes from versioned model names (e.g., gpt-4o-2024-08-06 → gpt-4o)
   let modelKey = input.modelName;
   if (!(modelKey in pricing)) {
-    modelKey = modelKey.replace(/-\d{4}-\d{2}-\d{2}$/, '');
+    modelKey = modelKey.replace(/-\d{8}$/, '');
+  }
+  // Normalize Anthropic model names: claude-sonnet-4 → claude-4-sonnet, claude-haiku-3.5 → claude-3.5-haiku, etc.
+  if (!(modelKey in pricing)) {
+    const m = modelKey.match(/^claude-(\w+)-(\d+(?:\.\d+)?)$/);
+    if (m) modelKey = `claude-${m[2]}-${m[1]}`;
   }
   if (!(modelKey in pricing)) {
     return { costUsd: 0 };
