@@ -1,6 +1,6 @@
 {
   "name": "@flusk/business-logic",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "main": "./src/index.ts",
   "files": [

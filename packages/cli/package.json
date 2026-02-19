@@ -1,6 +1,6 @@
 {
   "name": "@flusk/cli",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "type": "module",
   "description": "Code generator CLI for Flusk platform",
   "main": "./src/index.ts",

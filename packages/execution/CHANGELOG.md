@@ -1,5 +1,31 @@
 # @flusk/execution
 
+## 0.1.5
+
+### Patch Changes
+
+- ### Highlights
+
+  - **`flusk explain`** — AI-powered cost analysis with actionable insights
+  - **GitHub Action** — Automated PR cost comments via `@flusk/action`
+  - **3 new generators** — `command`, `prompt`, `action` for rapid scaffolding
+  - **Azure OpenAI + Cohere providers** — 15 models total
+  - **Python package** — `flusk-py` generated from same YAML schemas
+  - **PyPI Trusted Publisher** — credential-free publishing via GitHub OIDC
+
+  ### Fixes
+
+  - OTel register path resolution for src/ and dist/ layouts
+  - Generator audit — regenerated missing files and fixed markers
+  - Flushed OTel spans before child process exit
+
+- Updated dependencies
+  - @flusk/entities@0.2.1
+  - @flusk/types@0.2.1
+  - @flusk/resources@0.2.3
+  - @flusk/business-logic@0.1.5
+  - @flusk/logger@0.1.3
+
 ## 0.1.4
 
 ### Patch Changes
