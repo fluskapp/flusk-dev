@@ -27,6 +27,7 @@ const PRICING = {
     'claude-3-opus': { input: 15.0, output: 75.0 },
     'claude-3.5-sonnet': { input: 3.0, output: 15.0 },
     'claude-3-haiku': { input: 0.25, output: 1.25 },
+    'claude-3-5-haiku': { input: 1.0, output: 5.0 },
     'claude-4-opus': { input: 15.0, output: 75.0 },
     'claude-4-sonnet': { input: 3.0, output: 15.0 },
     'claude-4-haiku': { input: 0.5, output: 2.5 },
