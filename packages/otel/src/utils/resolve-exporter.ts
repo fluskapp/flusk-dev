@@ -45,7 +45,7 @@ export function resolveExporter(config: FluskOtelConfig): SpanExporter {
   if (!config.exportTargets?.length) return primary;
 
   const platformExporters = config.exportTargets.map((t) =>
-    createOtlpExporter({ platform: t.platform, endpoint: t.endpoint, apiKey: t.apiKey }),
+    createOtlpExporter({ platform: t.platform, endpoint: t.endpoint, apiKey: t.apiKey, instanceId: t.instanceId }),
   );
   log.info(`Multi-export: primary + ${platformExporters.length} platform target(s)`);
   return new MultiSpanExporter([primary, ...platformExporters]);

@@ -18,12 +18,13 @@ export interface OtlpExporterConfig {
   platform: OtlpPlatform;
   endpoint?: string;
   apiKey?: string;
+  instanceId?: string;
   headers?: Record<string, string>;
 }
 
 const PLATFORM_DEFAULTS: Record<OtlpPlatform, { endpoint: string; authHeader: string }> = {
   grafana: {
-    endpoint: 'https://tempo-us-central1.grafana.net/tempo',
+    endpoint: 'https://otlp-gateway-prod-us-east-0.grafana.net/otlp',
     authHeader: 'Authorization',
   },
   datadog: {
@@ -47,14 +48,20 @@ export function createOtlpExporter(config: OtlpExporterConfig): SpanExporter {
   const headers: Record<string, string> = { ...config.headers };
   if (config.apiKey) {
     if (config.platform === 'grafana') {
-      headers[defaults.authHeader] = `Basic ${Buffer.from(config.apiKey).toString('base64')}`;
+      // Grafana Cloud OTLP uses Basic auth: base64(instanceId:token)
+      // instanceId can be passed via config or extracted from endpoint
+      const instanceId = config.instanceId || '';
+      const credentials = instanceId ? `${instanceId}:${config.apiKey}` : config.apiKey;
+      headers[defaults.authHeader] = `Basic ${Buffer.from(credentials).toString('base64')}`;
     } else {
       headers[defaults.authHeader] = config.apiKey;
     }
   }
 
   log.info(`OTLP exporter: ${config.platform} → ${endpoint}`);
-  return new OTLPTraceExporter({ url: endpoint, headers }) as unknown as SpanExporter;
+  log.debug(`OTLP headers: ${JSON.stringify(Object.keys(headers))}`);
+  const url = endpoint.endsWith('/v1/traces') ? endpoint : `${endpoint}/v1/traces`;
+  return new OTLPTraceExporter({ url, headers, timeoutMillis: 10000 }) as unknown as SpanExporter;
 }
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---

@@ -10,6 +10,7 @@ export interface FluskExportTarget {
   platform: 'grafana' | 'datadog' | 'newrelic' | 'custom';
   endpoint?: string;
   apiKey?: string;
+  instanceId?: string;
 }
 
 export interface FluskOtelConfig {
@@ -53,6 +54,7 @@ function parseExportTargets(): FluskExportTarget[] {
       platform: platform as FluskExportTarget['platform'],
       endpoint: process.env[`FLUSK_${key}_ENDPOINT`],
       apiKey: process.env[`FLUSK_${key}_API_KEY`],
+      instanceId: process.env[`FLUSK_${key}_INSTANCE_ID`],
     };
   });
 }
