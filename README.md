@@ -226,7 +226,11 @@ flusk report --compare customer-support content-writer
 ### Observability Integrations
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/export-integration.png" alt="Export & Integrations" width="720" />
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/grafana-dashboard.png" alt="Flusk Grafana Dashboard — LLM Cost Observatory" width="720" />
+</p>
+
+<p align="center">
+  <em>Real Grafana dashboard showing 6 Anthropic API calls across Claude Sonnet 4 & Haiku 3.5 — with cost calculation, latency breakdown, and model distribution.</em>
 </p>
 
 Export LLM cost data to your existing observability stack. All integrations use standard OTLP — no vendor lock-in.
@@ -256,6 +260,22 @@ flusk export list                           # Show active targets
 ```
 
 > **Multi-export:** Flusk always writes to local SQLite AND your configured platforms in parallel. You never lose local data.
+
+<details>
+<summary><strong>See real Grafana Cloud traces</strong></summary>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/adirbenyossef/flusk-dev/main/docs/assets/grafana-traces-list.png" alt="Grafana Tempo Traces" width="720" />
+</p>
+
+Every LLM call becomes an OpenTelemetry span with full GenAI semantic attributes:
+- `gen_ai.system` — provider (anthropic, openai, etc.)
+- `gen_ai.request.model` — model name
+- `gen_ai.prompt` — input prompt text
+- `gen_ai.completion` — output completion text
+- `gen_ai.usage.input_tokens` / `gen_ai.usage.output_tokens` — token counts
+
+</details>
 
 ## API Reference
 
