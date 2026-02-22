@@ -56,16 +56,31 @@ export class WebhookClient {
     this.url = url;
   }
 
-  async send(payload: WebhookPayload): Promise<void> {
-    try {
-      await request(this.url, {
-        method: 'POST' as const,
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      log.info({ url: this.url.slice(0, 40) + '...' }, 'Webhook sent');
-    } catch (err) {
-      log.error({ error: err }, 'Webhook failed');
+  async send(payload: WebhookPayload, retries = 3): Promise<void> {
+    for (let attempt = 1; attempt <= retries; attempt++) {
+      try {
+        const res = await request(this.url, {
+          method: 'POST' as const,
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (res.statusCode >= 400) {
+          const errMsg = `HTTP ${res.statusCode}`;
+          log.warn({ url: this.url.slice(0, 40), attempt, status: res.statusCode }, `Webhook response error: ${errMsg}`);
+          if (attempt < retries && res.statusCode >= 500) {
+            await new Promise((r) => setTimeout(r, attempt * 1000));
+            continue;
+          }
+          throw new Error(errMsg);
+        }
+        log.info({ url: this.url.slice(0, 40) + '...' }, 'Webhook sent');
+        return;
+      } catch (err) {
+        log.error({ error: err, attempt, url: this.url.slice(0, 40) }, `Webhook failed (attempt ${attempt}/${retries})`);
+        if (attempt < retries) {
+          await new Promise((r) => setTimeout(r, attempt * 1000));
+        }
+      }
     }
   }
 
