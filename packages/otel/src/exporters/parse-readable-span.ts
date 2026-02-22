@@ -5,10 +5,13 @@
 
 // --- BEGIN GENERATED ---
 import type { ReadableSpan } from '@opentelemetry/sdk-trace-base';
+import { SpanStatusCode } from '@opentelemetry/api';
 import { createHash } from 'node:crypto';
 import { llmCall } from '@flusk/business-logic';
+import { createLogger } from '@flusk/logger';
 
 const { calculateCost } = llmCall;
+const log = createLogger({ name: 'parse-span' });
 const GENAI_PREFIX = 'gen_ai.';
 // --- END GENERATED ---
 
@@ -65,7 +68,9 @@ function parseGenAiSpan(span: ReadableSpan): Record<string, unknown> | null {
   const output = getNumAttr(span, 'gen_ai.usage.output_tokens');
   const tokens = { input, output, total: input + output };
   const promptHash = createHash('sha256').update(prompt).digest('hex');
-  const { costUsd } = calculateCost({ providerName: provider, modelName: model, tokenUsage: tokens });
+  const result = calculateCost({ providerName: provider, modelName: model, tokenUsage: tokens });
+  if (result.warning) log.warn(result.warning);
+  const isError = span.status.code === SpanStatusCode.ERROR;
 
   return {
     provider,
@@ -73,9 +78,11 @@ function parseGenAiSpan(span: ReadableSpan): Record<string, unknown> | null {
     prompt,
     promptHash,
     tokens,
-    cost: costUsd,
+    cost: result.costUsd ?? 0,
     response: getAttr(span, 'gen_ai.completion'),
     cached: false,
+    status: isError ? 'error' : 'ok',
+    errorMessage: isError ? (span.status.message ?? '') : '',
     organizationId: process.env['FLUSK_AGENT'] || 'default',
     consentGiven: true,
     consentPurpose: 'optimization',
@@ -142,7 +149,9 @@ function parseHttpLlmSpan(span: ReadableSpan): Record<string, unknown> | null {
 
   const tokens = { input: inputTokens, output: outputTokens, total: inputTokens + outputTokens };
   const promptHash = createHash('sha256').update(prompt).digest('hex');
-  const { costUsd } = calculateCost({ providerName: provider, modelName: model, tokenUsage: tokens });
+  const result = calculateCost({ providerName: provider, modelName: model, tokenUsage: tokens });
+  if (result.warning) log.warn(result.warning);
+  const isError = span.status.code === SpanStatusCode.ERROR;
 
   return {
     provider,
@@ -150,9 +159,11 @@ function parseHttpLlmSpan(span: ReadableSpan): Record<string, unknown> | null {
     prompt,
     promptHash,
     tokens,
-    cost: costUsd,
+    cost: result.costUsd ?? 0,
     response,
     cached: false,
+    status: isError ? 'error' : 'ok',
+    errorMessage: isError ? (span.status.message ?? '') : '',
     organizationId: process.env['FLUSK_AGENT'] || 'default',
     consentGiven: true,
     consentPurpose: 'optimization',
