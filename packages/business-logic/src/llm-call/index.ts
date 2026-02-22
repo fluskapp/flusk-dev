@@ -17,4 +17,5 @@ export {
 
 // --- BEGIN CUSTOM ---
 export { normalizePromptHash, normalizeText } from './normalize-prompt-hash.function.js';
+export { aggregateTokenTrends } from './token-usage-trends.function.js';
 // --- END CUSTOM ---
