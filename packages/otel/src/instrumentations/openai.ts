@@ -42,7 +42,8 @@ function patchMethod(Sdk: any): void {
           span.end();
           return result;
         } catch (err: any) {
-          span.setStatus({ code: SpanStatusCode.ERROR, message: err?.message });
+          const msg = (err?.message || '').replace(/sk-[a-zA-Z0-9_-]{10,}/g, '[REDACTED]');
+          span.setStatus({ code: SpanStatusCode.ERROR, message: msg });
           span.end();
           throw err;
         }

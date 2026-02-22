@@ -89,6 +89,13 @@ export async function createApp(
   app.setErrorHandler(errorHandler);
 
   if (cors) {
+    // Validate CORS origins are proper URLs
+    const origins = Array.isArray(cors.origin) ? cors.origin : [cors.origin];
+    for (const o of origins) {
+      if (typeof o === 'string' && o !== '*' && !o.startsWith('http://') && !o.startsWith('https://')) {
+        throw new Error(`Invalid CORS origin: "${o}" — must start with http:// or https://`);
+      }
+    }
     await app.register(import('@fastify/cors'), {
       origin: cors.origin,
       credentials: cors.credentials ?? false,

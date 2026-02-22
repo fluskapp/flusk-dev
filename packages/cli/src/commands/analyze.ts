@@ -179,7 +179,8 @@ function waitForCompletion(
     };
     child.on('exit', (code) => cleanup(code ?? 1));
     child.on('error', () => cleanup(1));
-    if (duration > 0) timer = setTimeout(() => { child.kill('SIGTERM'); }, duration * 1000);
+    const maxTimeout = duration > 0 ? duration : Number(process.env.FLUSK_ANALYZE_TIMEOUT || 3600);
+    timer = setTimeout(() => { child.kill('SIGTERM'); }, maxTimeout * 1000);
     process.on('SIGINT', sigintHandler);
   });
 }

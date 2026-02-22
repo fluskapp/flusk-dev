@@ -107,8 +107,8 @@ export async function calculateCostHook(
     response: body.response,
     cached: false,
     organizationId: request.organizationId || 'default',
-    consentGiven: true,
-    consentPurpose: 'optimization',
+    consentGiven: process.env.FLUSK_CONSENT_GIVEN !== 'false',
+    consentPurpose: process.env.FLUSK_CONSENT_PURPOSE || 'optimization',
   };
 }
 

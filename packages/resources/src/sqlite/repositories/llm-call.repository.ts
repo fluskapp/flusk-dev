@@ -73,8 +73,14 @@ export function listLLMCalls(db: DatabaseSync, limit = 50, offset = 0): LLMCallE
   return (stmt.all(limit, offset) as Record<string, unknown>[]).map(rowToEntity);
 }
 
+const UPDATABLE_COLUMNS = new Set([
+  'provider', 'model', 'prompt', 'promptHash', 'tokens', 'cost', 'response',
+  'cached', 'agentLabel', 'organizationId', 'consentGiven', 'consentPurpose',
+  'sessionId', 'status', 'errorMessage', 'costUsd',
+]);
+
 export function updateLLMCall(db: DatabaseSync, id: string, data: UpdateLLMCallInput): LLMCallEntity | null {
-  const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
+  const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined && UPDATABLE_COLUMNS.has(k));
   if (keys.length === 0) return findLLMCallById(db, id);
   const sets = keys.map((k) => `${toSnake(k)} = ?`).join(', ');
   const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));

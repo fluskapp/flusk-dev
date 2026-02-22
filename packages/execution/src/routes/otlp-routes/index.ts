@@ -14,6 +14,15 @@ import { otlpAuthHook } from '../../middleware/auth.middleware.js';
 export async function otlpRoutes(app: FastifyInstance): Promise<void> {
   registerProtoParser(app);
 
+  // Body size limit for OTLP ingestion (default 5MB)
+  app.addHook('onRequest', async (request, reply) => {
+    const maxBody = Number(process.env.FLUSK_OTLP_MAX_BODY_MB || 5) * 1024 * 1024;
+    const contentLength = Number(request.headers['content-length'] || 0);
+    if (contentLength > maxBody) {
+      return reply.status(413).send({ error: 'Payload too large' });
+    }
+  });
+
   await app.register(import('@fastify/rate-limit'), {
     max: 1000,
     timeWindow: '1 minute',

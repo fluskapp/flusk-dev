@@ -53,8 +53,8 @@ export function mapSpanToLlmCall(parsed: ParsedLlmCall): MappedLlmCall {
     response: parsed.response,
     cached: false,
     organizationId: 'default',
-    consentGiven: true,
-    consentPurpose: 'optimization',
+    consentGiven: process.env.FLUSK_CONSENT_GIVEN !== 'false',
+    consentPurpose: process.env.FLUSK_CONSENT_PURPOSE || 'optimization',
   };
 }
 // --- END CUSTOM ---
