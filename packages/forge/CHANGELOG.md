@@ -1,5 +1,15 @@
 # @flusk/forge
 
+## 0.3.1
+
+### Patch Changes
+
+- Function registry with YAML-driven pure functions, app manifest with generate-all and validate-manifest commands, architecture map visualization, and lint fixes.
+- Updated dependencies
+  - @flusk/resources@0.2.4
+  - @flusk/entities@0.2.2
+  - @flusk/execution@0.1.6
+
 ## 0.3.0
 
 ### Minor Changes

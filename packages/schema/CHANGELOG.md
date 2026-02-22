@@ -1,5 +1,11 @@
 # @flusk/schema
 
+## 0.1.5
+
+### Patch Changes
+
+- Function registry with YAML-driven pure functions, app manifest with generate-all and validate-manifest commands, architecture map visualization, and lint fixes.
+
 ## 0.1.4
 
 ### Patch Changes

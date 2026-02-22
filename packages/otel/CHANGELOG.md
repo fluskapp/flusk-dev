@@ -1,5 +1,14 @@
 # @flusk/otel
 
+## 0.2.4
+
+### Patch Changes
+
+- Function registry with YAML-driven pure functions, app manifest with generate-all and validate-manifest commands, architecture map visualization, and lint fixes.
+- Updated dependencies
+  - @flusk/business-logic@0.1.6
+  - @flusk/resources@0.2.4
+
 ## 0.2.3
 
 ### Patch Changes

@@ -1,5 +1,13 @@
 # @flusk/types
 
+## 0.2.2
+
+### Patch Changes
+
+- Function registry with YAML-driven pure functions, app manifest with generate-all and validate-manifest commands, architecture map visualization, and lint fixes.
+- Updated dependencies
+  - @flusk/entities@0.2.2
+
 ## 0.2.1
 
 ### Patch Changes
