@@ -105,8 +105,10 @@ function parseGenAiSpan(span: ReadableSpan): Record<string, unknown> | null {
     status: isError ? 'error' : 'ok',
     errorMessage: isError ? (span.status.message ?? '') : '',
     organizationId: process.env['FLUSK_AGENT'] || 'default',
-    consentGiven: true,
-    consentPurpose: 'optimization',
+    consentGiven: process.env['FLUSK_CONSENT_GIVEN'] === 'true'
+      || process.env['FLUSK_CONSENT_GIVEN'] === '1'
+      || false,
+    consentPurpose: process.env['FLUSK_CONSENT_PURPOSE'] || 'optimization',
   };
 }
 
@@ -192,8 +194,8 @@ function parseHttpLlmSpan(span: ReadableSpan): Record<string, unknown> | null {
     status: isError ? 'error' : 'ok',
     errorMessage: isError ? (span.status.message ?? '') : '',
     organizationId: process.env['FLUSK_AGENT'] || 'default',
-    consentGiven: true,
-    consentPurpose: 'optimization',
+    consentGiven: process.env['FLUSK_CONSENT_GIVEN'] === 'true' || process.env['FLUSK_CONSENT_GIVEN'] === '1' || false,
+    consentPurpose: process.env['FLUSK_CONSENT_PURPOSE'] || 'optimization',
   };
 }
 
