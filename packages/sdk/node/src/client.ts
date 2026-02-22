@@ -25,10 +25,14 @@ import type {
 export class FluskClient {
   private readonly apiKey: string
   private readonly baseUrl: string
+  private readonly timeoutMs: number
+  private readonly maxRetries: number
 
   constructor(config: FluskClientConfig) {
     this.apiKey = config.apiKey
     this.baseUrl = config.baseUrl || 'https://api.flusk.ai'
+    this.timeoutMs = config.timeoutMs ?? 30_000
+    this.maxRetries = config.maxRetries ?? 3
   }
 
   private authHeaders(extra?: Record<string, string>): Record<string, string> {
@@ -40,12 +44,35 @@ export class FluskClient {
   }
 
   private async fetchOrThrow<T>(url: string, init: RequestInit, label: string): Promise<T> {
-    const response = await fetch(url, init)
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`${label} failed: ${response.status} ${errorText}`)
+    let lastError: Error | undefined
+    for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
+      try {
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), this.timeoutMs)
+        const response = await fetch(url, { ...init, signal: controller.signal })
+        clearTimeout(timer)
+        if (response.status >= 500 && attempt < this.maxRetries) {
+          lastError = new Error(`${label} failed: ${response.status}`)
+          await new Promise((r) => setTimeout(r, Math.min(1000 * 2 ** attempt, 10_000)))
+          continue
+        }
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(`${label} failed: ${response.status} ${errorText}`)
+        }
+        return response.json() as Promise<T>
+      } catch (err) {
+        lastError = err as Error
+        if ((err as Error).name === 'AbortError') {
+          lastError = new Error(`${label} timed out after ${this.timeoutMs}ms`)
+        }
+        if (attempt < this.maxRetries) {
+          await new Promise((r) => setTimeout(r, Math.min(1000 * 2 ** attempt, 10_000)))
+          continue
+        }
+      }
     }
-    return response.json() as Promise<T>
+    throw lastError ?? new Error(`${label} failed after ${this.maxRetries} retries`)
   }
 
   async getSuggestions(organizationId?: string): Promise<ConversionSuggestion[]> {

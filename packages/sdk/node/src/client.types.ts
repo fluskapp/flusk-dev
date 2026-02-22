@@ -7,6 +7,8 @@
 export interface FluskClientConfig {
   apiKey: string
   baseUrl?: string
+  timeoutMs?: number
+  maxRetries?: number
 }
 
 export interface ConversionSuggestion {
