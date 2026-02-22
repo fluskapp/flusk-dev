@@ -13,8 +13,17 @@ export const KEY_LENGTH = 32;
 export const IV_LENGTH = 16;
 export const SALT_LENGTH = 32;
 
+/** scrypt cost parameters (N=2^15, r=8, p=1) — OWASP recommended */
+const SCRYPT_COST = 32768;  // N: CPU/memory cost
+const SCRYPT_BLOCK_SIZE = 8; // r: block size
+const SCRYPT_PARALLELIZATION = 1; // p: parallelization
+
 /** Derive encryption key from password using scrypt */
 export function deriveKey(password: string, salt: Buffer): Buffer {
-  return scryptSync(password, salt, KEY_LENGTH);
+  return scryptSync(password, salt, KEY_LENGTH, {
+    cost: SCRYPT_COST,
+    blockSize: SCRYPT_BLOCK_SIZE,
+    parallelization: SCRYPT_PARALLELIZATION,
+  });
 }
 // --- END CUSTOM ---
