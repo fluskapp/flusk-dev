@@ -16,6 +16,26 @@ const GENAI_PREFIX = 'gen_ai.';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+const MAX_STRING_LENGTH = 100 * 1024; // 100KB
+
+function sanitizeString(val: string): string {
+  return val.length > MAX_STRING_LENGTH ? val.slice(0, MAX_STRING_LENGTH) : val;
+}
+
+function sanitizeTokens(val: number): number {
+  if (!Number.isFinite(val) || val < 0) return 0;
+  return Math.floor(val);
+}
+
+function sanitizeCost(val: number): number {
+  if (!Number.isFinite(val) || val < 0) return 0;
+  return val;
+}
+
+function sanitizeProviderModel(val: string): string {
+  return val.replace(/[^a-zA-Z0-9\-._/]/g, '');
+}
+
 function getAttr(span: ReadableSpan, key: string): string {
   const val = span.attributes[key];
   return typeof val === 'string' ? val : '';
@@ -60,12 +80,13 @@ function detectProviderFromUrl(url: string, userAgent: string): string | null {
  * Try to parse a GenAI-attributed span (from traceloop or native OTel GenAI instrumentation)
  */
 function parseGenAiSpan(span: ReadableSpan): Record<string, unknown> | null {
-  const model = getAttr(span, 'gen_ai.response.model') || getAttr(span, 'gen_ai.request.model');
+  const rawModel = getAttr(span, 'gen_ai.response.model') || getAttr(span, 'gen_ai.request.model');
   const system = getAttr(span, 'gen_ai.system');
-  const provider = detectProvider(model, system);
-  const prompt = getAttr(span, 'gen_ai.prompt');
-  const input = getNumAttr(span, 'gen_ai.usage.input_tokens');
-  const output = getNumAttr(span, 'gen_ai.usage.output_tokens');
+  const model = sanitizeProviderModel(rawModel);
+  const provider = sanitizeProviderModel(detectProvider(rawModel, system));
+  const prompt = sanitizeString(getAttr(span, 'gen_ai.prompt'));
+  const input = sanitizeTokens(getNumAttr(span, 'gen_ai.usage.input_tokens'));
+  const output = sanitizeTokens(getNumAttr(span, 'gen_ai.usage.output_tokens'));
   const tokens = { input, output, total: input + output };
   const promptHash = createHash('sha256').update(prompt).digest('hex');
   const result = calculateCost({ providerName: provider, modelName: model, tokenUsage: tokens });
@@ -78,8 +99,8 @@ function parseGenAiSpan(span: ReadableSpan): Record<string, unknown> | null {
     prompt,
     promptHash,
     tokens,
-    cost: result.costUsd ?? 0,
-    response: getAttr(span, 'gen_ai.completion'),
+    cost: sanitizeCost(result.costUsd ?? 0),
+    response: sanitizeString(getAttr(span, 'gen_ai.completion')),
     cached: false,
     status: isError ? 'error' : 'ok',
     errorMessage: isError ? (span.status.message ?? '') : '',
@@ -147,20 +168,26 @@ function parseHttpLlmSpan(span: ReadableSpan): Record<string, unknown> | null {
     return null;
   }
 
+  const sanitizedModel = sanitizeProviderModel(model);
+  const sanitizedProvider = sanitizeProviderModel(provider);
+  const sanitizedPrompt = sanitizeString(prompt);
+  const sanitizedResponse = sanitizeString(response);
+  inputTokens = sanitizeTokens(inputTokens);
+  outputTokens = sanitizeTokens(outputTokens);
   const tokens = { input: inputTokens, output: outputTokens, total: inputTokens + outputTokens };
-  const promptHash = createHash('sha256').update(prompt).digest('hex');
-  const result = calculateCost({ providerName: provider, modelName: model, tokenUsage: tokens });
+  const promptHash = createHash('sha256').update(sanitizedPrompt).digest('hex');
+  const result = calculateCost({ providerName: sanitizedProvider, modelName: sanitizedModel, tokenUsage: tokens });
   if (result.warning) log.warn(result.warning);
   const isError = span.status.code === SpanStatusCode.ERROR;
 
   return {
-    provider,
-    model,
-    prompt,
+    provider: sanitizedProvider,
+    model: sanitizedModel,
+    prompt: sanitizedPrompt,
     promptHash,
     tokens,
-    cost: result.costUsd ?? 0,
-    response,
+    cost: sanitizeCost(result.costUsd ?? 0),
+    response: sanitizedResponse,
     cached: false,
     status: isError ? 'error' : 'ok',
     errorMessage: isError ? (span.status.message ?? '') : '',

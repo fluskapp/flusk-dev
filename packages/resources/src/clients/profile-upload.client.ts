@@ -9,6 +9,40 @@ import { request } from 'undici';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+const PRIVATE_IP_PATTERNS = [
+  /^127\./,
+  /^10\./,
+  /^172\.(1[6-9]|2\d|3[01])\./,
+  /^192\.168\./,
+  /^169\.254\./,
+  /^0\./,
+];
+
+function validateUploadUrl(rawUrl: string): void {
+  const parsed = new URL(rawUrl);
+  const isDev = process.env['NODE_ENV'] === 'development' || process.env['NODE_ENV'] === 'test';
+
+  // In dev/test, allow any URL (tests use mock servers)
+  if (isDev) return;
+
+  const isLocalhost = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1';
+
+  if (parsed.protocol !== 'https:') {
+    throw new Error(`Upload URL must use HTTPS (got ${parsed.protocol})`);
+  }
+
+  const host = parsed.hostname;
+  if (host === '::1' || host.startsWith('fc') || host.startsWith('fd') || isLocalhost) {
+    throw new Error(`Upload URL blocked: private/reserved address (${host})`);
+  }
+
+  for (const pattern of PRIVATE_IP_PATTERNS) {
+    if (pattern.test(host)) {
+      throw new Error(`Upload URL blocked: private IP range (${host})`);
+    }
+  }
+}
+
 export interface ProfileUploadPayload {
   name: string;
   type: 'cpu' | 'heap';
@@ -36,6 +70,7 @@ export class ProfileUploadClient {
     this.baseUrl = baseUrl
       ?? process.env['FLUSK_API_URL']
       ?? 'http://localhost:3001';
+    validateUploadUrl(this.baseUrl);
   }
 
   async upload(payload: ProfileUploadPayload): Promise<ProfileUploadResult> {

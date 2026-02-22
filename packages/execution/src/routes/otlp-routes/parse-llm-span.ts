@@ -10,6 +10,21 @@ import { llmCall } from '@flusk/business-logic';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+const MAX_STRING_LENGTH = 100 * 1024; // 100KB
+
+function sanitizeString(val: string): string {
+  return val.length > MAX_STRING_LENGTH ? val.slice(0, MAX_STRING_LENGTH) : val;
+}
+
+function sanitizeTokens(val: number): number {
+  if (!Number.isFinite(val) || val < 0) return 0;
+  return Math.floor(val);
+}
+
+function sanitizeProviderModel(val: string): string {
+  return val.replace(/[^a-zA-Z0-9\-._/]/g, '');
+}
+
 const {
   BEDROCK_SYSTEM_VALUES,
   BEDROCK_MODEL_PREFIXES,
@@ -53,17 +68,21 @@ export function parseLlmSpan(span: OtlpSpan): ParsedLlmCall {
   const model = provider === 'bedrock'
     ? normalizBedrockModelId(rawModel)
     : rawModel;
-  const prompt = getStringAttr(attrs, 'gen_ai.prompt');
-  const response = getStringAttr(attrs, 'gen_ai.completion');
+  const prompt = sanitizeString(getStringAttr(attrs, 'gen_ai.prompt'));
+  const response = sanitizeString(getStringAttr(attrs, 'gen_ai.completion'));
+  const safeProvider = sanitizeProviderModel(provider) as Provider;
+  const safeModel = sanitizeProviderModel(model);
+  const safePromptTokens = sanitizeTokens(promptTokens);
+  const safeCompletionTokens = sanitizeTokens(completionTokens);
 
   return {
-    provider,
-    model,
+    provider: safeProvider,
+    model: safeModel,
     prompt,
     response,
-    promptTokens,
-    completionTokens,
-    totalTokens: promptTokens + completionTokens,
+    promptTokens: safePromptTokens,
+    completionTokens: safeCompletionTokens,
+    totalTokens: safePromptTokens + safeCompletionTokens,
     latencyMs: calcLatencyMs(span),
     metadata: {
       traceId: span.traceId,

@@ -78,10 +78,12 @@
   "packageManager": "pnpm@10.26.1",
   "pnpm": {
     "overrides": {
-      "tar": ">=7.5.7",
+      "tar": ">=7.5.8",
       "path-to-regexp": ">=6.3.0",
       "undici": ">=6.23.0",
-      "esbuild": ">=0.25.0"
+      "esbuild": ">=0.25.0",
+      "fast-xml-parser": ">=5.3.6",
+      "minimatch": ">=10.2.1"
     }
   }
 }

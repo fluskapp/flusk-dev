@@ -11,6 +11,39 @@ import { createLogger } from '@flusk/logger';
 // --- BEGIN CUSTOM ---
 const log = createLogger({ name: 'webhook' });
 
+const PRIVATE_IP_PATTERNS = [
+  /^127\./,
+  /^10\./,
+  /^172\.(1[6-9]|2\d|3[01])\./,
+  /^192\.168\./,
+  /^169\.254\./,
+  /^0\./,
+];
+
+function validateWebhookUrl(rawUrl: string): void {
+  const parsed = new URL(rawUrl);
+  const isDev = process.env['NODE_ENV'] === 'development' || process.env['NODE_ENV'] === 'test';
+
+  // In dev/test, allow any URL (tests use mock servers, dev uses localhost)
+  if (isDev) return;
+
+  if (parsed.protocol !== 'https:') {
+    throw new Error(`Webhook URL must use HTTPS (got ${parsed.protocol})`);
+  }
+
+  const host = parsed.hostname;
+  const isLocalhost = host === 'localhost' || host === '127.0.0.1';
+  if (host === '::1' || host.startsWith('fc') || host.startsWith('fd') || isLocalhost) {
+    throw new Error(`Webhook URL blocked: private/reserved address (${host})`);
+  }
+
+  for (const pattern of PRIVATE_IP_PATTERNS) {
+    if (pattern.test(host)) {
+      throw new Error(`Webhook URL blocked: private IP range (${host})`);
+    }
+  }
+}
+
 export interface WebhookPayload {
   text: string;
 }
@@ -19,6 +52,7 @@ export class WebhookClient {
   private url: string;
 
   constructor(url: string) {
+    validateWebhookUrl(url);
     this.url = url;
   }
 
