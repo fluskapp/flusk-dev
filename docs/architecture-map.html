@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flusk Architecture Map</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; overflow: hidden; }
+#app { display: flex; height: 100vh; }
+#sidebar { width: 340px; background: #161b22; border-right: 1px solid #30363d; display: flex; flex-direction: column; z-index: 10; }
+#sidebar-header { padding: 16px; border-bottom: 1px solid #30363d; }
+#sidebar-header h1 { font-size: 18px; color: #58a6ff; margin-bottom: 8px; }
+#search { width: 100%; padding: 8px 12px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; font-size: 14px; outline: none; }
+#search:focus { border-color: #58a6ff; }
+#filters { padding: 12px 16px; border-bottom: 1px solid #30363d; display: flex; flex-wrap: wrap; gap: 6px; }
+.filter-btn { padding: 4px 10px; border-radius: 12px; border: 1px solid #30363d; background: transparent; color: #8b949e; font-size: 11px; cursor: pointer; transition: all 0.2s; }
+.filter-btn.active { color: #fff; border-color: transparent; }
+.filter-btn:hover { opacity: 0.8; }
+#details { flex: 1; overflow-y: auto; padding: 16px; }
+#details h2 { font-size: 16px; margin-bottom: 8px; }
+#details .detail-type { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+#details .detail-section { margin-top: 12px; }
+#details .detail-section h3 { font-size: 13px; color: #8b949e; margin-bottom: 4px; }
+#details .detail-item { font-size: 12px; padding: 2px 0; color: #c9d1d9; font-family: 'SF Mono', 'Fira Code', monospace; }
+#details .connection { padding: 4px 8px; margin: 2px 0; background: #0d1117; border-radius: 4px; font-size: 12px; cursor: pointer; }
+#details .connection:hover { background: #1c2128; }
+#graph-container { flex: 1; position: relative; }
+#controls { position: absolute; top: 12px; right: 12px; display: flex; gap: 6px; z-index: 5; }
+#controls button { padding: 6px 12px; background: #21262d; border: 1px solid #30363d; border-radius: 6px; color: #c9d1d9; cursor: pointer; font-size: 12px; }
+#controls button:hover { background: #30363d; }
+#layout-toggle { position: absolute; bottom: 12px; right: 12px; z-index: 5; }
+#layout-toggle button { padding: 8px 16px; background: #238636; border: none; border-radius: 6px; color: #fff; cursor: pointer; font-size: 13px; }
+#layout-toggle button:hover { background: #2ea043; }
+#stats { position: absolute; bottom: 12px; left: 12px; font-size: 11px; color: #484f58; z-index: 5; }
+svg { width: 100%; height: 100%; }
+.link { stroke-opacity: 0.3; fill: none; }
+.link.highlighted { stroke-opacity: 0.9; stroke-width: 2.5px !important; }
+.node circle { stroke-width: 2px; cursor: pointer; transition: r 0.2s; }
+.node circle:hover { r: 12; }
+.node text { font-size: 10px; fill: #8b949e; pointer-events: none; }
+.node.highlighted circle { stroke: #fff; stroke-width: 3px; }
+.node.highlighted text { fill: #fff; font-weight: 600; }
+.node.dimmed { opacity: 0.15; }
+.link.dimmed { opacity: 0.05; }
+.tooltip { position: absolute; background: #1c2128; border: 1px solid #30363d; border-radius: 6px; padding: 8px 12px; font-size: 12px; pointer-events: none; z-index: 20; max-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+</style>
+</head>
+<body>
+<div id="app">
+<div id="sidebar">
+  <div id="sidebar-header">
+    <h1>🔬 Flusk Architecture</h1>
+    <input id="search" type="text" placeholder="Search nodes..." />
+  </div>
+  <div id="filters"></div>
+  <div id="details">
+    <p style="color:#484f58; font-size:13px;">Click a node to see details</p>
+  </div>
+</div>
+<div id="graph-container">
+  <div id="controls">
+    <button onclick="zoomFit()">Fit</button>
+    <button onclick="resetHighlight()">Reset</button>
+  </div>
+  <div id="layout-toggle">
+    <button onclick="toggleLayout()">Toggle Layout</button>
+  </div>
+  <div id="stats"></div>
+  <svg></svg>
+</div>
+</div>
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────
+const TYPES = {
+  entity:    { color: '#3b82f6', label: 'Entities', emoji: '🟦' },
+  logic:     { color: '#22c55e', label: 'Business Logic', emoji: '🟩' },
+  route:     { color: '#f97316', label: 'Routes', emoji: '🟧' },
+  repo:      { color: '#a855f7', label: 'Repositories', emoji: '🟪' },
+  client:    { color: '#ef4444', label: 'Clients', emoji: '🟥' },
+  command:   { color: '#eab308', label: 'CLI Commands', emoji: '🟨' },
+  tui:       { color: '#e5e7eb', label: 'TUI Screens', emoji: '⬜' },
+  otel:      { color: '#06b6d4', label: 'OTel', emoji: '🩵' },
+};
+
+const nodes = [];
+const links = [];
+const nodeMap = {};
+
+function addNode(id, name, type, details = {}) {
+  if (nodeMap[id]) return;
+  const node = { id, name, type, details, layer: layerOf(type) };
+  nodes.push(node);
+  nodeMap[id] = node;
+}
+function addLink(source, target, label = '') {
+  if (nodeMap[source] && nodeMap[target]) links.push({ source, target, label });
+}
+function layerOf(t) {
+  return { command: 0, tui: 0, route: 1, otel: 1, logic: 2, repo: 3, client: 3, entity: 4 }[t] ?? 2;
+}
+
+// Entities
+const entities = [
+  { name: 'AnalyzeSession', storage: 'sqlite', fields: ['script','durationMs','totalCalls','totalCost'] },
+  { name: 'BudgetAlert', storage: 'sqlite', fields: ['alertType','threshold','actual','model','acknowledged'] },
+  { name: 'Conversion', storage: 'sqlite, postgres', fields: ['patternId','organizationId','conversionType','status','estimatedSavings'] },
+  { name: 'ExplainSession', storage: 'sqlite', fields: ['analyzeSessionId','llmProvider','llmModel','promptTokens','completionTokens'] },
+  { name: 'Insight', storage: 'sqlite', fields: ['sessionId','category','severity','title','description'] },
+  { name: 'LLMCall', storage: 'sqlite', fields: ['provider','model','prompt','promptHash','response','inputTokens','outputTokens','cost','durationMs'] },
+  { name: 'ModelPerformance', storage: 'postgres', fields: ['model','promptCategory','avgQuality','avgLatencyMs'] },
+  { name: 'Optimization', storage: 'postgres', fields: ['organizationId','optimizationType','title','description','estimatedSavingsPerMonth'] },
+  { name: 'Pattern', storage: 'sqlite, postgres', fields: ['organizationId','promptHash','occurrenceCount','firstSeenAt'] },
+  { name: 'PerformancePattern', storage: 'sqlite', fields: ['profileSessionId','pattern','severity','description','suggestion'] },
+  { name: 'ProfileSession', storage: 'sqlite', fields: ['name','profileType','durationMs','totalSamples'] },
+  { name: 'PromptTemplate', storage: 'postgres', fields: ['organizationId','name','description','activeVersionId','variables'] },
+  { name: 'PromptVersion', storage: 'postgres', fields: ['templateId','version','content','metrics','status'] },
+  { name: 'RoutingDecision', storage: 'postgres', fields: ['ruleId','llmCallId','selectedModel','originalModel','reason'] },
+  { name: 'RoutingRule', storage: 'postgres', fields: ['organizationId','name','qualityThreshold','fallbackModel'] },
+  { name: 'Span', storage: 'postgres', fields: ['traceId','parentSpanId','spanType','name','input'] },
+  { name: 'Trace', storage: 'postgres', fields: ['organizationId','name','totalCost','totalTokens','totalLatencyMs'] },
+];
+entities.forEach(e => addNode(`entity:${e.name}`, e.name, 'entity', { storage: e.storage, fields: e.fields }));
+
+// Business Logic domains
+const blDomains = {
+  budget: ['check-budget','check-duplicates','check-per-call'],
+  conversion: ['generate-cache-rule','generate-downgrade','validate-conversion'],
+  explain: ['format-insights','run-explain'],
+  'llm-call': ['calculate-cost','hash-prompt','normalize-provider','validate-llm-call','validate-tokens'],
+  optimization: ['estimate-savings','format-code-snippet','generate-cache-config','generate-model-swap','generate-prompt-dedup','validate-optimization'],
+  pattern: ['calculate-savings','detect-duplicates','detect-similar-groups','validate-pattern'],
+  'profile-session': ['correlate-with-traces','detect-cold-start','detect-hot-path-calls','detect-memory-churn','detect-patterns','detect-serialization-waste','generate-profile-suggestions','parse-flame-markdown','score-suggestions'],
+  'prompt-template': ['render-prompt','validate-prompt-template'],
+  'prompt-version': ['compare-versions','select-ab-variant','should-rollback','validate-prompt-version'],
+  routing: ['calculate-savings','classify-complexity','select-model','should-ab-test'],
+  span: ['validate-span'],
+  trace: ['aggregate-trace-stats','detect-bottleneck','validate-trace'],
+};
+Object.entries(blDomains).forEach(([domain, fns]) => {
+  fns.forEach(fn => addNode(`logic:${domain}/${fn}`, fn, 'logic', { domain, fullName: `${domain}/${fn}` }));
+});
+
+// Routes
+const routes = [
+  { file: 'analyze-session', methods: ['GET','POST'], entity: 'AnalyzeSession' },
+  { file: 'budget-alert', methods: ['GET','POST'], entity: 'BudgetAlert' },
+  { file: 'conversion', methods: ['GET','POST','PATCH'], entity: 'Conversion' },
+  { file: 'llm-call', methods: ['GET','POST'], entity: 'LLMCall' },
+  { file: 'optimization', methods: ['GET','POST'], entity: 'Optimization' },
+  { file: 'pattern', methods: ['GET','POST'], entity: 'Pattern' },
+  { file: 'performance-pattern', methods: ['GET','POST'], entity: 'PerformancePattern' },
+  { file: 'profile-session', methods: ['GET','POST'], entity: 'ProfileSession' },
+  { file: 'prompt-template', methods: ['GET','POST','PUT'], entity: 'PromptTemplate' },
+  { file: 'prompt-version', methods: ['GET','POST'], entity: 'PromptVersion' },
+  { file: 'routing-rule', methods: ['GET','POST','PUT','DELETE'], entity: 'RoutingRule' },
+  { file: 'span', methods: ['GET','POST'], entity: 'Span' },
+  { file: 'trace', methods: ['GET','POST'], entity: 'Trace' },
+  { file: 'health', methods: ['GET'], entity: null },
+  { file: 'cost-events', methods: ['POST'], entity: 'LLMCall' },
+  { file: 'gdpr', methods: ['DELETE'], entity: null },
+  { file: 'similarity', methods: ['POST'], entity: 'Pattern' },
+];
+routes.forEach(r => addNode(`route:${r.file}`, `/${r.file}`, 'route', { methods: r.methods, entity: r.entity }));
+
+// Repositories
+const repos = [
+  { name: 'budget-alert', entity: 'BudgetAlert', fns: ['create','find'] },
+  { name: 'conversion', entity: 'Conversion', fns: ['create','find-by-id','find-by-pattern','find-accepted','find-suggested','update-status','update','delete-by-id'] },
+  { name: 'llm-call', entity: 'LLMCall', fns: ['create','find-by-id','find-by-prompt-hash','find-similar','update-embedding','update','hard-delete'] },
+  { name: 'model-performance', entity: 'ModelPerformance', fns: ['find-by-category','upsert'] },
+  { name: 'optimization', entity: 'Optimization', fns: [] },
+  { name: 'pattern', entity: 'Pattern', fns: ['create','find-by-id','find-by-organization','find-by-prompt-hash','find-many','update-occurrence'] },
+  { name: 'performance-pattern', entity: 'PerformancePattern', fns: ['create','find-by-profile-id','hard-delete','list'] },
+  { name: 'profile-session', entity: 'ProfileSession', fns: ['create','find-by-id','find-by-time-range','hard-delete','list','update'] },
+  { name: 'prompt-template', entity: 'PromptTemplate', fns: ['create','find','update'] },
+  { name: 'prompt-version', entity: 'PromptVersion', fns: ['create','find','update'] },
+  { name: 'routing-decision', entity: 'RoutingDecision', fns: ['create','find-by-rule','get-savings-summary'] },
+  { name: 'routing-rule', entity: 'RoutingRule', fns: ['create','delete-by-id','find-by-id','find-by-organization','update'] },
+  { name: 'span', entity: 'Span', fns: ['create','find'] },
+  { name: 'trace', entity: 'Trace', fns: ['create','find'] },
+];
+repos.forEach(r => addNode(`repo:${r.name}`, `${r.name} repo`, 'repo', { entity: r.entity, functions: r.fns }));
+
+// Clients
+const clients = [
+  { name: 'openai-embedding', desc: 'OpenAI Embedding API' },
+  { name: 'pricing', desc: 'LLM Pricing Service' },
+  { name: 'profile-upload', desc: 'Profile Upload Service' },
+  { name: 'webhook', desc: 'Webhook Delivery' },
+];
+clients.forEach(c => addNode(`client:${c.name}`, c.name, 'client', { description: c.desc }));
+
+// CLI Commands
+const commands = [
+  'analyze','analyze-budget','analyze-receiver','analyze-report','budget','create-entity','dashboard',
+  'explain','export','generate','generate-detector','generate-docker-compose','generate-dockerfile',
+  'generate-entity-from-yaml','generate-entrypoint','generate-env','generate-fastify-plugin',
+  'generate-feature','generate-middleware','generate-migration','generate-otel-hook','generate-package',
+  'generate-plugin','generate-profile','generate-provider','generate-route','generate-service',
+  'generate-sqlite-repo','generate-swagger','generate-test','generate-tui-app','generate-tui-component',
+  'generate-tui-hook','generate-tui-screen','generate-watt','guard','history','init','init-config',
+  'marketing','migrate','profile','profile-compare','profile-list','profile-report','purge',
+  'ratio','recipe','regenerate','report','setup','status','validate','validate-config',
+  'validate-generated','validate-schema','validate-structure','watch',
+];
+commands.forEach(c => addNode(`cmd:${c}`, `flusk ${c}`, 'command', {}));
+
+// TUI Screens
+const tuiScreens = ['budget','history','models','overview','patterns','profile','suggestions','watch-screen'];
+tuiScreens.forEach(s => addNode(`tui:${s}`, `${s} screen`, 'tui', {}));
+
+// OTel
+const otelParts = [
+  { name: 'sqlite-exporter', cat: 'exporter' },
+  { name: 'otlp-exporter', cat: 'exporter' },
+  { name: 'multi-exporter', cat: 'exporter' },
+  { name: 'openai-instr', cat: 'instrumentation' },
+  { name: 'anthropic-instr', cat: 'instrumentation' },
+  { name: 'azure-openai-instr', cat: 'instrumentation' },
+  { name: 'cohere-instr', cat: 'instrumentation' },
+  { name: 'google-instr', cat: 'instrumentation' },
+  { name: 'auto-profile-hook', cat: 'hook' },
+  { name: 'flame-profile-plugin', cat: 'plugin' },
+  { name: 'sanitize-processor', cat: 'processor' },
+];
+otelParts.forEach(o => addNode(`otel:${o.name}`, o.name, 'otel', { category: o.cat }));
+
+// ─── EDGES ──────────────────────────────────────────────────────────
+// Entity ↔ Repo
+repos.forEach(r => {
+  addLink(`repo:${r.name}`, `entity:${r.entity}`, 'stores');
+});
+
+// Route → Entity (via repo) & Route → Logic
+routes.forEach(r => {
+  if (r.entity) {
+    const repoKey = repos.find(rp => rp.entity === r.entity);
+    if (repoKey) addLink(`route:${r.file}`, `repo:${repoKey.name}`, 'reads/writes');
+  }
+  // route → business logic by domain match
+  const domain = r.file.replace('.routes','');
+  Object.entries(blDomains).forEach(([d, fns]) => {
+    if (d === domain || domain.startsWith(d)) {
+      fns.slice(0,2).forEach(fn => addLink(`route:${r.file}`, `logic:${d}/${fn}`, 'uses'));
+    }
+  });
+});
+
+// Business Logic → Entity
+const domainEntityMap = {
+  budget: 'BudgetAlert', conversion: 'Conversion', explain: 'ExplainSession',
+  'llm-call': 'LLMCall', optimization: 'Optimization', pattern: 'Pattern',
+  'profile-session': 'ProfileSession', 'prompt-template': 'PromptTemplate',
+  'prompt-version': 'PromptVersion', routing: 'RoutingRule', span: 'Span', trace: 'Trace',
+};
+Object.entries(blDomains).forEach(([domain, fns]) => {
+  const ent = domainEntityMap[domain];
+  if (ent) fns.forEach(fn => addLink(`logic:${domain}/${fn}`, `entity:${ent}`, 'operates on'));
+});
+
+// CLI → Logic
+const cmdLogicMap = {
+  analyze: ['llm-call/calculate-cost','llm-call/hash-prompt'],
+  budget: ['budget/check-budget','budget/check-duplicates','budget/check-per-call'],
+  'analyze-budget': ['budget/check-budget'],
+  explain: ['explain/run-explain','explain/format-insights'],
+  report: ['llm-call/calculate-cost'],
+  profile: ['profile-session/detect-patterns','profile-session/generate-profile-suggestions'],
+  'profile-report': ['profile-session/parse-flame-markdown','profile-session/score-suggestions'],
+  'profile-compare': ['profile-session/correlate-with-traces'],
+  watch: ['llm-call/calculate-cost','pattern/detect-duplicates'],
+};
+Object.entries(cmdLogicMap).forEach(([cmd, fns]) => {
+  fns.forEach(fn => addLink(`cmd:${cmd}`, `logic:${fn}`, 'invokes'));
+});
+
+// TUI → Entity
+const tuiEntityMap = {
+  budget: 'BudgetAlert', history: 'AnalyzeSession', models: 'ModelPerformance',
+  overview: 'LLMCall', patterns: 'Pattern', profile: 'ProfileSession', suggestions: 'Optimization',
+};
+Object.entries(tuiEntityMap).forEach(([s, e]) => addLink(`tui:${s}`, `entity:${e}`, 'displays'));
+
+// OTel → Entity
+['otel:sqlite-exporter','otel:otlp-exporter'].forEach(o => {
+  addLink(o, 'entity:LLMCall', 'instruments');
+  addLink(o, 'entity:Span', 'instruments');
+  addLink(o, 'entity:Trace', 'instruments');
+});
+
+// Client connections
+addLink('logic:llm-call/calculate-cost', 'client:pricing', 'queries');
+addLink('logic:pattern/detect-similar-groups', 'client:openai-embedding', 'uses');
+addLink('route:similarity', 'client:openai-embedding', 'uses');
+
+// ─── VISUALIZATION ──────────────────────────────────────────────────
+const width = window.innerWidth - 340;
+const height = window.innerHeight;
+let useLayered = true;
+
+const svg = d3.select('svg');
+const g = svg.append('g');
+const zoom = d3.zoom().scaleExtent([0.1, 5]).on('zoom', e => g.attr('transform', e.transform));
+svg.call(zoom);
+
+const linkG = g.append('g').attr('class','links');
+const nodeG = g.append('g').attr('class','nodes');
+
+const simulation = d3.forceSimulation(nodes)
+  .force('link', d3.forceLink(links).id(d => d.id).distance(80).strength(0.3))
+  .force('charge', d3.forceManyBody().strength(-200))
+  .force('center', d3.forceCenter(width/2, height/2))
+  .force('collision', d3.forceCollide(25))
+  .force('y', d3.forceY(d => useLayered ? 100 + d.layer * (height-200)/4 : height/2).strength(useLayered ? 0.3 : 0))
+  .force('x', d3.forceX(width/2).strength(0.05));
+
+const linkEls = linkG.selectAll('line').data(links).join('line')
+  .attr('class','link')
+  .attr('stroke', d => {
+    const st = typeof d.source === 'object' ? d.source.type : nodeMap[d.source]?.type;
+    return TYPES[st]?.color || '#30363d';
+  })
+  .attr('stroke-width', 1);
+
+const nodeEls = nodeG.selectAll('g').data(nodes).join('g').attr('class','node');
+nodeEls.append('circle')
+  .attr('r', d => d.type === 'entity' ? 10 : 7)
+  .attr('fill', d => TYPES[d.type].color)
+  .attr('stroke', d => d3.color(TYPES[d.type].color).darker(0.5));
+nodeEls.append('text')
+  .text(d => d.name)
+  .attr('dx', 14).attr('dy', 4);
+
+nodeEls.call(d3.drag()
+  .on('start', (e,d) => { if(!e.active) simulation.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+  .on('drag', (e,d) => { d.fx=e.x; d.fy=e.y; })
+  .on('end', (e,d) => { if(!e.active) simulation.alphaTarget(0); d.fx=null; d.fy=null; })
+);
+
+// Tooltip
+const tooltip = d3.select('body').append('div').attr('class','tooltip').style('display','none');
+nodeEls.on('mouseover', (e,d) => {
+  tooltip.style('display','block').html(`<strong>${d.name}</strong><br><span style="color:${TYPES[d.type].color}">${TYPES[d.type].label}</span>`);
+}).on('mousemove', e => {
+  tooltip.style('left',(e.pageX+12)+'px').style('top',(e.pageY-12)+'px');
+}).on('mouseout', () => tooltip.style('display','none'));
+
+// Click highlight
+nodeEls.on('click', (e, d) => {
+  e.stopPropagation();
+  highlightNode(d);
+  showDetails(d);
+});
+svg.on('click', () => resetHighlight());
+
+function highlightNode(d) {
+  const connected = new Set([d.id]);
+  links.forEach(l => {
+    const s = typeof l.source === 'object' ? l.source.id : l.source;
+    const t = typeof l.target === 'object' ? l.target.id : l.target;
+    if (s === d.id) connected.add(t);
+    if (t === d.id) connected.add(s);
+  });
+  nodeEls.classed('highlighted', n => n.id === d.id)
+         .classed('dimmed', n => !connected.has(n.id));
+  linkEls.classed('highlighted', l => {
+    const s = typeof l.source === 'object' ? l.source.id : l.source;
+    const t = typeof l.target === 'object' ? l.target.id : l.target;
+    return s === d.id || t === d.id;
+  }).classed('dimmed', l => {
+    const s = typeof l.source === 'object' ? l.source.id : l.source;
+    const t = typeof l.target === 'object' ? l.target.id : l.target;
+    return s !== d.id && t !== d.id;
+  });
+}
+
+function resetHighlight() {
+  nodeEls.classed('highlighted', false).classed('dimmed', false);
+  linkEls.classed('highlighted', false).classed('dimmed', false);
+}
+
+function showDetails(d) {
+  const det = d.details || {};
+  let html = `<div class="detail-type" style="color:${TYPES[d.type].color}">${TYPES[d.type].emoji} ${TYPES[d.type].label}</div>`;
+  html += `<h2>${d.name}</h2>`;
+  if (det.storage) html += `<div class="detail-section"><h3>Storage</h3><div class="detail-item">${det.storage}</div></div>`;
+  if (det.fields) html += `<div class="detail-section"><h3>Fields</h3>${det.fields.map(f=>`<div class="detail-item">• ${f}</div>`).join('')}</div>`;
+  if (det.methods) html += `<div class="detail-section"><h3>Methods</h3><div class="detail-item">${det.methods.join(', ')}</div></div>`;
+  if (det.domain) html += `<div class="detail-section"><h3>Domain</h3><div class="detail-item">${det.domain}</div></div>`;
+  if (det.functions) html += `<div class="detail-section"><h3>Functions</h3>${det.functions.map(f=>`<div class="detail-item">• ${f}</div>`).join('')}</div>`;
+  if (det.category) html += `<div class="detail-section"><h3>Category</h3><div class="detail-item">${det.category}</div></div>`;
+  if (det.description) html += `<div class="detail-section"><h3>Description</h3><div class="detail-item">${det.description}</div></div>`;
+
+  // Connections
+  const conns = [];
+  links.forEach(l => {
+    const s = typeof l.source === 'object' ? l.source : nodeMap[l.source];
+    const t = typeof l.target === 'object' ? l.target : nodeMap[l.target];
+    if (s?.id === d.id) conns.push({ dir: '→', node: t, label: l.label });
+    if (t?.id === d.id) conns.push({ dir: '←', node: s, label: l.label });
+  });
+  if (conns.length) {
+    html += `<div class="detail-section"><h3>Connections (${conns.length})</h3>`;
+    conns.forEach(c => {
+      html += `<div class="connection" onclick="highlightAndShow('${c.node.id}')" style="border-left:3px solid ${TYPES[c.node.type].color}">
+        ${c.dir} ${c.node.name} <span style="color:#484f58">${c.label}</span></div>`;
+    });
+    html += '</div>';
+  }
+  document.getElementById('details').innerHTML = html;
+}
+
+window.highlightAndShow = function(id) {
+  const n = nodeMap[id];
+  if (n) { highlightNode(n); showDetails(n); }
+};
+
+simulation.on('tick', () => {
+  linkEls.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y).attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+  nodeEls.attr('transform', d => `translate(${d.x},${d.y})`);
+});
+
+// Filters
+const filtersEl = document.getElementById('filters');
+const activeFilters = new Set(Object.keys(TYPES));
+Object.entries(TYPES).forEach(([key, val]) => {
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn active';
+  btn.style.backgroundColor = val.color + '33';
+  btn.style.borderColor = val.color;
+  btn.style.color = val.color;
+  btn.textContent = `${val.emoji} ${val.label}`;
+  btn.onclick = () => {
+    if (activeFilters.has(key)) { activeFilters.delete(key); btn.classList.remove('active'); btn.style.opacity='0.4'; }
+    else { activeFilters.add(key); btn.classList.add('active'); btn.style.opacity='1'; }
+    applyFilters();
+  };
+  filtersEl.appendChild(btn);
+});
+
+function applyFilters() {
+  nodeEls.style('display', d => activeFilters.has(d.type) ? null : 'none');
+  linkEls.style('display', l => {
+    const s = typeof l.source === 'object' ? l.source : nodeMap[l.source];
+    const t = typeof l.target === 'object' ? l.target : nodeMap[l.target];
+    return activeFilters.has(s?.type) && activeFilters.has(t?.type) ? null : 'none';
+  });
+}
+
+// Search
+document.getElementById('search').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  if (!q) { resetHighlight(); return; }
+  const matches = new Set();
+  nodes.forEach(n => { if (n.name.toLowerCase().includes(q) || n.id.toLowerCase().includes(q)) matches.add(n.id); });
+  nodeEls.classed('dimmed', n => !matches.has(n.id)).classed('highlighted', n => matches.has(n.id));
+  linkEls.classed('dimmed', true);
+});
+
+function zoomFit() {
+  const bounds = g.node().getBBox();
+  const dx = bounds.width, dy = bounds.height, x = bounds.x, y = bounds.y;
+  const scale = 0.85 / Math.max(dx / width, dy / height);
+  const translate = [width/2 - scale*(x+dx/2), height/2 - scale*(y+dy/2)];
+  svg.transition().duration(750).call(zoom.transform, d3.zoomIdentity.translate(translate[0],translate[1]).scale(scale));
+}
+
+function toggleLayout() {
+  useLayered = !useLayered;
+  simulation.force('y', d3.forceY(d => useLayered ? 100 + d.layer * (height-200)/4 : height/2).strength(useLayered ? 0.3 : 0));
+  simulation.alpha(0.8).restart();
+}
+
+// Stats
+document.getElementById('stats').textContent = `${nodes.length} nodes · ${links.length} edges · ${entities.length} entities · ${Object.values(blDomains).flat().length} functions`;
+
+// Initial fit after settling
+setTimeout(zoomFit, 2000);
+</script>
+</body>
+</html>
