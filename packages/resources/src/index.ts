@@ -5,7 +5,8 @@
 // --- BEGIN GENERATED ---
 // SQLite storage
 export { getDb, closeDb } from './sqlite/connection.js';
-export { runMigrations } from './sqlite/migrations.js';
+export { runMigrations, getSchemaVersion, listAppliedMigrations } from './sqlite/migrations.js';
+export type { MigrationRecord } from './sqlite/migrations.js';
 export * as SqliteLLMCallRepo from './sqlite/repositories/llm-call/index.js';
 export * as SqliteAnalyzeSessionRepo from './sqlite/repositories/analyze-session/index.js';
 export * as SqliteProfileSessionRepo from './sqlite/repositories/profile-session/index.js';

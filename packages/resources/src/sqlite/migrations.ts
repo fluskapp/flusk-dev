@@ -52,4 +52,34 @@ function getSqlFiles(): string[] {
 }
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---
+export interface MigrationRecord {
+  id: number;
+  name: string;
+  applied_at: string;
+}
+
+/**
+ * Get the current schema version (number of applied migrations).
+ */
+export function getSchemaVersion(db: DatabaseSync): number {
+  try {
+    const stmt = db.prepare('SELECT COUNT(*) as count FROM _migrations');
+    const row = stmt.get() as { count: number } | undefined;
+    return row?.count ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
+ * List all applied migrations with timestamps.
+ */
+export function listAppliedMigrations(db: DatabaseSync): MigrationRecord[] {
+  try {
+    const stmt = db.prepare('SELECT id, name, applied_at FROM _migrations ORDER BY id');
+    return stmt.all() as MigrationRecord[];
+  } catch {
+    return [];
+  }
+}
 // --- END CUSTOM ---

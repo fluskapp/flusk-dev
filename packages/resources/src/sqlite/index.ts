@@ -7,7 +7,8 @@
  */
 
 export { getDb, closeDb } from './connection.js';
-export { runMigrations } from './migrations.js';
+export { runMigrations, getSchemaVersion, listAppliedMigrations } from './migrations.js';
+export type { MigrationRecord } from './migrations.js';
 
 export * as SqliteLLMCallRepo from './repositories/llm-call/index.js';
 export * as SqliteAnalyzeSessionRepo from './repositories/analyze-session/index.js';
