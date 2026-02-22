@@ -7,4 +7,8 @@ export { validateConversion } from './validate-conversion.function.js';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+export { generateDowngrade } from './generate-downgrade.function.js';
+export type { GenerateDowngradeInput, GenerateDowngradeOutput, BenchmarkComparison } from './generate-downgrade.function.js';
+export { MODEL_BENCHMARKS, compareBenchmarks } from './model-benchmarks.js';
+export type { ModelBenchmarks } from './model-benchmarks.js';
 // --- END CUSTOM ---

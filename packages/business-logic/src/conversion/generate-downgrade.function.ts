@@ -141,13 +141,16 @@ export function generateDowngrade(input: GenerateDowngradeInput): GenerateDowngr
   const costSavingsPerCall = input.avgCost * downgrade.costReduction;
   const estimatedSavings = callsPerMonth * costSavingsPerCall;
 
+  const benchmarks = compareBenchmarks(input.model, downgrade.toModel);
+
   return {
     config: {
       fromModel: input.model,
       toModel: downgrade.toModel,
       estimatedQualityLoss: downgrade.qualityLoss
     },
-    estimatedSavings: Math.round(estimatedSavings * 100) / 100 // Round to 2 decimals
+    estimatedSavings: Math.round(estimatedSavings * 100) / 100, // Round to 2 decimals
+    benchmarks,
   };
 }
 // --- END CUSTOM ---
