@@ -48,7 +48,11 @@ export async function generateEmbedding(
 
   if (!response.ok) {
     const err = await response.text();
-    throw new Error(`OpenAI embedding failed: ${response.status} - ${err}`);
+    // Sanitize error to strip API keys/tokens before exposing
+    const sanitized = err.replace(/sk-[a-zA-Z0-9_-]{20,}/g, 'sk-***REDACTED***')
+      .replace(/Bearer\s+[a-zA-Z0-9_-]+/gi, 'Bearer ***REDACTED***')
+      .replace(/api[_-]?key["']?\s*[:=]\s*["']?[a-zA-Z0-9_-]{20,}/gi, 'api_key=***REDACTED***');
+    throw new Error(`OpenAI embedding failed: ${response.status} - ${sanitized}`);
   }
 
   const data = (await response.json()) as {
