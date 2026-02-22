@@ -7,11 +7,22 @@
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+import { compareBenchmarks, type ModelBenchmarks } from './model-benchmarks.js';
+
 export interface GenerateDowngradeInput {
   provider: string;
   model: string;
   occurrenceCount: number;
   avgCost: number;
+}
+
+/**
+ * Benchmark comparison included in downgrade suggestions
+ */
+export interface BenchmarkComparison {
+  from: ModelBenchmarks;
+  to: ModelBenchmarks;
+  delta: ModelBenchmarks;
 }
 
 /**
@@ -29,6 +40,7 @@ export interface DowngradeConfig {
 export interface GenerateDowngradeOutput {
   config: DowngradeConfig;
   estimatedSavings: number;
+  benchmarks: BenchmarkComparison | null;
 }
 
 /**
