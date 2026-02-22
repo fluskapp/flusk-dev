@@ -160,8 +160,17 @@ function spawnChild(
   // Create a thin wrapper that loads OTel THEN the user script.
   // Using tsx as runtime ensures TypeScript support and proper module resolution.
   // We avoid node --import because getNodeAutoInstrumentations deadlocks in loader context.
-  const wrapperPath = resolve(process.env.HOME ?? '~', '.flusk', '_analyze-wrapper.mjs');
-  mkdirSync(resolve(process.env.HOME ?? '~', '.flusk'), { recursive: true });
+  const wrapperId = randomBytes(8).toString('hex');
+  const fluskDir = resolve(process.env.HOME ?? '~', '.flusk');
+  mkdirSync(fluskDir, { recursive: true });
+  const wrapperPath = resolve(fluskDir, `_analyze-wrapper-${wrapperId}.mjs`);
+  // Guard against symlink attacks on the wrapper path
+  if (existsSync(wrapperPath)) {
+    const stats = require('node:fs').lstatSync(wrapperPath);
+    if (stats.isSymbolicLink()) {
+      throw new Error(`Wrapper path is a symlink — refusing to write: ${wrapperPath}`);
+    }
+  }
   writeFileSync(wrapperPath, [
     `const { sdk, ready } = await import('${safeOtelRegister}');`,
     `// Wait for async OpenAI monkey-patches to be applied before loading user script`,

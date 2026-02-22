@@ -73,8 +73,17 @@ function spawnWithOtel(
 
   const safePath = scriptPath.replace(/\\/g, '/').replace(/'/g, "\\'");
   const safeOtel = otelRegister.replace(/\\/g, '/').replace(/'/g, "\\'");
-  const wrapperPath = resolve(process.env.HOME ?? '~', '.flusk', '_watch-wrapper.mjs');
-  mkdirSync(resolve(process.env.HOME ?? '~', '.flusk'), { recursive: true });
+  const { randomBytes } = require('node:crypto');
+  const wrapperId = randomBytes(8).toString('hex');
+  const fluskDir = resolve(process.env.HOME ?? '~', '.flusk');
+  mkdirSync(fluskDir, { recursive: true });
+  const wrapperPath = resolve(fluskDir, `_watch-wrapper-${wrapperId}.mjs`);
+  if (existsSync(wrapperPath)) {
+    const stats = require('node:fs').lstatSync(wrapperPath);
+    if (stats.isSymbolicLink()) {
+      throw new Error(`Wrapper path is a symlink — refusing to write: ${wrapperPath}`);
+    }
+  }
   writeFileSync(wrapperPath, [
     `const { sdk, ready } = await import('${safeOtel}');`,
     `if (ready) await ready;`,
