@@ -36,10 +36,15 @@ export const plugin = fp(async (app) => {
 
   const hmac = process.env.HMAC_SECRET || process.env.FLUSK_HMAC_SECRET;
   if (!hmac) {
+    app.log.error('HMAC_SECRET or FLUSK_HMAC_SECRET is not set. Auth middleware will fail.');
     throw new Error(
       'HMAC_SECRET or FLUSK_HMAC_SECRET must be set in server mode. ' +
+      'Auth requires this for token validation. ' +
       'Generate one with: openssl rand -hex 32',
     );
+  }
+  if (hmac.length < 32) {
+    app.log.warn('HMAC_SECRET is shorter than 32 characters — consider using a stronger secret');
   }
 
   if (!process.env.ENCRYPTION_KEY) {
