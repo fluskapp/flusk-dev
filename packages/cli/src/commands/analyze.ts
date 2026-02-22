@@ -187,20 +187,33 @@ function spawnChild(
   });
 }
 
+const KILL_GRACE_MS = 5000;
+
 function waitForCompletion(
   child: ReturnType<typeof spawn>, duration: number,
 ): Promise<number> {
   return new Promise((resolve) => {
     let timer: ReturnType<typeof setTimeout> | undefined;
+    let killTimer: ReturnType<typeof setTimeout> | undefined;
     const sigintHandler = () => { child.kill('SIGTERM'); };
     const cleanup = (code: number) => {
       if (timer) clearTimeout(timer);
+      if (killTimer) clearTimeout(killTimer);
       process.removeListener('SIGINT', sigintHandler);
       resolve(code);
     };
     child.on('exit', (code) => cleanup(code ?? 1));
     child.on('error', () => cleanup(1));
-    if (duration > 0) timer = setTimeout(() => { child.kill('SIGTERM'); }, duration * 1000);
+    if (duration > 0) {
+      timer = setTimeout(() => {
+        log.warn({ duration }, 'Analysis duration exceeded — sending SIGTERM');
+        child.kill('SIGTERM');
+        killTimer = setTimeout(() => {
+          log.warn('Child process did not exit after SIGTERM — sending SIGKILL');
+          child.kill('SIGKILL');
+        }, KILL_GRACE_MS);
+      }, duration * 1000);
+    }
     process.on('SIGINT', sigintHandler);
   });
 }
