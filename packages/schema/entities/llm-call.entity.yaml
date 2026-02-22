@@ -54,6 +54,17 @@ fields:
     description: Whether this response was served from cache
     default: false
 
+  status:
+    type: string
+    required: true
+    description: Call status (ok or error)
+    default: "ok"
+
+  errorMessage:
+    type: string
+    description: Error message if the call failed
+    default: ""
+
   agentLabel:
     type: string
     description: Agent label for multi-agent tracking

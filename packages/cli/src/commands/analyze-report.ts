@@ -7,6 +7,7 @@
  */
 import chalk from 'chalk';
 import type { LLMCallEntity, AnalyzeSessionEntity } from '@flusk/entities';
+import { groupByModel, findDuplicates, fmt, usd, truncate, formatDuration } from './report-helpers.function.js';
 
 export interface ReportData {
   session: AnalyzeSessionEntity;
@@ -22,50 +23,9 @@ export function generateReport(data: ReportData, opts: ReportOptions): string {
   if (opts.format === 'json') return JSON.stringify(data, null, 2);
   return generateMarkdownReport(data, opts.color);
 }
+// --- END GENERATED ---
 
-interface ModelSummary {
-  model: string;
-  calls: number;
-  tokens: number;
-  cost: number;
-}
-
-function groupByModel(calls: LLMCallEntity[]): ModelSummary[] {
-  const map = new Map<string, ModelSummary>();
-  for (const c of calls) {
-    const existing = map.get(c.model) ?? { model: c.model, calls: 0, tokens: 0, cost: 0 };
-    existing.calls++;
-    existing.tokens += ((c.tokens as { total?: number })?.total ?? 0);
-    existing.cost += c.cost;
-    map.set(c.model, existing);
-  }
-  return [...map.values()].sort((a, b) => b.cost - a.cost);
-}
-
-function findDuplicates(calls: LLMCallEntity[]) {
-  const hashMap = new Map<string, LLMCallEntity[]>();
-  for (const c of calls) {
-    const group = hashMap.get(c.promptHash) ?? [];
-    group.push(c);
-    hashMap.set(c.promptHash, group);
-  }
-  return [...hashMap.entries()]
-    .filter(([, v]) => v.length > 1)
-    .sort((a, b) => b[1].length - a[1].length);
-}
-
-function fmt(n: number): string {
-  return n.toLocaleString('en-US');
-}
-
-function usd(n: number): string {
-  return n < 0.01 ? `$${n.toFixed(4)}` : `$${n.toFixed(2)}`;
-}
-
-function truncate(s: string, max = 50): string {
-  return s.length > max ? s.slice(0, max) + '...' : s;
-}
-
+// --- BEGIN CUSTOM ---
 function generateMarkdownReport(data: ReportData, color: boolean): string {
   const { session, calls } = data;
   const identity = (s: string) => s;
@@ -74,15 +34,15 @@ function generateMarkdownReport(data: ReportData, color: boolean): string {
   const yellow = color ? chalk.bold.yellow : identity;
   const green = color ? chalk.bold.green : identity;
   const models = groupByModel(calls);
-  const totalCost = calls.reduce((s, call) => s + call.cost, 0);
-  const totalTokens = calls.reduce((s, call) => s + ((call.tokens as { total?: number })?.total ?? 0), 0);
+  const totalCost = calls.reduce((s, c) => s + c.cost, 0);
+  const totalTokens = calls.reduce((s, c) => s + ((c.tokens as { total?: number })?.total ?? 0), 0);
   const dupes = findDuplicates(calls);
   const lines: string[] = [];
 
   lines.push(cyan('# Flusk Analysis Report'));
   lines.push('');
   lines.push(`${bold('Script')}: ${session.script}`);
-  lines.push(`${bold('Duration')}: ${Math.round(session.durationMs / 1000)}s`);
+  lines.push(`${bold('Duration')}: ${formatDuration(session.durationMs)}`);
   lines.push(`${bold('Date')}: ${session.startedAt}`);
   lines.push('');
   lines.push(yellow('## Cost Summary'));
@@ -93,9 +53,19 @@ function generateMarkdownReport(data: ReportData, color: boolean): string {
   }
   lines.push(`| ${bold('Total')} | ${bold(String(calls.length))} | ${bold(fmt(totalTokens))} | ${bold(usd(totalCost))} |`);
 
+  const failedCalls = calls.filter((c) => (c as Record<string, unknown>).status === 'error');
+  if (failedCalls.length > 0) {
+    const failedCost = failedCalls.reduce((s, c) => s + c.cost, 0);
+    lines.push('', yellow('## Failed Calls'));
+    lines.push(`⚠️  ${failedCalls.length} failed call(s) costing ${usd(failedCost)} (input tokens still billed)`);
+    for (const c of failedCalls.slice(0, 5)) {
+      const msg = (c as Record<string, unknown>).errorMessage || 'unknown error';
+      lines.push(`- \`${c.model}\` — ${usd(c.cost)} — ${truncate(String(msg))}`);
+    }
+  }
+
   if (calls.length > 0) {
-    lines.push('');
-    lines.push(yellow('## Top Expensive Calls'));
+    lines.push('', yellow('## Top Expensive Calls'));
     const top = [...calls].sort((a, b) => b.cost - a.cost).slice(0, 5);
     top.forEach((call, i) => {
       lines.push(`${i + 1}. \`${call.model}\` — "${truncate(call.prompt)}" — ${usd(call.cost)}`);
@@ -106,18 +76,14 @@ function generateMarkdownReport(data: ReportData, color: boolean): string {
     const dupeCost = dupes.reduce((s, [, g]) => s + (g.length - 1) * g[0].cost, 0);
     const dupeCount = dupes.reduce((s, [, g]) => s + g.length, 0);
     const pct = calls.length > 0 ? ((dupeCount / calls.length) * 100).toFixed(0) : '0';
-    lines.push('');
-    lines.push(yellow('## Duplicate Prompts Detected'));
+    lines.push('', yellow('## Duplicate Prompts Detected'));
     lines.push(`⚠️  Found ${dupeCount} duplicate prompts (${pct}% of total calls)`);
     for (const [, group] of dupes.slice(0, 5)) {
       lines.push(`- "${truncate(group[0].prompt)}" sent ${group.length} times → save ${usd((group.length - 1) * group[0].cost)}`);
     }
-    lines.push('');
-    lines.push(green(`## Total Potential Savings: ${usd(dupeCost)}/run (${totalCost > 0 ? ((dupeCost / totalCost) * 100).toFixed(1) : '0'}%)`));
+    lines.push('', green(`## Total Potential Savings: ${usd(dupeCost)}/run (${totalCost > 0 ? ((dupeCost / totalCost) * 100).toFixed(1) : '0'}%)`));
   }
 
   return lines.join('\n');
 }
-// --- END GENERATED ---
-// --- BEGIN CUSTOM ---
 // --- END CUSTOM ---
