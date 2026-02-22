@@ -34,6 +34,7 @@ export function getDb(path?: string): DatabaseSync {
   _db = new DatabaseSync(dbPath);
   _dbPath = dbPath;
   _db.exec('PRAGMA journal_mode=WAL');
+  _db.exec('PRAGMA busy_timeout=5000');
   _db.exec('PRAGMA foreign_keys=ON');
   return _db;
 }
@@ -57,5 +58,27 @@ export function getSecureDb(path?: string): DatabaseSync {
   const db = getDb(path);
   hardenPermissions(path || DB_PATH);
   return db;
+}
+
+/**
+ * Serialize write operations to avoid SQLITE_BUSY under concurrency.
+ * Queues callbacks and executes them sequentially.
+ */
+const writeQueue: Array<() => void> = [];
+let writing = false;
+
+function drainWriteQueue(): void {
+  if (writing || writeQueue.length === 0) return;
+  writing = true;
+  const task = writeQueue.shift()!;
+  try { task(); } finally {
+    writing = false;
+    drainWriteQueue();
+  }
+}
+
+export function serializedWrite(fn: () => void): void {
+  writeQueue.push(fn);
+  drainWriteQueue();
 }
 // --- END CUSTOM ---
