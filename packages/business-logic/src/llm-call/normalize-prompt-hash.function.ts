@@ -30,11 +30,11 @@ const TIMESTAMP_PATTERNS = [
  * and removes timestamps before hashing.
  */
 export function normalizeText(text: string): string {
-  let normalized = text.toLowerCase();
+  let normalized = text;
   for (const pattern of TIMESTAMP_PATTERNS) {
     normalized = normalized.replace(pattern, '<TIMESTAMP>');
   }
-  normalized = normalized.replace(/\s+/g, ' ').trim();
+  normalized = normalized.toLowerCase().replace(/\s+/g, ' ').trim();
   return normalized;
 }
 

@@ -12,12 +12,12 @@ describe('normalizeText', () => {
 
   it('strips ISO timestamps', () => {
     const text = 'Created at 2024-01-15T10:30:00Z by user';
-    expect(normalizeText(text)).toBe('created at <TIMESTAMP> by user');
+    expect(normalizeText(text)).toBe('created at <timestamp> by user');
   });
 
   it('strips unix timestamps', () => {
     const text = 'Event at 1700000000 happened';
-    expect(normalizeText(text)).toBe('event at <TIMESTAMP> happened');
+    expect(normalizeText(text)).toBe('event at <timestamp> happened');
   });
 });
 
