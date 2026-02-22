@@ -6,6 +6,7 @@ import type { DatabaseSync } from 'node:sqlite';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const SQL_DIR = join(__dirname, 'sql');
@@ -19,9 +20,13 @@ export function runMigrations(db: DatabaseSync): void {
     CREATE TABLE IF NOT EXISTS _migrations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL UNIQUE,
+      checksum TEXT,
       applied_at TEXT NOT NULL DEFAULT (datetime('now'))
     )
   `);
+
+  // Add checksum column if upgrading from older schema
+  try { db.exec('ALTER TABLE _migrations ADD COLUMN checksum TEXT'); } catch { /* already exists */ }
 
   const applied = getAppliedMigrations(db);
   const files = getSqlFiles();
@@ -29,8 +34,9 @@ export function runMigrations(db: DatabaseSync): void {
   for (const file of files) {
     if (!applied.has(file)) {
       const sql = readFileSync(join(SQL_DIR, file), 'utf-8');
+      const checksum = createHash('sha256').update(sql).digest('hex').slice(0, 16);
       db.exec(sql);
-      db.prepare('INSERT INTO _migrations (name) VALUES (?)').run(file);
+      db.prepare('INSERT INTO _migrations (name, checksum) VALUES (?, ?)').run(file, checksum);
     }
   }
 }

@@ -13,8 +13,14 @@ export const KEY_LENGTH = 32;
 export const IV_LENGTH = 16;
 export const SALT_LENGTH = 32;
 
-/** Derive encryption key from password using scrypt */
+/** Derive encryption key from password using scrypt with hardened cost params */
+const SCRYPT_COST = Number(process.env.FLUSK_SCRYPT_COST || 16384); // N
+const SCRYPT_BLOCK_SIZE = 8; // r
+const SCRYPT_PARALLELIZATION = 1; // p
+
 export function deriveKey(password: string, salt: Buffer): Buffer {
-  return scryptSync(password, salt, KEY_LENGTH);
+  return scryptSync(password, salt, KEY_LENGTH, {
+    N: SCRYPT_COST, r: SCRYPT_BLOCK_SIZE, p: SCRYPT_PARALLELIZATION,
+  });
 }
 // --- END CUSTOM ---

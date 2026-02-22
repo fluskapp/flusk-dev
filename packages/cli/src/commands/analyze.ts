@@ -14,7 +14,7 @@ import { spawn } from 'node:child_process';
 import { resolve, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { writeFile } from 'node:fs/promises';
-import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { writeFileSync, mkdirSync, existsSync, unlinkSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import { createSqliteStorage } from '@flusk/resources';
 import { startReceiver } from './analyze-receiver.js';
@@ -148,7 +148,8 @@ function spawnChild(
   // Create a thin wrapper that loads OTel THEN the user script.
   // Using tsx as runtime ensures TypeScript support and proper module resolution.
   // We avoid node --import because getNodeAutoInstrumentations deadlocks in loader context.
-  const wrapperPath = resolve(process.env.HOME ?? '~', '.flusk', '_analyze-wrapper.mjs');
+  const rnd = Math.random().toString(36).slice(2, 10);
+  const wrapperPath = resolve(process.env.HOME ?? '~', '.flusk', `_analyze-wrapper-${rnd}.mjs`);
   mkdirSync(resolve(process.env.HOME ?? '~', '.flusk'), { recursive: true });
   writeFileSync(wrapperPath, [
     `const { sdk, ready } = await import('${safeOtelRegister}');`,
@@ -161,9 +162,12 @@ function spawnChild(
 
   // Run from otel package dir so pnpm workspace deps (@opentelemetry/*) resolve correctly
   const otelPkgDir = resolve(otelRegister, '..', '..');
-  return spawn('npx', ['tsx', wrapperPath], {
+  const child = spawn('npx', ['tsx', wrapperPath], {
     stdio: 'inherit', env, cwd: otelPkgDir,
   });
+  // Clean up wrapper file when child exits
+  child.on('exit', () => { try { unlinkSync(wrapperPath); } catch { /* ignore */ } });
+  return child;
 }
 
 function waitForCompletion(

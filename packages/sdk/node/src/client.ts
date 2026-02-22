@@ -40,12 +40,33 @@ export class FluskClient {
   }
 
   private async fetchOrThrow<T>(url: string, init: RequestInit, label: string): Promise<T> {
-    const response = await fetch(url, init)
-    if (!response.ok) {
-      const errorText = await response.text()
-      throw new Error(`${label} failed: ${response.status} ${errorText}`)
+    const maxRetries = 3;
+    const timeoutMs = 30_000;
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), timeoutMs);
+      try {
+        const response = await fetch(url, { ...init, signal: controller.signal });
+        clearTimeout(timer);
+        if (response.status >= 500 && attempt < maxRetries) {
+          await new Promise(r => setTimeout(r, Math.min(1000 * 2 ** attempt, 8000)));
+          continue;
+        }
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`${label} failed: ${response.status} ${errorText}`);
+        }
+        return response.json() as Promise<T>;
+      } catch (err) {
+        clearTimeout(timer);
+        if (attempt < maxRetries && (err instanceof Error && (err.name === 'AbortError' || err.message.includes('fetch')))) {
+          await new Promise(r => setTimeout(r, Math.min(1000 * 2 ** attempt, 8000)));
+          continue;
+        }
+        throw err;
+      }
     }
-    return response.json() as Promise<T>
+    throw new Error(`${label} failed after ${maxRetries} retries`);
   }
 
   async getSuggestions(organizationId?: string): Promise<ConversionSuggestion[]> {
