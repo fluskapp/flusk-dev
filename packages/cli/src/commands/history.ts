@@ -14,8 +14,13 @@ export const historyCommand = new Command('history')
   .description('Show past analyze sessions')
   .option('-l, --limit <n>', 'Number of sessions to show', '20')
   .action((opts) => {
+    const limit = parseInt(opts.limit, 10);
+    if (!Number.isFinite(limit) || limit < 1 || limit > 1000) {
+      console.error(chalk.red('❌ Limit must be between 1 and 1000'));
+      process.exit(1);
+    }
     const storage = createSqliteStorage();
-    const sessions = storage.analyzeSessions.list(parseInt(opts.limit, 10), 0);
+    const sessions = storage.analyzeSessions.list(limit, 0);
 
     if (sessions.length === 0) {
       console.log(chalk.dim('No analyze sessions found. Run `flusk analyze <script>` first.'));

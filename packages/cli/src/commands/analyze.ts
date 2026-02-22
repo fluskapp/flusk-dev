@@ -35,7 +35,19 @@ export const analyzeCommand = new Command('analyze')
   .option('-m, --mode <mode>', 'Export mode (local|server)', 'local')
   .option('--redact', 'Redact prompt/completion text from storage (security)')
   .action(async (script: string, opts) => {
+    if (script.length > 500) {
+      console.error(chalk.red('❌ Script path too long (max 500 characters)'));
+      process.exit(1);
+    }
     const duration = parseInt(opts.duration, 10);
+    if (!Number.isFinite(duration) || duration < 0 || duration > 86400) {
+      console.error(chalk.red('❌ Duration must be between 0 and 86400 seconds'));
+      process.exit(1);
+    }
+    if (opts.agent && opts.agent.length > 100) {
+      console.error(chalk.red('❌ Agent name too long (max 100 characters)'));
+      process.exit(1);
+    }
     const config = await loadConfig();
     const mode = opts.mode as 'local' | 'server';
     const agentLabel = opts.agent || config.agent || process.env.FLUSK_AGENT;
