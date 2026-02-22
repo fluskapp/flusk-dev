@@ -36,10 +36,37 @@ const generateTest: RecipeStep = {
   },
 };
 
+/** Auto-register the command in flusk.ts */
+const registerCommand: RecipeStep = {
+  name: 'register-command',
+  description: 'Register command in packages/cli/bin/flusk.ts',
+  async run(ctx) {
+    const name = ctx.options['name'] as string;
+    const camel = toCamelCase(name);
+    const fluskTs = resolve(ctx.projectRoot, 'packages/cli/bin/flusk.ts');
+    const { readFileSync, writeFileSync } = await import('node:fs');
+    const content = readFileSync(fluskTs, 'utf-8');
+    const importLine = `import { ${camel}Command } from '../src/commands/${name}.js';`;
+    const addLine = `program.addCommand(${camel}Command);`;
+
+    if (content.includes(importLine)) {
+      return { files: [] };
+    }
+
+    // Insert before program.parse()
+    const updated = content.replace(
+      'program.parse(process.argv);',
+      `// ${name} command\n${importLine}\n${addLine}\n\nprogram.parse(process.argv);`,
+    );
+    writeFileSync(fluskTs, updated, 'utf-8');
+    return { files: [fluskTs] };
+  },
+};
+
 export const cliCommandRecipe: Recipe = {
   name: 'cli-command',
   description: 'Generate a CLI command with test file',
-  steps: [generateCommand, generateTest],
+  steps: [generateCommand, generateTest, registerCommand],
 };
 
 function commandTemplate(name: string, description: string): string {
