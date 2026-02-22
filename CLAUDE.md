@@ -145,13 +145,29 @@ pnpm lint       # ESLint
 6. Use `@flusk/logger` for all logging
 7. 2026 tools only — no deprecated APIs
 
-## AI Sub-Agent Mode (YAML-Only)
+## AI Sub-Agent Mode (STRICT)
 
-For entity work, AI agents operate in **YAML-only mode**:
+**Sub-agents have LIMITED file permissions. They may ONLY:**
+1. Edit `packages/schema/entities/*.entity.yaml` files (entity definitions)
+2. Edit `// --- BEGIN CUSTOM ---` sections in existing generated files
+3. Run generator commands (`flusk g:*`, `flusk recipe *`, `flusk regenerate`)
+
+**Sub-agents may NEVER:**
+- Create new `.ts`/`.tsx` files directly
+- Edit `// --- BEGIN GENERATED ---` sections
+- Add `@generated` headers manually (only generators do this)
+- Modify barrel exports (index.ts) — generators handle this
+
+**Workflow for new features:**
+1. Define YAML if entity-related → `packages/schema/entities/`
+2. Run generators: `flusk g:tui-component`, `flusk g:tui-hook`, `flusk g:tui-screen`, `flusk recipe cli-command`, etc.
+3. Fill in CUSTOM sections with business logic
+4. Run `flusk regenerate` if YAML changed
+5. Run `pnpm test && pnpm lint` to verify
+
+**Old instructions (still valid):**
 - Read `docs/generators/agent-instructions.md` for full rules
-- Edit ONLY `packages/schema/entities/*.entity.yaml` files
 - Run `./scripts/yaml-agent.sh generate <yaml>` to produce code
-- NEVER edit `.ts` files directly (except CUSTOM sections)
 - Use `./scripts/yaml-agent.sh diff <yaml>` to preview changes
 
 ## Hard-Won Lessons (from real failures)
