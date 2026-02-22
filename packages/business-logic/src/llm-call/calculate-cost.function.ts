@@ -5,25 +5,26 @@
 // --- BEGIN GENERATED ---
 import type { TokenUsage } from '@flusk/entities';
 import { BEDROCK_PRICING } from './providers/bedrock.pricing.js';
+import { OPENAI_PRICING } from './providers/openai.pricing.js';
+import { ANTHROPIC_PRICING } from './providers/anthropic.pricing.js';
+import { GOOGLE_PRICING } from './providers/google.pricing.js';
+import { DEEPSEEK_PRICING } from './providers/deepseek.pricing.js';
+import { COHERE_PRICING } from './providers/cohere.pricing.js';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-/**
- * Pricing table for LLM providers (USD per 1M tokens)
- * Updated as of February 2026
- */
+/** Pricing table — USD per 1M tokens. Updated February 2026. */
 const PRICING = {
   bedrock: BEDROCK_PRICING,
   openai: {
+    ...OPENAI_PRICING,
     'gpt-4': { input: 30.0, output: 60.0 },
     'gpt-4-turbo': { input: 10.0, output: 30.0 },
-    'gpt-4o': { input: 2.5, output: 10.0 },
-    'gpt-4o-mini': { input: 0.15, output: 0.6 },
     'gpt-4.5': { input: 75.0, output: 150.0 },
     'gpt-3.5-turbo': { input: 0.5, output: 1.5 },
-    'o3-mini': { input: 1.1, output: 4.4 },
   },
   anthropic: {
+    ...ANTHROPIC_PRICING,
     'claude-3-opus': { input: 15.0, output: 75.0 },
     'claude-3.5-sonnet': { input: 3.0, output: 15.0 },
     'claude-3-haiku': { input: 0.25, output: 1.25 },
@@ -32,84 +33,50 @@ const PRICING = {
     'claude-4-sonnet': { input: 3.0, output: 15.0 },
     'claude-4-haiku': { input: 0.5, output: 2.5 },
   },
-  google: {
-    'gemini-2.5-pro': { input: 1.25, output: 10.0 },
-    'gemini-2.5-flash': { input: 0.15, output: 0.6 },
-    'gemini-2.0-flash': { input: 0.1, output: 0.4 },
-  },
-  cohere: {
-    'command': { input: 1.0, output: 2.0 },
-    'command-light': { input: 0.3, output: 0.6 },
-    'command-r': { input: 0.5, output: 1.5 },
-    'command-r-plus': { input: 3.0, output: 15.0 },
-  },
+  google: { ...GOOGLE_PRICING },
+  deepseek: { ...DEEPSEEK_PRICING },
+  cohere: { ...COHERE_PRICING },
 } as const;
 
 type Provider = keyof typeof PRICING;
 type Pricing = { input: number; output: number };
 
-/**
- * Input for calculateCost function
- */
 export interface CalculateCostInput {
   providerName: string;
   modelName: string;
   tokenUsage: TokenUsage;
 }
 
-/**
- * Output from calculateCost function
- */
 export interface CalculateCostOutput {
-  costUsd: number;
+  costUsd: number | null;
+  warning?: string;
 }
 
-/**
- * Calculate LLM API call cost in USD
- *
- * Pure function with hardcoded pricing tables. Deterministic calculation
- * based on provider, model, and token usage.
- *
- * @param input - Provider name, model identifier, and token usage
- * @returns Object containing cost in USD, or 0 if provider/model not found
- *
- * @example
- * ```ts
- * calculateCost({
- *   providerName: 'openai',
- *   modelName: 'gpt-4',
- *   tokenUsage: { input: 1000, output: 500, total: 1500 }
- * })
- * // => { costUsd: 0.06 }
- * ```
- */
+/** Calculate LLM API call cost in USD. Returns null for unknown provider/model. */
 export function calculateCost(input: CalculateCostInput): CalculateCostOutput {
   const providerKey = input.providerName.toLowerCase();
 
   if (!(providerKey in PRICING)) {
-    return { costUsd: 0 };
+    return { costUsd: null, warning: `Unknown provider: ${input.providerName}` };
   }
 
   const pricing = PRICING[providerKey as Provider];
-
-  // Strip date suffixes from versioned model names (e.g., gpt-4o-2024-08-06 → gpt-4o)
   let modelKey = input.modelName;
-  if (!(modelKey in pricing)) {
-    modelKey = modelKey.replace(/-\d{8}$/, '');
-  }
-  // Normalize Anthropic model names: claude-sonnet-4 → claude-4-sonnet, claude-haiku-3.5 → claude-3.5-haiku, etc.
+
+  // Strip date suffixes (e.g., gpt-4o-2024-08-06 → gpt-4o)
+  if (!(modelKey in pricing)) modelKey = modelKey.replace(/-\d{8}$/, '');
+  // Normalize Anthropic names: claude-sonnet-4 → claude-4-sonnet
   if (!(modelKey in pricing)) {
     const m = modelKey.match(/^claude-(\w+)-(\d+(?:\.\d+)?)$/);
     if (m) modelKey = `claude-${m[2]}-${m[1]}`;
   }
   if (!(modelKey in pricing)) {
-    return { costUsd: 0 };
+    return { costUsd: null, warning: `Unknown model: ${input.providerName}/${input.modelName}` };
   }
 
-  const modelPricing = pricing[modelKey as keyof typeof pricing] as Pricing;
-
-  const inputCost = (input.tokenUsage.input / 1_000_000) * modelPricing.input;
-  const outputCost = (input.tokenUsage.output / 1_000_000) * modelPricing.output;
+  const mp = pricing[modelKey as keyof typeof pricing] as Pricing;
+  const inputCost = (input.tokenUsage.input / 1_000_000) * mp.input;
+  const outputCost = (input.tokenUsage.output / 1_000_000) * mp.output;
 
   return { costUsd: inputCost + outputCost };
 }

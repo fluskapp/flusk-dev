@@ -37,22 +37,22 @@ describe('calculateCost', () => {
     expect(result.costUsd).toBeCloseTo(0.09, 6);
   });
 
-  it('returns 0 for unknown provider', () => {
+  it('returns null for unknown provider', () => {
     const result = calculateCost({
       providerName: 'unknown',
       modelName: 'gpt-4',
       tokenUsage: { input: 1000, output: 500, total: 1500 },
     });
-    expect(result.costUsd).toBe(0);
+    expect(result.costUsd).toBeNull();
   });
 
-  it('returns 0 for unknown model', () => {
+  it('returns null for unknown model', () => {
     const result = calculateCost({
       providerName: 'openai',
       modelName: 'gpt-99',
       tokenUsage: { input: 1000, output: 500, total: 1500 },
     });
-    expect(result.costUsd).toBe(0);
+    expect(result.costUsd).toBeNull();
   });
 
   it('is case-insensitive for provider', () => {
