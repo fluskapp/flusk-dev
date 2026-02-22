@@ -21,7 +21,18 @@ async function getApp(): Promise<FastifyInstance> {
   }
 
   const corsOriginRaw = process.env.FLUSK_CORS_ORIGIN || process.env.CORS_ORIGIN || 'http://localhost:3000';
-  const corsOrigin = corsOriginRaw.includes(',') ? corsOriginRaw.split(',').map(s => s.trim()) : corsOriginRaw;
+  const origins = corsOriginRaw.includes(',') ? corsOriginRaw.split(',').map(s => s.trim()) : [corsOriginRaw.trim()];
+  // Validate each origin is a valid URL pattern
+  for (const origin of origins) {
+    if (origin !== '*' && origin !== 'true' && origin !== 'false') {
+      try {
+        new URL(origin);
+      } catch {
+        throw new Error(`Invalid CORS origin: "${origin}". Must be a valid URL (e.g. https://example.com)`);
+      }
+    }
+  }
+  const corsOrigin = origins.length === 1 ? origins[0] : origins;
   const app = await createApp({
     logger: process.env.NODE_ENV !== 'production',
     cors: { origin: corsOrigin, credentials: true },
