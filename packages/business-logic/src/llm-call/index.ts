@@ -16,4 +16,5 @@ export {
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+export { normalizePromptHash, normalizeText } from './normalize-prompt-hash.function.js';
 // --- END CUSTOM ---
