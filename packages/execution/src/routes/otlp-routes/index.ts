@@ -11,7 +11,15 @@ import { registerProtoParser } from './proto-parser.js';
 import { liveFeedRoute } from './live-feed.js';
 import { otlpAuthHook } from '../../middleware/auth.middleware.js';
 
+/** Max request body size for OTLP ingestion (1MB) */
+const MAX_BODY_SIZE = 1 * 1024 * 1024;
+
 export async function otlpRoutes(app: FastifyInstance): Promise<void> {
+  // Enforce body size limit for trace ingestion
+  app.addContentTypeParser('application/json', { parseAs: 'buffer', bodyLimit: MAX_BODY_SIZE }, (_req, body, done) => {
+    try { done(null, JSON.parse(body.toString())); } catch (err) { done(err as Error); }
+  });
+
   registerProtoParser(app);
 
   await app.register(import('@fastify/rate-limit'), {
