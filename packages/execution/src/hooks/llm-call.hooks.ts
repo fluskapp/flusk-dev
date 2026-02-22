@@ -103,7 +103,7 @@ export async function calculateCostHook(
     prompt: body.prompt,
     promptHash: hash,
     tokens: body.tokens,
-    cost: costUsd,
+    cost: costUsd ?? 0,
     response: body.response,
     cached: false,
     organizationId: request.organizationId || 'default',

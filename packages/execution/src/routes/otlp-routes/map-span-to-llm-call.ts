@@ -49,7 +49,7 @@ export function mapSpanToLlmCall(parsed: ParsedLlmCall): MappedLlmCall {
     prompt: parsed.prompt,
     promptHash,
     tokens,
-    cost: costUsd,
+    cost: costUsd ?? 0,
     response: parsed.response,
     cached: false,
     organizationId: 'default',

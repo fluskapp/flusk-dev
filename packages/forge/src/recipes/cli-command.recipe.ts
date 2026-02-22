@@ -59,7 +59,7 @@ const registerCommand: RecipeStep = {
       `// ${name} command\n${importLine}\n${addLine}\n\nprogram.parse(process.argv);`,
     );
     writeFileSync(fluskTs, updated, 'utf-8');
-    return { files: [fluskTs] };
+    return { files: [{ path: fluskTs, action: 'updated' }] };
   },
 };
 
