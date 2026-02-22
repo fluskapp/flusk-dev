@@ -14,4 +14,6 @@ export { useProfiles } from './use-profiles.js';
 export type { UseProfilesResult, ProfileSession, CorrelationData } from './use-profiles.js';
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---
+export { useWatchPolling } from './use-watch-polling.js';
+export type { UseWatchPollingResult } from './use-watch-polling.js';
 // --- END CUSTOM ---

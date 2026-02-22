@@ -16,4 +16,10 @@ export type { Suggestion } from './suggestion-list.js';
 export { LiveFeed } from './live-feed.js';
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---
+export { LiveCostTicker } from './live-cost-ticker.js';
+export type { LiveCostTickerProps } from './live-cost-ticker.js';
+export { CallTable } from './call-table.js';
+export type { CallRow, CallTableProps } from './call-table.js';
+export { RateIndicator } from './rate-indicator.js';
+export type { RateIndicatorProps } from './rate-indicator.js';
 // --- END CUSTOM ---

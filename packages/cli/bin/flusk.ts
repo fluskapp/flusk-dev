@@ -156,6 +156,10 @@ program.addCommand(purgeCommand);
 import { explainCommand } from '../src/commands/explain.js';
 program.addCommand(explainCommand);
 
+// Live watch debugger
+import { watchCommand } from '../src/commands/watch.js';
+program.addCommand(watchCommand);
+
 program.parse(process.argv);
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---

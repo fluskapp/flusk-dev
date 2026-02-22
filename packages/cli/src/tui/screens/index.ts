@@ -15,4 +15,7 @@ export { ModelsScreen } from './models.js';
 export { HistoryScreen } from './history.js';
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---
+export { WatchScreen } from './watch-screen.js';
+export type { WatchScreenProps } from './watch-screen.js';
+export { renderWatchApp } from './watch-app.js';
 // --- END CUSTOM ---
