@@ -56,15 +56,20 @@ export async function errorHandler(
   const isProduction = process.env.NODE_ENV === 'production';
 
   // Build structured error response
+  // In production, never leak internal details for server errors
+  const safeMessage = isProduction
+    ? (statusCode >= 500 ? 'Internal Server Error' : (error.validation ? 'Validation Error' : 'Request Error'))
+    : (error.message || 'Internal Server Error');
+
   const response: ErrorResponse = {
     error: {
-      message: isProduction && statusCode >= 500
-        ? 'Internal Server Error'
-        : (error.message || 'Internal Server Error'),
+      message: safeMessage,
       code: errorCode,
       statusCode,
-      // Include validation details if present (never in production for 500s)
-      ...(error.validation && !(isProduction && statusCode >= 500) && { details: error.validation })
+      // Include validation details only in non-production
+      ...(!isProduction && error.validation && { details: error.validation }),
+      // Include stack trace only in development
+      ...(!isProduction && error.stack && { details: error.stack })
     }
   };
 
