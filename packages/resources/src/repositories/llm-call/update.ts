@@ -16,45 +16,64 @@ import { findById } from './find-by-id.js';
  * @param id - UUID of the LLM call to update
  * @param data - Partial data to update
  */
+/** Allowlist of columns that may be updated */
+const ALLOWED_COLUMNS: Record<string, string> = {
+  provider: 'provider',
+  model: 'model',
+  prompt: 'prompt',
+  promptHash: 'prompt_hash',
+  tokens: 'tokens',
+  cost: 'cost',
+  response: 'response',
+  cached: 'cached',
+};
+
 export async function update(
   pool: Pool,
   id: string,
   data: Partial<Omit<LLMCallEntity, 'id' | 'createdAt' | 'updatedAt'>>
 ): Promise<LLMCallEntity | null> {
+  // Reject any keys not in the allowlist
+  for (const key of Object.keys(data)) {
+    if (!(key in ALLOWED_COLUMNS)) {
+      throw new Error(`Invalid update field: ${key}`);
+    }
+  }
+
   const updates: string[] = [];
   const values: unknown[] = [];
   let paramCount = 1;
 
   if (data.provider !== undefined) {
-    updates.push(`provider = $${paramCount++}`);
+    updates.push(`${ALLOWED_COLUMNS.provider} = $${paramCount++}`);
     values.push(data.provider);
   }
   if (data.model !== undefined) {
-    updates.push(`model = $${paramCount++}`);
+    updates.push(`${ALLOWED_COLUMNS.model} = $${paramCount++}`);
     values.push(data.model);
   }
   if (data.prompt !== undefined) {
-    updates.push(`prompt = $${paramCount++}`);
+    updates.push(`${ALLOWED_COLUMNS.prompt} = $${paramCount++}`);
     values.push(data.prompt);
   }
   if (data.promptHash !== undefined) {
-    updates.push(`prompt_hash = $${paramCount++}`);
+    updates.push(`${ALLOWED_COLUMNS.promptHash} = $${paramCount++}`);
     values.push(data.promptHash);
   }
   if (data.tokens !== undefined) {
-    updates.push(`tokens = $${paramCount++}`);
+    updates.push(`${ALLOWED_COLUMNS.tokens} = $${paramCount++}`);
     values.push(JSON.stringify(data.tokens));
   }
   if (data.cost !== undefined) {
-    updates.push(`cost = $${paramCount++}`);
+    updates.push(`${ALLOWED_COLUMNS.cost} = $${paramCount++}`);
     values.push(data.cost);
   }
   if (data.response !== undefined) {
-    updates.push(`response = $${paramCount++}`);
+    updates.push(`${ALLOWED_COLUMNS.response} = $${paramCount++}`);
     values.push(data.response);
   }
   if (data.cached !== undefined) {
-    updates.push(`cached = $${paramCount++}`);
+    updates.push(`${ALLOWED_COLUMNS.cached} = $${paramCount++}`);
     values.push(data.cached);
   }
 
