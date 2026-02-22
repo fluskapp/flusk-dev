@@ -1,0 +1,66 @@
+# Pipeline: Detect duplicate prompts in a session
+name: duplicateDetection
+namespace: analytics
+description: Find duplicate and near-duplicate prompts by hash and similarity
+package: business-logic
+
+input:
+  calls:
+    type: LLMCallEntity[]
+    description: Array of LLM calls to analyze
+
+output:
+  type: DuplicateReport
+  fields:
+    exactDuplicates: { type: number, description: Number of exact duplicate prompts }
+    nearDuplicates: { type: number, description: Number of near-duplicate prompts }
+    wastedCost: { type: number, description: Estimated cost wasted on duplicates }
+    groups: { type: "DuplicateGroup[]", description: Grouped duplicate prompts }
+
+steps:
+  - id: group-by-hash
+    fn: primitives.collection.groupBy
+    args:
+      items: $input.calls
+      key: promptHash
+    output: hashGroups
+
+  - id: find-exact-dupes
+    expr: |
+      [...$hashGroups.entries()]
+        .filter(([_, items]) => items.length > 1)
+        .map(([hash, items]) => ({
+          hash,
+          count: items.length,
+          model: items[0].model,
+          cost: items.reduce((s, c) => s + (c.costUsd ?? 0), 0),
+          wastedCost: items.slice(1).reduce((s, c) => s + (c.costUsd ?? 0), 0),
+        }))
+    output: exactGroups
+
+  - id: count-exact
+    expr: "$exactGroups.length"
+    output: exactDuplicates
+
+  - id: wasted
+    fn: primitives.math.sum
+    args:
+      items: "$exactGroups.map(g => g.wastedCost)"
+    output: wastedCost
+
+  - id: return
+    value:
+      exactDuplicates: $exactDuplicates
+      nearDuplicates: 0
+      wastedCost: $wastedCost
+      groups: $exactGroups
+
+tests:
+  - name: no duplicates
+    input:
+      calls: []
+    expected:
+      exactDuplicates: 0
+      nearDuplicates: 0
+      wastedCost: 0
+      groups: []

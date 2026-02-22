@@ -82,3 +82,6 @@ export * from './validation/index.js';
 
 // Wizard
 export * from './wizard/index.js';
+
+// Pipeline generator
+export * from './generators/pipeline.generator.js';

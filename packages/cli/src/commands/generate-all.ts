@@ -93,4 +93,24 @@ export const generateAllCommand = new Command('generate-all')
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+import { generateAllPipelines } from '@flusk/forge/generators/pipeline.generator.js';
+
+// Extend generate-all to include pipelines
+const origAction = generateAllCommand._actionHandler;
+generateAllCommand.action(async (options) => {
+  // Run original action first
+  if (origAction) await origAction.call(generateAllCommand, options);
+
+  // Then run pipeline generation
+  const projectRoot = process.cwd();
+  const pipelinesDir = resolve(projectRoot, 'packages/schema/pipelines');
+  console.log(chalk.cyan('  ▶  Running pipelines → pipeline.generator'));
+  try {
+    const result = await generateAllPipelines(pipelinesDir, projectRoot);
+    console.log(chalk.green(`     ✅ ${result.files.length} pipeline files`));
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error(chalk.red(`     ❌ pipelines: ${msg}`));
+  }
+});
 // --- END CUSTOM ---

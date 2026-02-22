@@ -1,0 +1,84 @@
+# Pipeline: Compare model usage and suggest downgrades
+name: modelComparison
+namespace: analytics
+description: Analyze model usage patterns and suggest cost-saving downgrades
+package: business-logic
+
+input:
+  calls:
+    type: LLMCallEntity[]
+    description: Array of LLM calls to analyze
+
+output:
+  type: ModelComparisonResult
+  fields:
+    models: { type: "ModelUsage[]", description: Per-model usage stats }
+    suggestions: { type: "DowngradeSuggestion[]", description: Model downgrade suggestions }
+    potentialSavings: { type: number, description: Total potential savings from downgrades }
+
+steps:
+  - id: group-models
+    fn: primitives.collection.groupBy
+    args:
+      items: $input.calls
+      key: model
+    output: modelGroups
+
+  - id: model-stats
+    expr: |
+      [...$modelGroups.entries()].map(([model, items]) => ({
+        model,
+        count: items.length,
+        totalCost: items.reduce((s, c) => s + (c.costUsd ?? 0), 0),
+        avgTokens: items.reduce((s, c) => s + (c.tokens?.total ?? 0), 0) / items.length,
+        percentage: 0,
+      }))
+    output: rawModels
+
+  - id: total-cost
+    fn: primitives.math.sum
+    args:
+      items: "$rawModels.map(m => m.totalCost)"
+    output: totalCost
+
+  - id: with-percentage
+    expr: |
+      $rawModels.map(m => ({
+        ...m,
+        percentage: $totalCost > 0 ? (m.totalCost / $totalCost) * 100 : 0,
+      }))
+    output: models
+
+  - id: sort-by-cost
+    fn: primitives.collection.sortBy
+    args:
+      items: $models
+      key: totalCost
+      order: desc
+    output: sortedModels
+
+  - id: suggest-downgrades
+    expr: |
+      $sortedModels
+        .filter(m => m.model.includes('gpt-4') && m.avgTokens < 2000)
+        .map(m => ({
+          from: m.model,
+          to: 'gpt-4o-mini',
+          callCount: m.count,
+          currentCost: m.totalCost,
+          estimatedCost: m.totalCost * 0.06,
+          savings: m.totalCost * 0.94,
+        }))
+    output: suggestions
+
+  - id: potential-savings
+    fn: primitives.math.sum
+    args:
+      items: "$suggestions.map(s => s.savings)"
+    output: potentialSavings
+
+  - id: return
+    value:
+      models: $sortedModels
+      suggestions: $suggestions
+      potentialSavings: $potentialSavings

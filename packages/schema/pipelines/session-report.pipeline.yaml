@@ -1,0 +1,61 @@
+# Pipeline: Generate a full analysis report for a session
+name: sessionReport
+namespace: analytics
+description: Compose cost summary, duplicates, and model comparison into a full report
+package: business-logic
+
+input:
+  calls:
+    type: LLMCallEntity[]
+    description: All LLM calls for this session
+  sessionId:
+    type: string
+    description: Session identifier
+
+output:
+  type: SessionReport
+  fields:
+    sessionId: { type: string }
+    costSummary: { type: CostSummary }
+    duplicates: { type: DuplicateReport }
+    modelComparison: { type: ModelComparisonResult }
+    overallScore: { type: number, description: "Health score 0-100" }
+    generatedAt: { type: string }
+
+steps:
+  - id: cost
+    pipeline: costSummary
+    args:
+      calls: $input.calls
+    output: costSummary
+
+  - id: dupes
+    pipeline: duplicateDetection
+    args:
+      calls: $input.calls
+    output: duplicates
+
+  - id: models
+    pipeline: modelComparison
+    args:
+      calls: $input.calls
+    output: modelComparison
+
+  - id: score
+    expr: |
+      Math.max(0, Math.min(100,
+        100
+        - ($duplicates.exactDuplicates * 5)
+        - ($modelComparison.suggestions.length * 10)
+        - ($costSummary.avgCostPerCall > 0.01 ? 15 : 0)
+      ))
+    output: overallScore
+
+  - id: return
+    value:
+      sessionId: $input.sessionId
+      costSummary: $costSummary
+      duplicates: $duplicates
+      modelComparison: $modelComparison
+      overallScore: $overallScore
+      generatedAt: new Date().toISOString()

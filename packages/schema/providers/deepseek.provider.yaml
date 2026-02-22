@@ -1,0 +1,16 @@
+# DeepSeek provider definition for Flusk generator
+name: deepseek
+displayName: DeepSeek
+sdkPackage: openai
+clientClass: OpenAI
+methods:
+  - name: chat.completions.create
+    path: chat.completions.create
+    streamParam: stream
+spans:
+  system: deepseek
+  modelPrefixes: ["deepseek-"]
+apiUrls: ["api.deepseek.com"]
+models:
+  deepseek-v3: { input: 0.27, output: 1.10 }
+  deepseek-r1: { input: 0.55, output: 2.19 }
