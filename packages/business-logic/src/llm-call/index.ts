@@ -16,4 +16,10 @@ export {
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+export { normalizePromptHash, normalizeText } from './normalize-prompt-hash.function.js';
+export { aggregateTokenTrends } from './token-usage-trends.function.js';
+export { analyzeContextWindow } from './context-window-util.function.js';
+export { groupConversationCosts } from './conversation-cost.function.js';
+export { extractToolCalls } from './extract-tool-calls.function.js';
+export { estimateVisionTokens } from './vision-token-count.function.js';
 // --- END CUSTOM ---
