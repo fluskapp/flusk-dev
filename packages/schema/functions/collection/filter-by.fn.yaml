@@ -1,0 +1,25 @@
+name: filterBy
+namespace: collection
+description: Filter an array of objects where a key matches a value
+pure: true
+generic: true
+typeParams: [T]
+
+input:
+  items: { type: "T[]", description: "Array to filter" }
+  key: { type: string, description: "Key to match on" }
+  value: { type: unknown, description: "Value to match" }
+
+output:
+  type: "T[]"
+  description: "Items where key equals value"
+
+body: "items.filter((item) => (item as Record<string, unknown>)[key] === value)"
+
+tests:
+  - name: filter by model
+    input: { items: [{ model: "gpt-4" }, { model: "gpt-3" }, { model: "gpt-4" }], key: "model", value: "gpt-4" }
+    expected: [{ model: "gpt-4" }, { model: "gpt-4" }]
+  - name: no matches
+    input: { items: [{ model: "gpt-3" }], key: "model", value: "gpt-4" }
+    expected: []

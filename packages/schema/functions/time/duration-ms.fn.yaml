@@ -1,0 +1,26 @@
+name: durationMs
+namespace: time
+description: Calculate duration in milliseconds between two ISO timestamps
+pure: true
+generic: false
+
+input:
+  startedAt: { type: string, description: "ISO 8601 start timestamp" }
+  endedAt: { type: string, description: "ISO 8601 end timestamp" }
+
+output:
+  type: number
+  description: "Duration in milliseconds (non-negative)"
+
+body: "Math.max(0, new Date(endedAt).getTime() - new Date(startedAt).getTime())"
+
+tests:
+  - name: basic duration
+    input: { startedAt: "2024-01-01T00:00:00.000Z", endedAt: "2024-01-01T00:00:01.000Z" }
+    expected: 1000
+  - name: same time
+    input: { startedAt: "2024-01-01T00:00:00.000Z", endedAt: "2024-01-01T00:00:00.000Z" }
+    expected: 0
+  - name: negative clamped to 0
+    input: { startedAt: "2024-01-01T00:00:01.000Z", endedAt: "2024-01-01T00:00:00.000Z" }
+    expected: 0

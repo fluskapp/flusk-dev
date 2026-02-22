@@ -1,0 +1,31 @@
+name: groupBy
+namespace: collection
+description: Group array items by a key's value into a Map
+pure: true
+generic: true
+typeParams: [T]
+
+input:
+  items: { type: "T[]", description: "Array of objects to group" }
+  key: { type: string, description: "Key to group by" }
+
+output:
+  type: "Record<string, T[]>"
+  description: "Plain object mapping key value to array of matching items"
+
+body:
+  steps:
+    - return: |
+        items.reduce((acc, item) => {
+          const k = String((item as Record<string, unknown>)[key]);
+          acc[k] = acc[k] ?? [];
+          acc[k].push(item);
+          return acc;
+        }, {} as Record<string, T[]>)
+
+tests:
+  - name: group by model
+    input:
+      items: [{ model: "gpt-4", cost: 1 }, { model: "gpt-3", cost: 2 }, { model: "gpt-4", cost: 3 }]
+      key: "model"
+    expected: { "gpt-4": [{ model: "gpt-4", cost: 1 }, { model: "gpt-4", cost: 3 }], "gpt-3": [{ model: "gpt-3", cost: 2 }] }

@@ -1,0 +1,25 @@
+name: sum
+namespace: math
+description: Sum all numbers in an array
+pure: true
+generic: false
+
+input:
+  values: { type: "number[]", description: "Array of numbers to sum" }
+
+output:
+  type: number
+  description: "Sum of all values"
+
+body: "values.reduce((acc, v) => acc + v, 0)"
+
+tests:
+  - name: basic sum
+    input: { values: [1, 2, 3] }
+    expected: 6
+  - name: empty array
+    input: { values: [] }
+    expected: 0
+  - name: single value
+    input: { values: [42] }
+    expected: 42

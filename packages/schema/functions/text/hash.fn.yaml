@@ -1,0 +1,27 @@
+name: hash
+namespace: text
+description: Create a deterministic hash of a string using Node crypto
+pure: true
+generic: false
+
+input:
+  input: { type: string, description: "String to hash" }
+  algorithm: { type: string, description: "Hash algorithm (default: sha256)" }
+
+output:
+  type: string
+  description: "Hex-encoded hash string"
+
+body: |
+  (() => {
+    const { createHash } = require('node:crypto');
+    return createHash(algorithm ?? 'sha256').update(input).digest('hex');
+  })()
+
+tests:
+  - name: sha256 hash
+    input: { input: "hello", algorithm: "sha256" }
+    expected: "2cf24dba5fb0a30e26e83b2ac5b9e29e1b161e5c1fa7425e73043362938b9824"
+  - name: empty string
+    input: { input: "", algorithm: "sha256" }
+    expected: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"

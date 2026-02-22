@@ -1,0 +1,30 @@
+name: truncate
+namespace: text
+description: Truncate a string to a maximum length, appending an ellipsis if cut
+pure: true
+generic: false
+
+input:
+  text: { type: string, description: "Input string to truncate" }
+  maxLength: { type: number, description: "Maximum character length" }
+  ellipsis: { type: string, description: "Suffix when truncated (default: ...)" }
+
+output:
+  type: string
+  description: "Truncated string"
+
+body: |
+  text.length <= maxLength
+    ? text
+    : text.slice(0, maxLength - (ellipsis ?? '...').length) + (ellipsis ?? '...')
+
+tests:
+  - name: no truncation needed
+    input: { text: "hello", maxLength: 10, ellipsis: "..." }
+    expected: "hello"
+  - name: truncates with ellipsis
+    input: { text: "hello world", maxLength: 8, ellipsis: "..." }
+    expected: "hello..."
+  - name: exact length
+    input: { text: "hello", maxLength: 5, ellipsis: "..." }
+    expected: "hello"

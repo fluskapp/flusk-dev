@@ -1,0 +1,25 @@
+name: findBy
+namespace: collection
+description: Find the first item in an array matching a key-value pair
+pure: true
+generic: true
+typeParams: [T]
+
+input:
+  items: { type: "T[]", description: "Array of objects to search" }
+  key: { type: string, description: "Key to match on" }
+  value: { type: unknown, description: "Value to match" }
+
+output:
+  type: "T | null"
+  description: "First matching item or null if not found"
+
+body: "items.find((item) => (item as Record<string, unknown>)[key] === value) ?? null"
+
+tests:
+  - name: found item
+    input: { items: [{ id: 1, name: "a" }, { id: 2, name: "b" }], key: "id", value: 2 }
+    expected: { id: 2, name: "b" }
+  - name: not found
+    input: { items: [{ id: 1 }], key: "id", value: 99 }
+    expected: null

@@ -1,0 +1,31 @@
+name: compareCost
+namespace: cost
+description: Compare two costs and return the difference and savings percentage
+pure: true
+generic: false
+
+input:
+  baseline: { type: number, description: "Baseline cost in USD" }
+  optimized: { type: number, description: "Optimized cost in USD" }
+
+output:
+  type: "{ savings: number; savingsPercent: number; cheaper: boolean }"
+  description: "Savings amount, percentage, and whether optimized is cheaper"
+
+body: |
+  {
+    savings: baseline - optimized,
+    savingsPercent: baseline === 0 ? 0 : ((baseline - optimized) / baseline) * 100,
+    cheaper: optimized < baseline,
+  }
+
+tests:
+  - name: optimized is cheaper
+    input: { baseline: 1.0, optimized: 0.25 }
+    expected: { savings: 0.75, savingsPercent: 75, cheaper: true }
+  - name: same cost
+    input: { baseline: 1.0, optimized: 1.0 }
+    expected: { savings: 0, savingsPercent: 0, cheaper: false }
+  - name: zero baseline
+    input: { baseline: 0, optimized: 0 }
+    expected: { savings: 0, savingsPercent: 0, cheaper: false }

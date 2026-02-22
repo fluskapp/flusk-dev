@@ -1,0 +1,26 @@
+name: percentage
+namespace: math
+description: Calculate what percentage part is of total
+pure: true
+generic: false
+
+input:
+  part: { type: number, description: "The part value" }
+  total: { type: number, description: "The total value" }
+
+output:
+  type: number
+  description: "Percentage (0-100), or 0 if total is 0"
+
+body: "total === 0 ? 0 : (part / total) * 100"
+
+tests:
+  - name: basic percentage
+    input: { part: 25, total: 100 }
+    expected: 25
+  - name: zero total
+    input: { part: 5, total: 0 }
+    expected: 0
+  - name: full percentage
+    input: { part: 50, total: 50 }
+    expected: 100

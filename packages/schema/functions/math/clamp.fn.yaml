@@ -1,0 +1,27 @@
+name: clamp
+namespace: math
+description: Clamp a number between a minimum and maximum value
+pure: true
+generic: false
+
+input:
+  value: { type: number, description: "The value to clamp" }
+  min: { type: number, description: "Minimum allowed value" }
+  max: { type: number, description: "Maximum allowed value" }
+
+output:
+  type: number
+  description: "Value clamped to [min, max]"
+
+body: "Math.min(Math.max(value, min), max)"
+
+tests:
+  - name: below min
+    input: { value: -5, min: 0, max: 10 }
+    expected: 0
+  - name: above max
+    input: { value: 15, min: 0, max: 10 }
+    expected: 10
+  - name: within range
+    input: { value: 5, min: 0, max: 10 }
+    expected: 5

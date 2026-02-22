@@ -45,4 +45,6 @@ export { explain };
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+import * as primitives from './primitives/index.js';
+export { primitives };
 // --- END CUSTOM ---

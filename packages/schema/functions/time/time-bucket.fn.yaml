@@ -1,0 +1,37 @@
+name: timeBucket
+namespace: time
+description: Round a timestamp down to the nearest bucket (minute, hour, day)
+pure: true
+generic: false
+
+input:
+  timestamp: { type: string, description: "ISO 8601 timestamp" }
+  bucket: { type: "\"minute\" | \"hour\" | \"day\"", description: "Bucket size" }
+
+output:
+  type: string
+  description: "ISO 8601 timestamp rounded down to bucket boundary"
+
+body: |
+  (() => {
+    const d = new Date(timestamp);
+    if (bucket === 'day') {
+      d.setUTCHours(0, 0, 0, 0);
+    } else if (bucket === 'hour') {
+      d.setUTCMinutes(0, 0, 0);
+    } else {
+      d.setUTCSeconds(0, 0);
+    }
+    return d.toISOString();
+  })()
+
+tests:
+  - name: minute bucket
+    input: { timestamp: "2024-01-01T12:34:56.789Z", bucket: "minute" }
+    expected: "2024-01-01T12:34:00.000Z"
+  - name: hour bucket
+    input: { timestamp: "2024-01-01T12:34:56.789Z", bucket: "hour" }
+    expected: "2024-01-01T12:00:00.000Z"
+  - name: day bucket
+    input: { timestamp: "2024-01-01T12:34:56.789Z", bucket: "day" }
+    expected: "2024-01-01T00:00:00.000Z"

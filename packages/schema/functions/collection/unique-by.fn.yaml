@@ -1,0 +1,28 @@
+name: uniqueBy
+namespace: collection
+description: Return array with duplicates removed, deduplicating by a key
+pure: true
+generic: true
+typeParams: [T]
+
+input:
+  items: { type: "T[]", description: "Array with possible duplicates" }
+  key: { type: string, description: "Key to deduplicate by" }
+
+output:
+  type: "T[]"
+  description: "Array with first occurrence of each key kept"
+
+body: |
+  items.filter((item, index, arr) => {
+    const k = (item as Record<string, unknown>)[key];
+    return arr.findIndex(i => (i as Record<string, unknown>)[key] === k) === index;
+  })
+
+tests:
+  - name: removes duplicates
+    input: { items: [{ id: 1, v: "a" }, { id: 2, v: "b" }, { id: 1, v: "c" }], key: "id" }
+    expected: [{ id: 1, v: "a" }, { id: 2, v: "b" }]
+  - name: no duplicates
+    input: { items: [{ id: 1 }, { id: 2 }], key: "id" }
+    expected: [{ id: 1 }, { id: 2 }]

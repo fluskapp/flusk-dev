@@ -38,6 +38,8 @@ export { generateWatt } from './generators/watt.generator.js';
 export { generateProvider } from './generators/provider.generator.js';
 export { generateTest } from './generators/test.generator.js';
 export { generateMiddleware } from './generators/middleware.generator.js';
+export { generateFunction, loadFnSchema, updateNamespaceBarrel, updatePrimitivesBarrel } from './generators/function.generator.js';
+export type { FnSchema, FnInput, FnGenResult } from './generators/function.generator.js';
 
 // Python generators
 export { generatePythonEntity } from './generators/python/entity.generator.js';
@@ -46,6 +48,7 @@ export { generatePythonRepository } from './generators/python/repository.generat
 export { generatePythonTest } from './generators/python/test.generator.js';
 export { generatePyproject } from './generators/python/pyproject.generator.js';
 export { generatePythonInit } from './generators/python/init.generator.js';
+export { generatePyFunction, updatePyNamespaceInit, updatePyPrimitivesInit } from './generators/python/function.generator.js';
 export { generateEntitySchemaContent, generateEntitySchema } from './generators/entity-schema.generator.js';
 export type { GeneratorResult } from './generators/entity-schema.generator.js';
 

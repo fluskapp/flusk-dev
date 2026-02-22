@@ -1,0 +1,31 @@
+name: sortBy
+namespace: collection
+description: Sort an array of objects by a key, ascending or descending
+pure: true
+generic: true
+typeParams: [T]
+
+input:
+  items: { type: "T[]", description: "Array to sort" }
+  key: { type: string, description: "Key to sort by" }
+  direction: { type: "\"asc\" | \"desc\"", description: "Sort direction" }
+
+output:
+  type: "T[]"
+  description: "Sorted copy of the array"
+
+body: |
+  [...items].sort((a, b) => {
+    const av = (a as Record<string, unknown>)[key] as string | number;
+    const bv = (b as Record<string, unknown>)[key] as string | number;
+    const cmp = av < bv ? -1 : av > bv ? 1 : 0;
+    return direction === 'desc' ? -cmp : cmp;
+  })
+
+tests:
+  - name: sort ascending
+    input: { items: [{ v: 3 }, { v: 1 }, { v: 2 }], key: "v", direction: "asc" }
+    expected: [{ v: 1 }, { v: 2 }, { v: 3 }]
+  - name: sort descending
+    input: { items: [{ v: 1 }, { v: 3 }, { v: 2 }], key: "v", direction: "desc" }
+    expected: [{ v: 3 }, { v: 2 }, { v: 1 }]

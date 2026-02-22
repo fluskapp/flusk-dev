@@ -1,0 +1,34 @@
+name: similarityScore
+namespace: text
+description: Calculate Jaccard similarity between two strings using word sets
+pure: true
+generic: false
+
+input:
+  a: { type: string, description: "First string" }
+  b: { type: string, description: "Second string" }
+
+output:
+  type: number
+  description: "Similarity score 0-1 (1 = identical)"
+
+body: |
+  (() => {
+    const wordsA = new Set(a.toLowerCase().split(/\s+/).filter(Boolean));
+    const wordsB = new Set(b.toLowerCase().split(/\s+/).filter(Boolean));
+    if (wordsA.size === 0 && wordsB.size === 0) return 1;
+    const intersection = [...wordsA].filter(w => wordsB.has(w)).length;
+    const union = new Set([...wordsA, ...wordsB]).size;
+    return intersection / union;
+  })()
+
+tests:
+  - name: identical strings
+    input: { a: "hello world", b: "hello world" }
+    expected: 1
+  - name: no overlap
+    input: { a: "hello", b: "world" }
+    expected: 0
+  - name: partial overlap
+    input: { a: "hello world", b: "hello there" }
+    expected: 0.3333333333333333

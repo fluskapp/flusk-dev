@@ -1,0 +1,28 @@
+name: calculateCost
+namespace: cost
+description: Calculate LLM call cost from token counts and per-token pricing
+pure: true
+generic: false
+
+input:
+  inputTokens: { type: number, description: "Number of input tokens" }
+  outputTokens: { type: number, description: "Number of output tokens" }
+  pricePerInputToken: { type: number, description: "Price per input token in USD" }
+  pricePerOutputToken: { type: number, description: "Price per output token in USD" }
+
+output:
+  type: number
+  description: "Total cost in USD"
+
+body: "(inputTokens * pricePerInputToken) + (outputTokens * pricePerOutputToken)"
+
+tests:
+  - name: basic calculation
+    input: { inputTokens: 100, outputTokens: 50, pricePerInputToken: 0.001, pricePerOutputToken: 0.002 }
+    expected: 0.2
+  - name: zero tokens
+    input: { inputTokens: 0, outputTokens: 0, pricePerInputToken: 0.001, pricePerOutputToken: 0.002 }
+    expected: 0
+  - name: input only
+    input: { inputTokens: 1000, outputTokens: 0, pricePerInputToken: 0.003, pricePerOutputToken: 0.015 }
+    expected: 3

@@ -148,6 +148,20 @@ program.addCommand(exportCommand);
 // Marketing automation
 program.addCommand(marketingCommand);
 
+// Architecture map
+import { mapCommand } from '../src/commands/map.js';
+program.addCommand(mapCommand);
+
+// Function registry generator
+import { generateFunctionCommand } from '../src/commands/generate-function.js';
+program.addCommand(generateFunctionCommand);
+
+// App manifest commands
+import { generateAllCommand } from '../src/commands/generate-all.js';
+import { validateManifestCommand } from '../src/commands/validate-manifest.js';
+program.addCommand(generateAllCommand);
+program.addCommand(validateManifestCommand);
+
 // Data retention
 import { purgeCommand } from '../src/commands/purge.js';
 program.addCommand(purgeCommand);

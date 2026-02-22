@@ -1,0 +1,29 @@
+name: average
+namespace: math
+description: Calculate the arithmetic mean of an array of numbers
+pure: true
+generic: false
+
+input:
+  values: { type: "number[]", description: "Array of numbers" }
+
+output:
+  type: number
+  description: "Arithmetic mean, or 0 for empty array"
+
+body:
+  steps:
+    - name: total
+      expr: "values.reduce((acc, v) => acc + v, 0)"
+    - return: "values.length === 0 ? 0 : total / values.length"
+
+tests:
+  - name: basic average
+    input: { values: [1, 2, 3] }
+    expected: 2
+  - name: empty array
+    input: { values: [] }
+    expected: 0
+  - name: single value
+    input: { values: [10] }
+    expected: 10
