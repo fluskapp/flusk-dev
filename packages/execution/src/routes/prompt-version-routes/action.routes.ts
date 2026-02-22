@@ -9,16 +9,17 @@ import { PromptTemplateRepository, PromptVersionRepository } from '@flusk/resour
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+interface PartialVersionUpdate { status?: string; metrics?: Record<string, unknown> }
+interface PartialTemplateUpdate { activeVersionId?: string }
+
 export async function promptVersionActionRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post('/:id/activate', {
     schema: { params: Type.Object({ id: Type.String({ format: 'uuid' }) }) },
   }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
     const version = PromptVersionRepository.findPromptVersionById(fastify.db, request.params.id);
     if (!version) return reply.code(404).send({ error: 'Version not found' });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial update cast
-    PromptVersionRepository.updatePromptVersion(fastify.db, version.id, { status: 'active' } as any);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial update cast
-    PromptTemplateRepository.updatePromptTemplate(fastify.db, version.templateId, { activeVersionId: version.id } as any);
+    PromptVersionRepository.updatePromptVersion(fastify.db, version.id, { status: 'active' } as PartialVersionUpdate);
+    PromptTemplateRepository.updatePromptTemplate(fastify.db, version.templateId, { activeVersionId: version.id } as PartialTemplateUpdate);
     return reply.send({ activated: true });
   });
 
@@ -32,14 +33,10 @@ export async function promptVersionActionRoutes(fastify: FastifyInstance): Promi
       .filter((v) => v.templateId === version.templateId)
       .sort((a, b) => b.version - a.version);
     if (templateVersions.length < 2) return reply.code(400).send({ error: 'No previous version' });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial update cast
-    const prev = templateVersions[1] as any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial update cast
-    PromptVersionRepository.updatePromptVersion(fastify.db, version.id, { status: 'archived' } as any);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial update cast
-    PromptVersionRepository.updatePromptVersion(fastify.db, prev.id, { status: 'active' } as any);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial update cast
-    PromptTemplateRepository.updatePromptTemplate(fastify.db, version.templateId, { activeVersionId: prev.id } as any);
+    const prev = templateVersions[1]!;
+    PromptVersionRepository.updatePromptVersion(fastify.db, version.id, { status: 'archived' } as PartialVersionUpdate);
+    PromptVersionRepository.updatePromptVersion(fastify.db, prev.id, { status: 'active' } as PartialVersionUpdate);
+    PromptTemplateRepository.updatePromptTemplate(fastify.db, version.templateId, { activeVersionId: prev.id } as PartialTemplateUpdate);
     return reply.send({ rolledBackTo: prev.id });
   });
 
@@ -61,10 +58,8 @@ export async function promptVersionActionRoutes(fastify: FastifyInstance): Promi
   }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
     const version = PromptVersionRepository.findPromptVersionById(fastify.db, request.params.id);
     if (!version) return reply.code(404).send({ error: 'Version not found' });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic metrics payload
-    const metrics = request.body as any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial update cast
-    PromptVersionRepository.updatePromptVersion(fastify.db, version.id, { metrics } as any);
+    const metrics = request.body as Record<string, unknown>;
+    PromptVersionRepository.updatePromptVersion(fastify.db, version.id, { metrics } as PartialVersionUpdate);
     return reply.send({ updated: true });
   });
 }

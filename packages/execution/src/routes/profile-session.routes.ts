@@ -4,14 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type, type TSchema } from '@sinclair/typebox';
+import { Type, type TSchema, type TObject, type Static } from '@sinclair/typebox';
 import { ProfileSessionEntitySchema } from '@flusk/entities';
 import { ProfileSessionRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateProfileSessionSchema = Type.Omit(ProfileSessionEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateProfileSessionSchema = Type.Omit(ProfileSessionEntitySchema as unknown as TObject, ['id', 'createdAt', 'updatedAt']);
 const ProfileSessionResponseSchema = ProfileSessionEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -32,8 +31,7 @@ export async function profileSessionRoutes(
       tags: ['ProfileSession'],
     },
   }, async (request, reply) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = await ProfileSessionRepository.create(pool, request.body as any);
+    const created = await ProfileSessionRepository.create(pool, request.body as Static<typeof CreateProfileSessionSchema>);
     return reply.code(201).send(created);
   });
 
@@ -71,8 +69,7 @@ export async function profileSessionRoutes(
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = await ProfileSessionRepository.update(pool, id, request.body as any);
+    const updated = await ProfileSessionRepository.update(pool, id, request.body as Static<typeof CreateProfileSessionSchema>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });

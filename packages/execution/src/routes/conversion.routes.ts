@@ -4,14 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type, type TSchema } from '@sinclair/typebox';
+import { Type, type TSchema, type TObject, type Static } from '@sinclair/typebox';
 import { ConversionEntitySchema } from '@flusk/entities';
 import { ConversionRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateConversionSchema = Type.Omit(ConversionEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateConversionSchema = Type.Omit(ConversionEntitySchema as unknown as TObject, ['id', 'createdAt', 'updatedAt']);
 const ConversionResponseSchema = ConversionEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -32,8 +31,7 @@ export async function conversionRoutes(
       tags: ['Conversion'],
     },
   }, async (request, reply) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = await ConversionRepository.create(pool, request.body as any);
+    const created = await ConversionRepository.create(pool, request.body as Static<typeof CreateConversionSchema>);
     return reply.code(201).send(created);
   });
 
@@ -70,8 +68,7 @@ export async function conversionRoutes(
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = await ConversionRepository.update(pool, id, request.body as any);
+    const updated = await ConversionRepository.update(pool, id, request.body as Static<typeof CreateConversionSchema>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });

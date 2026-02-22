@@ -4,14 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type, type TSchema } from '@sinclair/typebox';
+import { Type, type TSchema, type TObject, type Static } from '@sinclair/typebox';
 import { PerformancePatternEntitySchema } from '@flusk/entities';
 import { PerformancePatternRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreatePerformancePatternSchema = Type.Omit(PerformancePatternEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreatePerformancePatternSchema = Type.Omit(PerformancePatternEntitySchema as unknown as TObject, ['id', 'createdAt', 'updatedAt']);
 const PerformancePatternResponseSchema = PerformancePatternEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -32,8 +31,7 @@ export async function performancePatternRoutes(
       tags: ['PerformancePattern'],
     },
   }, async (request, reply) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = await PerformancePatternRepository.create(pool, request.body as any);
+    const created = await PerformancePatternRepository.create(pool, request.body as Static<typeof CreatePerformancePatternSchema>);
     return reply.code(201).send(created);
   });
 

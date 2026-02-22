@@ -4,14 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type, type TSchema } from '@sinclair/typebox';
+import { Type, type TSchema, type TObject, type Static } from '@sinclair/typebox';
 import { PromptTemplateEntitySchema } from '@flusk/entities';
 import { PromptTemplateRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreatePromptTemplateSchema = Type.Omit(PromptTemplateEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreatePromptTemplateSchema = Type.Omit(PromptTemplateEntitySchema as unknown as TObject, ['id', 'createdAt', 'updatedAt']);
 const PromptTemplateResponseSchema = PromptTemplateEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -30,8 +29,7 @@ export async function promptTemplateRoutes(
       tags: ['PromptTemplate'],
     },
   }, async (request, reply) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = PromptTemplateRepository.createPromptTemplate(fastify.db, request.body as any);
+    const created = PromptTemplateRepository.createPromptTemplate(fastify.db, request.body as Static<typeof CreatePromptTemplateSchema>);
     return reply.code(201).send(created);
   });
 
@@ -69,8 +67,7 @@ export async function promptTemplateRoutes(
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = PromptTemplateRepository.updatePromptTemplate(fastify.db, id, request.body as any);
+    const updated = PromptTemplateRepository.updatePromptTemplate(fastify.db, id, request.body as Static<typeof CreatePromptTemplateSchema>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });

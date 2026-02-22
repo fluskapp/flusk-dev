@@ -4,26 +4,23 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { Type, type TSchema } from '@sinclair/typebox';
+import { Type, type TSchema, type TObject, type Static } from '@sinclair/typebox';
 import { PromptTemplateEntitySchema } from '@flusk/entities';
 import { PromptTemplateRepository } from '@flusk/resources';
 import { promptTemplate } from '@flusk/business-logic';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit cast
-const CreateSchema = Type.Omit(PromptTemplateEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateSchema = Type.Omit(PromptTemplateEntitySchema as unknown as TObject, ['id', 'createdAt', 'updatedAt']);
 
 export async function promptTemplateCrudRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post('/', {
     schema: { body: CreateSchema, response: { 201: PromptTemplateEntitySchema as unknown as TSchema } },
   }, async (request: FastifyRequest, reply: FastifyReply) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- body validated by schema
-    const data = request.body as any;
+    const data = request.body as Static<typeof CreateSchema>;
     const validation = promptTemplate.validatePromptTemplate(data);
     if (!validation.valid) return reply.code(400).send({ error: validation.errors.join(', ') });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- body validated by schema
-    const created = PromptTemplateRepository.createPromptTemplate(fastify.db, data as any);
+    const created = PromptTemplateRepository.createPromptTemplate(fastify.db, data);
     return reply.code(201).send(created);
   });
 
@@ -45,8 +42,7 @@ export async function promptTemplateCrudRoutes(fastify: FastifyInstance): Promis
   fastify.put('/:id', {
     schema: { params: Type.Object({ id: Type.String({ format: 'uuid' }) }) },
   }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- body validated by schema
-    const updated = PromptTemplateRepository.updatePromptTemplate(fastify.db, request.params.id, request.body as any);
+    const updated = PromptTemplateRepository.updatePromptTemplate(fastify.db, request.params.id, request.body as Partial<Static<typeof CreateSchema>>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.send(updated);
   });

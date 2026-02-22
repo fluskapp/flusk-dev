@@ -4,14 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type, type TSchema } from '@sinclair/typebox';
+import { Type, type TSchema, type TObject, type Static } from '@sinclair/typebox';
 import { BudgetAlertEntitySchema } from '@flusk/entities';
 import { BudgetAlertRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateBudgetAlertSchema = Type.Omit(BudgetAlertEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateBudgetAlertSchema = Type.Omit(BudgetAlertEntitySchema as unknown as TObject, ['id', 'createdAt', 'updatedAt']);
 const BudgetAlertResponseSchema = BudgetAlertEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -31,8 +30,7 @@ export async function budgetAlertRoutes(
       description: 'Create a new BudgetAlert record',
     },
   }, async (request, reply) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = BudgetAlertRepository.createBudgetAlert(fastify.db, request.body as any);
+    const created = BudgetAlertRepository.createBudgetAlert(fastify.db, request.body as Static<typeof CreateBudgetAlertSchema>);
     return reply.code(201).send(created);
   });
 
@@ -70,8 +68,7 @@ export async function budgetAlertRoutes(
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = BudgetAlertRepository.updateBudgetAlert(fastify.db, id, request.body as any);
+    const updated = BudgetAlertRepository.updateBudgetAlert(fastify.db, id, request.body as Static<typeof CreateBudgetAlertSchema>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });

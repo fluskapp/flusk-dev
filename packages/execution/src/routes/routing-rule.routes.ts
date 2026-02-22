@@ -4,14 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type, type TSchema } from '@sinclair/typebox';
+import { Type, type TSchema, type TObject, type Static } from '@sinclair/typebox';
 import { RoutingRuleEntitySchema } from '@flusk/entities';
 import { RoutingRuleRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateRoutingRuleSchema = Type.Omit(RoutingRuleEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateRoutingRuleSchema = Type.Omit(RoutingRuleEntitySchema as unknown as TObject, ['id', 'createdAt', 'updatedAt']);
 const RoutingRuleResponseSchema = RoutingRuleEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -32,8 +31,7 @@ export async function routingRuleRoutes(
       tags: ['RoutingRule'],
     },
   }, async (request, reply) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = await RoutingRuleRepository.create(pool, request.body as any);
+    const created = await RoutingRuleRepository.create(pool, request.body as Static<typeof CreateRoutingRuleSchema>);
     return reply.code(201).send(created);
   });
 
@@ -70,8 +68,7 @@ export async function routingRuleRoutes(
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = await RoutingRuleRepository.update(pool, id, request.body as any);
+    const updated = await RoutingRuleRepository.update(pool, id, request.body as Static<typeof CreateRoutingRuleSchema>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });

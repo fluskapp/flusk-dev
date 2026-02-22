@@ -4,14 +4,13 @@
 
 // --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
-import { Type, type TSchema } from '@sinclair/typebox';
+import { Type, type TSchema, type TObject, type Static } from '@sinclair/typebox';
 import { OptimizationEntitySchema } from '@flusk/entities';
 import { OptimizationRepository } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateOptimizationSchema = Type.Omit(OptimizationEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateOptimizationSchema = Type.Omit(OptimizationEntitySchema as unknown as TObject, ['id', 'createdAt', 'updatedAt']);
 const OptimizationResponseSchema = OptimizationEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -30,8 +29,7 @@ export async function optimizationRoutes(
       tags: ['Optimization'],
     },
   }, async (request, reply) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = OptimizationRepository.createOptimization(fastify.db, request.body as any);
+    const created = OptimizationRepository.createOptimization(fastify.db, request.body as Static<typeof CreateOptimizationSchema>);
     return reply.code(201).send(created);
   });
 
@@ -69,8 +67,7 @@ export async function optimizationRoutes(
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = OptimizationRepository.updateOptimization(fastify.db, id, request.body as any);
+    const updated = OptimizationRepository.updateOptimization(fastify.db, id, request.body as Static<typeof CreateOptimizationSchema>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });

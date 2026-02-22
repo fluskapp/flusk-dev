@@ -25,8 +25,7 @@ export async function promptVersionCrudRoutes(fastify: FastifyInstance): Promise
     const data = request.body as Record<string, unknown>;
     const validation = promptVersion.validatePromptVersion(data);
     if (!validation.valid) return reply.code(400).send({ error: validation.errors.join(', ') });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- body validated by schema
-    const created = PromptVersionRepository.createPromptVersion(fastify.db, data as any);
+    const created = PromptVersionRepository.createPromptVersion(fastify.db, data as Record<string, unknown>);
     return reply.code(201).send(created);
   });
 
