@@ -31,4 +31,6 @@ export { loggerRecipe } from './logger.recipe.js';
 export { sdkProviderRecipe } from './sdk-provider.recipe.js';
 export { sqliteRepoRecipe } from './sqlite-repo.recipe.js';
 export { pythonPackageRecipe } from './python-package.recipe.js';
+export { crudRoutesRecipe } from './crud-routes.recipe.js';
+export { httpClientRecipe } from './http-client.recipe.js';
 export { registerDefaultRecipes, resetDefaultRecipes } from './register-defaults.js';

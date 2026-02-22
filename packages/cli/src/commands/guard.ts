@@ -93,4 +93,38 @@ export const guardCommand = new Command('guard')
   });
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---
+import {
+  runEnhancedGuard,
+} from '@flusk/forge';
+
+/** Enhanced guard checks — runs after the base guard command */
+export function registerEnhancedGuard(cmd: Command): void {
+  cmd.hook('postAction', async () => {
+    const root = process.cwd();
+    const result = runEnhancedGuard(root);
+
+    // Missing headers
+    for (const f of result.missingHeaders) {
+      console.warn(chalk.yellow(`⚠️  NEW FILE without @generated: ${f}`));
+      console.warn(chalk.gray(`   → Use: flusk g feature <name>`));
+    }
+
+    // Tampered GENERATED sections
+    for (const t of result.tamperedFiles) {
+      console.error(chalk.red(`❌ TAMPERED: ${t.filePath} [${t.sectionLabel}]`));
+    }
+
+    // Large CUSTOM sections
+    for (const l of result.largeCustomSections) {
+      console.warn(chalk.yellow(
+        `⚠️  LARGE CUSTOM (${l.lineCount} lines): ${l.filePath} [${l.sectionLabel}]`,
+      ));
+      console.warn(chalk.gray(`   → Consider creating a generator`));
+    }
+
+    if (result.tamperedFiles.length > 0) {
+      process.exitCode = 1;
+    }
+  });
+}
 // --- END CUSTOM ---

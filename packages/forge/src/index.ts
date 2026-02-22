@@ -69,6 +69,8 @@ export * from './regeneration/index.js';
 // Validators
 export { validateConfig } from './validators/config.validator.js';
 export { validateSchemas } from './validators/schema.validator.js';
+export { validateEntityYamls } from './validators/yaml-schema.validator.js';
+export type { YamlValidationResult, YamlValidationIssue } from './validators/yaml-schema.validator.js';
 export { validateStructure } from './validators/structure.validator.js';
 export { runValidation } from './validators/run-validation.js';
 

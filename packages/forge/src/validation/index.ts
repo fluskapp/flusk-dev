@@ -6,3 +6,14 @@ export { detectTampering } from './tampering-detector.js';
 export type { TamperedFile } from './tampering-detector.js';
 export { computeRatio } from './ratio-calculator.js';
 export type { RatioResult, PackageCounts } from './ratio-calculator.js';
+export {
+  runEnhancedGuard,
+  findMissingHeaders,
+  detectGeneratedTampering,
+  findLargeCustomSections,
+} from './enhanced-guard.js';
+export type {
+  EnhancedGuardResult,
+  TamperedGeneratedFile,
+  LargeCustomSection,
+} from './enhanced-guard.js';

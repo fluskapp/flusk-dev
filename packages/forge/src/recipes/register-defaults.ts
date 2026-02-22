@@ -18,6 +18,8 @@ import { loggerRecipe } from './logger.recipe.js';
 import { sdkProviderRecipe } from './sdk-provider.recipe.js';
 import { sqliteRepoRecipe } from './sqlite-repo.recipe.js';
 import { pythonPackageRecipe } from './python-package.recipe.js';
+import { crudRoutesRecipe } from './crud-routes.recipe.js';
+import { httpClientRecipe } from './http-client.recipe.js';
 
 let registered = false;
 
@@ -36,6 +38,8 @@ export function registerDefaultRecipes(): void {
   registerRecipe(sdkProviderRecipe);
   registerRecipe(sqliteRepoRecipe);
   registerRecipe(pythonPackageRecipe);
+  registerRecipe(crudRoutesRecipe);
+  registerRecipe(httpClientRecipe);
   registered = true;
 }
 
