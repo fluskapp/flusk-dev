@@ -1,0 +1,144 @@
+# app.flusk.yaml — Flusk Application Manifest
+# Single source of truth for all schema sources and generation targets.
+# Run `flusk generate-all` to regenerate the entire project from this manifest.
+# Run `flusk validate-manifest` to verify all referenced files exist.
+
+app: flusk
+version: 0.3.0
+description: LLM cost observability platform
+
+# ─── Schema Sources ───────────────────────────────────────────────────────────
+schemas:
+  entities:
+    glob: packages/schema/entities/*.entity.yaml
+    files:
+      - packages/schema/entities/analyze-session.entity.yaml
+      - packages/schema/entities/budget-alert.entity.yaml
+      - packages/schema/entities/conversion.entity.yaml
+      - packages/schema/entities/explain-session.entity.yaml
+      - packages/schema/entities/insight.entity.yaml
+      - packages/schema/entities/llm-call.entity.yaml
+      - packages/schema/entities/model-performance.entity.yaml
+      - packages/schema/entities/optimization.entity.yaml
+      - packages/schema/entities/pattern.entity.yaml
+      - packages/schema/entities/performance-pattern.entity.yaml
+      - packages/schema/entities/profile-session.entity.yaml
+      - packages/schema/entities/prompt-template.entity.yaml
+      - packages/schema/entities/prompt-version.entity.yaml
+      - packages/schema/entities/routing-decision.entity.yaml
+      - packages/schema/entities/routing-rule.entity.yaml
+      - packages/schema/entities/span.entity.yaml
+      - packages/schema/entities/trace.entity.yaml
+
+  providers:
+    glob: packages/schema/providers/*.provider.yaml
+    files:
+      - packages/schema/providers/anthropic.provider.yaml
+      - packages/schema/providers/azure-openai.provider.yaml
+      - packages/schema/providers/cohere.provider.yaml
+      - packages/schema/providers/google.provider.yaml
+      - packages/schema/providers/openai.provider.yaml
+
+  commands:
+    glob: packages/schema/commands/*.command.yaml
+    files:
+      - packages/schema/commands/explain.command.yaml
+
+  prompts:
+    glob: packages/schema/prompts/*.prompt.yaml
+    files:
+      - packages/schema/prompts/explain-system.prompt.yaml
+
+  actions:
+    glob: packages/schema/actions/*.action.yaml
+    files:
+      - packages/schema/actions/analyze.action.yaml
+
+  functions:
+    glob: packages/schema/functions/**/*.fn.yaml
+    namespaces:
+      math:
+        - packages/schema/functions/math/sum.fn.yaml
+        - packages/schema/functions/math/average.fn.yaml
+        - packages/schema/functions/math/percentage.fn.yaml
+        - packages/schema/functions/math/clamp.fn.yaml
+      collection:
+        - packages/schema/functions/collection/find-by.fn.yaml
+        - packages/schema/functions/collection/group-by.fn.yaml
+        - packages/schema/functions/collection/sort-by.fn.yaml
+        - packages/schema/functions/collection/unique-by.fn.yaml
+        - packages/schema/functions/collection/filter-by.fn.yaml
+      cost:
+        - packages/schema/functions/cost/calculate-cost.fn.yaml
+        - packages/schema/functions/cost/compare-cost.fn.yaml
+        - packages/schema/functions/cost/aggregate-cost.fn.yaml
+      text:
+        - packages/schema/functions/text/hash.fn.yaml
+        - packages/schema/functions/text/truncate.fn.yaml
+        - packages/schema/functions/text/similarity-score.fn.yaml
+      time:
+        - packages/schema/functions/time/duration-ms.fn.yaml
+        - packages/schema/functions/time/format-duration.fn.yaml
+        - packages/schema/functions/time/time-bucket.fn.yaml
+
+# ─── Generation Targets ───────────────────────────────────────────────────────
+targets:
+  typescript:
+    packages:
+      entities:
+        from: entities
+        generator: entity-schema
+        output: packages/entities/src/
+      types:
+        from: entities
+        generator: types
+        output: packages/types/src/
+      resources:
+        from: entities
+        generator: sqlite-repo
+        output: packages/resources/src/sqlite/
+      business-logic:
+        from: [functions]
+        recipe: function-registry
+        output: packages/business-logic/src/primitives/
+      execution:
+        from: entities
+        generator: crud-routes
+        output: packages/execution/src/routes/
+      otel:
+        from: providers
+        generator: otel-hook
+        output: packages/otel/src/
+      cli:
+        from: commands
+        generator: cli-command
+        output: packages/cli/src/commands/
+
+  python:
+    output: flusk-py/
+    from: [entities, functions]
+    recipes: [python-package, function-registry]
+
+# ─── Storage ──────────────────────────────────────────────────────────────────
+storage:
+  default: sqlite
+  path: "~/.flusk/data.db"
+  migrations: packages/resources/src/sqlite/sql/
+
+# ─── CLI Definition ───────────────────────────────────────────────────────────
+cli:
+  binary: flusk
+  commands:
+    - $ref: packages/schema/commands/*.command.yaml
+
+# ─── Generation Order (dependency-safe) ──────────────────────────────────────
+generationOrder:
+  - entities      # TypeBox schemas — no deps
+  - types         # Derived from entities
+  - resources     # Repos from entities + types
+  - functions     # Pure functions — no deps
+  - business-logic # Uses entities + types + functions
+  - execution     # Routes use entities + business-logic
+  - otel          # Hooks use providers
+  - cli           # Commands use execution + business-logic
+  - python        # Python package mirrors TS
