@@ -6,7 +6,6 @@
 
 // --- BEGIN GENERATED (do not edit) ---
 // @ts-nocheck — generated pipeline with dynamic expr: steps
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getLogger } from '@flusk/logger';
 import type { LLMCallEntity } from '@flusk/entities';
 import type { ErrorAnalysisReport } from '@flusk/types';

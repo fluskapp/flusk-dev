@@ -23,7 +23,6 @@ export function generatePipelineCode(schema: PipelineSchema): string {
 
 // --- BEGIN GENERATED (do not edit) ---
 // @ts-nocheck — generated pipeline with dynamic expr: steps
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getLogger } from '@flusk/logger';
 ${[...typeImports, ...imports].filter(Boolean).join('\n')}
 
