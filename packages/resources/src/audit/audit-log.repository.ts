@@ -3,7 +3,7 @@
  */
 
 // --- BEGIN GENERATED ---
-import { getPool } from '../db/pool.js';
+import { getDb } from '../sqlite/connection.js';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
@@ -31,48 +31,40 @@ export interface AuditLogEntry {
  * @param entry - Audit log entry (id and createdAt auto-generated)
  * @returns Created audit log entry
  */
-export async function logAudit(
+export function logAudit(
   entry: Omit<AuditLogEntry, 'id' | 'createdAt'>
-): Promise<AuditLogEntry> {
-  const db = getPool();
+): AuditLogEntry {
+  const db = getDb();
+  const id = crypto.randomUUID();
+  const createdAt = new Date().toISOString();
 
-  const query = `
+  const stmt = db.prepare(`
     INSERT INTO audit_logs (
-      action, resource, resource_id, organization_id, user_id,
-      ip_address, user_agent, success, error_message, metadata
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-    RETURNING *
-  `;
+      id, created_at, action, resource, resource_id, organization_id,
+      user_id, ip_address, user_agent, success, error_message, metadata
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
 
-  const values = [
-    entry.action,
-    entry.resource,
-    entry.resourceId,
-    entry.organizationId,
-    entry.userId,
-    entry.ipAddress,
-    entry.userAgent,
-    entry.success,
-    entry.errorMessage,
+  stmt.run(
+    id, createdAt, entry.action, entry.resource, entry.resourceId,
+    entry.organizationId, entry.userId, entry.ipAddress,
+    entry.userAgent, entry.success ? 1 : 0, entry.errorMessage,
     entry.metadata ? JSON.stringify(entry.metadata) : null
-  ];
-
-  const result = await db.query(query, values);
-  const row = result.rows[0];
+  );
 
   return {
-    id: row.id,
-    createdAt: row.created_at.toISOString(),
-    action: row.action,
-    resource: row.resource,
-    resourceId: row.resource_id,
-    organizationId: row.organization_id,
-    userId: row.user_id,
-    ipAddress: row.ip_address,
-    userAgent: row.user_agent,
-    success: row.success,
-    errorMessage: row.error_message,
-    metadata: row.metadata
+    id,
+    createdAt,
+    action: entry.action,
+    resource: entry.resource,
+    resourceId: entry.resourceId,
+    organizationId: entry.organizationId,
+    userId: entry.userId,
+    ipAddress: entry.ipAddress,
+    userAgent: entry.userAgent,
+    success: entry.success,
+    errorMessage: entry.errorMessage,
+    metadata: entry.metadata,
   };
 }
 // --- END CUSTOM ---

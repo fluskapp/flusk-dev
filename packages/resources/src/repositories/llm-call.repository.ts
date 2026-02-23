@@ -9,5 +9,5 @@
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-export * from './llm-call/index.js';
+export * from '../sqlite/repositories/llm-call.repository.js';
 // --- END CUSTOM ---

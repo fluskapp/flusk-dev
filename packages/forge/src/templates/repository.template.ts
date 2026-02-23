@@ -13,17 +13,17 @@ export function generateRepositoryTemplate(entityName: string): string {
  * DO NOT EDIT - regenerate using: flusk g ${entityName}.entity.ts
  */
 
-import type { Pool } from 'pg';
+import type { DatabaseSync } from 'node:sqlite';
 import { ${pascalName}Entity } from '@flusk/entities';
 
 /**
  * Convert database row to ${pascalName}Entity
  */
-function rowToEntity(row: any): ${pascalName}Entity {
+function rowToEntity(row: Record<string, unknown>): ${pascalName}Entity {
   return {
-    id: row.id,
-    createdAt: row.created_at.toISOString(),
-    updatedAt: row.updated_at.toISOString(),
+    id: String(row.id),
+    createdAt: String(row.created_at),
+    updatedAt: String(row.updated_at),
     // TODO: Add field mappings from schema
   } as ${pascalName}Entity;
 }
@@ -31,64 +31,52 @@ function rowToEntity(row: any): ${pascalName}Entity {
 /**
  * Create a new ${entityName} record
  */
-export async function create(
-  pool: Pool,
+export function create(
+  db: DatabaseSync,
   data: Omit<${pascalName}Entity, 'id' | 'createdAt' | 'updatedAt'>
-): Promise<${pascalName}Entity> {
+): ${pascalName}Entity {
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
   // TODO: Add actual fields from schema
-  const query = \`
-    INSERT INTO ${tableName} (
-      -- Add columns here
-    ) VALUES (
-      -- Add values here
-    )
-    RETURNING *
-  \`;
+  const stmt = db.prepare(\\\`
+    INSERT INTO ${tableName} (id, created_at, updated_at)
+    VALUES (?, ?, ?)
+  \\\`);
 
-  const result = await pool.query(query);
-  return rowToEntity(result.rows[0]);
+  stmt.run(id, now, now);
+  return findById(db, id)!;
 }
 
 /**
  * Find ${entityName} by UUID
  */
-export async function findById(
-  pool: Pool,
+export function findById(
+  db: DatabaseSync,
   id: string
-): Promise<${pascalName}Entity | null> {
-  const query = 'SELECT * FROM ${tableName} WHERE id = $1';
-  const result = await pool.query(query, [id]);
-
-  if (result.rows.length === 0) {
-    return null;
-  }
-
-  return rowToEntity(result.rows[0]);
+): ${pascalName}Entity | null {
+  const stmt = db.prepare('SELECT * FROM ${tableName} WHERE id = ?');
+  const row = stmt.get(id) as Record<string, unknown> | undefined;
+  return row ? rowToEntity(row) : null;
 }
 
 /**
  * Update ${entityName} record
  */
-export async function update(
-  pool: Pool,
+export function update(
+  db: DatabaseSync,
   id: string,
-  data: Partial<Omit<${pascalName}Entity, 'id' | 'createdAt' | 'updatedAt'>>
-): Promise<${pascalName}Entity | null> {
+  _data: Partial<Omit<${pascalName}Entity, 'id' | 'createdAt' | 'updatedAt'>>
+): ${pascalName}Entity | null {
   // TODO: Implement dynamic update logic
-  const query = \`
+  const now = new Date().toISOString();
+  const stmt = db.prepare(\\\`
     UPDATE ${tableName}
-    SET updated_at = NOW()
-    WHERE id = $1
-    RETURNING *
-  \`;
+    SET updated_at = ?
+    WHERE id = ?
+  \\\`);
 
-  const result = await pool.query(query, [id]);
-
-  if (result.rows.length === 0) {
-    return null;
-  }
-
-  return rowToEntity(result.rows[0]);
+  stmt.run(now, id);
+  return findById(db, id);
 }
 `;
 }

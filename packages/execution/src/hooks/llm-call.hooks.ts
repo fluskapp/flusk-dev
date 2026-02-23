@@ -5,12 +5,9 @@
 // --- BEGIN GENERATED ---
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import { llmCall } from '@flusk/business-logic';
-import { RedisClient } from '@flusk/resources';
-import { getLogger } from '@flusk/logger';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-const log = getLogger().child({ module: 'llm-call-hooks' });
 const { hashPrompt, calculateCost } = llmCall;
 
 interface LlmCallBody {
@@ -59,30 +56,6 @@ export async function hashPromptHook(
 }
 
 /**
- * Check Redis cache for existing response
- */
-export async function checkCacheHook(
-  request: FastifyRequest,
-  reply: FastifyReply
-): Promise<void> {
-  const hash = request.promptHash;
-  if (!hash) return;
-
-  try {
-    const cached = await RedisClient.getCachedResponse(hash);
-    if (cached) {
-      return reply.code(200).send({
-        cached: true,
-        response: cached,
-        promptHash: hash,
-      });
-    }
-  } catch (err) {
-    log.warn({ err }, 'Redis cache lookup failed — continuing to handler');
-  }
-}
-
-/**
  * Calculate cost and build llmCallData on request
  */
 export async function calculateCostHook(
@@ -112,23 +85,5 @@ export async function calculateCostHook(
     consentGiven: process.env.FLUSK_CONSENT_GIVEN !== 'false',
     consentPurpose: process.env.FLUSK_CONSENT_PURPOSE || 'optimization',
   };
-}
-
-/**
- * Cache the response in Redis after sending
- */
-export async function cacheResponseHook(
-  request: FastifyRequest,
-  _reply: FastifyReply,
-  payload: unknown
-): Promise<unknown> {
-  const hash = request.promptHash;
-  const body = request.body as { response?: string };
-  if (hash && body?.response) {
-    RedisClient.cacheResponse(hash, body.response).catch((err) => {
-      log.warn({ err }, 'Redis cache write failed');
-    });
-  }
-  return payload;
 }
 // --- END CUSTOM ---

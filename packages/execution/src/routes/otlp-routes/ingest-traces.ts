@@ -9,7 +9,7 @@ import type { FastifyInstance } from 'fastify';
 import type { OtlpTraceRequest } from './types.js';
 import { isGenAiSpan, parseLlmSpan } from './parse-llm-span.js';
 import { mapSpanToLlmCall } from './map-span-to-llm-call.js';
-import { LLMCallRepository } from '@flusk/resources';
+import { LLMCallRepository, getDb } from '@flusk/resources';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
@@ -25,7 +25,7 @@ export async function ingestTracesHandler(app: FastifyInstance): Promise<void> {
           try {
             const parsed = parseLlmSpan(span);
             const callData = mapSpanToLlmCall(parsed);
-            const created = await LLMCallRepository.create(app.pg.pool, callData);
+            const created = LLMCallRepository.createLLMCall(getDb(), callData);
             app.eventBus?.emit('llm-call:created', created);
             results.accepted++;
           } catch (err) {

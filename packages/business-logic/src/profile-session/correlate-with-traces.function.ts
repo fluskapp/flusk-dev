@@ -3,7 +3,7 @@
  */
 
 // --- BEGIN GENERATED ---
-import type { Pool } from 'pg';
+import type { DatabaseSync } from 'node:sqlite';
 import { ProfileSessionEntity, LLMCallEntity, HotspotEntry } from '@flusk/entities';
 // --- END GENERATED ---
 
@@ -17,33 +17,33 @@ export type CorrelationResult = {
  * Correlate a profile session with LLM calls that occurred during
  * the profiling window. Returns matched calls with overlapping hotspots.
  */
-export async function correlateWithTraces(
-  pool: Pool,
+export function correlateWithTraces(
+  db: DatabaseSync,
   session: ProfileSessionEntity
-): Promise<CorrelationResult[]> {
+): CorrelationResult[] {
   const startTime = session.startedAt;
   const endMs = new Date(session.startedAt).getTime() + session.durationMs;
   const endTime = new Date(endMs).toISOString();
 
-  const query = `
-    SELECT * FROM llm_calls
-    WHERE created_at BETWEEN $1 AND $2
-    ORDER BY created_at ASC
-  `;
+  const stmt = db.prepare(
+    `SELECT * FROM llm_calls
+     WHERE created_at BETWEEN ? AND ?
+     ORDER BY created_at ASC`
+  );
 
-  const result = await pool.query(query, [startTime, endTime]);
+  const rows = stmt.all(startTime, endTime) as Record<string, unknown>[];
 
-  return result.rows.map((row) => ({
+  return rows.map((row) => ({
     llmCall: {
       id: row.id,
-      createdAt: row.created_at.toISOString(),
-      updatedAt: row.updated_at.toISOString(),
+      createdAt: String(row.created_at),
+      updatedAt: String(row.updated_at),
       provider: row.provider,
       model: row.model,
       prompt: row.prompt,
       promptHash: row.prompt_hash,
       tokens: row.tokens,
-      cost: parseFloat(row.cost),
+      cost: Number(row.cost),
       response: row.response,
       cached: row.cached,
       organizationId: row.organization_id,

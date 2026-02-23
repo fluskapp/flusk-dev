@@ -19,8 +19,9 @@ vi.mock('./map-span-to-llm-call.js', () => ({
 
 vi.mock('@flusk/resources', () => ({
   LLMCallRepository: {
-    create: vi.fn(async (_pool: unknown, data: unknown) => ({ id: '1', ...data as object })),
+    createLLMCall: vi.fn((_db: unknown, data: unknown) => ({ id: '1', ...data as object })),
   },
+  getDb: vi.fn(() => ({})),
 }));
 
 import { ingestTracesHandler } from './ingest-traces.js';
@@ -31,7 +32,6 @@ function makeApp() {
   return {
     app: {
       post: vi.fn((_path: string, handler: Function) => { routes['post'] = handler; }),
-      pg: { pool: {} },
       eventBus: { emit: vi.fn() },
     },
     routes,
@@ -55,7 +55,7 @@ describe('ingestTracesHandler', () => {
     const body = { resourceSpans: [{ scopeSpans: [{ spans: [genAiSpan, httpSpan] }] }] };
     const reply = { status: vi.fn().mockReturnThis(), send: vi.fn() };
     await handler({ body, headers: {}, log: { error: vi.fn() } }, reply);
-    expect(LLMCallRepository.create).toHaveBeenCalledTimes(1);
+    expect(LLMCallRepository.createLLMCall).toHaveBeenCalledTimes(1);
   });
 
   it('returns 200 with partialSuccess on empty input', async () => {
@@ -72,7 +72,7 @@ describe('ingestTracesHandler', () => {
   it('handles failed spans gracefully', async () => {
     const { app, routes } = makeApp();
     await ingestTracesHandler(app as any);
-    vi.mocked(LLMCallRepository.create).mockRejectedValueOnce(new Error('boom'));
+    vi.mocked(LLMCallRepository.createLLMCall).mockImplementationOnce(() => { throw new Error('boom'); });
     const handler = routes['post']!;
     const body = { resourceSpans: [{ scopeSpans: [{ spans: [genAiSpan] }] }] };
     const logError = vi.fn();

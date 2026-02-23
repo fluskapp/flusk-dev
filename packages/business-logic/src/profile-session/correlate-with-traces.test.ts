@@ -8,8 +8,12 @@ import { describe, it, expect } from 'vitest';
 import { correlateWithTraces } from './correlate-with-traces.function.js';
 import { ProfileSessionEntity } from '@flusk/entities';
 
-function createMockPool(rows: any[]) {
-  return { query: async () => ({ rows }) } as any;
+function createMockDb(rows: Record<string, unknown>[]) {
+  return {
+    prepare: () => ({
+      all: () => rows,
+    }),
+  } as any;
 }
 
 const MOCK_SESSION: ProfileSessionEntity = {
@@ -31,11 +35,11 @@ const MOCK_SESSION: ProfileSessionEntity = {
 };
 
 describe('correlateWithTraces', () => {
-  it('should return correlated LLM calls', async () => {
+  it('should return correlated LLM calls', () => {
     const mockRow = {
       id: 'call-1',
-      created_at: new Date('2026-02-13T18:00:05Z'),
-      updated_at: new Date('2026-02-13T18:00:05Z'),
+      created_at: '2026-02-13T18:00:05.000Z',
+      updated_at: '2026-02-13T18:00:05.000Z',
       provider: 'openai',
       model: 'gpt-4',
       prompt: 'test',
@@ -49,17 +53,17 @@ describe('correlateWithTraces', () => {
       consent_purpose: 'optimization',
     };
 
-    const pool = createMockPool([mockRow]);
-    const results = await correlateWithTraces(pool, MOCK_SESSION);
+    const db = createMockDb([mockRow]);
+    const results = correlateWithTraces(db, MOCK_SESSION);
 
     expect(results).toHaveLength(1);
     expect(results[0].llmCall.provider).toBe('openai');
     expect(results[0].relatedHotspots).toHaveLength(1);
   });
 
-  it('should return empty array when no matching calls', async () => {
-    const pool = createMockPool([]);
-    const results = await correlateWithTraces(pool, MOCK_SESSION);
+  it('should return empty array when no matching calls', () => {
+    const db = createMockDb([]);
+    const results = correlateWithTraces(db, MOCK_SESSION);
     expect(results).toHaveLength(0);
   });
 });

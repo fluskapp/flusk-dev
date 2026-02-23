@@ -16,23 +16,13 @@ export type { StorageAdapter } from './storage.js';
 export { createSqliteStorage } from './sqlite-storage.js';
 export { createStorage } from './create-storage.js';
 
-// Repository exports (Postgres — server mode)
+// Repository exports
 export * as LLMCallRepository from './repositories/llm-call.repository.js';
-export * as PatternRepository from './repositories/pattern/index.js';
-export * as ConversionRepository from './repositories/conversion/index.js';
-export * as RoutingRuleRepository from './repositories/routing-rule/index.js';
-export * as ModelPerformanceRepository from './repositories/model-performance/index.js';
-export * as RoutingDecisionRepository from './repositories/routing-decision/index.js';
-export * as ProfileSessionRepository from './repositories/profile-session/index.js';
-export * as PerformancePatternRepository from './repositories/performance-pattern/index.js';
 export * as TraceRepository from './repositories/trace.repository.js';
 export * as SpanRepository from './repositories/span.repository.js';
 export * as OptimizationRepository from './repositories/optimization.repository.js';
 export * as PromptTemplateRepository from './repositories/prompt-template.repository.js';
 export * as PromptVersionRepository from './repositories/prompt-version.repository.js';
-
-// Cache exports
-export * as RedisClient from './cache/redis.client.js';
 
 // Client exports
 export * as PricingClient from './clients/pricing.client.js';

@@ -8,8 +8,6 @@ import type { FastifyInstance } from 'fastify';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { errorHandler } from './middleware/error-handler.middleware.js';
 import { plugin as configPlugin } from './plugins/config.plugin.js';
-import { plugin as postgresPlugin } from './plugins/postgres.plugin.js';
-import { plugin as redisPlugin } from './plugins/redis.plugin.js';
 import { plugin as sensiblePlugin } from './plugins/sensible.plugin.js';
 import { plugin as migratePlugin } from './plugins/migrate.plugin.js';
 import { plugin as eventBusPlugin } from './plugins/event-bus.plugin.js';
@@ -68,8 +66,6 @@ export async function createApp(
 
   // 2. Infrastructure (skip in unit tests)
   if (!skipDb) {
-    await app.register(postgresPlugin);
-    await app.register(redisPlugin);
     await app.register(sensiblePlugin);
     await app.register(migratePlugin);
   }

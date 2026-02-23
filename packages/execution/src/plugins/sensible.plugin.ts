@@ -16,16 +16,11 @@ export const plugin = fp(async (app) => {
     maxEventLoopDelay: 1000,
     maxHeapUsedBytes: 1_000_000_000,
     maxRssBytes: 1_500_000_000,
-    healthCheck: async () => {
-      await app.pg.query('SELECT 1');
-      await app.redis.ping();
-      return true;
-    },
+    healthCheck: async () => true,
     healthCheckInterval: 5000,
     exposeStatusRoute: '/health/live',
   });
 }, {
   name: 'flusk-sensible',
-  dependencies: ['flusk-postgres', 'flusk-redis'],
 });
 // --- END CUSTOM ---

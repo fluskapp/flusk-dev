@@ -11,11 +11,7 @@
 export { createApp } from './app.js';
 export type { CreateAppOptions } from './app.js';
 
-// Plugin exports
-export { default as llmCallsPlugin } from './plugins/llm-calls.plugin.js';
-
 // Route exports
-export { llmCallsRoutes } from './routes/llm-calls.route.js';
 export { healthRoutes } from './routes/health.routes.js';
 
 // Middleware exports
@@ -25,9 +21,7 @@ export { authMiddleware, optionalAuthMiddleware } from './middleware/auth.middle
 // Hook exports
 export {
   hashPromptHook,
-  checkCacheHook,
   calculateCostHook,
-  cacheResponseHook
 } from './hooks/llm-call.hooks.js';
 
 // OTLP parsing exports (used by CLI analyze-receiver)
