@@ -2,6 +2,8 @@
  * Gitignore IDE, OS, and project-specific sections
  */
 
+import { getProjectPatterns } from './gitignore-project.js';
+
 /**
  * IDE, OS, temp files, and project-specific ignore patterns
  */
@@ -69,34 +71,5 @@ temp/
 *.temp
 .cache/
 .parcel-cache/
-
-# ============================================
-# Platformatic Watt
-# ============================================
-.platformatic/
-.watt/
-
-# ============================================
-# Flusk Specific
-# ============================================
-# Generated migrations (keep source migrations)
-packages/resources/src/migrations/*.generated.ts
-
-# Generated types (regenerated from entities)
-packages/types/src/*.generated.ts
-
-# Local development overrides
-watt.local.json
-docker-compose.local.yml
-
-# ============================================
-# Misc
-# ============================================
-.turbo/
-.vercel/
-.next/
-.nuxt/
-.output/
-.vite/
-`;
+` + getProjectPatterns();
 }

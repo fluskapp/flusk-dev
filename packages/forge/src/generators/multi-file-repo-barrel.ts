@@ -3,7 +3,6 @@
  */
 
 import type { EntitySchema } from '../schema/entity-schema.types.js';
-import type { QuerySchema } from '../schema/query-schema.types.js';
 import { toKebab, normalizeQueries } from './multi-file-repo-helpers.js';
 
 /** Infer interface name for raw queries */

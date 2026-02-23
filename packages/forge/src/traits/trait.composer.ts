@@ -7,7 +7,7 @@
  */
 
 import { createLogger } from '@flusk/logger';
-import type { TraitContext, TraitOutput } from './trait.types.js';
+import type { TraitContext } from './trait.types.js';
 import { resolveTraitChain } from './trait.registry.js';
 import type { EntitySchema, StorageTarget } from '../schema/index.js';
 import { toKebabCase, toSnakeCase, toTableName } from '../generators/utils.js';

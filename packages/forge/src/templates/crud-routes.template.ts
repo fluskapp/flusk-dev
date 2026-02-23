@@ -7,6 +7,7 @@
  */
 
 import { toPascalCase, toCamelCase } from '../generators/utils.js';
+import { buildHandlersSuffix } from './crud-routes-handlers.template.js';
 
 export interface CrudRoutesTemplateOptions {
   entityName: string;
@@ -84,36 +85,5 @@ export async function ${camel}Routes(
     return reply.code(200).send(items);
   });
 
-  fastify.put('/:id', {
-    schema: {
-      params: IdParamsSchema,
-      body: Type.Partial(Create${pascal}Schema),
-      response: { 200: ${pascal}ResponseSchema as unknown as TSchema, 404: NotFoundSchema },
-      tags: ['${pascal}'],
-      description: 'Update ${pascal} by ID',
-    },
-  }, async (request, reply) => {
-    const { id } = request.params as { id: string };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = ${pascal}Repository.update${pascal}(fastify.db, id, request.body as any);
-    if (!updated) return reply.code(404).send({ error: 'Not found' });
-    return reply.code(200).send(updated);
-  });
-
-  fastify.delete('/:id', {
-    schema: {
-      params: IdParamsSchema,
-      response: { 204: Type.Null(), 404: NotFoundSchema },
-      tags: ['${pascal}'],
-      description: 'Delete ${pascal} by ID',
-    },
-  }, async (request, reply) => {
-    const { id } = request.params as { id: string };
-    const deleted = ${pascal}Repository.delete${pascal}(fastify.db, id);
-    if (!deleted) return reply.code(404).send({ error: 'Not found' });
-    return reply.code(204).send();
-  });
-}
-// --- END CUSTOM ---
-`;
+` + buildHandlersSuffix(entityName);
 }

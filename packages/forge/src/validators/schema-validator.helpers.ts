@@ -3,9 +3,10 @@
  * Content validation and syntax error detection for TypeBox schemas
  */
 
-import type { ValidationResult, ValidationError } from './config-validator.types.js';
+import type { ValidationResult } from './config-validator.types.js';
 import { createEmptyResult } from './config-validator.types.js';
 import { VALID_TYPEBOX_TYPES, RESERVED_KEYWORDS } from './schema-validator.constants.js';
+import { detectSyntaxErrors } from './schema-syntax-detector.js';
 
 /**
  * Validate schema content
@@ -69,43 +70,4 @@ export function validateSchemaContent(content: string, file: string): Validation
   }
 
   return result;
-}
-
-/**
- * Detect common syntax errors
- */
-function detectSyntaxErrors(content: string, file: string): ValidationError[] {
-  const errors: ValidationError[] = [];
-
-  const openBraces = (content.match(/{/g) || []).length;
-  const closeBraces = (content.match(/}/g) || []).length;
-  if (openBraces !== closeBraces) {
-    errors.push({
-      file,
-      message: `Unmatched braces: ${openBraces} opening, ${closeBraces} closing`,
-      fix: 'Balance braces in the schema definition',
-    });
-  }
-
-  const openParens = (content.match(/\(/g) || []).length;
-  const closeParens = (content.match(/\)/g) || []).length;
-  if (openParens !== closeParens) {
-    errors.push({
-      file,
-      message: `Unmatched parentheses: ${openParens} opening, ${closeParens} closing`,
-      fix: 'Balance parentheses in Type definitions',
-    });
-  }
-
-  const openBrackets = (content.match(/\[/g) || []).length;
-  const closeBrackets = (content.match(/]/g) || []).length;
-  if (openBrackets !== closeBrackets) {
-    errors.push({
-      file,
-      message: `Unmatched brackets: ${openBrackets} opening, ${closeBrackets} closing`,
-      fix: 'Balance brackets in array definitions',
-    });
-  }
-
-  return errors;
 }

@@ -1,12 +1,13 @@
 /**
- * Entity schema generator - creates TypeBox entity schema files from definitions
+ * Entity schema generator - creates TypeBox entity schema files
  */
 
 import { resolve } from 'node:path';
 import { writeFile, mkdir } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { toKebabCase } from './utils.js';
-import type { EntityDefinition, FieldDefinition } from '../types/entity.types.js';
+import type { EntityDefinition } from '../types/entity.types.js';
+import { generateFieldDefinition } from './entity-schema-field.js';
 
 export interface GeneratorResult {
   path: string;
@@ -15,71 +16,23 @@ export interface GeneratorResult {
 }
 
 /**
- * Generate TypeBox field definition from field configuration
- */
-function generateFieldDefinition(field: FieldDefinition): string {
-  const description = field.description || `${field.name} field`;
-  let typeDef = '';
-
-  switch (field.type) {
-    case 'String':
-      typeDef = `Type.String({ description: '${description}' })`;
-      break;
-
-    case 'Integer':
-      typeDef = `Type.Integer({ minimum: 0, description: '${description}' })`;
-      break;
-
-    case 'Number':
-      typeDef = `Type.Number({ minimum: 0, description: '${description}' })`;
-      break;
-
-    case 'Boolean':
-      typeDef = `Type.Boolean({ description: '${description}' })`;
-      break;
-
-    case 'UUID':
-      typeDef = `Type.String({ format: 'uuid', description: '${description}' })`;
-      break;
-
-    case 'Date':
-      typeDef = `Type.String({ format: 'date-time', description: '${description}' })`;
-      break;
-
-    case 'Email':
-      typeDef = `Type.String({ format: 'email', description: '${description}' })`;
-      break;
-
-    default:
-      typeDef = `Type.String({ description: '${description}' })`;
-  }
-
-  // Wrap with Optional if not required
-  if (!field.required) {
-    typeDef = `Type.Optional(${typeDef})`;
-  }
-
-  return typeDef;
-}
-
-/**
  * Generate entity schema file content
  */
-export function generateEntitySchemaContent(definition: EntityDefinition): string {
+export function generateEntitySchemaContent(
+  definition: EntityDefinition,
+): string {
   const { name: entityName, fields } = definition;
-  // Generate field definitions
   const fieldDefinitions = fields.map(field => {
     const fieldDef = generateFieldDefinition(field);
     return `  ${field.name}: ${fieldDef}`;
   }).join(',\n');
 
-  // Build the entity schema
   const hasFields = fields.length > 0;
   const fieldsObject = hasFields
     ? `,\n  Type.Object({\n${fieldDefinitions}\n  })`
     : '';
 
-  const content = `import { Type, Static } from '@sinclair/typebox';
+  return `import { Type, Static } from '@sinclair/typebox';
 import { BaseEntitySchema } from './base.entity.js';
 
 /**
@@ -92,37 +45,30 @@ export const ${entityName}EntitySchema = Type.Composite([
 
 export type ${entityName}Entity = Static<typeof ${entityName}EntitySchema>;
 `;
-
-  return content;
 }
 
 /**
  * Generate entity schema file
  */
 export async function generateEntitySchema(
-  definition: EntityDefinition
+  definition: EntityDefinition,
 ): Promise<GeneratorResult> {
   const { name: entityName } = definition;
   const kebabName = toKebabCase(entityName);
   const fileName = `${kebabName}.entity.ts`;
-
   const outputDir = resolve(process.cwd(), 'packages/entities/src');
   const outputPath = resolve(outputDir, fileName);
 
-  // Ensure directory exists
   if (!existsSync(outputDir)) {
     await mkdir(outputDir, { recursive: true });
   }
 
-  // Generate content
   const content = generateEntitySchemaContent(definition);
-
-  // Write file
   await writeFile(outputPath, content, 'utf-8');
 
   return {
     path: `entities/src/${fileName}`,
     content,
-    fullPath: outputPath
+    fullPath: outputPath,
   };
 }

@@ -4,7 +4,6 @@
 
 import type { EntitySchema } from '../schema/entity-schema.types.js';
 import { tbl, entityLabel, isJson, isBool } from './multi-file-crud-helpers.js';
-import { toSnakeCase } from './utils.js';
 
 function toSnake(s: string): string {
   return s.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
