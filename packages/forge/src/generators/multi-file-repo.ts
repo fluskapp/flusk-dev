@@ -8,6 +8,7 @@
 
 import type { EntitySchema } from '../schema/entity-schema.types.js';
 import { generateRowToEntity, generateCreate, generateFindById, generateList, generateUpdate, generateDeleteById, generateFindByTimeRange } from './multi-file-crud.js';
+import { generateAggregate } from './multi-file-crud-aggregate.js';
 import { generateCustomQuery } from './multi-file-queries.js';
 import { normalizeQueries } from './multi-file-repo-helpers.js';
 import { generateBarrel } from './multi-file-repo-barrel.js';
@@ -40,6 +41,11 @@ export function generateMultiFileRepo(
   // Add time-range query if trait enabled
   if (schema.capabilities?.['time-range']) {
     files.push({ filename: 'find-by-time-range.ts', content: generateFindByTimeRange(schema) });
+  }
+
+  // Add aggregation if trait enabled
+  if (schema.capabilities?.aggregation) {
+    files.push({ filename: 'aggregate.ts', content: generateAggregate(schema) });
   }
 
   const queries = normalizeQueries(schema.queries);

@@ -1,11 +1,3 @@
-/**
- * @generated from packages/schema/entities/llm-call.entity.yaml
- * Hash: 246a8a696c52e028c91354ebc15896a2f70e96542315a70258b1339b8d3b515c
- * Generated: 2026-02-23T08:08:01.286Z
- * DO NOT EDIT generated sections — changes will be overwritten.
- */
-
-// --- BEGIN GENERATED (do not edit) [typebox] ---
 import { Type, Static } from '@sinclair/typebox';
 import { BaseEntitySchema } from './base.entity.js';
 
@@ -35,9 +27,3 @@ export const LLMCallEntitySchema = Type.Composite([
 ]);
 
 export type LLMCallEntity = Static<typeof LLMCallEntitySchema>;
-
-// --- END GENERATED ---
-
-// --- BEGIN CUSTOM [entity] ---
-
-// --- END CUSTOM ---

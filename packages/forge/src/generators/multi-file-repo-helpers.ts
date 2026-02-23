@@ -14,7 +14,10 @@ export interface GeneratedFile {
 
 /** Convert camelCase to kebab-case */
 export function toKebab(s: string): string {
-  return s.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+  return s
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    .replace(/([a-z])([A-Z])/g, '$1-$2')
+    .toLowerCase();
 }
 
 /** Normalize queries from array or record format */

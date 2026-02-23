@@ -54,18 +54,26 @@ export function generateBarrel(
   if (schema.capabilities?.['time-range']) {
     lines.push(`export { findByTimeRange } from './find-by-time-range.js';`);
   }
+  if (schema.capabilities?.aggregation) {
+    lines.push(`export { aggregate } from './aggregate.js';`);
+    lines.push(`export type { AggregateOptions, AggregateResult } from './aggregate.js';`);
+  }
 
   const rawQueries = queries.filter(
     (q) => q.type === 'raw-sql' && q.returns === 'raw');
   const scalarQueries = queries.filter((q) => q.returns === 'scalar');
   const listQueries = queries.filter((q) => q.returns === 'list');
   const otherQueries = [...rawQueries, ...scalarQueries, ...listQueries];
+  const exportedTypes = new Set<string>();
   for (const q of otherQueries) {
     const kebab = toKebab(q.name);
     lines.push(`export { ${q.name} } from './${kebab}.js';`);
     if (q.type === 'raw-sql' && q.returns === 'raw' && q.sql) {
       const iface = inferRawInterfaceName(q.name, q.sql);
-      lines.push(`export type { ${iface} } from './${kebab}.js';`);
+      if (!exportedTypes.has(iface)) {
+        lines.push(`export type { ${iface} } from './${kebab}.js';`);
+        exportedTypes.add(iface);
+      }
     }
   }
   return lines.join('\n') + '\n';

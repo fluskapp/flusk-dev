@@ -1,0 +1,12 @@
+import type { DatabaseSync } from 'node:sqlite';
+
+/**
+ * Delete LLM call by id
+ */
+export function deleteById(
+  db: DatabaseSync,
+  id: string,
+): boolean {
+  const stmt = db.prepare('DELETE FROM llm_calls WHERE id = ?');
+  return stmt.run(id).changes > 0;
+}

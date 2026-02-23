@@ -1,0 +1,32 @@
+import type { DatabaseSync } from 'node:sqlite';
+
+export interface AggregateOptions {
+  op: 'sum' | 'avg' | 'count' | 'min' | 'max';
+  field: 'cost';
+  groupBy?: string;
+}
+
+export interface AggregateResult {
+  value: number;
+  group?: string;
+}
+
+/**
+ * Run an aggregate query on LLMCall
+ */
+export function aggregate(
+  db: DatabaseSync,
+  opts: AggregateOptions,
+): AggregateResult[] {
+  const col = String(opts.field).replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase();
+  const fn = opts.op.toUpperCase();
+  const groupCol = opts.groupBy?.replace(/[^a-z_]/gi, '');
+  const select = groupCol
+    ? `${groupCol} as "group", ${fn}(${col}) as value`
+    : `COALESCE(${fn}(${col}), 0) as value`;
+  const groupClause = groupCol ? `GROUP BY ${groupCol}` : '';
+  const stmt = db.prepare(
+    `SELECT ${select} FROM llmcalls ${groupClause}`,
+  );
+  return stmt.all() as unknown as AggregateResult[];
+}

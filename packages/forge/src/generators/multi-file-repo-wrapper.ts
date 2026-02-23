@@ -60,6 +60,15 @@ export function generateRepoWrapper(schema: EntitySchema): string {
     lines.push(`}`);
   }
 
+  // Aggregation if enabled
+  if (schema.capabilities?.aggregation) {
+    lines.push(``);
+    lines.push(`export type { AggregateOptions as ${n}AggregateOptions, AggregateResult as ${n}AggregateResult } from '../sqlite/repositories/${toKebab(n)}/aggregate.js';`);
+    lines.push(`export function aggregate${plural}(db: DatabaseSync, opts: Repo.AggregateOptions): Repo.AggregateResult[] {`);
+    lines.push(`  return Repo.aggregate(db, opts);`);
+    lines.push(`}`);
+  }
+
   // Custom queries pass-through
   const queries = normalizeQueries(schema.queries);
   for (const q of queries) {

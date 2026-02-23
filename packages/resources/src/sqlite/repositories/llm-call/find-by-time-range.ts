@@ -3,16 +3,16 @@ import type { LLMCallEntity } from '@flusk/entities';
 import { rowToEntity } from './row-to-entity.js';
 
 /**
- * List LLM calls with pagination
+ * Find LLMCall records within a time range
  */
-export function list(
+export function findByTimeRange(
   db: DatabaseSync,
-  limit = 50,
-  offset = 0,
+  from: string,
+  to: string,
 ): LLMCallEntity[] {
   const stmt = db.prepare(
-    'SELECT * FROM llm_calls ORDER BY created_at DESC LIMIT ? OFFSET ?',
+    'SELECT * FROM llm_calls WHERE created_at >= ? AND created_at <= ? ORDER BY created_at DESC',
   );
-  const rows = stmt.all(limit, offset) as Record<string, unknown>[];
+  const rows = stmt.all(from, to) as Record<string, unknown>[];
   return rows.map(rowToEntity);
 }

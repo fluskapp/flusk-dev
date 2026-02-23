@@ -60,10 +60,12 @@ export function generateCustomQuery(
   }
 
   if (query.type === 'raw-sql' && query.returns === 'raw') {
+    const { sql: resolvedSql, args } = replaceParams(query.sql!.trim(), names);
     const fnParams = types.length > 0
       ? `db: DatabaseSync, ${types.join(', ')}`
       : 'db: DatabaseSync';
-    return { filename: `${kebab}.ts`, content: generateRawQuery(query, fnParams) };
+    const resolvedQuery = { ...query, sql: resolvedSql };
+    return { filename: `${kebab}.ts`, content: generateRawQuery(resolvedQuery, fnParams, args) };
   }
 
   if (query.returns === 'single') {
