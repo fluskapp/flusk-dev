@@ -110,6 +110,9 @@ importers:
       '@flusk/logger':
         specifier: workspace:*
         version: link:../logger
+      '@flusk/resources':
+        specifier: workspace:*
+        version: link:../resources
       '@flusk/types':
         specifier: workspace:*
         version: link:../types
@@ -129,6 +132,9 @@ importers:
       '@clack/prompts':
         specifier: ^1.0.0
         version: 1.0.0
+      '@flusk/business-logic':
+        specifier: workspace:*
+        version: link:../business-logic
       '@flusk/entities':
         specifier: workspace:*
         version: link:../entities

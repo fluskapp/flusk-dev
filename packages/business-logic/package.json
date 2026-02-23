@@ -14,8 +14,9 @@
   },
   "dependencies": {
     "@flusk/entities": "workspace:*",
-    "@flusk/types": "workspace:*",
     "@flusk/logger": "workspace:*",
+    "@flusk/resources": "workspace:*",
+    "@flusk/types": "workspace:*",
     "@sinclair/typebox": "^0.34.48"
   },
   "devDependencies": {
