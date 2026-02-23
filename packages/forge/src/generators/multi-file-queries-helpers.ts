@@ -73,5 +73,5 @@ export function generateRawQuery(
     const name = asMatch ? asMatch[1] : col.replace(/\W/g, '_');
     return `  ${name}: ${isNum ? 'number' : 'string'};`;
   });
-  return `import type { DatabaseSync } from 'node:sqlite';\n\nexport interface ${iface} {\n${fields.join('\n')}\n}\n\n/**\n * ${query.description ?? query.name}\n */\nexport function ${query.name}(${fnParams}): ${iface}[] {\n  const stmt = db.prepare(\n    '${sql}',\n  );\n  return stmt.all() as ${iface}[];\n}\n`;
+  return `import type { DatabaseSync } from 'node:sqlite';\n\nexport interface ${iface} {\n${fields.join('\n')}\n}\n\n/**\n * ${query.description ?? query.name}\n */\nexport function ${query.name}(${fnParams}): ${iface}[] {\n  const stmt = db.prepare(\n    '${sql}',\n  );\n  return stmt.all() as unknown as ${iface}[];\n}\n`;
 }

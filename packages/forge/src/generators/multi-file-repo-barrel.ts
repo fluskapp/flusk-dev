@@ -50,6 +50,10 @@ export function generateBarrel(
 
   lines.push(`export { list } from './list.js';`);
   if (hasUpdate) lines.push(`export { update } from './update.js';`);
+  lines.push(`export { deleteById } from './delete-by-id.js';`);
+  if (schema.capabilities?.['time-range']) {
+    lines.push(`export { findByTimeRange } from './find-by-time-range.js';`);
+  }
 
   const rawQueries = queries.filter(
     (q) => q.type === 'raw-sql' && q.returns === 'raw');

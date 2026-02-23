@@ -1,9 +1,4 @@
-/**
- * Individual steps for the full-entity recipe.
- *
- * WHY: Each step is isolated for testability and the 100-line rule.
- * Steps share data through RecipeContext.shared.
- */
+/** Individual steps for the full-entity recipe. */
 
 import { resolve } from 'node:path';
 import type { RecipeStep } from './recipe.types.js';
@@ -13,6 +8,7 @@ import { generateMigrationSql } from '../schema/generate-migration.js';
 import { generateTypesFileContent } from '../schema/generate-types-file.js';
 import { composeTraits } from '../traits/trait.composer.js';
 import { generateMultiFileRepo } from '../generators/multi-file-repo.js';
+import { generateRepoWrapper } from '../generators/multi-file-repo-wrapper.js';
 import type { EntitySchema, StorageTarget } from '../schema/entity-schema.types.js';
 
 /** Generate TypeBox entity schema file */
@@ -76,6 +72,11 @@ export const composeTraitsStep: RecipeStep = {
         for (const rf of repoFiles) {
           files.push(writeRecipeFile(ctx, repoDir, rf.filename, rf.content));
         }
+        // Generate wrapper for route compatibility
+        const wrapperDir = resolve(ctx.projectRoot,
+          'packages/resources/src/repositories');
+        files.push(writeRecipeFile(ctx, wrapperDir, `${kebab}.repository.ts`,
+          generateRepoWrapper(schema)));
       } else {
         // Fallback to monolithic composer for non-sqlite targets
         const composed = composeTraits(schema, target);

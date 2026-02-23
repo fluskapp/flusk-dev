@@ -7,7 +7,7 @@
  */
 
 import type { EntitySchema } from '../schema/entity-schema.types.js';
-import { generateRowToEntity, generateCreate, generateFindById, generateList, generateUpdate } from './multi-file-crud.js';
+import { generateRowToEntity, generateCreate, generateFindById, generateList, generateUpdate, generateDeleteById, generateFindByTimeRange } from './multi-file-crud.js';
 import { generateCustomQuery } from './multi-file-queries.js';
 import { normalizeQueries } from './multi-file-repo-helpers.js';
 import { generateBarrel } from './multi-file-repo-barrel.js';
@@ -32,6 +32,14 @@ export function generateMultiFileRepo(
   files.push({ filename: 'list.ts', content: generateList(schema) });
   if (hasUpdate) {
     files.push({ filename: 'update.ts', content: generateUpdate(schema) });
+  }
+
+  // Always include delete
+  files.push({ filename: 'delete-by-id.ts', content: generateDeleteById(schema) });
+
+  // Add time-range query if trait enabled
+  if (schema.capabilities?.['time-range']) {
+    files.push({ filename: 'find-by-time-range.ts', content: generateFindByTimeRange(schema) });
   }
 
   const queries = normalizeQueries(schema.queries);
