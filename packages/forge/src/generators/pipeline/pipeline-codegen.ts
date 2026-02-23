@@ -12,7 +12,7 @@ export function generatePipelineCode(schema: PipelineSchema): string {
   const inputType = renderInputType(schema.name, schema.input);
   const outputType = renderOutputType(schema.name, schema.output);
   const imports = extractImports(schema.steps);
-  const typeImports = extractTypeImports(schema.input, schema.output);
+  const typeImports = extractTypeImports(schema.input);
   const steps = schema.steps.map(renderStep).join('\n\n');
 
   return `/**

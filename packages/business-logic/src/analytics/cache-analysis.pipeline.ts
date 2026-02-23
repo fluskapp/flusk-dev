@@ -8,7 +8,6 @@
 // @ts-nocheck — generated pipeline with dynamic expr: steps
 import { getLogger } from '@flusk/logger';
 import type { LLMCallEntity } from '@flusk/entities';
-import type { CacheAnalysisReport } from '@flusk/types';
 import { sum as primitives_math_sum } from '../primitives/math/sum.function.js';
 import { groupBy as primitives_collection_groupBy } from '../primitives/collection/group-by.function.js';
 

@@ -47,15 +47,10 @@ export function safeType(t: string): string {
 /** Extract type imports needed from input/output type refs */
 export function extractTypeImports(
   input: Record<string, { type: string }>,
-  output: { type: string; fields?: Record<string, { type: string }> },
 ): string[] {
   const types = new Set<string>();
   for (const v of Object.values(input)) {
     const match = v.type.match(/^([A-Z][A-Za-z]+)/);
-    if (match && match[1] !== 'Record') types.add(match[1]);
-  }
-  if (output.type) {
-    const match = output.type.match(/^([A-Z][A-Za-z]+)/);
     if (match && match[1] !== 'Record') types.add(match[1]);
   }
   if (types.size === 0) return [];

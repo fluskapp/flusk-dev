@@ -8,7 +8,6 @@
 // @ts-nocheck — generated pipeline with dynamic expr: steps
 import { getLogger } from '@flusk/logger';
 import type { LLMCallEntity } from '@flusk/entities';
-import type { SessionReport } from '@flusk/types';
 import { costSummary as costSummary_fn } from './cost-summary.pipeline.js';
 import { duplicateDetection as duplicateDetection_fn } from './duplicate-detection.pipeline.js';
 import { modelComparison as modelComparison_fn } from './model-comparison.pipeline.js';
