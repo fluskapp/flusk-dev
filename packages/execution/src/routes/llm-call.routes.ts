@@ -1,4 +1,5 @@
 /** @generated from LLMCall YAML — Traits: crud, aggregation, time-range */
+// --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
 import { Type, type TSchema } from '@sinclair/typebox';
 import { LLMCallEntitySchema } from '@flusk/entities';
@@ -96,4 +97,4 @@ export async function llmCallRoutes(
     const { from, to } = req.query as { from: string; to: string };
     return LLMCallRepository.findLLMCallsByTimeRange(fastify.db, from, to);
   });
-}
+}// --- END GENERATED ---
