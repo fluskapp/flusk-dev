@@ -10,7 +10,7 @@
  * - Return a value (value: { ... })
  */
 
-import { resolve, basename } from 'node:path';
+import { resolve } from 'node:path';
 import { writeFile, mkdir, readFile, readdir } from 'node:fs/promises';
 import { parse } from 'yaml';
 
