@@ -32,9 +32,7 @@
   "dependencies": {
     "@clack/prompts": "^1.0.0",
     "@flusk/entities": "workspace:*",
-    "@flusk/execution": "workspace:*",
     "@flusk/logger": "workspace:*",
-    "@flusk/resources": "workspace:*",
     "@sinclair/typebox": "^0.34.48",
     "chalk": "^5.4.1",
     "fs-extra": "^11.2.0",

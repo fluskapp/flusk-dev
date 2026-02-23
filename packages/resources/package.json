@@ -24,7 +24,6 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@flusk/business-logic": "workspace:*",
     "@flusk/entities": "workspace:*",
     "@flusk/logger": "workspace:*",
     "@flusk/types": "workspace:*",

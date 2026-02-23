@@ -3,11 +3,9 @@
  */
 
 // --- BEGIN GENERATED ---
-import { llmCall } from '@flusk/business-logic';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-const { calculateCost: businessCalculateCost } = llmCall;
 
 /**
  * Pricing Client - LLM Model Cost Calculator
@@ -80,7 +78,6 @@ export class PricingClient {
 
   /**
    * Calculate cost for a given token usage
-   * Delegates to business-logic calculateCost for consistency
    * @param provider - LLM provider
    * @param model - Model name
    * @param inputTokens - Number of input tokens
@@ -93,17 +90,11 @@ export class PricingClient {
     inputTokens: number,
     outputTokens: number
   ): number | null {
-    const result = businessCalculateCost({
-      providerName: provider,
-      modelName: model,
-      tokenUsage: {
-        input: inputTokens,
-        output: outputTokens,
-        total: inputTokens + outputTokens
-      }
-    });
-
-    return result.costUsd || null;
+    const pricing = this.getModelPricing(provider, model);
+    if (!pricing) return null;
+    const inputCost = (inputTokens / 1_000_000) * pricing.inputPricePerMToken;
+    const outputCost = (outputTokens / 1_000_000) * pricing.outputPricePerMToken;
+    return inputCost + outputCost;
   }
 }
 
