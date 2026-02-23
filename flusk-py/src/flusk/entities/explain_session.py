@@ -4,7 +4,6 @@
 from pydantic import Field
 from flusk.entities.base import FluskBaseModel
 
-
 class ExplainSession(FluskBaseModel):
     """Session tracking for flusk explain runs"""
 
@@ -15,5 +14,5 @@ class ExplainSession(FluskBaseModel):
     completion_tokens: int = Field(default=0, description="Number of completion tokens used", ge=0)
     explain_cost: float = Field(default=0, description="Cost of the explain LLM call in USD", ge=0)
     insights_count: int = Field(default=0, description="Number of insights generated", ge=0)
-    total_savings: float = Field(default=0, description="Total projected savings in USD", ge=0)
+    total_savings: float = Field(default=0, description="Total projected savings across all insights in USD", ge=0)
 # --- END GENERATED ---

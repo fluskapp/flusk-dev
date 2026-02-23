@@ -4,6 +4,6 @@ from typing import TypeVar
 T = TypeVar("T")
 
 
-def group_by(items: list[T], key: str) -> dict:
+def group_by(items: list[T], key: str) -> Record<str, list[T]>:
     """Group array items by a key's value into a Map"""
     raise NotImplementedError("group_by — implement from YAML body")

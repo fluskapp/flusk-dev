@@ -33,7 +33,9 @@ export function runMigrations(db: DatabaseSync): void {
 
   for (const file of files) {
     if (!applied.has(file)) {
-      const sql = readFileSync(join(SQL_DIR, file), 'utf-8');
+      const filePath = join(SQL_DIR, file);
+      let sql: string;
+      try { sql = readFileSync(filePath, 'utf-8'); } catch { continue; }
       const checksum = createHash('sha256').update(sql).digest('hex').slice(0, 16);
       db.exec(sql);
       db.prepare('INSERT INTO _migrations (name, checksum) VALUES (?, ?)').run(file, checksum);

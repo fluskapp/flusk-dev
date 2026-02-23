@@ -4,7 +4,7 @@
 import { SpanStatusCode } from '@opentelemetry/api';
 
 /** Wrap an async-iterable streaming response with span attributes */
-export function wrapStreamingResult(result: any, span: any): any {
+export function instrumentStreamingResult(result: any, span: any): any {
   let inputTokens = 0;
   let outputTokens = 0;
   let responseModel = '';

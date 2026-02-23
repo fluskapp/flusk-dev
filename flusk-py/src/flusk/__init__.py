@@ -7,6 +7,8 @@ from flusk.entities.base import FluskBaseModel
 from flusk.entities.analyze_session import *  # noqa: F403
 from flusk.entities.budget_alert import *  # noqa: F403
 from flusk.entities.conversion import *  # noqa: F403
+from flusk.entities.explain_session import *  # noqa: F403
+from flusk.entities.insight import *  # noqa: F403
 from flusk.entities.llm_call import *  # noqa: F403
 from flusk.entities.model_performance import *  # noqa: F403
 from flusk.entities.optimization import *  # noqa: F403

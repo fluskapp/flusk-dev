@@ -16,6 +16,8 @@ class LLMCall(FluskBaseModel):
     cost: float = Field(default=0, description="Calculated cost in USD for this API call", ge=0)
     response: str = Field(default="", description="Full response text from the LLM")
     cached: bool = Field(default=False, description="Whether this response was served from cache")
+    status: str = Field(default="ok", description="Call status (ok or error)")
+    error_message: str | None = Field(default="", description="Error message if the call failed")
     agent_label: str | None = Field(description="Agent label for multi-agent tracking")
     organization_id: str | None = Field(description="Organization ID for GDPR data portability and deletion", min_length=1)
     consent_given: bool = Field(default=True, description="GDPR consent flag")

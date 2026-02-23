@@ -13,6 +13,8 @@ class LLMCallInsert(TypedDict, total=False):
     cost: float
     response: str
     cached: bool
+    status: str
+    error_message: str  # optional
     agent_label: str  # optional
     organization_id: str  # optional
     consent_given: bool
@@ -28,6 +30,8 @@ class LLMCallUpdate(TypedDict, total=False):
     cost: float  # optional
     response: str  # optional
     cached: bool  # optional
+    status: str  # optional
+    error_message: str  # optional
     agent_label: str  # optional
     organization_id: str  # optional
     consent_given: bool  # optional

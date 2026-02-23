@@ -28,6 +28,7 @@ class TestInsightEntity:
 
     def test_create_minimal(self) -> None:
         """Can create with required fields."""
+        # TODO: fill required fields
         assert Insight is not None
 
 

@@ -5,6 +5,8 @@ from .analyze_session import *  # noqa: F403
 from .base import *  # noqa: F403
 from .budget_alert import *  # noqa: F403
 from .conversion import *  # noqa: F403
+from .explain_session import *  # noqa: F403
+from .insight import *  # noqa: F403
 from .llm_call import *  # noqa: F403
 from .model_performance import *  # noqa: F403
 from .optimization import *  # noqa: F403

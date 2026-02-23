@@ -4,6 +4,8 @@
 from .analyze_session_repo import *  # noqa: F403
 from .budget_alert_repo import *  # noqa: F403
 from .conversion_repo import *  # noqa: F403
+from .explain_session_repo import *  # noqa: F403
+from .insight_repo import *  # noqa: F403
 from .llm_call_repo import *  # noqa: F403
 from .model_performance_repo import *  # noqa: F403
 from .optimization_repo import *  # noqa: F403

@@ -6,6 +6,6 @@ from typing import TypeVar
 T = TypeVar("T")
 
 
-def find_by(items: list[T], key: str, value: Any) -> Optional[T]:
+def find_by(items: list[T], key: str, value: Any) -> T | null:
     """Find the first item in an array matching a key-value pair"""
     raise NotImplementedError("find_by — implement from YAML body")

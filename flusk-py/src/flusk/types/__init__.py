@@ -4,6 +4,8 @@
 from .analyze_session_types import *  # noqa: F403
 from .budget_alert_types import *  # noqa: F403
 from .conversion_types import *  # noqa: F403
+from .explain_session_types import *  # noqa: F403
+from .insight_types import *  # noqa: F403
 from .llm_call_types import *  # noqa: F403
 from .model_performance_types import *  # noqa: F403
 from .optimization_types import *  # noqa: F403

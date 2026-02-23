@@ -4,7 +4,7 @@
  * Works with openai@6.x where @traceloop/instrumentation-openai doesn't.
  */
 import { trace, SpanKind, SpanStatusCode, context } from '@opentelemetry/api';
-import { wrapStreamingResult } from './openai-v6-streaming.js';
+import { instrumentStreamingResult } from './openai-v6-streaming.js';
 
 const TRACER_NAME = 'flusk-openai-v6';
 
@@ -54,7 +54,7 @@ function patchCompletionsCreate(OpenAI: any): void {
 
           // Handle streaming responses
           if (body?.stream && result && Symbol.asyncIterator in result) {
-            return wrapStreamingResult(result, span);
+            return instrumentStreamingResult(result, span);
           }
 
           if (result?.model) span.setAttribute('gen_ai.response.model', result.model);
