@@ -41,6 +41,7 @@ function mergeRouteSection(
   const camel = toCamelCase(toKebabCase(entityName));
   return [
     `/** @generated from ${entityName} YAML — Traits: ${traits} */`,
+    `// --- BEGIN GENERATED (do not edit) ---`,
     imports.join('\n'),
     types,
     '',
@@ -52,6 +53,7 @@ function mergeRouteSection(
     `): Promise<void> {`,
     functions,
     `}`,
+    `// --- END GENERATED ---`,
   ].filter((line) => line !== undefined).join('\n');
 }
 

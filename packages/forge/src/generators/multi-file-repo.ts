@@ -9,6 +9,7 @@
 import type { EntitySchema } from '../schema/entity-schema.types.js';
 import { generateRowToEntity, generateCreate, generateFindById, generateList, generateUpdate, generateDeleteById, generateFindByTimeRange } from './multi-file-crud.js';
 import { generateAggregate } from './multi-file-crud-aggregate.js';
+import { generatedHeader, generatedFooter } from './multi-file-crud-helpers.js';
 import { generateCustomQuery } from './multi-file-queries.js';
 import { normalizeQueries } from './multi-file-repo-helpers.js';
 import { generateBarrel } from './multi-file-repo-barrel.js';
@@ -54,5 +55,12 @@ export function generateMultiFileRepo(
   }
 
   files.push({ filename: 'index.ts', content: generateBarrel(schema, hasUpdate) });
-  return files;
+
+  // Wrap all files with @generated markers
+  const hdr = generatedHeader(schema.name);
+  const ftr = generatedFooter();
+  return files.map(f => ({
+    filename: f.filename,
+    content: hdr + f.content + ftr,
+  }));
 }
