@@ -21,6 +21,7 @@ interface MappedLlmCall {
   cost: number;
   response: string;
   cached: boolean;
+  status: string;
   organizationId: string;
   consentGiven: boolean;
   consentPurpose: string;
@@ -52,6 +53,7 @@ export function mapSpanToLlmCall(parsed: ParsedLlmCall): MappedLlmCall {
     cost: costUsd ?? 0,
     response: parsed.response,
     cached: false,
+    status: 'ok',
     organizationId: 'default',
     consentGiven: process.env.FLUSK_CONSENT_GIVEN !== 'false',
     consentPurpose: process.env.FLUSK_CONSENT_PURPOSE || 'optimization',

@@ -26,7 +26,7 @@ const MOCK_CALL: LLMCallEntity = {
   updatedAt: '2026-02-13T18:00:05Z', provider: 'openai',
   model: 'gpt-4', prompt: 'test', promptHash: 'a'.repeat(64),
   tokens: { input: 10, output: 20, total: 30 }, cost: 0.12,
-  response: 'resp', cached: false, consentGiven: true,
+  response: 'resp', cached: false, status: 'ok', consentGiven: true,
   consentPurpose: 'optimization',
 };
 

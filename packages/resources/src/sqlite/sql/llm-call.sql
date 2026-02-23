@@ -1,6 +1,6 @@
 -- @generated from packages/schema/entities/llm-call.entity.yaml
--- Hash: 9077ad9201a1976687249820d2cdd48e60fbf3053ce4cab90034778c2f5966ab
--- Generated: 2026-02-17T09:41:15.603Z
+-- Hash: 246a8a696c52e028c91354ebc15896a2f70e96542315a70258b1339b8d3b515c
+-- Generated: 2026-02-23T08:08:01.302Z
 -- DO NOT EDIT generated sections — changes will be overwritten.
 
 CREATE TABLE IF NOT EXISTS llm_calls (
@@ -13,6 +13,8 @@ CREATE TABLE IF NOT EXISTS llm_calls (
   cost REAL NOT NULL DEFAULT 0,
   response TEXT NOT NULL DEFAULT '',
   cached INTEGER NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'ok',
+  error_message TEXT DEFAULT '',
   agent_label TEXT,
   organization_id TEXT,
   consent_given INTEGER NOT NULL DEFAULT 1,

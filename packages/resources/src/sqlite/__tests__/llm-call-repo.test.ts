@@ -28,6 +28,7 @@ describe('SQLite LLM Call Repository', () => {
     cost: 0.05,
     response: 'Hi there',
     cached: false,
+    status: 'ok',
     consentGiven: true,
     consentPurpose: 'optimization' as const,
   };

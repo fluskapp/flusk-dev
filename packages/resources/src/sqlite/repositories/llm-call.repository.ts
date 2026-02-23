@@ -1,7 +1,7 @@
 /**
  * @generated from packages/schema/entities/llm-call.entity.yaml
- * Hash: 9077ad9201a1976687249820d2cdd48e60fbf3053ce4cab90034778c2f5966ab
- * Generated: 2026-02-17T11:06:33.145Z
+ * Hash: 246a8a696c52e028c91354ebc15896a2f70e96542315a70258b1339b8d3b515c
+ * Generated: 2026-02-23T08:08:01.286Z
  * DO NOT EDIT generated sections — changes will be overwritten.
  */
 
@@ -41,6 +41,8 @@ function rowToEntity(row: Record<string, unknown>): LLMCallEntity {
     cost: row.cost as number,
     response: row.response as string,
     cached: Boolean(row.cached),
+    status: row.status as string,
+    errorMessage: (row.error_message as string) ?? undefined,
     agentLabel: (row.agent_label as string) ?? undefined,
     organizationId: (row.organization_id as string) ?? undefined,
     consentGiven: Boolean(row.consent_given),
@@ -57,8 +59,8 @@ function convertValueForDb(key: string, value: unknown): null | number | bigint 
 }
 
 export function createLLMCall(db: DatabaseSync, data: CreateLLMCallInput): LLMCallEntity {
-  const stmt = db.prepare(`INSERT INTO llm_calls (provider, model, prompt, prompt_hash, tokens, cost, response, cached, agent_label, organization_id, consent_given, consent_purpose, session_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`);
-  const row = stmt.get(data.provider, data.model, data.prompt, data.promptHash, JSON.stringify(data.tokens), data.cost, data.response, data.cached ? 1 : 0, data.agentLabel ?? null, data.organizationId ?? null, data.consentGiven ? 1 : 0, data.consentPurpose, data.sessionId ?? null) as Record<string, unknown>;
+  const stmt = db.prepare(`INSERT INTO llm_calls (provider, model, prompt, prompt_hash, tokens, cost, response, cached, status, error_message, agent_label, organization_id, consent_given, consent_purpose, session_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`);
+  const row = stmt.get(data.provider, data.model, data.prompt, data.promptHash, JSON.stringify(data.tokens), data.cost, data.response, data.cached ? 1 : 0, data.status, data.errorMessage ?? null, data.agentLabel ?? null, data.organizationId ?? null, data.consentGiven ? 1 : 0, data.consentPurpose, data.sessionId ?? null) as Record<string, unknown>;
   return rowToEntity(row);
 }
 
@@ -73,14 +75,8 @@ export function listLLMCalls(db: DatabaseSync, limit = 50, offset = 0): LLMCallE
   return (stmt.all(limit, offset) as Record<string, unknown>[]).map(rowToEntity);
 }
 
-const UPDATABLE_COLUMNS = new Set([
-  'provider', 'model', 'prompt', 'promptHash', 'tokens', 'cost', 'response',
-  'cached', 'agentLabel', 'organizationId', 'consentGiven', 'consentPurpose',
-  'sessionId', 'status', 'errorMessage', 'costUsd',
-]);
-
 export function updateLLMCall(db: DatabaseSync, id: string, data: UpdateLLMCallInput): LLMCallEntity | null {
-  const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined && UPDATABLE_COLUMNS.has(k));
+  const keys = Object.keys(data).filter((k) => data[k as keyof typeof data] !== undefined);
   if (keys.length === 0) return findLLMCallById(db, id);
   const sets = keys.map((k) => `${toSnake(k)} = ?`).join(', ');
   const vals = keys.map((k) => convertValueForDb(k, data[k as keyof typeof data]));

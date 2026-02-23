@@ -20,7 +20,7 @@ function makeCall(overrides: Partial<LLMCallEntity> = {}): LLMCallEntity {
     tokens: { input: 100, output: 50, total: 150 },
     cost: 0.01,
     response: '4',
-    cached: false,
+    cached: false, status: 'ok',
     consentGiven: true,
     consentPurpose: 'optimization',
     ...overrides,

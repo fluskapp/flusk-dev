@@ -33,6 +33,7 @@ describe('Storage adapter factory', () => {
       cost: 0.01,
       response: 'ok',
       cached: false,
+      status: 'ok',
       consentGiven: true,
       consentPurpose: 'optimization',
     });

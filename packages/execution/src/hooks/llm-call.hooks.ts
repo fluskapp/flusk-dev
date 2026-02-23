@@ -30,6 +30,7 @@ interface LlmCallData {
   cost: number;
   response: string;
   cached: boolean;
+  status: string;
   organizationId: string;
   consentGiven: boolean;
   consentPurpose: string;
@@ -106,6 +107,7 @@ export async function calculateCostHook(
     cost: costUsd ?? 0,
     response: body.response,
     cached: false,
+    status: 'ok',
     organizationId: request.organizationId || 'default',
     consentGiven: process.env.FLUSK_CONSENT_GIVEN !== 'false',
     consentPurpose: process.env.FLUSK_CONSENT_PURPOSE || 'optimization',

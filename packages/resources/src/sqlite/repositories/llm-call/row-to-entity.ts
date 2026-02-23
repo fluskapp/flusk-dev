@@ -21,6 +21,8 @@ export function rowToEntity(row: Record<string, unknown>): LLMCallEntity {
     cost: row.cost as number,
     response: row.response as string,
     cached: Boolean(row.cached),
+    status: (row.status as string) ?? 'ok',
+    errorMessage: (row.error_message as string) ?? undefined,
     agentLabel: (row.agent_label as string) ?? undefined,
     organizationId: (row.organization_id as string) ?? undefined,
     consentGiven: Boolean(row.consent_given),

@@ -36,7 +36,7 @@ const MOCK_LLM_CALL: LLMCallEntity = {
   tokens: { input: 10, output: 20, total: 30 },
   cost: 0.12,
   response: 'resp',
-  cached: false,
+  cached: false, status: 'ok',
   consentGiven: true,
   consentPurpose: 'optimization',
 };

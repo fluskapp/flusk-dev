@@ -1,7 +1,7 @@
 /**
  * @generated from packages/schema/entities/llm-call.entity.yaml
- * Hash: 9077ad9201a1976687249820d2cdd48e60fbf3053ce4cab90034778c2f5966ab
- * Generated: 2026-02-17T11:06:33.145Z
+ * Hash: 246a8a696c52e028c91354ebc15896a2f70e96542315a70258b1339b8d3b515c
+ * Generated: 2026-02-23T08:08:01.286Z
  * DO NOT EDIT generated sections — changes will be overwritten.
  */
 
@@ -24,6 +24,8 @@ export const LLMCallEntitySchema = Type.Composite([
     cost: Type.Number({ description: 'Calculated cost in USD for this API call', minimum: 0, default: 0 }),
     response: Type.String({ description: 'Full response text from the LLM', default: '' }),
     cached: Type.Boolean({ description: 'Whether this response was served from cache', default: false }),
+    status: Type.String({ description: 'Call status (ok or error)', default: 'ok' }),
+    errorMessage: Type.Optional(Type.String({ description: 'Error message if the call failed', default: '' })),
     agentLabel: Type.Optional(Type.String({ description: 'Agent label for multi-agent tracking' })),
     organizationId: Type.Optional(Type.String({ description: 'Organization ID for GDPR data portability and deletion', minLength: 1 })),
     consentGiven: Type.Boolean({ description: 'GDPR consent flag', default: true }),

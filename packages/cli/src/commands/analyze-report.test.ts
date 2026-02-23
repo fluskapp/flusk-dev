@@ -43,7 +43,7 @@ function mockCall(model: string, prompt: string, hash: string, cost: number, tok
     tokens: { input: tokens, output: tokens, total: tokens * 2 },
     cost,
     response: 'response text',
-    cached: false,
+    cached: false, status: 'ok',
     organizationId: 'default',
     consentGiven: true,
     consentPurpose: 'optimization',
