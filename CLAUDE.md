@@ -109,6 +109,20 @@ pnpm db:migrate # Run migrations
 pnpm lint       # ESLint
 ```
 
+## AI Agent Helpers
+
+```bash
+bash scripts/doctor.sh              # Full project health check
+bash scripts/scope.sh entity <name>  # Everything about an entity
+bash scripts/scope.sh domain <name>  # Business logic domain brief
+bash scripts/scope.sh pipeline <n>   # Pipeline YAML + generated code
+bash scripts/scope.sh package <name> # Package overview + API
+bash scripts/scope.sh feature <name> # Cross-package feature search
+```
+
+**Start every task with:** `bash scripts/doctor.sh` to understand project state,
+then `bash scripts/scope.sh` for your specific area.
+
 ## Code Generation Rules
 
 - **NEVER** edit files with `@generated` header directly
