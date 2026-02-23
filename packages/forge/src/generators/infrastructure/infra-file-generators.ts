@@ -3,8 +3,7 @@
  */
 
 import { resolve } from 'node:path';
-import { writeFile, mkdir } from 'node:fs/promises';
-import { existsSync } from 'node:fs';
+import { writeFile } from 'node:fs/promises';
 import { generateDockerComposeTemplate } from '../../templates/infrastructure/docker-compose.template.js';
 import { generateGitignoreTemplate } from '../../templates/infrastructure/gitignore.template.js';
 import { generateEnvTemplate } from '../../templates/infrastructure/env.template.js';
