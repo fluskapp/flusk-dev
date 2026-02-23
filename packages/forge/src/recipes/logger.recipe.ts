@@ -12,10 +12,12 @@ import { writeRecipeFile } from './recipe.helpers.js';
 import {
   typesTemplate,
   levelsTemplate,
-  factoryTemplate,
-  singletonTemplate,
   barrelTemplate,
 } from './logger-recipe-templates.js';
+import {
+  factoryTemplate,
+  singletonTemplate,
+} from './logger-recipe-code-templates.js';
 
 const generateTypes: RecipeStep = {
   name: 'generate-types',

@@ -4,6 +4,13 @@
 
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import {
+  REQUIRED_DIRECTORIES,
+  REQUIRED_FILES,
+  RECOMMENDED_FILES,
+  PACKAGE_NAMES,
+} from './structure-validator-constants.js';
+import { checkAntiPatterns } from './structure-validator-antipatterns.js';
 
 export interface ValidationResult {
   valid: boolean;
@@ -22,48 +29,16 @@ export interface ValidationWarning {
   message: string;
 }
 
-const REQUIRED_DIRECTORIES = [
-  'packages',
-  'packages/entities',
-  'packages/entities/src',
-  'packages/types',
-  'packages/types/src',
-  'packages/resources',
-  'packages/resources/src',
-  'packages/business-logic',
-  'packages/business-logic/src',
-  'packages/execution',
-  'packages/execution/src',
-];
-
-const REQUIRED_FILES = [
-  'package.json',
-  'pnpm-workspace.yaml',
-  'tsconfig.json',
-];
-
-const RECOMMENDED_FILES = [
-  '.gitignore',
-  'docker-compose.yml',
-  '.env.example',
-  'README.md',
-  'CLAUDE.md',
-];
-
 /**
  * Validate project structure
  */
-export async function validateStructure(projectRoot: string = process.cwd()): Promise<ValidationResult> {
-  const result: ValidationResult = {
-    valid: true,
-    errors: [],
-    warnings: [],
-  };
+export async function validateStructure(
+  projectRoot: string = process.cwd(),
+): Promise<ValidationResult> {
+  const result: ValidationResult = { valid: true, errors: [], warnings: [] };
 
-  // Check required directories
   for (const dir of REQUIRED_DIRECTORIES) {
-    const dirPath = resolve(projectRoot, dir);
-    if (!existsSync(dirPath)) {
+    if (!existsSync(resolve(projectRoot, dir))) {
       result.valid = false;
       result.errors.push({
         file: dir,
@@ -73,10 +48,8 @@ export async function validateStructure(projectRoot: string = process.cwd()): Pr
     }
   }
 
-  // Check required files
   for (const file of REQUIRED_FILES) {
-    const filePath = resolve(projectRoot, file);
-    if (!existsSync(filePath)) {
+    if (!existsSync(resolve(projectRoot, file))) {
       result.valid = false;
       result.errors.push({
         file,
@@ -86,26 +59,16 @@ export async function validateStructure(projectRoot: string = process.cwd()): Pr
     }
   }
 
-  // Check recommended files
   for (const file of RECOMMENDED_FILES) {
-    const filePath = resolve(projectRoot, file);
-    if (!existsSync(filePath)) {
-      result.warnings.push({
-        file,
-        message: 'Recommended file not found',
-      });
+    if (!existsSync(resolve(projectRoot, file))) {
+      result.warnings.push({ file, message: 'Recommended file not found' });
     }
   }
 
-  // Validate package structure
-  const packages = ['entities', 'types', 'resources', 'business-logic', 'execution'];
-  for (const pkg of packages) {
+  for (const pkg of PACKAGE_NAMES) {
     const pkgPath = resolve(projectRoot, 'packages', pkg);
-    const pkgJsonPath = resolve(pkgPath, 'package.json');
-    const srcPath = resolve(pkgPath, 'src');
-
     if (existsSync(pkgPath)) {
-      if (!existsSync(pkgJsonPath)) {
+      if (!existsSync(resolve(pkgPath, 'package.json'))) {
         result.valid = false;
         result.errors.push({
           file: `packages/${pkg}/package.json`,
@@ -113,8 +76,7 @@ export async function validateStructure(projectRoot: string = process.cwd()): Pr
           fix: `Create package.json in packages/${pkg}/`,
         });
       }
-
-      if (!existsSync(srcPath)) {
+      if (!existsSync(resolve(pkgPath, 'src'))) {
         result.valid = false;
         result.errors.push({
           file: `packages/${pkg}/src`,
@@ -125,48 +87,6 @@ export async function validateStructure(projectRoot: string = process.cwd()): Pr
     }
   }
 
-  // Check for common anti-patterns
-  const antiPatterns = checkAntiPatterns(projectRoot);
-  result.warnings.push(...antiPatterns);
-
+  result.warnings.push(...checkAntiPatterns(projectRoot));
   return result;
-}
-
-/**
- * Check for common anti-patterns
- */
-function checkAntiPatterns(projectRoot: string): ValidationWarning[] {
-  const warnings: ValidationWarning[] = [];
-
-  // Check for unnecessary files in root
-  const rootFiles = ['.DS_Store', 'Thumbs.db', 'desktop.ini'];
-  for (const file of rootFiles) {
-    const filePath = resolve(projectRoot, file);
-    if (existsSync(filePath)) {
-      warnings.push({
-        file,
-        message: 'Unnecessary file in root directory',
-      });
-    }
-  }
-
-  // Check for .env file (should be .env.example)
-  const envPath = resolve(projectRoot, '.env');
-  if (existsSync(envPath)) {
-    warnings.push({
-      file: '.env',
-      message: '.env file should not be committed to version control',
-    });
-  }
-
-  // Check for node_modules in root (should be hoisted by pnpm)
-  const nodeModulesPath = resolve(projectRoot, 'node_modules');
-  if (!existsSync(nodeModulesPath)) {
-    warnings.push({
-      file: 'node_modules',
-      message: 'Dependencies not installed',
-    });
-  }
-
-  return warnings;
 }
