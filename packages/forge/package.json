@@ -14,21 +14,6 @@
     "dist",
     "README.md"
   ],
-  "publishConfig": {
-    "access": "public",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "import": "./dist/index.js"
-      },
-      "./generators/pipeline.generator.js": {
-        "types": "./dist/generators/pipeline.generator.d.ts",
-        "import": "./dist/generators/pipeline.generator.js"
-      }
-    }
-  },
   "dependencies": {
     "@clack/prompts": "^1.0.0",
     "@flusk/entities": "workspace:*",
@@ -51,5 +36,12 @@
     "tsx": "^4.21.0",
     "typescript": "^5.7.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "development": "./src/index.ts",
+      "default": "./dist/index.js"
+    }
+  }
 }

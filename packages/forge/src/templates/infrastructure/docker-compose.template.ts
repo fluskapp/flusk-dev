@@ -3,6 +3,9 @@
  * Used by flusk init command to set up infrastructure services
  */
 
+import { postgresService, redisService } from './docker-compose-services.js';
+import { adminerService, redisInsightService, volumesAndNetworks } from './docker-compose-ui.js';
+
 export interface DockerComposeOptions {
   projectName: string;
   postgresPort?: number;
@@ -14,7 +17,9 @@ export interface DockerComposeOptions {
 /**
  * Generate docker-compose.yml template for Flusk infrastructure
  */
-export function generateDockerComposeTemplate(options: DockerComposeOptions): string {
+export function generateDockerComposeTemplate(
+  options: DockerComposeOptions,
+): string {
   const {
     projectName,
     postgresPort = 5432,
@@ -40,98 +45,14 @@ export function generateDockerComposeTemplate(options: DockerComposeOptions): st
 version: '3.9'
 
 services:
-  # PostgreSQL 16 with pgvector extension
-  postgres:
-    image: pgvector/pgvector:pg16
-    container_name: \${COMPOSE_PROJECT_NAME:-${projectName}}-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: \${POSTGRES_DB:-${projectName}}
-      POSTGRES_USER: \${POSTGRES_USER:-${projectName}}
-      POSTGRES_PASSWORD: \${POSTGRES_PASSWORD:-dev_password_change_me}
-      POSTGRES_INITDB_ARGS: "-E UTF8"
-    ports:
-      - "\${POSTGRES_PORT:-${postgresPort}}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./docker/postgres/init:/docker-entrypoint-initdb.d
-      - ./profiles:/app/profiles
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U \${POSTGRES_USER:-${projectName}} -d \${POSTGRES_DB:-${projectName}}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    networks:
-      - ${projectName}_network
+${postgresService(projectName, postgresPort)}
 
-  # Redis 7 with persistence
-  redis:
-    image: redis:7-alpine
-    container_name: \${COMPOSE_PROJECT_NAME:-${projectName}}-redis
-    restart: unless-stopped
-    command: >
-      redis-server
-      --appendonly yes
-      --appendfsync everysec
-      --maxmemory 256mb
-      --maxmemory-policy allkeys-lru
-    ports:
-      - "\${REDIS_PORT:-${redisPort}}:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-      start_period: 10s
-    networks:
-      - ${projectName}_network
+${redisService(projectName, redisPort)}
 
-  # Adminer - PostgreSQL Web UI
-  adminer:
-    image: adminer:latest
-    container_name: \${COMPOSE_PROJECT_NAME:-${projectName}}-adminer
-    restart: unless-stopped
-    environment:
-      ADMINER_DEFAULT_SERVER: postgres
-      ADMINER_DESIGN: nette
-    ports:
-      - "\${ADMINER_PORT:-${adminerPort}}:8080"
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks:
-      - ${projectName}_network
+${adminerService(projectName, adminerPort)}
 
-  # RedisInsight - Redis Web UI
-  redisinsight:
-    image: redislabs/redisinsight:latest
-    container_name: \${COMPOSE_PROJECT_NAME:-${projectName}}-redisinsight
-    restart: unless-stopped
-    ports:
-      - "\${REDISINSIGHT_PORT:-${redisInsightPort}}:8001"
-    volumes:
-      - redisinsight_data:/db
-    depends_on:
-      redis:
-        condition: service_healthy
-    networks:
-      - ${projectName}_network
+${redisInsightService(projectName, redisInsightPort)}
 
-# Persistent volumes
-volumes:
-  postgres_data:
-    driver: local
-  redis_data:
-    driver: local
-  redisinsight_data:
-    driver: local
-
-# Internal network
-networks:
-  ${projectName}_network:
-    driver: bridge
+${volumesAndNetworks(projectName)}
 `;
 }
