@@ -123,17 +123,14 @@ function renderStep(step: PipelineStep): string {
   lines.push(`  // Step: ${step.id}`);
 
   if (step.fn) {
-    // Function call step
-    const argEntries = Object.entries(step.args || {});
-    const argStr = argEntries
-      .map(([k, v]) => `${k}: ${resolveRef(v)}`)
-      .join(', ');
-    // fn format: namespace.name → import from primitives
+    // Function call step — positional args in YAML order
+    const argValues = Object.values(step.args || {})
+      .map((v) => resolveRef(v));
     lines.push(
-      `  const ${step.output} = ${step.fn.replace(/\./g, '_')}({ ${argStr} });`,
+      `  const ${step.output} = ${step.fn.replace(/\./g, '_')}(${argValues.join(', ')});`,
     );
   } else if (step.pipeline) {
-    // Sub-pipeline call — use _fn suffix to avoid shadowing
+    // Sub-pipeline call — pass as object (pipelines take named input)
     const fnAlias = `${step.pipeline}_fn`;
     const argEntries = Object.entries(step.args || {});
     const argStr = argEntries

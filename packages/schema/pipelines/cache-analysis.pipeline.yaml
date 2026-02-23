@@ -1,0 +1,79 @@
+# Pipeline: Analyze cache hit rates and savings
+name: cacheAnalysis
+namespace: analytics
+description: Calculate cache hit rates and cost savings from cached responses
+package: business-logic
+
+input:
+  calls:
+    type: LLMCallEntity[]
+    description: Array of LLM calls to analyze
+
+output:
+  type: CacheAnalysisReport
+  fields:
+    totalCalls: { type: number, description: Total calls }
+    cachedCalls: { type: number, description: Number of cached responses }
+    hitRate: { type: number, description: "Cache hit rate percentage (0-100)" }
+    costSaved: { type: number, description: Cost saved from cache hits }
+    byModel: { type: "Record<string, ModelCacheStats>", description: Cache stats per model }
+
+steps:
+  - id: total
+    expr: "$input.calls.length"
+    output: totalCalls
+
+  - id: cached
+    expr: "$input.calls.filter(c => c.cached).length"
+    output: cachedCalls
+
+  - id: hit-rate
+    expr: "$totalCalls > 0 ? ($cachedCalls / $totalCalls) * 100 : 0"
+    output: hitRate
+
+  - id: cost-saved
+    fn: primitives.math.sum
+    args:
+      values: "$input.calls.filter(c => c.cached).map(c => c.cost ?? 0)"
+    output: costSaved
+
+  - id: grouped
+    fn: primitives.collection.groupBy
+    args:
+      items: $input.calls
+      key: model
+    output: modelGroups
+
+  - id: by-model
+    expr: |
+      Object.fromEntries(
+        Object.entries($modelGroups).map(([model, items]) => {
+          const cached = items.filter(c => c.cached);
+          return [model, {
+            total: items.length,
+            cached: cached.length,
+            hitRate: items.length > 0 ? (cached.length / items.length) * 100 : 0,
+            costSaved: cached.reduce((s, c) => s + (c.cost ?? 0), 0),
+          }];
+        })
+      )
+    output: byModel
+
+  - id: return
+    value:
+      totalCalls: $totalCalls
+      cachedCalls: $cachedCalls
+      hitRate: $hitRate
+      costSaved: $costSaved
+      byModel: $byModel
+
+tests:
+  - name: empty calls
+    input:
+      calls: []
+    expected:
+      totalCalls: 0
+      cachedCalls: 0
+      hitRate: 0
+      costSaved: 0
+      byModel: {}
