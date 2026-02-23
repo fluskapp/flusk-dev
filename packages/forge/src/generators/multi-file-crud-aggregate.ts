@@ -3,10 +3,7 @@
  */
 
 import type { EntitySchema } from '../schema/entity-schema.types.js';
-
-function tbl(name: string): string {
-  return name.replace(/([a-z])([A-Z])/g, '$1_$2').toLowerCase() + 's';
-}
+import { tbl } from './multi-file-crud-helpers.js';
 
 /** Generate aggregate.ts */
 export function generateAggregate(schema: EntitySchema): string {

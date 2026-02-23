@@ -28,7 +28,7 @@ export function aggregate(
     : `COALESCE(${fn}(${col}), 0) as value`;
   const groupClause = groupCol ? `GROUP BY ${groupCol}` : '';
   const stmt = db.prepare(
-    `SELECT ${select} FROM llmcalls ${groupClause}`,
+    `SELECT ${select} FROM llm_calls ${groupClause}`,
   );
   return stmt.all() as unknown as AggregateResult[];
 }
