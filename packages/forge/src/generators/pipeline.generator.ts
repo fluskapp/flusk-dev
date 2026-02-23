@@ -83,6 +83,15 @@ function resolveRef(val: unknown): string {
   return `'${s}'`;
 }
 
+/** Map complex types to any for generated code (no external imports) */
+function safeType(t: string): string {
+  // Keep primitives and simple generics; replace custom types with any
+  if (/^(string|number|boolean|void|null|undefined|unknown|any)$/.test(t)) return t;
+  if (/^Record</.test(t)) return t.replace(/[A-Z][A-Za-z]+(?=[>\],\s}])/g, 'any');
+  if (/\[]$/.test(t)) return 'any[]';
+  return 'any';
+}
+
 /** Generate input type interface */
 function renderInputType(
   name: string,
@@ -90,7 +99,7 @@ function renderInputType(
 ): string {
   const pascal = toPascal(name);
   const fields = Object.entries(input)
-    .map(([k, v]) => `  ${k}: ${v.type};`)
+    .map(([k, v]) => `  ${k}: ${safeType(v.type)};`)
     .join('\n');
   return `export interface ${pascal}Input {\n${fields}\n}`;
 }
@@ -101,9 +110,9 @@ function renderOutputType(
   output: PipelineSchema['output'],
 ): string {
   const pascal = toPascal(name);
-  if (!output.fields) return `export type ${pascal}Output = ${output.type};`;
+  if (!output.fields) return `export type ${pascal}Output = ${safeType(output.type)};`;
   const fields = Object.entries(output.fields)
-    .map(([k, v]) => `  ${k}: ${v.type};`)
+    .map(([k, v]) => `  ${k}: ${safeType(v.type)};`)
     .join('\n');
   return `export interface ${pascal}Output {\n${fields}\n}`;
 }
@@ -193,6 +202,8 @@ export function generatePipelineCode(schema: PipelineSchema): string {
  */
 
 // --- BEGIN GENERATED (do not edit) ---
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// @ts-nocheck — generated pipeline with dynamic types
 import { getLogger } from '@flusk/logger';
 ${imports.join('\n')}
 

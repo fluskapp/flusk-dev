@@ -82,6 +82,21 @@ export const generateAllCommand = new Command('generate-all')
       }
     }
 
+    // Pipeline generation
+    console.log(chalk.cyan('  ▶  Running pipelines → pipeline.generator'));
+    try {
+      // @ts-expect-error — moduleResolution:node doesn't resolve exports map
+      const { generateAllPipelines } = await import('@flusk/forge/generators/pipeline.generator.js');
+      const pipelinesDir = resolve(projectRoot, 'packages/schema/pipelines');
+      const pResult = await generateAllPipelines(pipelinesDir, projectRoot);
+      totalFiles += pResult.files.length;
+      console.log(chalk.green(`     ✅ ${pResult.files.length} pipeline files`));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      errors.push(`pipelines: ${msg}`);
+      console.error(chalk.red(`     ❌ pipelines: ${msg}`));
+    }
+
     console.log('');
     if (errors.length) {
       console.log(chalk.red(`❌  ${errors.length} target(s) failed`));
@@ -93,24 +108,5 @@ export const generateAllCommand = new Command('generate-all')
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
-import { generateAllPipelines } from '@flusk/forge/generators/pipeline.generator.js';
-
-// Extend generate-all to include pipelines
-const origAction = generateAllCommand._actionHandler;
-generateAllCommand.action(async (options) => {
-  // Run original action first
-  if (origAction) await origAction.call(generateAllCommand, options);
-
-  // Then run pipeline generation
-  const projectRoot = process.cwd();
-  const pipelinesDir = resolve(projectRoot, 'packages/schema/pipelines');
-  console.log(chalk.cyan('  ▶  Running pipelines → pipeline.generator'));
-  try {
-    const result = await generateAllPipelines(pipelinesDir, projectRoot);
-    console.log(chalk.green(`     ✅ ${result.files.length} pipeline files`));
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error(chalk.red(`     ❌ pipelines: ${msg}`));
-  }
-});
+// Pipeline generation is integrated into the main action above
 // --- END CUSTOM ---

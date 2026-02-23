@@ -22,6 +22,10 @@
       ".": {
         "types": "./dist/index.d.ts",
         "import": "./dist/index.js"
+      },
+      "./generators/pipeline.generator.js": {
+        "types": "./dist/generators/pipeline.generator.d.ts",
+        "import": "./dist/generators/pipeline.generator.js"
       }
     }
   },
