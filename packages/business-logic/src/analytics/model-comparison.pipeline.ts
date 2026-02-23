@@ -5,20 +5,21 @@
  */
 
 // --- BEGIN GENERATED (do not edit) ---
+// @ts-nocheck — generated pipeline with dynamic expr: steps
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// @ts-nocheck — generated pipeline with dynamic types
 import { getLogger } from '@flusk/logger';
-
+import type { LLMCallEntity } from '@flusk/entities';
+import type { ModelComparisonResult } from '@flusk/types';
 
 const log = getLogger().child({ pipeline: 'modelComparison' });
 
 export interface ModelComparisonInput {
-  calls: any[];
+  calls: LLMCallEntity[];
 }
 
 export interface ModelComparisonOutput {
-  models: any[];
-  suggestions: any[];
+  models: ModelUsage[];
+  suggestions: DowngradeSuggestion[];
   potentialSavings: number;
 }
 

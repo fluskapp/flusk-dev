@@ -5,22 +5,23 @@
  */
 
 // --- BEGIN GENERATED (do not edit) ---
+// @ts-nocheck — generated pipeline with dynamic expr: steps
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// @ts-nocheck — generated pipeline with dynamic types
 import { getLogger } from '@flusk/logger';
-
+import type { LLMCallEntity } from '@flusk/entities';
+import type { DuplicateReport } from '@flusk/types';
 
 const log = getLogger().child({ pipeline: 'duplicateDetection' });
 
 export interface DuplicateDetectionInput {
-  calls: any[];
+  calls: LLMCallEntity[];
 }
 
 export interface DuplicateDetectionOutput {
   exactDuplicates: number;
   nearDuplicates: number;
   wastedCost: number;
-  groups: any[];
+  groups: DuplicateGroup[];
 }
 
 export function duplicateDetection(input: DuplicateDetectionInput): DuplicateDetectionOutput {

@@ -5,22 +5,23 @@
  */
 
 // --- BEGIN GENERATED (do not edit) ---
+// @ts-nocheck — generated pipeline with dynamic expr: steps
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// @ts-nocheck — generated pipeline with dynamic types
 import { getLogger } from '@flusk/logger';
-
+import type { LLMCallEntity } from '@flusk/entities';
+import type { LatencyReport } from '@flusk/types';
 
 const log = getLogger().child({ pipeline: 'latencyAnalysis' });
 
 export interface LatencyAnalysisInput {
-  calls: any[];
+  calls: LLMCallEntity[];
 }
 
 export interface LatencyAnalysisOutput {
   avgLatencyMs: number;
   p95LatencyMs: number;
-  slowestCalls: any[];
-  byModel: Record<string, any>;
+  slowestCalls: SlowCall[];
+  byModel: Record<string, ModelLatency>;
 }
 
 export function latencyAnalysis(input: LatencyAnalysisInput): LatencyAnalysisOutput {

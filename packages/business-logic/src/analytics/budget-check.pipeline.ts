@@ -5,15 +5,16 @@
  */
 
 // --- BEGIN GENERATED (do not edit) ---
+// @ts-nocheck — generated pipeline with dynamic expr: steps
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// @ts-nocheck — generated pipeline with dynamic types
 import { getLogger } from '@flusk/logger';
-
+import type { LLMCallEntity } from '@flusk/entities';
+import type { BudgetCheckResult } from '@flusk/types';
 
 const log = getLogger().child({ pipeline: 'budgetCheck' });
 
 export interface BudgetCheckInput {
-  calls: any[];
+  calls: LLMCallEntity[];
   dailyLimit: number;
   monthlyLimit: number;
 }
@@ -23,7 +24,7 @@ export interface BudgetCheckOutput {
   monthlySpend: number;
   dailyUtilization: number;
   monthlyUtilization: number;
-  alerts: any[];
+  alerts: BudgetAlert[];
   status: string;
 }
 

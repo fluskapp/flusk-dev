@@ -5,9 +5,11 @@
  */
 
 // --- BEGIN GENERATED (do not edit) ---
+// @ts-nocheck — generated pipeline with dynamic expr: steps
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// @ts-nocheck — generated pipeline with dynamic types
 import { getLogger } from '@flusk/logger';
+import type { LLMCallEntity } from '@flusk/entities';
+import type { SessionReport } from '@flusk/types';
 import { costSummary as costSummary_fn } from './cost-summary.pipeline.js';
 import { duplicateDetection as duplicateDetection_fn } from './duplicate-detection.pipeline.js';
 import { modelComparison as modelComparison_fn } from './model-comparison.pipeline.js';
@@ -15,15 +17,15 @@ import { modelComparison as modelComparison_fn } from './model-comparison.pipeli
 const log = getLogger().child({ pipeline: 'sessionReport' });
 
 export interface SessionReportInput {
-  calls: any[];
+  calls: LLMCallEntity[];
   sessionId: string;
 }
 
 export interface SessionReportOutput {
   sessionId: string;
-  costSummary: any;
-  duplicates: any;
-  modelComparison: any;
+  costSummary: CostSummary;
+  duplicates: DuplicateReport;
+  modelComparison: ModelComparisonResult;
   overallScore: number;
   generatedAt: string;
 }

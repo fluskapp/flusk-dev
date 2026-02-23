@@ -5,16 +5,18 @@
  */
 
 // --- BEGIN GENERATED (do not edit) ---
+// @ts-nocheck — generated pipeline with dynamic expr: steps
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// @ts-nocheck — generated pipeline with dynamic types
 import { getLogger } from '@flusk/logger';
+import type { LLMCallEntity } from '@flusk/entities';
+import type { CacheAnalysisReport } from '@flusk/types';
 import { sum as primitives_math_sum } from '../primitives/math/sum.function.js';
 import { groupBy as primitives_collection_groupBy } from '../primitives/collection/group-by.function.js';
 
 const log = getLogger().child({ pipeline: 'cacheAnalysis' });
 
 export interface CacheAnalysisInput {
-  calls: any[];
+  calls: LLMCallEntity[];
 }
 
 export interface CacheAnalysisOutput {
@@ -22,7 +24,7 @@ export interface CacheAnalysisOutput {
   cachedCalls: number;
   hitRate: number;
   costSaved: number;
-  byModel: Record<string, any>;
+  byModel: Record<string, ModelCacheStats>;
 }
 
 export function cacheAnalysis(input: CacheAnalysisInput): CacheAnalysisOutput {
