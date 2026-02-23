@@ -15,9 +15,21 @@ export interface FileHeaderInfo {
 }
 
 /** Build a file header comment block */
-export function buildFileHeader(yamlPath: string, yamlContent: string): string {
+export function buildFileHeader(
+  yamlPath: string,
+  yamlContent: string,
+  options?: { sql?: boolean },
+): string {
   const hash = computeHash(yamlContent);
   const ts = new Date().toISOString();
+  if (options?.sql) {
+    return [
+      `-- @generated from ${yamlPath}`,
+      `-- Hash: ${hash}`,
+      `-- Generated: ${ts}`,
+      `-- DO NOT EDIT generated sections — changes will be overwritten.`,
+    ].join('\n');
+  }
   return [
     `/**`,
     ` * @generated from ${yamlPath}`,

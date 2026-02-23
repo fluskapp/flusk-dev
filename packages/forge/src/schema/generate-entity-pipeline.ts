@@ -67,10 +67,11 @@ export function runEntityPipeline(
   writeGeneratedFile(typesDir, `${kebab}.types.ts`,
     `${header}\n\n${typesBody}`, files);
 
-  // 3. Generate migration SQL
+  // 3. Generate migration SQL (uses -- comments for SQLite compat)
   const sqlDir = resolve(projectRoot, 'packages/resources/src/sqlite/sql');
+  const sqlHeader = buildFileHeader(yamlRel, yamlContent, { sql: true });
   writeGeneratedFile(sqlDir, `${kebab}.sql`,
-    `${header}\n\n${generateMigrationSql(schema)}`, files);
+    `${sqlHeader}\n\n${generateMigrationSql(schema)}`, files);
 
   // 4. Compose traits for each storage target
   const hasCapabilities = schema.capabilities &&
@@ -85,10 +86,20 @@ export function runEntityPipeline(
       const repoBody = `${header}\n\n${wrapGenerated(composed.repository, 'repository')}\n\n${emptyCustomSection('repository')}`;
       writeGeneratedFile(dir, `${kebab}.repository.ts`, repoBody, files);
       if (composed.migration) {
-        const migDir = resolve(projectRoot,
-          `packages/resources/src/${target}/sql`);
-        writeGeneratedFile(migDir, `${kebab}-traits.sql`,
-          `${header}\n\n${composed.migration}`, files);
+        // Append trait SQL to main file (avoid sort-order issues)
+        const mainSqlPath = resolve(projectRoot,
+          `packages/resources/src/${target}/sql`, `${kebab}.sql`);
+        if (existsSync(mainSqlPath)) {
+          const existing = readFileSync(mainSqlPath, 'utf-8');
+          writeFileSync(mainSqlPath,
+            `${existing}\n${composed.migration}\n`);
+        } else {
+          const migDir = resolve(projectRoot,
+            `packages/resources/src/${target}/sql`);
+          const traitH = buildFileHeader(yamlRel, yamlContent, { sql: true });
+          writeGeneratedFile(migDir, `${kebab}.sql`,
+            `${traitH}\n\n${composed.migration}`, files);
+        }
       }
       if (composed.route) {
         const routeDir = resolve(projectRoot,
