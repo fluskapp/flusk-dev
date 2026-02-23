@@ -31,7 +31,7 @@ export function createSqliteStorage(dbPath?: string): StorageAdapter {
       findById: (id) => LLMCallRepo.findById(db, id),
       findByPromptHash: (hash) => LLMCallRepo.findByPromptHash(db, hash),
       list: (limit, offset) => LLMCallRepo.list(db, limit, offset),
-      listBySessionId: (sessionId, limit, offset) => LLMCallRepo.listBySessionId(db, sessionId, limit, offset),
+      listBySessionId: (sessionId) => LLMCallRepo.listBySessionId(db, sessionId),
       countByModel: () => LLMCallRepo.countByModel(db),
       countByModelBySessionId: (sessionId) => LLMCallRepo.countByModelBySessionId(db, sessionId),
       sumCost: () => LLMCallRepo.sumCost(db),
