@@ -164,7 +164,7 @@ function extractImports(steps: PipelineStep[]): string[] {
       const fnName = parts[parts.length - 1];
       const ns = parts.slice(0, -1).filter(p => p !== 'primitives').join('/');
       imports.push(
-        `import { ${fnName} as ${step.fn.replace(/\./g, '_')} } from '../../primitives/${ns}/${toKebab(fnName)}.function.js';`,
+        `import { ${fnName} as ${step.fn.replace(/\./g, '_')} } from '../primitives/${ns}/${toKebab(fnName)}.function.js';`,
       );
     }
     if (step.pipeline) {

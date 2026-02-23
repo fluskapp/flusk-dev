@@ -19,22 +19,28 @@ output:
 
 steps:
   - id: group-by-hash
-    fn: primitives.collection.groupBy
-    args:
-      items: $input.calls
-      key: promptHash
+    expr: |
+      (() => {
+        const groups = {};
+        for (const c of $input.calls) {
+          const h = c.promptHash;
+          if (!groups[h]) groups[h] = [];
+          groups[h].push(c);
+        }
+        return groups;
+      })()
     output: hashGroups
 
   - id: find-exact-dupes
     expr: |
-      [...$hashGroups.entries()]
+      Object.entries($hashGroups)
         .filter(([_, items]) => items.length > 1)
         .map(([hash, items]) => ({
           hash,
           count: items.length,
           model: items[0].model,
-          cost: items.reduce((s, c) => s + (c.costUsd ?? 0), 0),
-          wastedCost: items.slice(1).reduce((s, c) => s + (c.costUsd ?? 0), 0),
+          cost: items.reduce((s, c) => s + (c.cost ?? 0), 0),
+          wastedCost: items.slice(1).reduce((s, c) => s + (c.cost ?? 0), 0),
         }))
     output: exactGroups
 
@@ -43,9 +49,7 @@ steps:
     output: exactDuplicates
 
   - id: wasted
-    fn: primitives.math.sum
-    args:
-      items: "$exactGroups.map(g => g.wastedCost)"
+    expr: "$exactGroups.reduce((s, g) => s + g.wastedCost, 0)"
     output: wastedCost
 
   - id: return

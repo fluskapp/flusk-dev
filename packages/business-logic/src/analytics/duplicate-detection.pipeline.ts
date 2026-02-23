@@ -6,8 +6,7 @@
 
 // --- BEGIN GENERATED (do not edit) ---
 import { getLogger } from '@flusk/logger';
-import { groupBy as primitives_collection_groupBy } from '../../primitives/collection/group-by.function.js';
-import { sum as primitives_math_sum } from '../../primitives/math/sum.function.js';
+
 
 const log = getLogger().child({ pipeline: 'duplicateDetection' });
 
@@ -26,18 +25,26 @@ export function duplicateDetection(input: DuplicateDetectionInput): DuplicateDet
   log.debug({ pipeline: 'duplicateDetection' }, 'pipeline start');
 
   // Step: group-by-hash
-  const hashGroups = primitives_collection_groupBy({ items: input.calls, key: 'promptHash' });
+  const hashGroups = (() => {
+  const groups = {};
+  for (const c of input.calls) {
+    const h = c.promptHash;
+    if (!groups[h]) groups[h] = [];
+    groups[h].push(c);
+  }
+  return groups;
+})();
   log.debug({ step: 'group-by-hash' }, 'group-by-hash complete');
 
   // Step: find-exact-dupes
-  const exactGroups = [...hashGroups.entries()]
+  const exactGroups = Object.entries(hashGroups)
   .filter(([_, items]) => items.length > 1)
   .map(([hash, items]) => ({
     hash,
     count: items.length,
     model: items[0].model,
-    cost: items.reduce((s, c) => s + (c.costUsd ?? 0), 0),
-    wastedCost: items.slice(1).reduce((s, c) => s + (c.costUsd ?? 0), 0),
+    cost: items.reduce((s, c) => s + (c.cost ?? 0), 0),
+    wastedCost: items.slice(1).reduce((s, c) => s + (c.cost ?? 0), 0),
   }));
   log.debug({ step: 'find-exact-dupes' }, 'find-exact-dupes complete');
 
@@ -46,7 +53,7 @@ export function duplicateDetection(input: DuplicateDetectionInput): DuplicateDet
   log.debug({ step: 'count-exact' }, 'count-exact complete');
 
   // Step: wasted
-  const wastedCost = primitives_math_sum({ items: exactGroups.map(g => g.wastedCost) });
+  const wastedCost = exactGroups.reduce((s, g) => s + g.wastedCost, 0);
   log.debug({ step: 'wasted' }, 'wasted complete');
 
   // Step: return

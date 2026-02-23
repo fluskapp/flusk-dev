@@ -1,0 +1,75 @@
+# Pipeline: Break down costs and usage by agent label
+name: agentBreakdown
+namespace: analytics
+description: Multi-agent cost attribution — who spent what
+package: business-logic
+
+input:
+  calls:
+    type: LLMCallEntity[]
+    description: Array of LLM calls with agent labels
+
+output:
+  type: AgentBreakdownReport
+  fields:
+    agentCount: { type: number, description: Number of distinct agents }
+    agents: { type: "AgentStats[]", description: Per-agent usage and cost stats }
+    mostExpensive: { type: string, description: Agent label with highest spend }
+    mostActive: { type: string, description: Agent label with most calls }
+
+steps:
+  - id: agent-stats
+    expr: |
+      (() => {
+        const groups = {};
+        for (const c of $input.calls) {
+          const agent = c.agentLabel ?? 'default';
+          if (!groups[agent]) groups[agent] = [];
+          groups[agent].push(c);
+        }
+        return Object.entries(groups).map(([agent, items]) => ({
+          agent,
+          calls: items.length,
+          totalCost: items.reduce((s, c) => s + (c.cost ?? 0), 0),
+          totalTokens: items.reduce((s, c) => s + (c.tokens?.total ?? 0), 0),
+          models: [...new Set(items.map(c => c.model))],
+          errors: items.filter(c => c.status === 'error').length,
+        }));
+      })()
+    output: rawAgents
+
+  - id: sorted-agents
+    expr: "[...$rawAgents].sort((a, b) => b.totalCost - a.totalCost)"
+    output: agents
+
+  - id: agent-count
+    expr: "$agents.length"
+    output: agentCount
+
+  - id: most-expensive
+    expr: "$agents.length > 0 ? $agents[0].agent : 'none'"
+    output: mostExpensive
+
+  - id: most-active
+    expr: |
+      $agents.length > 0
+        ? [...$agents].sort((a, b) => b.calls - a.calls)[0].agent
+        : 'none'
+    output: mostActive
+
+  - id: return
+    value:
+      agentCount: $agentCount
+      agents: $agents
+      mostExpensive: $mostExpensive
+      mostActive: $mostActive
+
+tests:
+  - name: empty calls
+    input:
+      calls: []
+    expected:
+      agentCount: 0
+      agents: []
+      mostExpensive: none
+      mostActive: none

@@ -26,6 +26,7 @@
   "dependencies": {
     "@flusk/entities": "workspace:*",
     "@flusk/types": "workspace:*",
+    "@flusk/logger": "workspace:*",
     "@sinclair/typebox": "^0.34.48"
   },
   "devDependencies": {

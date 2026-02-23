@@ -17,28 +17,26 @@ output:
     potentialSavings: { type: number, description: Total potential savings from downgrades }
 
 steps:
-  - id: group-models
-    fn: primitives.collection.groupBy
-    args:
-      items: $input.calls
-      key: model
-    output: modelGroups
-
   - id: model-stats
     expr: |
-      [...$modelGroups.entries()].map(([model, items]) => ({
-        model,
-        count: items.length,
-        totalCost: items.reduce((s, c) => s + (c.costUsd ?? 0), 0),
-        avgTokens: items.reduce((s, c) => s + (c.tokens?.total ?? 0), 0) / items.length,
-        percentage: 0,
-      }))
+      (() => {
+        const groups = {};
+        for (const c of $input.calls) {
+          if (!groups[c.model]) groups[c.model] = [];
+          groups[c.model].push(c);
+        }
+        return Object.entries(groups).map(([model, items]) => ({
+          model,
+          count: items.length,
+          totalCost: items.reduce((s, c) => s + (c.cost ?? 0), 0),
+          avgTokens: items.reduce((s, c) => s + (c.tokens?.total ?? 0), 0) / items.length,
+          percentage: 0,
+        }));
+      })()
     output: rawModels
 
   - id: total-cost
-    fn: primitives.math.sum
-    args:
-      items: "$rawModels.map(m => m.totalCost)"
+    expr: "$rawModels.reduce((s, m) => s + m.totalCost, 0)"
     output: totalCost
 
   - id: with-percentage
@@ -49,12 +47,8 @@ steps:
       }))
     output: models
 
-  - id: sort-by-cost
-    fn: primitives.collection.sortBy
-    args:
-      items: $models
-      key: totalCost
-      order: desc
+  - id: sorted-models
+    expr: "[...$models].sort((a, b) => b.totalCost - a.totalCost)"
     output: sortedModels
 
   - id: suggest-downgrades
@@ -72,9 +66,7 @@ steps:
     output: suggestions
 
   - id: potential-savings
-    fn: primitives.math.sum
-    args:
-      items: "$suggestions.map(s => s.savings)"
+    expr: "$suggestions.reduce((s, sg) => s + sg.savings, 0)"
     output: potentialSavings
 
   - id: return
@@ -82,3 +74,12 @@ steps:
       models: $sortedModels
       suggestions: $suggestions
       potentialSavings: $potentialSavings
+
+tests:
+  - name: empty calls
+    input:
+      calls: []
+    expected:
+      models: []
+      suggestions: []
+      potentialSavings: 0

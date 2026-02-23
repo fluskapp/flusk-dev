@@ -19,31 +19,25 @@ output:
 
 steps:
   - id: total-cost
-    fn: primitives.cost.aggregateCost
-    args:
-      items: $input.calls
-      field: costUsd
+    expr: "$input.calls.reduce((s, c) => s + (c.cost ?? 0), 0)"
     output: totalCost
 
   - id: call-count
     expr: "$input.calls.length"
     output: callCount
 
-  - id: group-models
-    fn: primitives.collection.groupBy
-    args:
-      items: $input.calls
-      key: model
-    output: modelGroups
-
   - id: by-model
     expr: |
-      Object.fromEntries(
-        [...$modelGroups.entries()].map(([model, items]) => [
-          model,
-          { count: items.length, cost: items.reduce((s, c) => s + (c.costUsd ?? 0), 0) }
-        ])
-      )
+      (() => {
+        const groups = {};
+        for (const c of $input.calls) {
+          const m = c.model;
+          if (!groups[m]) groups[m] = { count: 0, cost: 0 };
+          groups[m].count++;
+          groups[m].cost += c.cost ?? 0;
+        }
+        return groups;
+      })()
     output: byModel
 
   - id: avg-cost

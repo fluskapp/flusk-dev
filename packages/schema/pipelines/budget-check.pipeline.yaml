@@ -1,0 +1,96 @@
+# Pipeline: Check spend against budget limits
+name: budgetCheck
+namespace: analytics
+description: Compare current spend to configured budget thresholds and flag overages
+package: business-logic
+
+input:
+  calls:
+    type: LLMCallEntity[]
+    description: LLM calls to check
+  dailyLimit:
+    type: number
+    description: Daily budget limit in USD
+  monthlyLimit:
+    type: number
+    description: Monthly budget limit in USD
+
+output:
+  type: BudgetCheckResult
+  fields:
+    dailySpend: { type: number, description: Total spend today }
+    monthlySpend: { type: number, description: Total spend this month }
+    dailyUtilization: { type: number, description: "Percentage of daily budget used (0-100+)" }
+    monthlyUtilization: { type: number, description: "Percentage of monthly budget used (0-100+)" }
+    alerts: { type: "BudgetAlert[]", description: Budget threshold warnings }
+    status: { type: string, description: "ok | warning | exceeded" }
+
+steps:
+  - id: today-start
+    expr: |
+      (() => {
+        const d = new Date();
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString();
+      })()
+    output: todayStart
+
+  - id: daily-calls
+    expr: "$input.calls.filter(c => c.createdAt && c.createdAt >= $todayStart)"
+    output: dailyCalls
+
+  - id: daily-spend
+    expr: "$dailyCalls.reduce((s, c) => s + (c.cost ?? 0), 0)"
+    output: dailySpend
+
+  - id: monthly-spend
+    expr: "$input.calls.reduce((s, c) => s + (c.cost ?? 0), 0)"
+    output: monthlySpend
+
+  - id: daily-util
+    expr: "$input.dailyLimit > 0 ? ($dailySpend / $input.dailyLimit) * 100 : 0"
+    output: dailyUtilization
+
+  - id: monthly-util
+    expr: "$input.monthlyLimit > 0 ? ($monthlySpend / $input.monthlyLimit) * 100 : 0"
+    output: monthlyUtilization
+
+  - id: build-alerts
+    expr: |
+      (() => {
+        const alerts = [];
+        if ($dailyUtilization >= 100) alerts.push({ level: 'exceeded', scope: 'daily', spend: $dailySpend, limit: $input.dailyLimit });
+        else if ($dailyUtilization >= 80) alerts.push({ level: 'warning', scope: 'daily', spend: $dailySpend, limit: $input.dailyLimit });
+        if ($monthlyUtilization >= 100) alerts.push({ level: 'exceeded', scope: 'monthly', spend: $monthlySpend, limit: $input.monthlyLimit });
+        else if ($monthlyUtilization >= 80) alerts.push({ level: 'warning', scope: 'monthly', spend: $monthlySpend, limit: $input.monthlyLimit });
+        return alerts;
+      })()
+    output: alerts
+
+  - id: status
+    expr: |
+      $alerts.some(a => a.level === 'exceeded') ? 'exceeded'
+        : $alerts.length > 0 ? 'warning' : 'ok'
+    output: status
+
+  - id: return
+    value:
+      dailySpend: $dailySpend
+      monthlySpend: $monthlySpend
+      dailyUtilization: $dailyUtilization
+      monthlyUtilization: $monthlyUtilization
+      alerts: $alerts
+      status: $status
+
+tests:
+  - name: empty calls under budget
+    input:
+      calls: []
+      dailyLimit: 10
+      monthlyLimit: 100
+    expected:
+      dailySpend: 0
+      monthlySpend: 0
+      dailyUtilization: 0
+      monthlyUtilization: 0
+      alerts: []
+      status: ok

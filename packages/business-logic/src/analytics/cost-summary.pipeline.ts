@@ -6,8 +6,7 @@
 
 // --- BEGIN GENERATED (do not edit) ---
 import { getLogger } from '@flusk/logger';
-import { aggregateCost as primitives_cost_aggregateCost } from '../../primitives/cost/aggregate-cost.function.js';
-import { groupBy as primitives_collection_groupBy } from '../../primitives/collection/group-by.function.js';
+
 
 const log = getLogger().child({ pipeline: 'costSummary' });
 
@@ -26,24 +25,24 @@ export function costSummary(input: CostSummaryInput): CostSummaryOutput {
   log.debug({ pipeline: 'costSummary' }, 'pipeline start');
 
   // Step: total-cost
-  const totalCost = primitives_cost_aggregateCost({ items: input.calls, field: 'costUsd' });
+  const totalCost = input.calls.reduce((s, c) => s + (c.cost ?? 0), 0);
   log.debug({ step: 'total-cost' }, 'total-cost complete');
 
   // Step: call-count
   const callCount = input.calls.length;
   log.debug({ step: 'call-count' }, 'call-count complete');
 
-  // Step: group-models
-  const modelGroups = primitives_collection_groupBy({ items: input.calls, key: 'model' });
-  log.debug({ step: 'group-models' }, 'group-models complete');
-
   // Step: by-model
-  const byModel = Object.fromEntries(
-  [...modelGroups.entries()].map(([model, items]) => [
-    model,
-    { count: items.length, cost: items.reduce((s, c) => s + (c.costUsd ?? 0), 0) }
-  ])
-);
+  const byModel = (() => {
+  const groups = {};
+  for (const c of input.calls) {
+    const m = c.model;
+    if (!groups[m]) groups[m] = { count: 0, cost: 0 };
+    groups[m].count++;
+    groups[m].cost += c.cost ?? 0;
+  }
+  return groups;
+})();
   log.debug({ step: 'by-model' }, 'by-model complete');
 
   // Step: avg-cost

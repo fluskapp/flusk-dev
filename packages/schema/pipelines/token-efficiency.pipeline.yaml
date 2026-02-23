@@ -1,0 +1,108 @@
+# Pipeline: Analyze token usage efficiency
+name: tokenEfficiency
+namespace: analytics
+description: Find token waste patterns — oversized prompts, low output ratios, and token-per-dollar efficiency
+package: business-logic
+
+input:
+  calls:
+    type: LLMCallEntity[]
+    description: Array of LLM calls to analyze
+
+output:
+  type: TokenEfficiencyReport
+  fields:
+    totalTokens: { type: number, description: Total tokens consumed }
+    inputOutputRatio: { type: number, description: Input-to-output token ratio }
+    avgTokensPerCall: { type: number, description: Average tokens per call }
+    tokensPerDollar: { type: number, description: Tokens generated per dollar spent }
+    oversizedPrompts: { type: "OversizedPrompt[]", description: Prompts with >4000 input tokens }
+    byModel: { type: "Record<string, ModelTokenStats>", description: Token stats per model }
+
+steps:
+  - id: total-tokens
+    expr: "$input.calls.reduce((s, c) => s + (c.tokens?.total ?? 0), 0)"
+    output: totalTokens
+
+  - id: total-input
+    expr: "$input.calls.reduce((s, c) => s + (c.tokens?.input ?? 0), 0)"
+    output: totalInput
+
+  - id: total-output
+    expr: "$input.calls.reduce((s, c) => s + (c.tokens?.output ?? 0), 0)"
+    output: totalOutput
+
+  - id: total-cost
+    expr: "$input.calls.reduce((s, c) => s + (c.cost ?? 0), 0)"
+    output: totalCost
+
+  - id: io-ratio
+    expr: "$totalOutput > 0 ? $totalInput / $totalOutput : 0"
+    output: inputOutputRatio
+
+  - id: avg-tokens
+    expr: "$input.calls.length > 0 ? $totalTokens / $input.calls.length : 0"
+    output: avgTokensPerCall
+
+  - id: tokens-per-dollar
+    expr: "$totalCost > 0 ? $totalOutput / $totalCost : 0"
+    output: tokensPerDollar
+
+  - id: oversized
+    expr: |
+      $input.calls
+        .filter(c => (c.tokens?.input ?? 0) > 4000)
+        .map(c => ({
+          model: c.model,
+          inputTokens: c.tokens?.input ?? 0,
+          outputTokens: c.tokens?.output ?? 0,
+          cost: c.cost ?? 0,
+          promptPreview: (c.prompt ?? '').slice(0, 80),
+        }))
+    output: oversizedPrompts
+
+  - id: by-model
+    expr: |
+      (() => {
+        const groups = {};
+        for (const c of $input.calls) {
+          if (!groups[c.model]) groups[c.model] = [];
+          groups[c.model].push(c);
+        }
+        return Object.fromEntries(
+          Object.entries(groups).map(([model, items]) => {
+            const inp = items.reduce((s, c) => s + (c.tokens?.input ?? 0), 0);
+            const out = items.reduce((s, c) => s + (c.tokens?.output ?? 0), 0);
+            const cost = items.reduce((s, c) => s + (c.cost ?? 0), 0);
+            return [model, {
+              totalTokens: inp + out,
+              inputTokens: inp,
+              outputTokens: out,
+              avgPerCall: items.length > 0 ? (inp + out) / items.length : 0,
+              tokensPerDollar: cost > 0 ? out / cost : 0,
+            }];
+          })
+        );
+      })()
+    output: byModel
+
+  - id: return
+    value:
+      totalTokens: $totalTokens
+      inputOutputRatio: $inputOutputRatio
+      avgTokensPerCall: $avgTokensPerCall
+      tokensPerDollar: $tokensPerDollar
+      oversizedPrompts: $oversizedPrompts
+      byModel: $byModel
+
+tests:
+  - name: empty calls
+    input:
+      calls: []
+    expected:
+      totalTokens: 0
+      inputOutputRatio: 0
+      avgTokensPerCall: 0
+      tokensPerDollar: 0
+      oversizedPrompts: []
+      byModel: {}

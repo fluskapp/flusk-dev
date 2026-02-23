@@ -107,6 +107,9 @@ importers:
       '@flusk/entities':
         specifier: workspace:*
         version: link:../entities
+      '@flusk/logger':
+        specifier: workspace:*
+        version: link:../logger
       '@flusk/types':
         specifier: workspace:*
         version: link:../types

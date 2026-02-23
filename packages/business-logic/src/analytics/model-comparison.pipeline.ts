@@ -6,9 +6,7 @@
 
 // --- BEGIN GENERATED (do not edit) ---
 import { getLogger } from '@flusk/logger';
-import { groupBy as primitives_collection_groupBy } from '../../primitives/collection/group-by.function.js';
-import { sum as primitives_math_sum } from '../../primitives/math/sum.function.js';
-import { sortBy as primitives_collection_sortBy } from '../../primitives/collection/sort-by.function.js';
+
 
 const log = getLogger().child({ pipeline: 'modelComparison' });
 
@@ -25,22 +23,25 @@ export interface ModelComparisonOutput {
 export function modelComparison(input: ModelComparisonInput): ModelComparisonOutput {
   log.debug({ pipeline: 'modelComparison' }, 'pipeline start');
 
-  // Step: group-models
-  const modelGroups = primitives_collection_groupBy({ items: input.calls, key: 'model' });
-  log.debug({ step: 'group-models' }, 'group-models complete');
-
   // Step: model-stats
-  const rawModels = [...modelGroups.entries()].map(([model, items]) => ({
-  model,
-  count: items.length,
-  totalCost: items.reduce((s, c) => s + (c.costUsd ?? 0), 0),
-  avgTokens: items.reduce((s, c) => s + (c.tokens?.total ?? 0), 0) / items.length,
-  percentage: 0,
-}));
+  const rawModels = (() => {
+  const groups = {};
+  for (const c of input.calls) {
+    if (!groups[c.model]) groups[c.model] = [];
+    groups[c.model].push(c);
+  }
+  return Object.entries(groups).map(([model, items]) => ({
+    model,
+    count: items.length,
+    totalCost: items.reduce((s, c) => s + (c.cost ?? 0), 0),
+    avgTokens: items.reduce((s, c) => s + (c.tokens?.total ?? 0), 0) / items.length,
+    percentage: 0,
+  }));
+})();
   log.debug({ step: 'model-stats' }, 'model-stats complete');
 
   // Step: total-cost
-  const totalCost = primitives_math_sum({ items: rawModels.map(m => m.totalCost) });
+  const totalCost = rawModels.reduce((s, m) => s + m.totalCost, 0);
   log.debug({ step: 'total-cost' }, 'total-cost complete');
 
   // Step: with-percentage
@@ -50,9 +51,9 @@ export function modelComparison(input: ModelComparisonInput): ModelComparisonOut
 }));
   log.debug({ step: 'with-percentage' }, 'with-percentage complete');
 
-  // Step: sort-by-cost
-  const sortedModels = primitives_collection_sortBy({ items: models, key: 'totalCost', order: 'desc' });
-  log.debug({ step: 'sort-by-cost' }, 'sort-by-cost complete');
+  // Step: sorted-models
+  const sortedModels = [...models].sort((a, b) => b.totalCost - a.totalCost);
+  log.debug({ step: 'sorted-models' }, 'sorted-models complete');
 
   // Step: suggest-downgrades
   const suggestions = sortedModels
@@ -68,7 +69,7 @@ export function modelComparison(input: ModelComparisonInput): ModelComparisonOut
   log.debug({ step: 'suggest-downgrades' }, 'suggest-downgrades complete');
 
   // Step: potential-savings
-  const potentialSavings = primitives_math_sum({ items: suggestions.map(s => s.savings) });
+  const potentialSavings = suggestions.reduce((s, sg) => s + sg.savings, 0);
   log.debug({ step: 'potential-savings' }, 'potential-savings complete');
 
   // Step: return

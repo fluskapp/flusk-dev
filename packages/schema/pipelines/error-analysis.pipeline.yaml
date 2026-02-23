@@ -1,0 +1,97 @@
+# Pipeline: Analyze error patterns in LLM calls
+name: errorAnalysis
+namespace: analytics
+description: Identify error rates, error-prone models, and recurring failure patterns
+package: business-logic
+
+input:
+  calls:
+    type: LLMCallEntity[]
+    description: Array of LLM calls to analyze
+
+output:
+  type: ErrorAnalysisReport
+  fields:
+    totalErrors: { type: number, description: Total failed calls }
+    errorRate: { type: number, description: "Error rate as percentage (0-100)" }
+    wastedCost: { type: number, description: Cost spent on failed calls }
+    byModel: { type: "Record<string, ModelErrorStats>", description: Error stats per model }
+    topErrors: { type: "ErrorPattern[]", description: Most common error messages }
+
+steps:
+  - id: failed-calls
+    expr: "$input.calls.filter(c => c.status === 'error')"
+    output: failedCalls
+
+  - id: total-errors
+    expr: "$failedCalls.length"
+    output: totalErrors
+
+  - id: error-rate
+    expr: "$input.calls.length > 0 ? ($totalErrors / $input.calls.length) * 100 : 0"
+    output: errorRate
+
+  - id: wasted-cost
+    expr: "$failedCalls.reduce((s, c) => s + (c.cost ?? 0), 0)"
+    output: wastedCost
+
+  - id: by-model
+    expr: |
+      (() => {
+        const groups = {};
+        for (const c of $input.calls) {
+          if (!groups[c.model]) groups[c.model] = [];
+          groups[c.model].push(c);
+        }
+        return Object.fromEntries(
+          Object.entries(groups).map(([model, items]) => {
+            const errors = items.filter(c => c.status === 'error');
+            return [model, {
+              total: items.length,
+              errors: errors.length,
+              errorRate: items.length > 0 ? (errors.length / items.length) * 100 : 0,
+              wastedCost: errors.reduce((s, c) => s + (c.cost ?? 0), 0),
+            }];
+          })
+        );
+      })()
+    output: byModel
+
+  - id: top-errors
+    expr: |
+      (() => {
+        const groups = {};
+        for (const c of $failedCalls) {
+          const msg = c.errorMessage ?? 'unknown';
+          if (!groups[msg]) groups[msg] = [];
+          groups[msg].push(c);
+        }
+        return Object.entries(groups)
+          .map(([msg, items]) => ({
+            message: msg,
+            count: items.length,
+            models: [...new Set(items.map(c => c.model))],
+          }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10);
+      })()
+    output: topErrors
+
+  - id: return
+    value:
+      totalErrors: $totalErrors
+      errorRate: $errorRate
+      wastedCost: $wastedCost
+      byModel: $byModel
+      topErrors: $topErrors
+
+tests:
+  - name: no errors
+    input:
+      calls: []
+    expected:
+      totalErrors: 0
+      errorRate: 0
+      wastedCost: 0
+      byModel: {}
+      topErrors: []
