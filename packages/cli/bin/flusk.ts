@@ -174,6 +174,10 @@ program.addCommand(explainCommand);
 import { watchCommand } from '../src/commands/watch.js';
 program.addCommand(watchCommand);
 
+// proxy command
+import { proxyCommand } from '../src/commands/proxy.js';
+program.addCommand(proxyCommand);
+
 program.parse(process.argv);
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---

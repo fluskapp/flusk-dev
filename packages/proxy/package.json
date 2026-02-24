@@ -1,0 +1,36 @@
+{
+  "name": "@flusk/proxy",
+  "version": "0.1.0",
+  "description": "Transparent LLM proxy — capture all API calls with zero code changes",
+  "type": "module",
+  "main": "./src/index.ts",
+  "files": ["dist", "README.md"],
+  "publishConfig": {
+    "access": "public",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@flusk/business-logic": "workspace:*",
+    "@flusk/logger": "workspace:*",
+    "@flusk/resources": "workspace:*",
+    "fastify": "^5.0.0"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0",
+    "typescript": "^5.8.0"
+  },
+  "license": "MIT"
+}
