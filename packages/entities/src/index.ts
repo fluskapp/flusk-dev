@@ -127,3 +127,15 @@ export {
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---
 // --- END CUSTOM ---
+
+// AlertChannel entity exports
+export {
+  AlertChannelEntitySchema,
+  type AlertChannelEntity
+} from './alert-channel.entity.js';
+
+// AlertEvent entity exports
+export {
+  AlertEventEntitySchema,
+  type AlertEventEntity
+} from './alert-event.entity.js';

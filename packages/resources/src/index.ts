@@ -44,3 +44,7 @@ export * as BudgetAlertRepository from './repositories/budget-alert.repository.j
 
 // --- BEGIN CUSTOM ---
 // --- END CUSTOM ---
+
+export * as AlertChannelRepository from './repositories/alert-channel.repository.js';
+
+export * as AlertEventRepository from './repositories/alert-event.repository.js';

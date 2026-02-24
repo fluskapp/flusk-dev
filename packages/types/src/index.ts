@@ -131,3 +131,25 @@ export {
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---
 // --- END CUSTOM ---
+
+export {
+  type AlertChannelEntity as AlertChannelEntityType,
+  type AlertChannelInsert,
+  type AlertChannelUpdate,
+  type AlertChannelQuery,
+  AlertChannelEntityJSONSchema,
+  AlertChannelInsertSchema,
+  AlertChannelUpdateSchema,
+  AlertChannelQuerySchema
+} from './alert-channel.types.js';
+
+export {
+  type AlertEventEntity as AlertEventEntityType,
+  type AlertEventInsert,
+  type AlertEventUpdate,
+  type AlertEventQuery,
+  AlertEventEntityJSONSchema,
+  AlertEventInsertSchema,
+  AlertEventUpdateSchema,
+  AlertEventQuerySchema
+} from './alert-event.types.js';

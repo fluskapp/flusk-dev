@@ -83,4 +83,33 @@ export const APP_ENTITIES: EntityDef[] = [
       { camel: 'consentPurpose', snake: 'consent_purpose', kind: 'string' },
     ],
   },
+  {
+    name: 'alert-channel',
+    table: 'alert_channels',
+    entityType: 'AlertChannelEntity',
+    label: 'Alert channel',
+    fields: [
+      { camel: 'name', snake: 'name', kind: 'string' },
+      { camel: 'channelType', snake: 'channel_type', kind: 'string', entityFieldCast: true },
+      { camel: 'config', snake: 'config', kind: 'json' },
+      { camel: 'enabled', snake: 'enabled', kind: 'boolean' },
+      { camel: 'severityFilter', snake: 'severity_filter', kind: 'string', entityFieldCast: true },
+    ],
+  },
+  {
+    name: 'alert-event',
+    table: 'alert_events',
+    entityType: 'AlertEventEntity',
+    label: 'Alert event',
+    fields: [
+      { camel: 'alertType', snake: 'alert_type', kind: 'string', entityFieldCast: true },
+      { camel: 'severity', snake: 'severity', kind: 'string', entityFieldCast: true },
+      { camel: 'title', snake: 'title', kind: 'string' },
+      { camel: 'message', snake: 'message', kind: 'string' },
+      { camel: 'channelName', snake: 'channel_name', kind: 'string', optional: true },
+      { camel: 'delivered', snake: 'delivered', kind: 'boolean' },
+      { camel: 'acknowledgedAt', snake: 'acknowledged_at', kind: 'string', optional: true },
+      { camel: 'metadata', snake: 'metadata', kind: 'json', optional: true },
+    ],
+  },
 ];
