@@ -174,6 +174,30 @@ program.addCommand(explainCommand);
 import { watchCommand } from '../src/commands/watch.js';
 program.addCommand(watchCommand);
 
+// alerts-setup command
+import { alertsSetupCommand } from '../src/commands/alerts-setup.js';
+program.addCommand(alertsSetupCommand);
+
+// alerts-test command
+import { alertsTestCommand } from '../src/commands/alerts-test.js';
+program.addCommand(alertsTestCommand);
+
+// alerts-list command
+import { alertsListCommand } from '../src/commands/alerts-list.js';
+program.addCommand(alertsListCommand);
+
+// alerts-mute command
+import { alertsMuteCommand } from '../src/commands/alerts-mute.js';
+program.addCommand(alertsMuteCommand);
+
+// alerts-ack command
+import { alertsAckCommand } from '../src/commands/alerts-ack.js';
+program.addCommand(alertsAckCommand);
+
+// kill command
+import { killCommand } from '../src/commands/kill.js';
+program.addCommand(killCommand);
+
 program.parse(process.argv);
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---

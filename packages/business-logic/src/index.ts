@@ -47,4 +47,7 @@ export { explain };
 // --- BEGIN CUSTOM ---
 import * as primitives from './primitives/index.js';
 export { primitives };
+
+import * as alerting from './alerting/index.js';
+export { alerting };
 // --- END CUSTOM ---

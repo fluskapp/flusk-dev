@@ -1,12 +1,12 @@
-/** @generated from AlertEvent YAML — Traits: crud, time-range */
+/** @generated from AlertChannel YAML — Traits: crud */
 // --- BEGIN GENERATED (do not edit) ---
 import type { FastifyInstance } from 'fastify';
 import { Type, type TSchema } from '@sinclair/typebox';
-import { AlertEventEntitySchema } from '@flusk/entities';
-import { AlertEventRepository } from '@flusk/resources';
+import { AlertChannelEntitySchema } from '@flusk/entities';
+import { AlertChannelRepository } from '@flusk/resources';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateAlertEventSchema = Type.Omit(AlertEventEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
-const AlertEventResponseSchema = AlertEventEntitySchema;
+const CreateAlertChannelSchema = Type.Omit(AlertChannelEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const AlertChannelResponseSchema = AlertChannelEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
 const ListQuerySchema = Type.Object({
@@ -15,34 +15,34 @@ const ListQuerySchema = Type.Object({
 });
 
 /**
- * Register AlertEvent routes
+ * Register AlertChannel routes
  */
-export async function alertEventRoutes(
+export async function alertChannelRoutes(
   fastify: FastifyInstance,
 ): Promise<void> {
   fastify.post('/', {
     schema: {
-      body: CreateAlertEventSchema,
-      response: { 201: AlertEventResponseSchema as unknown as TSchema },
-      tags: ['AlertEvent'],
-      description: 'Create a new AlertEvent record',
+      body: CreateAlertChannelSchema,
+      response: { 201: AlertChannelResponseSchema as unknown as TSchema },
+      tags: ['AlertChannel'],
+      description: 'Create a new AlertChannel record',
     },
   }, async (request, reply) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = AlertEventRepository.createAlertEvent(fastify.db, request.body as any);
+    const created = AlertChannelRepository.createAlertChannel(fastify.db, request.body as any);
     return reply.code(201).send(created);
   });
 
   fastify.get('/:id', {
     schema: {
       params: IdParamsSchema,
-      response: { 200: AlertEventResponseSchema as unknown as TSchema, 404: NotFoundSchema },
-      tags: ['AlertEvent'],
-      description: 'Get a AlertEvent by ID',
+      response: { 200: AlertChannelResponseSchema as unknown as TSchema, 404: NotFoundSchema },
+      tags: ['AlertChannel'],
+      description: 'Get a AlertChannel by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const entity = AlertEventRepository.findAlertEventById(fastify.db, id);
+    const entity = AlertChannelRepository.findAlertChannelById(fastify.db, id);
     if (!entity) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(entity);
   });
@@ -50,28 +50,28 @@ export async function alertEventRoutes(
   fastify.get('/', {
     schema: {
       querystring: ListQuerySchema,
-      response: { 200: Type.Array(AlertEventResponseSchema as unknown as TSchema) },
-      tags: ['AlertEvent'],
-      description: 'List AlertEvent records',
+      response: { 200: Type.Array(AlertChannelResponseSchema as unknown as TSchema) },
+      tags: ['AlertChannel'],
+      description: 'List AlertChannel records',
     },
   }, async (request, reply) => {
     const { limit, offset } = request.query as { limit?: number; offset?: number };
-    const items = AlertEventRepository.listAlertEvents(fastify.db, limit, offset);
+    const items = AlertChannelRepository.listAlertChannels(fastify.db, limit, offset);
     return reply.code(200).send(items);
   });
 
   fastify.put('/:id', {
     schema: {
       params: IdParamsSchema,
-      body: Type.Partial(CreateAlertEventSchema),
-      response: { 200: AlertEventResponseSchema as unknown as TSchema, 404: NotFoundSchema },
-      tags: ['AlertEvent'],
-      description: 'Update a AlertEvent by ID',
+      body: Type.Partial(CreateAlertChannelSchema),
+      response: { 200: AlertChannelResponseSchema as unknown as TSchema, 404: NotFoundSchema },
+      tags: ['AlertChannel'],
+      description: 'Update a AlertChannel by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = AlertEventRepository.updateAlertEvent(fastify.db, id, request.body as any);
+    const updated = AlertChannelRepository.updateAlertChannel(fastify.db, id, request.body as any);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });
@@ -80,19 +80,13 @@ export async function alertEventRoutes(
     schema: {
       params: IdParamsSchema,
       response: { 204: Type.Null(), 404: NotFoundSchema },
-      tags: ['AlertEvent'],
-      description: 'Delete a AlertEvent by ID',
+      tags: ['AlertChannel'],
+      description: 'Delete a AlertChannel by ID',
     },
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
-    const deleted = AlertEventRepository.deleteAlertEvent(fastify.db, id);
+    const deleted = AlertChannelRepository.deleteAlertChannel(fastify.db, id);
     if (!deleted) return reply.code(404).send({ error: 'Not found' });
     return reply.code(204).send();
-  });
-
-  /** Time-range query route for AlertEvent */
-  fastify.get('/by-time-range', async (req) => {
-    const { from, to } = req.query as { from: string; to: string };
-    return AlertEventRepository.findAlertEventsByTimeRange(fastify.db, from, to);
   });
 }// --- END GENERATED ---
