@@ -3,12 +3,9 @@
  */
 
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import { createLogger } from '@flusk/logger';
 import type { ProviderInfo } from './providers/detect.js';
 import { interceptResponse } from './interceptor.js';
 import { parseSSEChunks } from './stream-collector.js';
-
-const log = createLogger({ name: 'proxy-handler' });
 
 interface HandlerOpts {
   request: FastifyRequest;

@@ -5,8 +5,8 @@
 import { createHash } from 'node:crypto';
 import { createLogger } from '@flusk/logger';
 import { detectProvider } from './providers/detect.js';
-import { parseOpenAIRequest, parseOpenAIResponse } from './providers/openai.js';
-import { parseAnthropicRequest, parseAnthropicResponse } from './providers/anthropic.js';
+import { parseOpenAIResponse } from './providers/openai.js';
+import { parseAnthropicResponse } from './providers/anthropic.js';
 import { parseGenericResponse } from './providers/generic.js';
 import { calculateCost } from './cost-calculator.js';
 import { captureCall } from './capture.js';
