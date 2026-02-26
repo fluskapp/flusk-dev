@@ -127,3 +127,21 @@ export {
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---
 // --- END CUSTOM ---
+
+// Conversation entity exports
+export {
+  ConversationEntitySchema,
+  type ConversationEntity
+} from './conversation.entity.js';
+
+// TrainingPair entity exports
+export {
+  TrainingPairEntitySchema,
+  type TrainingPairEntity
+} from './training-pair.entity.js';
+
+// TrainingDataset entity exports
+export {
+  TrainingDatasetEntitySchema,
+  type TrainingDatasetEntity
+} from './training-dataset.entity.js';

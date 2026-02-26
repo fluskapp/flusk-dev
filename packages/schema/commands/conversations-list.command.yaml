@@ -1,0 +1,24 @@
+name: conversations-list
+description: List recent conversations with cost and turn summaries
+options:
+  - name: limit
+    type: integer
+    default: 20
+    description: Max conversations to show
+
+  - name: status
+    type: string
+    default: all
+    enum: [all, active, completed, abandoned]
+    description: Filter by status
+
+  - name: db
+    type: string
+    default: ./flusk.db
+    description: Path to the Flusk SQLite database
+
+  - name: format
+    type: string
+    default: table
+    enum: [table, json]
+    description: Output format

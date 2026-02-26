@@ -1,0 +1,27 @@
+name: isAbandoned
+namespace: conversation
+description: Check if a conversation should be marked as abandoned
+pure: true
+generic: false
+
+input:
+  lastCallAtMs: { type: number, description: "Last call timestamp in ms" }
+  nowMs: { type: number, description: "Current timestamp in ms" }
+  timeoutMinutes: { type: number, description: "Abandonment timeout in minutes" }
+
+output:
+  type: boolean
+  description: "True if conversation is abandoned"
+
+body: "(nowMs - lastCallAtMs) > (timeoutMinutes * 60 * 1000)"
+
+tests:
+  - name: not abandoned
+    input: { lastCallAtMs: 1000000, nowMs: 1060000, timeoutMinutes: 30 }
+    expected: false
+  - name: abandoned
+    input: { lastCallAtMs: 1000000, nowMs: 5000000, timeoutMinutes: 30 }
+    expected: true
+  - name: exactly at threshold
+    input: { lastCallAtMs: 0, nowMs: 1800000, timeoutMinutes: 30 }
+    expected: false

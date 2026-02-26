@@ -178,6 +178,18 @@ program.addCommand(watchCommand);
 import { proxyCommand } from '../src/commands/proxy.js';
 program.addCommand(proxyCommand);
 
+// conversations-list command
+import { conversationsListCommand } from '../src/commands/conversations-list.js';
+program.addCommand(conversationsListCommand);
+
+// conversations-show command
+import { conversationsShowCommand } from '../src/commands/conversations-show.js';
+program.addCommand(conversationsShowCommand);
+
+// conversations-top command
+import { conversationsTopCommand } from '../src/commands/conversations-top.js';
+program.addCommand(conversationsTopCommand);
+
 program.parse(process.argv);
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---

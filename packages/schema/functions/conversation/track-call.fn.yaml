@@ -1,0 +1,56 @@
+name: trackCall
+namespace: conversation
+description: Build updated conversation totals from a new LLM call
+pure: true
+generic: false
+
+input:
+  existingTurnCount: { type: number, description: "Current turn count" }
+  existingInputTokens: { type: number, description: "Current total input tokens" }
+  existingOutputTokens: { type: number, description: "Current total output tokens" }
+  existingCost: { type: number, description: "Current total cost" }
+  newInputTokens: { type: number, description: "New call input tokens" }
+  newOutputTokens: { type: number, description: "New call output tokens" }
+  newCost: { type: number, description: "New call cost" }
+
+output:
+  type: json
+  description: "Updated totals object"
+
+body: |
+  ({
+    turnCount: existingTurnCount + 1,
+    totalInputTokens: existingInputTokens + newInputTokens,
+    totalOutputTokens: existingOutputTokens + newOutputTokens,
+    totalCost: existingCost + newCost
+  })
+
+tests:
+  - name: first call
+    input:
+      existingTurnCount: 0
+      existingInputTokens: 0
+      existingOutputTokens: 0
+      existingCost: 0
+      newInputTokens: 100
+      newOutputTokens: 50
+      newCost: 0.005
+    expected:
+      turnCount: 1
+      totalInputTokens: 100
+      totalOutputTokens: 50
+      totalCost: 0.005
+  - name: subsequent call
+    input:
+      existingTurnCount: 3
+      existingInputTokens: 500
+      existingOutputTokens: 200
+      existingCost: 0.05
+      newInputTokens: 150
+      newOutputTokens: 80
+      newCost: 0.01
+    expected:
+      turnCount: 4
+      totalInputTokens: 650
+      totalOutputTokens: 280
+      totalCost: 0.06

@@ -3,7 +3,7 @@
  */
 
 // --- BEGIN GENERATED ---
-import type { LLMCallEntity, AnalyzeSessionEntity, ProfileSessionEntity, PerformancePatternEntity } from '@flusk/entities';
+import type { LLMCallEntity, AnalyzeSessionEntity, ProfileSessionEntity, PerformancePatternEntity, ConversationEntity } from '@flusk/entities';
 import type { ModelCount } from './sqlite/repositories/llm-call/count-by-model.js';
 // --- END GENERATED ---
 
@@ -20,6 +20,7 @@ export interface LLMCallMethods {
   sumCostBySessionId: (sessionId: string) => number;
   sumCostSince: (since: string) => number;
   countDuplicates: () => number;
+  listByConversationId: (conversationId: string) => LLMCallEntity[];
 }
 
 export interface AnalyzeSessionMethods {
@@ -41,11 +42,24 @@ export interface PatternMethods {
   list: (limit?: number, offset?: number) => PerformancePatternEntity[];
 }
 
+export interface ConversationMethods {
+  create: (data: Omit<ConversationEntity, 'id' | 'createdAt' | 'updatedAt'>) => ConversationEntity;
+  findById: (id: string) => ConversationEntity | null;
+  findByExternalId: (externalId: string) => ConversationEntity | null;
+  list: (limit?: number, offset?: number) => ConversationEntity[];
+  findAbandoned: (before: string) => ConversationEntity[];
+  topByCost: () => Record<string, unknown>[];
+  topByTurns: () => Record<string, unknown>[];
+  topByTokens: () => Record<string, unknown>[];
+  update: (id: string, data: Partial<ConversationEntity>) => ConversationEntity | null;
+}
+
 export interface StorageAdapter {
   mode: 'sqlite' | 'postgres';
   llmCalls: LLMCallMethods;
   analyzeSessions: AnalyzeSessionMethods;
   profileSessions: ProfileSessionMethods;
   patterns: PatternMethods;
+  conversations: ConversationMethods;
 }
 // --- END CUSTOM ---

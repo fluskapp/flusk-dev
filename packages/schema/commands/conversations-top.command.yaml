@@ -1,0 +1,24 @@
+name: conversations-top
+description: Show top conversations by cost, turns, or tokens
+options:
+  - name: by
+    type: string
+    default: cost
+    enum: [cost, turns, tokens]
+    description: Sort metric
+
+  - name: limit
+    type: integer
+    default: 10
+    description: Number of results
+
+  - name: db
+    type: string
+    default: ./flusk.db
+    description: Path to the Flusk SQLite database
+
+  - name: format
+    type: string
+    default: table
+    enum: [table, json]
+    description: Output format

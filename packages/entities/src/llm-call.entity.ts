@@ -23,7 +23,8 @@ export const LLMCallEntitySchema = Type.Composite([
     organizationId: Type.Optional(Type.String({ description: 'Organization ID for GDPR data portability and deletion', minLength: 1 })),
     consentGiven: Type.Boolean({ description: 'GDPR consent flag', default: true }),
     consentPurpose: Type.String({ description: 'Purpose of data processing (optimization, analytics, training)', default: 'optimization' }),
-    sessionId: Type.Optional(Type.String({ description: 'Analysis session ID for filtering results by run' }))
+    sessionId: Type.Optional(Type.String({ description: 'Analysis session ID for filtering results by run' })),
+    conversationId: Type.Optional(Type.String({ description: 'Conversation ID for multi-turn tracking' }))
   })
 ]);
 

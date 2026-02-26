@@ -24,6 +24,7 @@ export function rowToEntity(row: Record<string, unknown>): LLMCallEntity {
     consentGiven: Boolean(row.consent_given),
     consentPurpose: row.consent_purpose as string,
     sessionId: (row.session_id as string) ?? undefined,
+    conversationId: (row.conversation_id as string) ?? undefined,
   };
 }
 // --- END GENERATED ---

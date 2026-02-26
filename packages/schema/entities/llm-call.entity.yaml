@@ -91,6 +91,11 @@ fields:
     description: Analysis session ID for filtering results by run
     index: true
 
+  conversationId:
+    type: string
+    description: Conversation ID for multi-turn tracking
+    index: true
+
 capabilities:
   crud: true
   aggregation: true
@@ -151,6 +156,14 @@ queries:
     type: raw-sql
     sql: "SELECT COALESCE(SUM(cost), 0) as total FROM llm_calls WHERE session_id = :sessionId"
     returns: scalar
+
+  - name: listByConversationId
+    description: List LLM calls filtered by conversation ID
+    params:
+      conversationId: { type: string }
+    where: "conversation_id = :conversationId"
+    order: "created_at ASC"
+    returns: list
 
   - name: countByModelBySessionId
     description: Count LLM calls grouped by model for a specific session

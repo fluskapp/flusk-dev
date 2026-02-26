@@ -21,4 +21,5 @@ export { sumCost } from './sum-cost.js';
 export { sumCostSince } from './sum-cost-since.js';
 export { sumCostBySessionId } from './sum-cost-by-session-id.js';
 export { listBySessionId } from './list-by-session-id.js';
+export { listByConversationId } from './list-by-conversation-id.js';
 // --- END GENERATED ---

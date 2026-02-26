@@ -1,0 +1,19 @@
+name: conversations-show
+description: Show conversation detail with all LLM calls
+args:
+  - name: id
+    type: string
+    required: true
+    description: Conversation ID to show
+
+options:
+  - name: db
+    type: string
+    default: ./flusk.db
+    description: Path to the Flusk SQLite database
+
+  - name: format
+    type: string
+    default: text
+    enum: [text, json]
+    description: Output format

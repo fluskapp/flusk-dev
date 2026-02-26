@@ -14,6 +14,7 @@ import * as PatternRepo from './sqlite/repositories/performance-pattern/index.js
 
 // --- BEGIN CUSTOM ---
 import { hardenPermissions } from './sqlite/harden-permissions.js';
+import * as ConversationRepo from './sqlite/repositories/conversation/index.js';
 
 /**
  * Create a SQLite-backed storage adapter.
@@ -38,6 +39,7 @@ export function createSqliteStorage(dbPath?: string): StorageAdapter {
       sumCostBySessionId: (sessionId) => LLMCallRepo.sumCostBySessionId(db, sessionId),
       sumCostSince: (since: string) => LLMCallRepo.sumCostSince(db, since),
       countDuplicates: () => LLMCallRepo.countDuplicates(db),
+      listByConversationId: (cid: string) => LLMCallRepo.listByConversationId(db, cid),
     },
     analyzeSessions: {
       create: (data) => AnalyzeSessionRepo.create(db, data),
@@ -54,6 +56,17 @@ export function createSqliteStorage(dbPath?: string): StorageAdapter {
       create: (data) => PatternRepo.create(db, data),
       findByProfileId: (id) => PatternRepo.findByProfileId(db, id),
       list: (limit, offset) => PatternRepo.list(db, limit, offset),
+    },
+    conversations: {
+      create: (data) => ConversationRepo.create(db, data),
+      findById: (id) => ConversationRepo.findById(db, id),
+      findByExternalId: (eid) => ConversationRepo.findByExternalId(db, eid),
+      list: (limit, offset) => ConversationRepo.list(db, limit, offset),
+      findAbandoned: (before) => ConversationRepo.findAbandoned(db, before),
+      topByCost: () => ConversationRepo.topByCost(db),
+      topByTurns: () => ConversationRepo.topByTurns(db),
+      topByTokens: () => ConversationRepo.topByTokens(db),
+      update: (id, data) => ConversationRepo.update(db, id, data),
     },
   };
 }

@@ -1,0 +1,122 @@
+name: Conversation
+description: Multi-turn conversation grouping LLM calls into sessions
+storage: [sqlite]
+
+fields:
+  externalId:
+    type: string
+    index: true
+    description: User-provided conversation ID
+
+  model:
+    type: string
+    required: true
+    description: Primary model used in conversation
+    min: 1
+
+  provider:
+    type: string
+    required: true
+    description: Primary LLM provider
+    min: 1
+
+  turnCount:
+    type: integer
+    required: true
+    description: Number of LLM calls in conversation
+    default: 0
+    min: 0
+
+  totalInputTokens:
+    type: integer
+    required: true
+    description: Sum of input tokens across all calls
+    default: 0
+    min: 0
+
+  totalOutputTokens:
+    type: integer
+    required: true
+    description: Sum of output tokens across all calls
+    default: 0
+    min: 0
+
+  totalCost:
+    type: number
+    required: true
+    description: Total cost in USD across all calls
+    default: 0
+    min: 0
+
+  firstCallAt:
+    type: date
+    required: true
+    description: Timestamp of the first LLM call
+
+  lastCallAt:
+    type: date
+    required: true
+    description: Timestamp of the most recent LLM call
+
+  metadata:
+    type: json
+    description: Arbitrary metadata for the conversation
+
+  status:
+    type: enum
+    values: [active, completed, abandoned]
+    required: true
+    default: active
+    description: Conversation lifecycle status
+
+capabilities:
+  crud: true
+  time-range: true
+  aggregation: true
+
+queries:
+  - name: findByExternalId
+    description: Find conversation by external ID
+    params:
+      externalId: { type: string }
+    where: "external_id = :externalId"
+    returns: single
+
+  - name: listByTimeRange
+    description: List conversations in a time range
+    params:
+      from: { type: string }
+      to: { type: string }
+    where: "first_call_at >= :from AND last_call_at <= :to"
+    order: "last_call_at DESC"
+    returns: list
+
+  - name: topByCost
+    description: Top conversations by total cost
+    type: raw-sql
+    sql: "SELECT * FROM conversations ORDER BY total_cost DESC LIMIT 10"
+    returns: raw
+
+  - name: topByTurns
+    description: Top conversations by turn count
+    type: raw-sql
+    sql: "SELECT * FROM conversations ORDER BY turn_count DESC LIMIT 10"
+    returns: raw
+
+  - name: topByTokens
+    description: Top conversations by total tokens
+    type: raw-sql
+    sql: "SELECT * FROM conversations ORDER BY (total_input_tokens + total_output_tokens) DESC LIMIT 10"
+    returns: raw
+
+  - name: findAbandoned
+    description: Find active conversations older than a threshold
+    params:
+      before: { type: string }
+    where: "status = 'active' AND last_call_at < :before"
+    returns: list
+
+relations:
+  - entity: LLMCall
+    type: hasMany
+    foreignKey: conversationId

@@ -131,3 +131,36 @@ export {
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---
 // --- END CUSTOM ---
+
+export {
+  type ConversationEntity as ConversationEntityType,
+  type ConversationInsert,
+  type ConversationUpdate,
+  type ConversationQuery,
+  ConversationEntityJSONSchema,
+  ConversationInsertSchema,
+  ConversationUpdateSchema,
+  ConversationQuerySchema
+} from './conversation.types.js';
+
+export {
+  type TrainingPairEntity as TrainingPairEntityType,
+  type TrainingPairInsert,
+  type TrainingPairUpdate,
+  type TrainingPairQuery,
+  TrainingPairEntityJSONSchema,
+  TrainingPairInsertSchema,
+  TrainingPairUpdateSchema,
+  TrainingPairQuerySchema
+} from './training-pair.types.js';
+
+export {
+  type TrainingDatasetEntity as TrainingDatasetEntityType,
+  type TrainingDatasetInsert,
+  type TrainingDatasetUpdate,
+  type TrainingDatasetQuery,
+  TrainingDatasetEntityJSONSchema,
+  TrainingDatasetInsertSchema,
+  TrainingDatasetUpdateSchema,
+  TrainingDatasetQuerySchema
+} from './training-dataset.types.js';
