@@ -8,6 +8,8 @@ import { createLogger } from '@flusk/logger';
 import { detectProvider } from './providers/detect.js';
 import { resolveUpstream } from './upstream.js';
 import { handleProxy } from './proxy-handler.js';
+import { SmartRouter } from './router.js';
+import type { RouterConfig } from './router-config.js';
 
 const log = createLogger({ name: 'proxy-server' });
 
@@ -15,6 +17,7 @@ export interface ProxyOptions {
   port: number;
   upstream?: string;
   cache?: boolean;
+  routerConfig?: Partial<RouterConfig>;
 }
 
 /** Create and configure the proxy Fastify server. */
@@ -37,6 +40,9 @@ export function createProxyServer(opts: ProxyOptions): FastifyInstance {
     },
   );
 
+  const router = opts.routerConfig
+    ? new SmartRouter(opts.routerConfig) : undefined;
+
   app.all('/*', async (request, reply) => {
     const path = request.url;
     const headers = request.headers as Record<string, string | undefined>;
@@ -47,7 +53,9 @@ export function createProxyServer(opts: ProxyOptions): FastifyInstance {
       return reply.status(502).send({ error: 'Unknown provider' });
     }
 
-    return handleProxy({ request, reply, upstream, path, info, headers });
+    return handleProxy({
+      request, reply, upstream, path, info, headers, router,
+    });
   });
 
   app.addHook('onReady', () => {

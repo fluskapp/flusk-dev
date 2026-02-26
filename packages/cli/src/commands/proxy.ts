@@ -16,12 +16,24 @@ export const proxyCommand = new Command('proxy')
   .option('-p, --port <port>', 'Port to listen on', '8787')
   .option('-u, --upstream <provider>', 'Explicit upstream (openai, anthropic, or URL)')
   .option('--cache', 'Enable response caching', false)
-  .action(async (opts: { port: string; upstream?: string; cache: boolean }) => {
+  .option('-s, --strategy <strategy>', 'Routing strategy: fallback|cost|latency|round-robin')
+  .option('--fallback <models...>', 'Fallback model chain (e.g., gpt-4o claude-3-sonnet)')
+  .action(async (opts: {
+    port: string; upstream?: string; cache: boolean;
+    strategy?: string; fallback?: string[];
+  }) => {
     const { startProxy } = await import('@flusk/proxy');
     const port = parseInt(opts.port, 10);
+    const routerConfig = opts.strategy ? {
+      strategy: opts.strategy as 'fallback' | 'cost' | 'latency' | 'round-robin',
+      targets: [],
+      fallbackChain: opts.fallback,
+    } : undefined;
 
-    log.info({ port, upstream: opts.upstream }, 'Starting proxy');
-    const app = await startProxy({ port, upstream: opts.upstream, cache: opts.cache });
+    log.info({ port, upstream: opts.upstream, strategy: opts.strategy }, 'Starting proxy');
+    const app = await startProxy({
+      port, upstream: opts.upstream, cache: opts.cache, routerConfig,
+    });
 
     const shutdown = async () => {
       log.info('Shutting down proxy');
