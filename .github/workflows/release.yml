@@ -7,6 +7,9 @@ jobs:
   release:
     if: ${{ vars.ENABLE_PUBLISH == 'true' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
