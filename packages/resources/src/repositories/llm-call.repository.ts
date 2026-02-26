@@ -68,6 +68,10 @@ export function sumCostBySessionId(db: DatabaseSync, sessionId: string): unknown
   return Repo.sumCostBySessionId(db, sessionId) as unknown;
 }
 
+export function listByConversationId(db: DatabaseSync, conversationId: string): LLMCallEntity[] {
+  return Repo.listByConversationId(db, conversationId) as LLMCallEntity[];
+}
+
 export function countByModelBySessionId(db: DatabaseSync, sessionId: string): unknown[] {
   return Repo.countByModelBySessionId(db, sessionId) as unknown[];
 }

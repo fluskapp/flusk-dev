@@ -1,0 +1,37 @@
+name: formatAsAlpaca
+namespace: training
+description: Format a training pair as Alpaca format for fine-tuning
+pure: true
+generic: false
+
+input:
+  prompt: { type: string, description: "User prompt (instruction)" }
+  completion: { type: string, description: "Assistant completion (output)" }
+  systemPrompt: { type: string, description: "System prompt (input context) or empty" }
+
+output:
+  type: string
+  description: "JSON string in Alpaca format"
+
+body: |
+  (() => {
+    return JSON.stringify({
+      instruction: prompt,
+      input: systemPrompt || '',
+      output: completion,
+    });
+  })()
+
+tests:
+  - name: formats with context
+    input:
+      prompt: "Summarize this"
+      completion: "Here is a summary."
+      systemPrompt: "You are a summarizer."
+    expected: '{"instruction":"Summarize this","input":"You are a summarizer.","output":"Here is a summary."}'
+  - name: formats without context
+    input:
+      prompt: "Hello"
+      completion: "Hi"
+      systemPrompt: ""
+    expected: '{"instruction":"Hello","input":"","output":"Hi"}'

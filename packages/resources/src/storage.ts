@@ -3,7 +3,7 @@
  */
 
 // --- BEGIN GENERATED ---
-import type { LLMCallEntity, AnalyzeSessionEntity, ProfileSessionEntity, PerformancePatternEntity, ConversationEntity } from '@flusk/entities';
+import type { LLMCallEntity, AnalyzeSessionEntity, ProfileSessionEntity, PerformancePatternEntity, ConversationEntity, TrainingPairEntity, TrainingDatasetEntity } from '@flusk/entities';
 import type { ModelCount } from './sqlite/repositories/llm-call/count-by-model.js';
 // --- END GENERATED ---
 
@@ -54,6 +54,25 @@ export interface ConversationMethods {
   update: (id: string, data: Partial<ConversationEntity>) => ConversationEntity | null;
 }
 
+export interface TrainingPairMethods {
+  create: (data: Omit<TrainingPairEntity, 'id' | 'createdAt' | 'updatedAt'>) => TrainingPairEntity;
+  findById: (id: string) => TrainingPairEntity | null;
+  list: (limit?: number, offset?: number) => TrainingPairEntity[];
+  listByModel: (sourceModel: string) => TrainingPairEntity[];
+  findByCluster: (cluster: string) => TrainingPairEntity[];
+  countByTenant: (tenantId: string) => number;
+  countByModelGrouped: () => unknown[];
+  countByClusterGrouped: () => unknown[];
+  update: (id: string, data: Partial<TrainingPairEntity>) => TrainingPairEntity | null;
+}
+
+export interface TrainingDatasetMethods {
+  create: (data: Omit<TrainingDatasetEntity, 'id' | 'createdAt' | 'updatedAt'>) => TrainingDatasetEntity;
+  findById: (id: string) => TrainingDatasetEntity | null;
+  list: (limit?: number, offset?: number) => TrainingDatasetEntity[];
+  update: (id: string, data: Partial<TrainingDatasetEntity>) => TrainingDatasetEntity | null;
+}
+
 export interface StorageAdapter {
   mode: 'sqlite' | 'postgres';
   llmCalls: LLMCallMethods;
@@ -61,5 +80,7 @@ export interface StorageAdapter {
   profileSessions: ProfileSessionMethods;
   patterns: PatternMethods;
   conversations: ConversationMethods;
+  trainingPairs: TrainingPairMethods;
+  trainingDatasets: TrainingDatasetMethods;
 }
 // --- END CUSTOM ---

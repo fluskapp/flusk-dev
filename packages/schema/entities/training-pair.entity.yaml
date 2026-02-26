@@ -1,0 +1,116 @@
+name: TrainingPair
+description: A captured LLM query-response pair for SLM fine-tuning training data
+storage: [sqlite]
+
+fields:
+  tenantId:
+    type: string
+    index: true
+    description: Tenant ID for multi-tenant isolation
+
+  sourceModel:
+    type: string
+    required: true
+    index: true
+    description: Source model identifier (e.g. claude-sonnet-4-20250514, gpt-4o)
+
+  sourceProvider:
+    type: enum
+    values: [anthropic, openai, google]
+    required: true
+    description: LLM provider name
+
+  prompt:
+    type: string
+    required: true
+    description: Full user prompt or messages JSON
+
+  completion:
+    type: string
+    required: true
+    description: Model response text
+
+  systemPrompt:
+    type: string
+    description: System prompt if present
+
+  inputTokens:
+    type: integer
+    required: true
+    min: 0
+    default: 0
+    description: Number of input tokens
+
+  outputTokens:
+    type: integer
+    required: true
+    min: 0
+    default: 0
+    description: Number of output tokens
+
+  quality:
+    type: enum
+    values: [unrated, good, flagged, rejected]
+    required: true
+    default: unrated
+    description: Quality rating for this training pair
+
+  cluster:
+    type: string
+    index: true
+    description: Assigned pattern cluster label
+
+  metadata:
+    type: json
+    description: Additional metadata (temperature, tools used, etc.)
+
+capabilities:
+  crud: true
+  time-range: true
+  aggregation: true
+
+queries:
+  - name: findByCluster
+    description: Find training pairs in a specific cluster
+    params:
+      cluster: { type: string }
+    where: "cluster = :cluster"
+    order: "created_at DESC"
+    returns: list
+
+  - name: listByModel
+    description: List training pairs by source model with pagination
+    params:
+      sourceModel: { type: string }
+    where: "source_model = :sourceModel"
+    order: "created_at DESC"
+    returns: list
+
+  - name: countByTenant
+    description: Count training pairs for a specific tenant
+    params:
+      tenantId: { type: string }
+    type: raw-sql
+    sql: "SELECT COUNT(*) as total FROM training_pairs WHERE tenant_id = :tenantId"
+    returns: scalar
+
+  - name: countByModelGrouped
+    description: Count training pairs grouped by source model
+    type: raw-sql
+    sql: "SELECT source_model as model, COUNT(*) as count FROM training_pairs GROUP BY source_model ORDER BY count DESC"
+    returns: raw
+
+  - name: countByClusterGrouped
+    description: Count training pairs grouped by cluster
+    type: raw-sql
+    sql: "SELECT cluster, COUNT(*) as count FROM training_pairs WHERE cluster IS NOT NULL GROUP BY cluster ORDER BY count DESC"
+    returns: raw
+
+  - name: findByDatasetCluster
+    description: Find pairs matching a cluster filter for dataset export
+    params:
+      cluster: { type: string }
+      quality: { type: string }
+    where: "cluster = :cluster AND quality = :quality"
+    order: "created_at ASC"
+    returns: list

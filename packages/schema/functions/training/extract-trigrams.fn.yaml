@@ -1,0 +1,34 @@
+name: extractTrigrams
+namespace: training
+description: Extract word trigrams from text for similarity comparison
+pure: true
+generic: false
+
+input:
+  text: { type: string, description: "Input text to extract trigrams from" }
+
+output:
+  type: "string[]"
+  description: "Array of word trigrams"
+
+body: |
+  (() => {
+    const words = text.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/).filter(Boolean);
+    if (words.length < 3) return words.length > 0 ? [words.join(' ')] : [];
+    const trigrams: string[] = [];
+    for (let i = 0; i <= words.length - 3; i++) {
+      trigrams.push(words.slice(i, i + 3).join(' '));
+    }
+    return trigrams;
+  })()
+
+tests:
+  - name: extracts trigrams from sentence
+    input: { text: "the quick brown fox jumps" }
+    expected: ["the quick brown", "quick brown fox", "brown fox jumps"]
+  - name: handles short text
+    input: { text: "hello world" }
+    expected: ["hello world"]
+  - name: handles empty text
+    input: { text: "" }
+    expected: []

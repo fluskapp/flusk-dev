@@ -1,0 +1,83 @@
+name: TrainingDataset
+description: A curated dataset of training pairs ready for SLM fine-tuning export
+storage: [sqlite]
+
+fields:
+  tenantId:
+    type: string
+    index: true
+    description: Tenant ID for multi-tenant isolation
+
+  name:
+    type: string
+    required: true
+    description: Dataset name (e.g. marketing-agent-v1)
+
+  sourceModel:
+    type: string
+    required: true
+    description: Which teacher model the pairs came from
+
+  targetModel:
+    type: string
+    description: Which SLM to fine-tune with this dataset
+
+  pairCount:
+    type: integer
+    required: true
+    min: 0
+    default: 0
+    description: Number of training pairs in this dataset
+
+  status:
+    type: enum
+    values: [collecting, ready, training, deployed]
+    required: true
+    default: collecting
+    description: Dataset lifecycle status
+
+  clusterSummary:
+    type: json
+    required: true
+    default: "{}"
+    description: Top pattern clusters with counts
+
+  exportFormat:
+    type: enum
+    values: [jsonl, alpaca, sharegpt]
+    required: true
+    default: jsonl
+    description: Export format for fine-tuning
+
+  exportPath:
+    type: string
+    description: File path where dataset was exported
+
+capabilities:
+  crud: true
+  time-range: true
+  aggregation: true
+
+queries:
+  - name: findByName
+    description: Find dataset by name
+    params:
+      name: { type: string }
+    where: "name = :name"
+    returns: single
+
+  - name: listByTenant
+    description: List datasets for a tenant
+    params:
+      tenantId: { type: string }
+    where: "tenant_id = :tenantId"
+    order: "created_at DESC"
+    returns: list
+
+  - name: listByStatus
+    description: List datasets by status
+    params:
+      status: { type: string }
+    where: "status = :status"
+    order: "created_at DESC"
+    returns: list

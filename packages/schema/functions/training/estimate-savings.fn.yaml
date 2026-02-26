@@ -1,0 +1,47 @@
+name: estimateSavings
+namespace: training
+description: Estimate cost savings if a cluster used SLM instead of teacher model
+pure: true
+generic: false
+
+input:
+  pairCount: { type: number, description: "Number of pairs in cluster" }
+  avgInputTokens: { type: number, description: "Average input tokens per pair" }
+  avgOutputTokens: { type: number, description: "Average output tokens per pair" }
+  teacherInputCostPer1k: { type: number, description: "Teacher model cost per 1k input tokens" }
+  teacherOutputCostPer1k: { type: number, description: "Teacher model cost per 1k output tokens" }
+  slmInputCostPer1k: { type: number, description: "SLM cost per 1k input tokens" }
+  slmOutputCostPer1k: { type: number, description: "SLM cost per 1k output tokens" }
+
+output:
+  type: json
+  description: "{ teacherCost, slmCost, savings, savingsPercent }"
+
+body: |
+  (() => {
+    const teacherInput = (pairCount * avgInputTokens / 1000) * teacherInputCostPer1k;
+    const teacherOutput = (pairCount * avgOutputTokens / 1000) * teacherOutputCostPer1k;
+    const teacherCost = teacherInput + teacherOutput;
+    const slmInput = (pairCount * avgInputTokens / 1000) * slmInputCostPer1k;
+    const slmOutput = (pairCount * avgOutputTokens / 1000) * slmOutputCostPer1k;
+    const slmCost = slmInput + slmOutput;
+    const savings = teacherCost - slmCost;
+    const savingsPercent = teacherCost > 0 ? (savings / teacherCost) * 100 : 0;
+    return { teacherCost, slmCost, savings, savingsPercent };
+  })()
+
+tests:
+  - name: calculates savings correctly
+    input:
+      pairCount: 1000
+      avgInputTokens: 500
+      avgOutputTokens: 200
+      teacherInputCostPer1k: 0.015
+      teacherOutputCostPer1k: 0.060
+      slmInputCostPer1k: 0.001
+      slmOutputCostPer1k: 0.002
+    expected:
+      teacherCost: 19.5
+      slmCost: 0.9
+      savings: 18.6
+      savingsPercent: 95.38461538461539

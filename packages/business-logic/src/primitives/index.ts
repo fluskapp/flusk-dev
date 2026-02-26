@@ -7,3 +7,4 @@ export * from './cost/index.js';
 export * from './math/index.js';
 export * from './text/index.js';
 export * from './time/index.js';
+export * from './training/index.js';

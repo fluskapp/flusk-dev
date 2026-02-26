@@ -1,0 +1,68 @@
+name: shouldCollect
+namespace: training
+description: Determine if an LLM call should be collected as training data
+pure: true
+generic: false
+
+input:
+  provider: { type: string, description: "LLM provider name" }
+  model: { type: string, description: "Model identifier" }
+  prompt: { type: string, description: "User prompt text" }
+  completion: { type: string, description: "Model response text" }
+  status: { type: string, description: "Call status (ok or error)" }
+  teacherModels:
+    type: "string[]"
+    description: "List of teacher model identifiers to collect from"
+
+output:
+  type: boolean
+  description: "Whether this call should be collected"
+
+body: |
+  (() => {
+    if (status !== 'ok') return false;
+    if (prompt.length < 10) return false;
+    if (completion.length < 10) return false;
+    const isTeacher = teacherModels.some(
+      (tm: string) => model.includes(tm) || tm.includes(model)
+    );
+    return isTeacher;
+  })()
+
+tests:
+  - name: collects from teacher model
+    input:
+      provider: "anthropic"
+      model: "claude-sonnet-4-20250514"
+      prompt: "Explain quantum computing"
+      completion: "Quantum computing uses qubits..."
+      status: "ok"
+      teacherModels: ["claude-sonnet-4-20250514", "gpt-4o"]
+    expected: true
+  - name: skips error calls
+    input:
+      provider: "openai"
+      model: "gpt-4o"
+      prompt: "Hello world"
+      completion: "Error occurred"
+      status: "error"
+      teacherModels: ["gpt-4o"]
+    expected: false
+  - name: skips non-teacher models
+    input:
+      provider: "openai"
+      model: "gpt-3.5-turbo"
+      prompt: "Hello world test"
+      completion: "Hi there response"
+      status: "ok"
+      teacherModels: ["gpt-4o", "claude-sonnet-4-20250514"]
+    expected: false
+  - name: skips short prompts
+    input:
+      provider: "openai"
+      model: "gpt-4o"
+      prompt: "Hi"
+      completion: "Hello! How can I help?"
+      status: "ok"
+      teacherModels: ["gpt-4o"]
+    expected: false

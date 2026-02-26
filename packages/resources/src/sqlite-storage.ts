@@ -15,6 +15,8 @@ import * as PatternRepo from './sqlite/repositories/performance-pattern/index.js
 // --- BEGIN CUSTOM ---
 import { hardenPermissions } from './sqlite/harden-permissions.js';
 import * as ConversationRepo from './sqlite/repositories/conversation/index.js';
+import * as TrainingPairRepo from './sqlite/repositories/training-pair/index.js';
+import * as TrainingDatasetRepo from './sqlite/repositories/training-dataset/index.js';
 
 /**
  * Create a SQLite-backed storage adapter.
@@ -67,6 +69,23 @@ export function createSqliteStorage(dbPath?: string): StorageAdapter {
       topByTurns: () => ConversationRepo.topByTurns(db),
       topByTokens: () => ConversationRepo.topByTokens(db),
       update: (id, data) => ConversationRepo.update(db, id, data),
+    },
+    trainingPairs: {
+      create: (data) => TrainingPairRepo.create(db, data),
+      findById: (id) => TrainingPairRepo.findById(db, id),
+      list: (limit, offset) => TrainingPairRepo.list(db, limit, offset),
+      listByModel: (model) => TrainingPairRepo.listByModel(db, model),
+      findByCluster: (cluster) => TrainingPairRepo.findByCluster(db, cluster),
+      countByTenant: (tenantId) => TrainingPairRepo.countByTenant(db, tenantId),
+      countByModelGrouped: () => TrainingPairRepo.countByModelGrouped(db),
+      countByClusterGrouped: () => TrainingPairRepo.countByClusterGrouped(db),
+      update: (id, data) => TrainingPairRepo.update(db, id, data),
+    },
+    trainingDatasets: {
+      create: (data) => TrainingDatasetRepo.create(db, data),
+      findById: (id) => TrainingDatasetRepo.findById(db, id),
+      list: (limit, offset) => TrainingDatasetRepo.list(db, limit, offset),
+      update: (id, data) => TrainingDatasetRepo.update(db, id, data),
     },
   };
 }

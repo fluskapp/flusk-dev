@@ -190,6 +190,9 @@ program.addCommand(conversationsShowCommand);
 import { conversationsTopCommand } from '../src/commands/conversations-top.js';
 program.addCommand(conversationsTopCommand);
 
+import { trainingCommand } from '../src/commands/training.js';
+program.addCommand(trainingCommand);
+
 program.parse(process.argv);
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---

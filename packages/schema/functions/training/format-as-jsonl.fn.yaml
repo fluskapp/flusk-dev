@@ -1,0 +1,37 @@
+name: formatAsJsonl
+namespace: training
+description: Format a training pair as JSONL chat format for fine-tuning
+pure: true
+generic: false
+
+input:
+  prompt: { type: string, description: "User prompt" }
+  completion: { type: string, description: "Assistant completion" }
+  systemPrompt: { type: string, description: "System prompt or empty string" }
+
+output:
+  type: string
+  description: "JSON string in OpenAI fine-tuning format"
+
+body: |
+  (() => {
+    const messages: Array<{ role: string; content: string }> = [];
+    if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+    messages.push({ role: 'user', content: prompt });
+    messages.push({ role: 'assistant', content: completion });
+    return JSON.stringify({ messages });
+  })()
+
+tests:
+  - name: formats with system prompt
+    input:
+      prompt: "What is AI?"
+      completion: "AI is artificial intelligence."
+      systemPrompt: "You are helpful."
+    expected: '{"messages":[{"role":"system","content":"You are helpful."},{"role":"user","content":"What is AI?"},{"role":"assistant","content":"AI is artificial intelligence."}]}'
+  - name: formats without system prompt
+    input:
+      prompt: "Hello"
+      completion: "Hi there"
+      systemPrompt: ""
+    expected: '{"messages":[{"role":"user","content":"Hello"},{"role":"assistant","content":"Hi there"}]}'

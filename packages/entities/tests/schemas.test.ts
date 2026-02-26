@@ -21,6 +21,8 @@ import {
   BudgetAlertEntitySchema,
   InsightEntitySchema,
   ExplainSessionEntitySchema,
+  TrainingPairEntitySchema,
+  TrainingDatasetEntitySchema,
 } from '../src/index.js';
 
 const schemas = {
@@ -44,6 +46,8 @@ const schemas = {
   BudgetAlertEntitySchema,
   InsightEntitySchema,
   ExplainSessionEntitySchema,
+  TrainingPairEntitySchema,
+  TrainingDatasetEntitySchema,
 };
 
 describe('Entity schemas', () => {

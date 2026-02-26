@@ -1,0 +1,35 @@
+name: jaccardSimilarity
+namespace: training
+description: Calculate Jaccard similarity between two string arrays
+pure: true
+generic: false
+
+input:
+  setA: { type: "string[]", description: "First set of strings" }
+  setB: { type: "string[]", description: "Second set of strings" }
+
+output:
+  type: number
+  description: "Similarity score 0-1"
+
+body: |
+  (() => {
+    const a = new Set(setA);
+    const b = new Set(setB);
+    if (a.size === 0 && b.size === 0) return 1;
+    if (a.size === 0 || b.size === 0) return 0;
+    const intersection = [...a].filter(x => b.has(x)).length;
+    const union = new Set([...a, ...b]).size;
+    return intersection / union;
+  })()
+
+tests:
+  - name: identical sets
+    input: { setA: ["a", "b", "c"], setB: ["a", "b", "c"] }
+    expected: 1
+  - name: no overlap
+    input: { setA: ["a", "b"], setB: ["c", "d"] }
+    expected: 0
+  - name: partial overlap
+    input: { setA: ["a", "b", "c"], setB: ["b", "c", "d"] }
+    expected: 0.5
