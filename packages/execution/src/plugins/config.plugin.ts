@@ -30,7 +30,7 @@ const schema = Type.Object({
 
 export const plugin = fp(async (app) => {
   await app.register(fastifyEnv, {
-    schema: Type.Strict(schema),
+    schema: schema,
     dotenv: true,
   });
 

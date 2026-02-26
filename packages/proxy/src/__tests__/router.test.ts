@@ -45,15 +45,15 @@ describe('SmartRouter', () => {
   it('skips rate-limited targets', () => {
     const targets = [mkTarget('a'), mkTarget('b')];
     const router = new SmartRouter({ strategy: 'fallback', targets });
-    router.reportOutcome(targets[0], 100, false, 429);
+    router.reportOutcome(targets[0]!, 100, false, 429);
     expect(router.route()?.target.model).toBe('b');
   });
 
   it('latency picks fastest', () => {
     const targets = [mkTarget('slow'), mkTarget('fast')];
     const router = new SmartRouter({ strategy: 'latency', targets });
-    router.reportOutcome(targets[0], 500, true, 200);
-    router.reportOutcome(targets[1], 50, true, 200);
+    router.reportOutcome(targets[0]!, 500, true, 200);
+    router.reportOutcome(targets[1]!, 50, true, 200);
     expect(router.route()?.target.model).toBe('fast');
   });
 });

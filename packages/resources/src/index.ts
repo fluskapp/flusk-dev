@@ -44,6 +44,7 @@ export * as BudgetAlertRepository from './repositories/budget-alert.repository.j
 
 // --- BEGIN CUSTOM ---
 export * as SqliteConversationRepo from './sqlite/repositories/conversation/index.js';
+export * as ConversationRepository from './repositories/conversation.repository.js';
 // --- END CUSTOM ---
 
 export * as TrainingPairRepository from './repositories/training-pair.repository.js';

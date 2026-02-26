@@ -22,7 +22,7 @@ export const proxyCommand = new Command('proxy')
     port: string; upstream?: string; cache: boolean;
     strategy?: string; fallback?: string[];
   }) => {
-    const { startProxy } = await import('@flusk/proxy');
+    const { createProxyServer: startProxy } = await import('@flusk/proxy');
     const port = parseInt(opts.port, 10);
     const routerConfig = opts.strategy ? {
       strategy: opts.strategy as 'fallback' | 'cost' | 'latency' | 'round-robin',

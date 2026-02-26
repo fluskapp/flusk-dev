@@ -16,7 +16,7 @@ export function trainingPairsAction(opts: PairsOpts): void {
   const limit = parseInt(opts.limit, 10);
 
   const pairs = opts.model
-    ? storage.trainingPairs.listByModel(opts.model, limit, 0)
+    ? storage.trainingPairs.listByModel(opts.model).slice(0, limit)
     : storage.trainingPairs.list(limit, 0);
 
   if (pairs.length === 0) {

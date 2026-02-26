@@ -6,7 +6,7 @@
 /**
  * Estimate cost savings if a cluster used SLM instead of teacher model
  */
-export function estimateSavings(pairCount: number, avgInputTokens: number, avgOutputTokens: number, teacherInputCostPer1k: number, teacherOutputCostPer1k: number, slmInputCostPer1k: number, slmOutputCostPer1k: number): json {
+export function estimateSavings(pairCount: number, avgInputTokens: number, avgOutputTokens: number, teacherInputCostPer1k: number, teacherOutputCostPer1k: number, slmInputCostPer1k: number, slmOutputCostPer1k: number): Record<string, unknown> {
   return (() => {
   const teacherInput = (pairCount * avgInputTokens / 1000) * teacherInputCostPer1k;
   const teacherOutput = (pairCount * avgOutputTokens / 1000) * teacherOutputCostPer1k;

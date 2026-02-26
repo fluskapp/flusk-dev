@@ -48,8 +48,8 @@ export function onCallComplete(call: CapturedCall, tenantId?: string): void {
       model: call.model,
       prompt: call.prompt,
       completion: call.response,
-      inputTokens: call.tokens.inputTokens,
-      outputTokens: call.tokens.outputTokens,
+      inputTokens: call.tokens.input,
+      outputTokens: call.tokens.output,
       status: call.status,
       tenantId,
     };

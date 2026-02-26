@@ -52,14 +52,14 @@ export class SmartRouter {
         return { target: found, reason: 'fallback-chain', fallbackIndex: 0 };
       }
     }
-    return { target: targets[0], reason: 'fallback-first', fallbackIndex: 0 };
+    return { target: targets[0]!, reason: 'fallback-first', fallbackIndex: 0 };
   }
 
   private cheapest(targets: ProviderTarget[]): RoutingDecision {
     const sorted = [...targets].sort(
       (a, b) => a.costPer1kInput - b.costPer1kInput,
     );
-    return { target: sorted[0], reason: 'lowest-cost', fallbackIndex: 0 };
+    return { target: sorted[0]!, reason: 'lowest-cost', fallbackIndex: 0 };
   }
 
   private fastest(targets: ProviderTarget[]): RoutingDecision {
@@ -68,14 +68,14 @@ export class SmartRouter {
       const lb = this.health.avgLatency(b.provider, b.model);
       return la - lb;
     });
-    return { target: sorted[0], reason: 'lowest-latency', fallbackIndex: 0 };
+    return { target: sorted[0]!, reason: 'lowest-latency', fallbackIndex: 0 };
   }
 
   private roundRobin(targets: ProviderTarget[]): RoutingDecision {
     const idx = this.rrIndex % targets.length;
     this.rrIndex++;
     return {
-      target: targets[idx], reason: 'round-robin', fallbackIndex: idx,
+      target: targets[idx]!, reason: 'round-robin', fallbackIndex: idx,
     };
   }
 }

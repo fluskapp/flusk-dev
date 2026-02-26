@@ -65,9 +65,9 @@ export function createSqliteStorage(dbPath?: string): StorageAdapter {
       findByExternalId: (eid) => ConversationRepo.findByExternalId(db, eid),
       list: (limit, offset) => ConversationRepo.list(db, limit, offset),
       findAbandoned: (before) => ConversationRepo.findAbandoned(db, before),
-      topByCost: () => ConversationRepo.topByCost(db),
-      topByTurns: () => ConversationRepo.topByTurns(db),
-      topByTokens: () => ConversationRepo.topByTokens(db),
+      topByCost: () => ConversationRepo.topByCost(db) as unknown as Record<string, unknown>[],
+      topByTurns: () => ConversationRepo.topByTurns(db) as unknown as Record<string, unknown>[],
+      topByTokens: () => ConversationRepo.topByTokens(db) as unknown as Record<string, unknown>[],
       update: (id, data) => ConversationRepo.update(db, id, data),
     },
     trainingPairs: {

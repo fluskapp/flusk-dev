@@ -6,7 +6,7 @@
 /**
  * Determine if an LLM call should be collected as training data
  */
-export function shouldCollect(provider: string, model: string, prompt: string, completion: string, status: string, teacherModels: string[]): boolean {
+export function shouldCollect(_provider: string, model: string, prompt: string, completion: string, status: string, teacherModels: string[]): boolean {
   return (() => {
   if (status !== 'ok') return false;
   if (prompt.length < 10) return false;

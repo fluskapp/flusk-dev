@@ -1,4 +1,5 @@
 /** @generated from TrainingPair YAML — Traits: crud, time-range, aggregation */
+// --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
 import { Type, type TSchema } from '@sinclair/typebox';
 import { TrainingPairEntitySchema } from '@flusk/entities';
@@ -96,4 +97,4 @@ export async function trainingPairRoutes(
   });
 
   fastify.get('/aggregate', async (req) => { const opts = req.query as unknown as TrainingPairRepository.TrainingPairAggregateOptions; return TrainingPairRepository.aggregateTrainingPairs(fastify.db, opts); });
-}
+}// --- END GENERATED ---

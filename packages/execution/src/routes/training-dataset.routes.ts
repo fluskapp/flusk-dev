@@ -1,4 +1,5 @@
 /** @generated from TrainingDataset YAML — Traits: crud, time-range, aggregation */
+// --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
 import { Type, type TSchema } from '@sinclair/typebox';
 import { TrainingDatasetEntitySchema } from '@flusk/entities';
@@ -96,4 +97,4 @@ export async function trainingDatasetRoutes(
   });
 
   fastify.get('/aggregate', async (req) => { const opts = req.query as unknown as TrainingDatasetRepository.TrainingDatasetAggregateOptions; return TrainingDatasetRepository.aggregateTrainingDatasets(fastify.db, opts); });
-}
+}// --- END GENERATED ---

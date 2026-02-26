@@ -138,6 +138,9 @@ importers:
       '@flusk/marketing':
         specifier: workspace:*
         version: link:../marketing
+      '@flusk/proxy':
+        specifier: workspace:*
+        version: link:../proxy
       '@flusk/resources':
         specifier: workspace:*
         version: link:../resources
