@@ -30,13 +30,13 @@
     "@flusk/resources": "workspace:*",
     "@flusk/types": "workspace:*",
     "@opentelemetry/otlp-transformer": "^0.211.0",
-    "@sinclair/typebox": "^0.32.0",
+    "@sinclair/typebox": "^0.34.48",
     "fastify": "^5.0.0",
     "fastify-plugin": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
-    "typescript": "^5.6.0"
+    "typescript": "^5.7.0"
   },
   "license": "MIT",
   "exports": {

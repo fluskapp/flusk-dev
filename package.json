@@ -62,7 +62,6 @@
     "vitest": "^4.0.18"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.74.0",
     "@fastify/cors": "^10.0.0",
     "@flusk/business-logic": "workspace:*",
     "@flusk/entities": "workspace:*",
@@ -70,10 +69,7 @@
     "@flusk/resources": "workspace:*",
     "@flusk/types": "workspace:*",
     "fastify": "^5.0.0",
-    "ioredis": "^5.3.2",
-    "pg": "^8.11.3",
-    "pnpm": "^10.28.2",
-    "twitter-api-v2": "^1.29.0"
+    "pg": "^8.11.3"
   },
   "packageManager": "pnpm@10.26.1",
   "pnpm": {

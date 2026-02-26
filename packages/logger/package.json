@@ -20,6 +20,9 @@
     "pino-pretty": "^13.0.0",
     "typescript": "^5.7.0"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
   "exports": {
     ".": {

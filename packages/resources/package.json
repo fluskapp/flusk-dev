@@ -16,11 +16,14 @@
     "@flusk/entities": "workspace:*",
     "@flusk/logger": "workspace:*",
     "@flusk/types": "workspace:*",
-    "@sinclair/typebox": "^0.32.0",
+    "@sinclair/typebox": "^0.34.48",
     "undici": "^7.0.0"
   },
   "devDependencies": {
-    "typescript": "^5.3.3"
+    "typescript": "^5.7.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "license": "MIT",
   "exports": {
