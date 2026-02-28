@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Open-source LLM cost optimization platform — zero-code tracking via OpenTelemetry",
+  "description": "Open-source LLM cost optimization platform \u2014 zero-code tracking via OpenTelemetry",
   "keywords": [
     "llm",
     "opentelemetry",
@@ -47,7 +47,6 @@
     "@changesets/changelog-github": "^0.5.2",
     "@changesets/cli": "^2.29.8",
     "@types/node": "^22.10.5",
-    "@types/pg": "^8.16.0",
     "@typescript-eslint/eslint-plugin": "^8.55.0",
     "@typescript-eslint/parser": "^8.55.0",
     "@vercel/node": "^3.0.0",
@@ -68,8 +67,7 @@
     "@flusk/execution": "workspace:*",
     "@flusk/resources": "workspace:*",
     "@flusk/types": "workspace:*",
-    "fastify": "^5.0.0",
-    "pg": "^8.11.3"
+    "fastify": "^5.0.0"
   },
   "packageManager": "pnpm@10.26.1",
   "pnpm": {

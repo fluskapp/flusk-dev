@@ -74,7 +74,7 @@ export interface TrainingDatasetMethods {
 }
 
 export interface StorageAdapter {
-  mode: 'sqlite' | 'postgres';
+  mode: 'sqlite';
   llmCalls: LLMCallMethods;
   analyzeSessions: AnalyzeSessionMethods;
   profileSessions: ProfileSessionMethods;

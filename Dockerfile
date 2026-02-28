@@ -27,4 +27,4 @@ COPY docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 EXPOSE 3000
 ENTRYPOINT ["tini", "--"]
-CMD ["node", "dist/packages/execution/src/server.js"]
+CMD ["node", "dist/server.js"]

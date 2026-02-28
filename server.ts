@@ -1,6 +1,6 @@
 /**
- * Flusk Platform - Real Server Entry Point
- * Wires execution package with PostgreSQL + Redis
+ * Flusk Platform - Server Entry Point
+ * SQLite-only architecture — zero external deps
  */
 import { createApp } from '@flusk/execution';
 
@@ -9,14 +9,6 @@ const migrateOnly = process.argv.includes('--migrate-only');
 async function start() {
   const PORT = Number(process.env.PORT) || 3000;
   const HOST = process.env.HOST || '0.0.0.0';
-
-  // Validate required env vars
-  if (!process.env.DATABASE_URL) {
-    throw new Error('DATABASE_URL environment variable is required');
-  }
-  if (!process.env.REDIS_URL) {
-    process.env.REDIS_URL = 'redis://localhost:6379';
-  }
 
   const corsOriginRaw = process.env.FLUSK_CORS_ORIGIN || process.env.CORS_ORIGIN || 'http://localhost:3000';
   const corsOrigin = corsOriginRaw.includes(',') ? corsOriginRaw.split(',').map(s => s.trim()) : corsOriginRaw;

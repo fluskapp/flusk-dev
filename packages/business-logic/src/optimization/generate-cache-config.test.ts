@@ -16,7 +16,7 @@ describe('generateCacheConfig', () => {
 
   it('generates valid TypeScript code', () => {
     const code = generateCacheConfig(patterns);
-    expect(code).toContain('import');
+    expect(code).toContain('Map');
     expect(code).toContain('buildCacheKey');
     expect(code).toContain('cachedLLMCall');
     expect(code).toContain('CACHE_TTL');

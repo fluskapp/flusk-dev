@@ -17,6 +17,7 @@ schemas:
       - packages/schema/entities/conversion.entity.yaml
       - packages/schema/entities/explain-session.entity.yaml
       - packages/schema/entities/insight.entity.yaml
+      - packages/schema/entities/conversation.entity.yaml
       - packages/schema/entities/llm-call.entity.yaml
       - packages/schema/entities/model-performance.entity.yaml
       - packages/schema/entities/optimization.entity.yaml
@@ -29,6 +30,8 @@ schemas:
       - packages/schema/entities/routing-rule.entity.yaml
       - packages/schema/entities/span.entity.yaml
       - packages/schema/entities/trace.entity.yaml
+      - packages/schema/entities/training-dataset.entity.yaml
+      - packages/schema/entities/training-pair.entity.yaml
 
   providers:
     glob: packages/schema/providers/*.provider.yaml
