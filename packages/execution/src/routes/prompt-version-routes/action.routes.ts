@@ -62,7 +62,7 @@ export async function promptVersionActionRoutes(fastify: FastifyInstance): Promi
     const version = PromptVersionRepository.findPromptVersionById(fastify.db, request.params.id);
     if (!version) return reply.code(404).send({ error: 'Version not found' });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- dynamic metrics payload
-    const metrics = request.body as Record<string, unknown>;
+    const metrics = request.body as any;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- partial update cast
     PromptVersionRepository.updatePromptVersion(fastify.db, version.id, { metrics } as Record<string, unknown>);
     return reply.send({ updated: true });

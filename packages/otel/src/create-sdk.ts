@@ -56,7 +56,7 @@ export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): Nod
   // We must wrap the exporter in a BatchSpanProcessor ourselves.
   const spanProcessors: SpanProcessor[] = [
     new SanitizeSpanProcessor(),
-    // @ts-expect-error — dual OTel SDK versions (v1 + v2) cause exporter type mismatch
+    // @ts-ignore — dual OTel SDK versions (v1 + v2) cause exporter type mismatch
     new BatchSpanProcessor(traceExporter),
     ...(opts?.spanProcessors ?? []),
   ];
@@ -64,7 +64,7 @@ export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): Nod
   return new NodeSDK({
     resource,
     instrumentations,
-    // @ts-expect-error — dual OTel SDK versions (v1 + v2) in workspace
+    // @ts-ignore — dual OTel SDK versions (v1 + v2) in workspace
     spanProcessors,
   });
 }

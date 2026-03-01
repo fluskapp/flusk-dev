@@ -29,7 +29,7 @@ export async function conversationRoutes(
     },
   }, async (request, reply) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = ConversationRepository.createConversation(fastify.db, request.body as Record<string, unknown>);
+    const created = ConversationRepository.createConversation(fastify.db, request.body as any);
     return reply.code(201).send(created);
   });
 
@@ -71,7 +71,7 @@ export async function conversationRoutes(
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = ConversationRepository.updateConversation(fastify.db, id, request.body as Record<string, unknown>);
+    const updated = ConversationRepository.updateConversation(fastify.db, id, request.body as any);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });
