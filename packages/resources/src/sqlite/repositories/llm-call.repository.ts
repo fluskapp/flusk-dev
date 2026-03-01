@@ -1,7 +1,7 @@
 /**
  * @generated from packages/schema/entities/llm-call.entity.yaml
- * Hash: 246a8a696c52e028c91354ebc15896a2f70e96542315a70258b1339b8d3b515c
- * Generated: 2026-02-23T08:08:01.286Z
+ * Hash: 4237c1e6c23f3f216db72182e62a84ee90153fcd732d8aaad01fadd4f8d27280
+ * Generated: 2026-03-01T18:57:16.433Z
  * DO NOT EDIT generated sections — changes will be overwritten.
  */
 
@@ -16,6 +16,7 @@ export type UpdateLLMCallInput = Partial<CreateLLMCallInput>;
 export interface LLMCallModelCount { model: string; count: number; }
 export interface LLMCallPromptHashCount { promptHash: string; count: number; }
 export interface LLMCallSessionIdCount { sessionId: string; count: number; }
+export interface LLMCallConversationIdCount { conversationId: string; count: number; }
 export interface LLMCallAggregateOptions { op: 'sum' | 'avg' | 'count' | 'min' | 'max'; field: 'cost'; groupBy?: string; }
 export interface LLMCallAggregateResult { value: number; group?: string; }
 
@@ -48,6 +49,7 @@ function rowToEntity(row: Record<string, unknown>): LLMCallEntity {
     consentGiven: Boolean(row.consent_given),
     consentPurpose: row.consent_purpose as string,
     sessionId: (row.session_id as string) ?? undefined,
+    conversationId: (row.conversation_id as string) ?? undefined,
   };
 }
 
@@ -59,8 +61,8 @@ function convertValueForDb(key: string, value: unknown): null | number | bigint 
 }
 
 export function createLLMCall(db: DatabaseSync, data: CreateLLMCallInput): LLMCallEntity {
-  const stmt = db.prepare(`INSERT INTO llm_calls (provider, model, prompt, prompt_hash, tokens, cost, response, cached, status, error_message, agent_label, organization_id, consent_given, consent_purpose, session_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`);
-  const row = stmt.get(data.provider, data.model, data.prompt, data.promptHash, JSON.stringify(data.tokens), data.cost, data.response, data.cached ? 1 : 0, data.status, data.errorMessage ?? null, data.agentLabel ?? null, data.organizationId ?? null, data.consentGiven ? 1 : 0, data.consentPurpose, data.sessionId ?? null) as Record<string, unknown>;
+  const stmt = db.prepare(`INSERT INTO llm_calls (provider, model, prompt, prompt_hash, tokens, cost, response, cached, status, error_message, agent_label, organization_id, consent_given, consent_purpose, session_id, conversation_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`);
+  const row = stmt.get(data.provider, data.model, data.prompt, data.promptHash, JSON.stringify(data.tokens), data.cost, data.response, data.cached ? 1 : 0, data.status, data.errorMessage ?? null, data.agentLabel ?? null, data.organizationId ?? null, data.consentGiven ? 1 : 0, data.consentPurpose, data.sessionId ?? null, data.conversationId ?? null) as Record<string, unknown>;
   return rowToEntity(row);
 }
 
@@ -106,6 +108,12 @@ export function countByPromptHash(db: DatabaseSync): LLMCallPromptHashCount[] {
 export function countBySessionId(db: DatabaseSync): LLMCallSessionIdCount[] {
   const stmt = db.prepare('SELECT session_id, COUNT(*) as count FROM llm_calls GROUP BY session_id ORDER BY count DESC');
   return stmt.all() as unknown as LLMCallSessionIdCount[];
+}
+
+/** Count LLMCall records grouped by conversationId */
+export function countByConversationId(db: DatabaseSync): LLMCallConversationIdCount[] {
+  const stmt = db.prepare('SELECT conversation_id, COUNT(*) as count FROM llm_calls GROUP BY conversation_id ORDER BY count DESC');
+  return stmt.all() as unknown as LLMCallConversationIdCount[];
 }
 
 /** Sum total cost of all LLMCall records */
