@@ -11,6 +11,6 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install
-      - run: pnpm -r --filter @flusk/forge build
+      - run: pnpm -r build
       - run: pnpm exec tsx packages/cli/bin/flusk.ts validate-generated --strict
         # Fails PR if generated files are stale or hand-edited
