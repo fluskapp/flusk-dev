@@ -8,6 +8,7 @@ import { detectProvider } from './providers/detect.js';
 import { parseOpenAIResponse } from './providers/openai.js';
 import { parseAnthropicResponse } from './providers/anthropic.js';
 import { parseGenericResponse } from './providers/generic.js';
+import { parseGoogleResponse } from './providers/google.js';
 import { calculateCost } from './cost-calculator.js';
 import { captureCall } from './capture.js';
 import type { CapturedCall } from './capture.js';
@@ -63,5 +64,6 @@ function parseResponseByProvider(
 ) {
   if (provider === 'openai') return parseOpenAIResponse(opts.responseBody);
   if (provider === 'anthropic') return parseAnthropicResponse(opts.responseBody);
+  if (provider === 'google') return parseGoogleResponse(opts.responseBody);
   return parseGenericResponse(opts.responseBody);
 }

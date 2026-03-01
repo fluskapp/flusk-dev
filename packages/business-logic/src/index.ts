@@ -48,4 +48,11 @@ export { explain };
 import * as primitives from './primitives/index.js';
 export { primitives };
 export * from './training/index.js';
+
+import * as alerts from './alerts/index.js';
+export { alerts };
+
+export { dailyReport } from './analytics/daily-report.pipeline.js';
+export { anomalyReport } from './analytics/anomaly-report.pipeline.js';
+export { wasteReport } from './analytics/waste-report.pipeline.js';
 // --- END CUSTOM ---
