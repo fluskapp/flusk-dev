@@ -12,6 +12,7 @@ const DB_PATH = join(FLUSK_DIR, 'data.db');
 
 let _db: DatabaseSync | null = null;
 let _dbPath: string | null = null;
+let _initPromise: Promise<DatabaseSync> | null = null;
 
 /**
  * Get or create the SQLite database connection singleton.
@@ -39,12 +40,36 @@ export function getDb(path?: string): DatabaseSync {
 }
 
 /**
+ * Async-safe singleton getter — prevents concurrent initialization races.
+ * Multiple callers awaiting getDbAsync() will share the same init promise.
+ */
+export async function getDbAsync(path?: string): Promise<DatabaseSync> {
+  if (_db) {
+    const dbPath = path || DB_PATH;
+    if (path !== undefined && _dbPath !== dbPath) {
+      throw new Error(
+        `SQLite connection already open for "${_dbPath}" — cannot reopen for "${dbPath}". Call closeDb() first.`,
+      );
+    }
+    return _db;
+  }
+  if (_initPromise) return _initPromise;
+  _initPromise = Promise.resolve().then(() => getDb(path));
+  try {
+    return await _initPromise;
+  } finally {
+    _initPromise = null;
+  }
+}
+
+/**
  * Close the database connection and reset the singleton.
  */
 export function closeDb(): void {
   _db?.close();
   _db = null;
   _dbPath = null;
+  _initPromise = null;
 }
 // --- END GENERATED ---
 // --- BEGIN CUSTOM ---

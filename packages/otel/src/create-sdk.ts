@@ -47,8 +47,7 @@ export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): Nod
       '@opentelemetry/instrumentation-fs': { enabled: false },
       '@opentelemetry/instrumentation-dns': { enabled: false },
       '@opentelemetry/instrumentation-net': { enabled: false },
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- openai instrumentation config not in auto-instrumentations type defs yet
-      ...({ '@opentelemetry/instrumentation-openai': { captureContent: config.captureContent } } as any),
+      ...({ '@opentelemetry/instrumentation-openai': { captureContent: config.captureContent } } as Record<string, unknown>),
     }),
   ];
 
@@ -57,16 +56,14 @@ export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): Nod
   // We must wrap the exporter in a BatchSpanProcessor ourselves.
   const spanProcessors: SpanProcessor[] = [
     new SanitizeSpanProcessor(),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- exporter types are overly strict
-    new BatchSpanProcessor(traceExporter as any),
+    new BatchSpanProcessor(traceExporter as unknown as import('@opentelemetry/sdk-trace-base').SpanExporter),
     ...(opts?.spanProcessors ?? []),
   ];
 
   return new NodeSDK({
     resource,
     instrumentations,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- NodeSDK expects specific SpanProcessor array type
-    spanProcessors: spanProcessors as any,
+    spanProcessors: spanProcessors as unknown as import('@opentelemetry/sdk-trace-base').SpanProcessor[],
   });
 }
 // --- END CUSTOM ---

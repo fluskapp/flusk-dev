@@ -55,7 +55,7 @@ describe('SqliteSpanExporter', () => {
   it('exports GenAI spans to SQLite', () => {
     const result = { code: -1 };
     exporter.export(
-      [{ name: 'genai' } as any, { name: 'http' } as any],
+      [{ name: 'genai' } as unknown as import('@opentelemetry/sdk-trace-base').ReadableSpan, { name: 'http' } as unknown as import('@opentelemetry/sdk-trace-base').ReadableSpan],
       (r) => { result.code = r.code; },
     );
     expect(result.code).toBe(SUCCESS);
@@ -65,7 +65,7 @@ describe('SqliteSpanExporter', () => {
 
   it('skips non-GenAI spans', () => {
     const result = { code: -1 };
-    exporter.export([{ name: 'http' } as any], (r) => { result.code = r.code; });
+    exporter.export([{ name: 'http' } as unknown as import('@opentelemetry/sdk-trace-base').ReadableSpan], (r) => { result.code = r.code; });
     expect(result.code).toBe(SUCCESS);
     expect(mockCreate).not.toHaveBeenCalled();
   });

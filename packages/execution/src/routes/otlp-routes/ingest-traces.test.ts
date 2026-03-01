@@ -50,7 +50,7 @@ const httpSpan = {
 describe('ingestTracesHandler', () => {
   it('filters only GenAI spans from mixed data', async () => {
     const { app, routes } = makeApp();
-    await ingestTracesHandler(app as any);
+    await ingestTracesHandler(app as unknown as import("fastify").FastifyInstance);
     const handler = routes['post']!;
     const body = { resourceSpans: [{ scopeSpans: [{ spans: [genAiSpan, httpSpan] }] }] };
     const reply = { status: vi.fn().mockReturnThis(), send: vi.fn() };
@@ -60,7 +60,7 @@ describe('ingestTracesHandler', () => {
 
   it('returns 200 with partialSuccess on empty input', async () => {
     const { app, routes } = makeApp();
-    await ingestTracesHandler(app as any);
+    await ingestTracesHandler(app as unknown as import("fastify").FastifyInstance);
     const handler = routes['post']!;
     const body = { resourceSpans: [] };
     const reply = { status: vi.fn().mockReturnThis(), send: vi.fn() };
@@ -71,7 +71,7 @@ describe('ingestTracesHandler', () => {
 
   it('handles failed spans gracefully', async () => {
     const { app, routes } = makeApp();
-    await ingestTracesHandler(app as any);
+    await ingestTracesHandler(app as unknown as import("fastify").FastifyInstance);
     vi.mocked(LLMCallRepository.createLLMCall).mockImplementationOnce(() => { throw new Error('boom'); });
     const handler = routes['post']!;
     const body = { resourceSpans: [{ scopeSpans: [{ spans: [genAiSpan] }] }] };

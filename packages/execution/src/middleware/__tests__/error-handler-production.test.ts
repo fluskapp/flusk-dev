@@ -17,7 +17,7 @@ beforeAll(async () => {
   });
 
   app.get('/validation', async () => {
-    const err = new Error('Bad input') as any;
+    const err = new Error('Bad input') as Error & { statusCode?: number; validation?: unknown[] };
     err.statusCode = 400;
     err.validation = [{ message: 'field required' }];
     throw err;

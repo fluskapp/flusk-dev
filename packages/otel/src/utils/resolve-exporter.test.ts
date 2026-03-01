@@ -69,7 +69,7 @@ describe('resolveExporter', () => {
   it('returns OTLPTraceExporter in server mode', () => {
     process.env.FLUSK_MODE = 'server';
     const exporter = resolveExporter(config);
-    expect((exporter as any).opts.url).toBe('https://otel.flusk.dev/v1/traces');
+    expect((exporter as unknown as { opts: { url: string } }).opts.url).toBe('https://otel.flusk.dev/v1/traces');
   });
 });
 // --- END GENERATED ---

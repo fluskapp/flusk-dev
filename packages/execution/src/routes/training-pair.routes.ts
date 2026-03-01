@@ -5,7 +5,7 @@ import { Type, type TSchema } from '@sinclair/typebox';
 import { TrainingPairEntitySchema } from '@flusk/entities';
 import { TrainingPairRepository } from '@flusk/resources';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateTrainingPairSchema = Type.Omit(TrainingPairEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateTrainingPairSchema = Type.Omit(TrainingPairEntitySchema as unknown as import("@sinclair/typebox").TObject, ['id', 'createdAt', 'updatedAt']);
 const TrainingPairResponseSchema = TrainingPairEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -29,7 +29,7 @@ export async function trainingPairRoutes(
     },
   }, async (request, reply) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = TrainingPairRepository.createTrainingPair(fastify.db, request.body as any);
+    const created = TrainingPairRepository.createTrainingPair(fastify.db, request.body as Record<string, unknown>);
     return reply.code(201).send(created);
   });
 
@@ -71,7 +71,7 @@ export async function trainingPairRoutes(
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = TrainingPairRepository.updateTrainingPair(fastify.db, id, request.body as any);
+    const updated = TrainingPairRepository.updateTrainingPair(fastify.db, id, request.body as Record<string, unknown>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });

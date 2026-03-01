@@ -33,8 +33,9 @@ describe('costEventBus', () => {
     })
 
     expect(received).toHaveLength(1)
-    expect((received[0] as any).type).toBe('call.tracked')
-    expect((received[0] as any).data.id).toBe('test-1')
+    const event = received[0] as Record<string, unknown>
+    expect(event.type).toBe('call.tracked')
+    expect((event.data as Record<string, unknown>).id).toBe('test-1')
   })
 
   it('supports multiple subscribers', () => {

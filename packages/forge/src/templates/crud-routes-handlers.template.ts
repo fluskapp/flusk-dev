@@ -16,7 +16,7 @@ export function generateUpdateHandler(pascal: string): string {
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = ${pascal}Repository.update${pascal}(fastify.db, id, request.body as any);
+    const updated = ${pascal}Repository.update${pascal}(fastify.db, id, request.body as Record<string, unknown>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });`;

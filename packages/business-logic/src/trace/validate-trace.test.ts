@@ -31,7 +31,7 @@ describe('validateTrace', () => {
   it('rejects invalid status', () => {
     const result = validateTrace({
       organizationId: '123e4567-e89b-12d3-a456-426614174000',
-      name: 'test', status: 'invalid' as any, startedAt: new Date().toISOString(),
+      name: 'test', status: 'invalid' as unknown, startedAt: new Date().toISOString(),
     });
     expect(result.valid).toBe(false);
     expect(result.errors).toContain('status must be running, completed, or failed');

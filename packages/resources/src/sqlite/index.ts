@@ -6,7 +6,7 @@
  * SQLite module barrel — connection, migrations, repositories
  */
 
-export { getDb, closeDb } from './connection.js';
+export { getDb, getDbAsync, closeDb } from './connection.js';
 export { runMigrations } from './migrations.js';
 
 export * as SqliteLLMCallRepo from './repositories/llm-call/index.js';

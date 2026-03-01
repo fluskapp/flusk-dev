@@ -5,7 +5,7 @@
 
 // --- BEGIN GENERATED ---
 import { describe, it, expect, afterEach } from 'vitest';
-import { getDb, closeDb } from '../connection.js';
+import { getDb, getDbAsync, closeDb } from '../connection.js';
 
 describe('SQLite connection', () => {
   afterEach(() => {
@@ -42,4 +42,17 @@ describe('SQLite connection', () => {
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+describe('getDbAsync race safety', () => {
+  afterEach(() => { closeDb(); });
+
+  it('concurrent calls return the same instance', async () => {
+    const results = await Promise.all([
+      getDbAsync(':memory:'),
+      getDbAsync(':memory:'),
+      getDbAsync(':memory:'),
+    ]);
+    expect(results[0]).toBe(results[1]);
+    expect(results[1]).toBe(results[2]);
+  });
+});
 // --- END CUSTOM ---

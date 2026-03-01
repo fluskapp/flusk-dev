@@ -12,18 +12,18 @@ import { promptTemplate } from '@flusk/business-logic';
 
 // --- BEGIN CUSTOM ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit cast
-const CreateSchema = Type.Omit(PromptTemplateEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateSchema = Type.Omit(PromptTemplateEntitySchema as unknown as import("@sinclair/typebox").TObject, ['id', 'createdAt', 'updatedAt']);
 
 export async function promptTemplateCrudRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post('/', {
     schema: { body: CreateSchema, response: { 201: PromptTemplateEntitySchema as unknown as TSchema } },
   }, async (request: FastifyRequest, reply: FastifyReply) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- body validated by schema
-    const data = request.body as any;
+    const data = request.body as Record<string, unknown>;
     const validation = promptTemplate.validatePromptTemplate(data);
     if (!validation.valid) return reply.code(400).send({ error: validation.errors.join(', ') });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- body validated by schema
-    const created = PromptTemplateRepository.createPromptTemplate(fastify.db, data as any);
+    const created = PromptTemplateRepository.createPromptTemplate(fastify.db, data as Record<string, unknown>);
     return reply.code(201).send(created);
   });
 
@@ -46,7 +46,7 @@ export async function promptTemplateCrudRoutes(fastify: FastifyInstance): Promis
     schema: { params: Type.Object({ id: Type.String({ format: 'uuid' }) }) },
   }, async (request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- body validated by schema
-    const updated = PromptTemplateRepository.updatePromptTemplate(fastify.db, request.params.id, request.body as any);
+    const updated = PromptTemplateRepository.updatePromptTemplate(fastify.db, request.params.id, request.body as Record<string, unknown>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.send(updated);
   });

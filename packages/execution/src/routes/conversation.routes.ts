@@ -5,7 +5,7 @@ import { Type, type TSchema } from '@sinclair/typebox';
 import { ConversationEntitySchema } from '@flusk/entities';
 import { ConversationRepository } from '@flusk/resources';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateConversationSchema = Type.Omit(ConversationEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateConversationSchema = Type.Omit(ConversationEntitySchema as unknown as import("@sinclair/typebox").TObject, ['id', 'createdAt', 'updatedAt']);
 const ConversationResponseSchema = ConversationEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -29,7 +29,7 @@ export async function conversationRoutes(
     },
   }, async (request, reply) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = ConversationRepository.createConversation(fastify.db, request.body as any);
+    const created = ConversationRepository.createConversation(fastify.db, request.body as Record<string, unknown>);
     return reply.code(201).send(created);
   });
 
@@ -71,7 +71,7 @@ export async function conversationRoutes(
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = ConversationRepository.updateConversation(fastify.db, id, request.body as any);
+    const updated = ConversationRepository.updateConversation(fastify.db, id, request.body as Record<string, unknown>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });

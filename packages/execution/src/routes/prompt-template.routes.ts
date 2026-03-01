@@ -11,7 +11,7 @@ import { PromptTemplateRepository } from '@flusk/resources';
 
 // --- BEGIN CUSTOM ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreatePromptTemplateSchema = Type.Omit(PromptTemplateEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreatePromptTemplateSchema = Type.Omit(PromptTemplateEntitySchema as unknown as import("@sinclair/typebox").TObject, ['id', 'createdAt', 'updatedAt']);
 const PromptTemplateResponseSchema = PromptTemplateEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -31,7 +31,7 @@ export async function promptTemplateRoutes(
     },
   }, async (request, reply) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = PromptTemplateRepository.createPromptTemplate(fastify.db, request.body as any);
+    const created = PromptTemplateRepository.createPromptTemplate(fastify.db, request.body as Record<string, unknown>);
     return reply.code(201).send(created);
   });
 
@@ -70,7 +70,7 @@ export async function promptTemplateRoutes(
   }, async (request, reply) => {
     const { id } = request.params as { id: string };
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const updated = PromptTemplateRepository.updatePromptTemplate(fastify.db, id, request.body as any);
+    const updated = PromptTemplateRepository.updatePromptTemplate(fastify.db, id, request.body as Record<string, unknown>);
     if (!updated) return reply.code(404).send({ error: 'Not found' });
     return reply.code(200).send(updated);
   });

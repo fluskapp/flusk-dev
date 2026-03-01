@@ -25,7 +25,7 @@ describe('auto-profile.hook', () => {
     };
 
     const processor = createAutoProfileProcessor({ profiler });
-    processor.onStart(makeMockSpan('openai.chat', 'trace-123'), {} as any);
+    processor.onStart(makeMockSpan('openai.chat', 'trace-123'), {} as unknown as import('@opentelemetry/api').Context);
 
     expect(profiler.start).toHaveBeenCalledWith(['trace-123']);
   });
@@ -38,7 +38,7 @@ describe('auto-profile.hook', () => {
     };
 
     const processor = createAutoProfileProcessor({ profiler });
-    processor.onStart(makeMockSpan('http.request', 'trace-456'), {} as any);
+    processor.onStart(makeMockSpan('http.request', 'trace-456'), {} as unknown as import('@opentelemetry/api').Context);
 
     expect(profiler.start).not.toHaveBeenCalled();
   });
@@ -51,7 +51,7 @@ describe('auto-profile.hook', () => {
     };
 
     const processor = createAutoProfileProcessor({ profiler });
-    processor.onStart(makeMockSpan('openai.chat', 'trace-789'), {} as any);
+    processor.onStart(makeMockSpan('openai.chat', 'trace-789'), {} as unknown as import('@opentelemetry/api').Context);
 
     expect(profiler.start).not.toHaveBeenCalled();
   });
