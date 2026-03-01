@@ -12,7 +12,7 @@ import { promptTemplate } from '@flusk/business-logic';
 
 // --- BEGIN CUSTOM ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit cast
-const CreateSchema = Type.Omit(PromptTemplateEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateSchema = Type.Omit(PromptTemplateEntitySchema as unknown as import("@sinclair/typebox").TObject, ['id', 'createdAt', 'updatedAt']);
 
 export async function promptTemplateCrudRoutes(fastify: FastifyInstance): Promise<void> {
   fastify.post('/', {

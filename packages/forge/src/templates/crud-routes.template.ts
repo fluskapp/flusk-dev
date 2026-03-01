@@ -33,7 +33,7 @@ import { ${pascal}Repository } from '@flusk/resources';
 
 // --- BEGIN CUSTOM ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const Create${pascal}Schema = Type.Omit(${pascal}EntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const Create${pascal}Schema = Type.Omit(${pascal}EntitySchema as unknown as import('@sinclair/typebox').TObject, ['id', 'createdAt', 'updatedAt']);
 const ${pascal}ResponseSchema = ${pascal}EntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -54,7 +54,7 @@ export async function ${camel}Routes(
     },
   }, async (request, reply) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- request body validated by schema
-    const created = ${pascal}Repository.create${pascal}(fastify.db, request.body as any);
+    const created = ${pascal}Repository.create${pascal}(fastify.db, request.body as Record<string, unknown>);
     return reply.code(201).send(created);
   });
 

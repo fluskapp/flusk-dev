@@ -13,7 +13,7 @@ function createMockDb(rows: Record<string, unknown>[]) {
     prepare: () => ({
       all: () => rows,
     }),
-  } as any;
+  } as unknown as import('node:sqlite').DatabaseSync;
 }
 
 const MOCK_SESSION: ProfileSessionEntity = {

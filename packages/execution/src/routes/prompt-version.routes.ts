@@ -11,7 +11,7 @@ import { PromptVersionRepository } from '@flusk/resources';
 
 // --- BEGIN CUSTOM ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreatePromptVersionSchema = Type.Omit(PromptVersionEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreatePromptVersionSchema = Type.Omit(PromptVersionEntitySchema as unknown as import("@sinclair/typebox").TObject, ['id', 'createdAt', 'updatedAt']);
 const PromptVersionResponseSchema = PromptVersionEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });

@@ -42,8 +42,7 @@ export default async function handler(
     await app.ready();
 
     const response = await app.inject({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Fastify inject expects specific HTTP method union but VercelRequest.method is string
-      method: (req.method || 'GET') as any,
+      method: (req.method || 'GET') as 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH',
       url: req.url || '/',
       headers: req.headers as Record<string, string>,
       payload: req.body,

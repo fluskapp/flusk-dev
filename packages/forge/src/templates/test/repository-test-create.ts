@@ -41,7 +41,7 @@ export function getCreateTests(entityName: string): string {
       const invalidData = {};
 
       // Act & Assert
-      await expect(repository.create(invalidData as any)).rejects.toThrow();
+      await expect(repository.create(invalidData as unknown)).rejects.toThrow();
     });
 
     it('should set default values correctly', async () => {

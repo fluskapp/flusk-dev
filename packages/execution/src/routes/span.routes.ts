@@ -11,7 +11,7 @@ import { SpanRepository } from '@flusk/resources';
 
 // --- BEGIN CUSTOM ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateSpanSchema = Type.Omit(SpanEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateSpanSchema = Type.Omit(SpanEntitySchema as unknown as import("@sinclair/typebox").TObject, ['id', 'createdAt', 'updatedAt']);
 const SpanResponseSchema = SpanEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });

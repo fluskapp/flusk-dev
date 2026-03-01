@@ -1,11 +1,18 @@
+/**
+ * @generated from packages/schema/entities/llm-call.entity.yaml
+ * Hash: 4237c1e6c23f3f216db72182e62a84ee90153fcd732d8aaad01fadd4f8d27280
+ * Generated: 2026-03-01T18:57:16.433Z
+ * DO NOT EDIT generated sections — changes will be overwritten.
+ */
+
+// --- BEGIN GENERATED (do not edit) [routes] ---
 /** @generated from LLMCall YAML — Traits: crud, aggregation, time-range */
-// --- BEGIN GENERATED ---
 import type { FastifyInstance } from 'fastify';
 import { Type, type TSchema } from '@sinclair/typebox';
 import { LLMCallEntitySchema } from '@flusk/entities';
 import { LLMCallRepository } from '@flusk/resources';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateLLMCallSchema = Type.Omit(LLMCallEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateLLMCallSchema = Type.Omit(LLMCallEntitySchema as unknown as import('@sinclair/typebox').TObject, ['id', 'createdAt', 'updatedAt']);
 const LLMCallResponseSchema = LLMCallEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });
@@ -97,4 +104,9 @@ export async function llmCallRoutes(
     const { from, to } = req.query as { from: string; to: string };
     return LLMCallRepository.findLLMCallsByTimeRange(fastify.db, from, to);
   });
-}// --- END GENERATED ---
+}
+// --- END GENERATED ---
+
+// --- BEGIN CUSTOM [routes] ---
+
+// --- END CUSTOM ---

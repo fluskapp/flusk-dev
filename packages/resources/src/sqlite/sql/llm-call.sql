@@ -1,3 +1,8 @@
+-- @generated from packages/schema/entities/llm-call.entity.yaml
+-- Hash: 4237c1e6c23f3f216db72182e62a84ee90153fcd732d8aaad01fadd4f8d27280
+-- Generated: 2026-03-01T18:57:16.468Z
+-- DO NOT EDIT generated sections — changes will be overwritten.
+
 CREATE TABLE IF NOT EXISTS llm_calls (
   id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
   provider TEXT NOT NULL,
@@ -23,4 +28,5 @@ CREATE INDEX IF NOT EXISTS idx_llm_calls_model ON llm_calls(model);
 CREATE INDEX IF NOT EXISTS idx_llm_calls_prompt_hash ON llm_calls(prompt_hash);
 CREATE INDEX IF NOT EXISTS idx_llm_calls_session_id ON llm_calls(session_id);
 CREATE INDEX IF NOT EXISTS idx_llm_calls_conversation_id ON llm_calls(conversation_id);
+CREATE INDEX IF NOT EXISTS idx_llm_calls_created_at ON llm_calls(created_at);
 CREATE INDEX IF NOT EXISTS idx_llm_calls_created_at ON llm_calls(created_at);

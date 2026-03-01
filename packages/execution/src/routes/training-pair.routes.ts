@@ -5,7 +5,7 @@ import { Type, type TSchema } from '@sinclair/typebox';
 import { TrainingPairEntitySchema } from '@flusk/entities';
 import { TrainingPairRepository } from '@flusk/resources';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateTrainingPairSchema = Type.Omit(TrainingPairEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateTrainingPairSchema = Type.Omit(TrainingPairEntitySchema as unknown as import("@sinclair/typebox").TObject, ['id', 'createdAt', 'updatedAt']);
 const TrainingPairResponseSchema = TrainingPairEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });

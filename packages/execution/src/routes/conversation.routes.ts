@@ -5,7 +5,7 @@ import { Type, type TSchema } from '@sinclair/typebox';
 import { ConversationEntitySchema } from '@flusk/entities';
 import { ConversationRepository } from '@flusk/resources';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateConversationSchema = Type.Omit(ConversationEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateConversationSchema = Type.Omit(ConversationEntitySchema as unknown as import("@sinclair/typebox").TObject, ['id', 'createdAt', 'updatedAt']);
 const ConversationResponseSchema = ConversationEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });

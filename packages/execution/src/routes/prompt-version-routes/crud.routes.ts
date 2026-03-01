@@ -22,7 +22,7 @@ export async function promptVersionCrudRoutes(fastify: FastifyInstance): Promise
       response: { 201: PromptVersionEntitySchema },
     },
   }, async (request: FastifyRequest, reply: FastifyReply) => {
-    const data = request.body as Record<string, unknown>;
+    const data = request.body as any;
     const validation = promptVersion.validatePromptVersion(data);
     if (!validation.valid) return reply.code(400).send({ error: validation.errors.join(', ') });
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- body validated by schema

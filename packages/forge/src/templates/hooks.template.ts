@@ -24,7 +24,7 @@ export async function validate${pascalName}Hook(
 ): Promise<void> {
   // TODO: Add validation logic
   // Example:
-  // const body = request.body as any;
+  // const body = request.body as Record<string, unknown>;
   // if (!body.requiredField) {
   //   return reply.code(400).send({ error: 'requiredField is required' });
   // }

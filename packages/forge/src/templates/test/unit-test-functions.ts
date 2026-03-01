@@ -21,7 +21,7 @@ export function generateFunctionTests(functions: string[]): string {
       const invalidInput = null;
 
       // Act & Assert
-      expect(() => ${fn}(invalidInput as any)).toThrow();
+      expect(() => ${fn}(invalidInput as unknown)).toThrow();
     });
 
     it('should return expected output format', () => {

@@ -55,7 +55,7 @@ export async function ${entityName.replace(/-/g, '')}Routes(
       }
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const data = request.body as any;
+      const data = request.body as Record<string, unknown>;
       const created = await ${pascalName}Repository.create(data);
       return reply.code(201).send(created);
     }

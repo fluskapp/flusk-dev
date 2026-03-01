@@ -11,7 +11,7 @@ import { TraceRepository } from '@flusk/resources';
 
 // --- BEGIN CUSTOM ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateTraceSchema = Type.Omit(TraceEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateTraceSchema = Type.Omit(TraceEntitySchema as unknown as import("@sinclair/typebox").TObject, ['id', 'createdAt', 'updatedAt']);
 const TraceResponseSchema = TraceEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });

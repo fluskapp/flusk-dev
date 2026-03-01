@@ -33,7 +33,7 @@ describe('validateSpan', () => {
   it('rejects invalid type', () => {
     const result = validateSpan({
       traceId: '123e4567-e89b-12d3-a456-426614174000',
-      name: 'test', spanType: 'invalid' as any,
+      name: 'test', spanType: 'invalid' as 'llm' | 'tool' | 'retrieval' | 'chain',
       status: 'running', startedAt: new Date().toISOString(),
     });
     expect(result.valid).toBe(false);

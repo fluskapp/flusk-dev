@@ -36,7 +36,7 @@ export function generateClassTests(classes: string[]): string {
       const invalidInput = null;
 
       // Act & Assert
-      await expect(instance.execute(invalidInput as any)).rejects.toThrow();
+      await expect(instance.execute(invalidInput as unknown)).rejects.toThrow();
     });
 
     it('should validate input parameters', async () => {

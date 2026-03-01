@@ -11,7 +11,7 @@ import { SqliteAnalyzeSessionRepo as AnalyzeSessionRepository } from '@flusk/res
 
 // --- BEGIN CUSTOM ---
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast
-const CreateAnalyzeSessionSchema = Type.Omit(AnalyzeSessionEntitySchema as any, ['id', 'createdAt', 'updatedAt']);
+const CreateAnalyzeSessionSchema = Type.Omit(AnalyzeSessionEntitySchema as unknown as import("@sinclair/typebox").TObject, ['id', 'createdAt', 'updatedAt']);
 const AnalyzeSessionResponseSchema = AnalyzeSessionEntitySchema;
 const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });
 const NotFoundSchema = Type.Object({ error: Type.String() });

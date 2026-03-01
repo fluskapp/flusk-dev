@@ -25,7 +25,7 @@ export function buildCrudRoutes(n: string): TraitCodeSection {
     ],
     types: [
       `// eslint-disable-next-line @typescript-eslint/no-explicit-any -- TypeBox Type.Omit requires TObject cast`,
-      `const Create${n}Schema = Type.Omit(${n}EntitySchema as any, ['id', 'createdAt', 'updatedAt']);`,
+      `const Create${n}Schema = Type.Omit(${n}EntitySchema as unknown as import('@sinclair/typebox').TObject, ['id', 'createdAt', 'updatedAt']);`,
       `const ${n}ResponseSchema = ${n}EntitySchema;`,
       `const IdParamsSchema = Type.Object({ id: Type.String({ format: 'uuid' }) });`,
       `const NotFoundSchema = Type.Object({ error: Type.String() });`,

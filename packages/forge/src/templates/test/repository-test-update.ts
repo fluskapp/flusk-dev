@@ -36,7 +36,7 @@ export function getUpdateTests(entityName: string): string {
       const invalidUpdates = { invalid: true };
 
       // Act & Assert
-      await expect(repository.update(created.id, invalidUpdates as any)).rejects.toThrow();
+      await expect(repository.update(created.id, invalidUpdates as unknown)).rejects.toThrow();
     });
   });`;
 }

@@ -9,13 +9,13 @@ beforeAll(async () => {
   app.setErrorHandler(errorHandler);
 
   app.get('/not-found', async () => {
-    const err = new Error('Not found') as any;
+    const err = new Error('Not found') as Error & { statusCode?: number; validation?: unknown[] };
     err.statusCode = 404;
     throw err;
   });
 
   app.get('/validation', async () => {
-    const err = new Error('Validation failed') as any;
+    const err = new Error('Validation failed') as Error & { statusCode?: number; validation?: unknown[] };
     err.statusCode = 400;
     err.validation = [{ message: 'field required' }];
     throw err;
@@ -26,13 +26,13 @@ beforeAll(async () => {
   });
 
   app.get('/conflict', async () => {
-    const err = new Error('Duplicate') as any;
+    const err = new Error('Duplicate') as Error & { statusCode?: number; validation?: unknown[] };
     err.statusCode = 409;
     throw err;
   });
 
   app.get('/forbidden', async () => {
-    const err = new Error('Forbidden') as any;
+    const err = new Error('Forbidden') as Error & { statusCode?: number; validation?: unknown[] };
     err.statusCode = 403;
     throw err;
   });
