@@ -9,4 +9,6 @@ export type { RenderPromptResult } from './render-prompt.function.js';
 // --- END GENERATED ---
 
 // --- BEGIN CUSTOM ---
+export { detectTemplates } from './detect.js';
+export type { PromptCall, DetectedTemplate } from './detect.js';
 // --- END CUSTOM ---

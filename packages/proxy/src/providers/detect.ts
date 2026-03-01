@@ -2,8 +2,8 @@
  * Detect LLM provider from request URL path and headers.
  */
 
-export type ProviderName = 'openai' | 'anthropic' | 'unknown';
-export type EndpointType = 'chat' | 'completions' | 'embeddings' | 'messages' | 'unknown';
+export type ProviderName = 'openai' | 'anthropic' | 'google' | 'unknown';
+export type EndpointType = 'chat' | 'completions' | 'embeddings' | 'messages' | 'generate' | 'unknown';
 
 export interface ProviderInfo {
   provider: ProviderName;
@@ -17,6 +17,8 @@ const ROUTE_MAP: Array<{ path: string; provider: ProviderName; endpoint: Endpoin
   { path: '/v1/messages', provider: 'anthropic', endpoint: 'messages' },
 ];
 
+const GOOGLE_PATH_RE = /^\/v1(?:beta)?\/models\/[^/]+:(?:generateContent|streamGenerateContent)$/;
+
 /** Detect provider from URL path and request headers. */
 export function detectProvider(
   path: string,
@@ -26,6 +28,11 @@ export function detectProvider(
     if (path === route.path) {
       return { provider: route.provider, endpoint: route.endpoint };
     }
+  }
+
+  // Google Gemini path detection
+  if (GOOGLE_PATH_RE.test(path)) {
+    return { provider: 'google', endpoint: 'generate' };
   }
 
   // Anthropic header-based detection

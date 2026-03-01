@@ -8,6 +8,7 @@ import { Command } from 'commander';
 
 // --- BEGIN CUSTOM ---
 import { createLogger } from '@flusk/logger';
+import { validatePort } from '../utils/validation.js';
 
 const log = createLogger({ name: 'proxy-cmd' });
 
@@ -23,7 +24,7 @@ export const proxyCommand = new Command('proxy')
     strategy?: string; fallback?: string[];
   }) => {
     const { createProxyServer: startProxy } = await import('@flusk/proxy');
-    const port = parseInt(opts.port, 10);
+    const port = validatePort(opts.port);
     const routerConfig = opts.strategy ? {
       strategy: opts.strategy as 'fallback' | 'cost' | 'latency' | 'round-robin',
       targets: [],

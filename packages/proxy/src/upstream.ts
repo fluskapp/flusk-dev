@@ -5,6 +5,7 @@
 const UPSTREAM_MAP: Record<string, string> = {
   openai: 'https://api.openai.com',
   anthropic: 'https://api.anthropic.com',
+  google: 'https://generativelanguage.googleapis.com',
 };
 
 /** Resolve upstream base URL. Returns null if unknown. */

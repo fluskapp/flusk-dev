@@ -44,6 +44,9 @@ import { generateDetectorCommand } from '../src/commands/generate-detector.js';
 import { generateSqliteRepoCommand } from '../src/commands/generate-sqlite-repo.js';
 import { analyzeCommand } from '../src/commands/analyze.js';
 import { reportCommand } from '../src/commands/report.js';
+import { reportDailyCommand } from '../src/commands/report-daily.js';
+import { reportAnomalyCommand } from '../src/commands/report-anomaly.js';
+import { reportWasteCommand } from '../src/commands/report-waste.js';
 import { historyCommand } from '../src/commands/history.js';
 import { budgetCommand } from '../src/commands/budget.js';
 import { initConfigCommand } from '../src/commands/init-config.js';
@@ -122,6 +125,9 @@ program.addCommand(generateSqliteRepoCommand);
 
 // LLM cost analysis
 program.addCommand(analyzeCommand);
+reportCommand.addCommand(reportDailyCommand);
+reportCommand.addCommand(reportAnomalyCommand);
+reportCommand.addCommand(reportWasteCommand);
 program.addCommand(reportCommand);
 program.addCommand(historyCommand);
 program.addCommand(budgetCommand);
@@ -177,6 +183,20 @@ program.addCommand(watchCommand);
 // proxy command
 import { proxyCommand } from '../src/commands/proxy.js';
 program.addCommand(proxyCommand);
+
+// OTel instrumentation
+import { instrumentCommand } from '../src/commands/instrument.js';
+program.addCommand(instrumentCommand);
+
+// Production alerts
+import { alertsCommand } from '../src/commands/alerts.js';
+import { alertsSetupCommand } from '../src/commands/alerts-setup.js';
+import { alertsListCommand } from '../src/commands/alerts-list.js';
+import { alertsTestCommand } from '../src/commands/alerts-test.js';
+alertsCommand.addCommand(alertsSetupCommand);
+alertsCommand.addCommand(alertsListCommand);
+alertsCommand.addCommand(alertsTestCommand);
+program.addCommand(alertsCommand);
 
 // conversations-list command
 import { conversationsListCommand } from '../src/commands/conversations-list.js';
