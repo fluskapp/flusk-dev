@@ -39,8 +39,8 @@ export class SqliteSpanExporter implements SpanExporter {
           data.prompt = '[REDACTED]';
           data.response = '[REDACTED]';
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- parseReadableSpan returns dynamic shape matching LLMCallEntity
-        this.storage.llmCalls.create({ ...(data as Record<string, unknown>), sessionId });
+        // @ts-expect-error — parseReadableSpan returns dynamic shape matching LLMCallEntity
+        this.storage.llmCalls.create({ ...data, sessionId });
         count++;
       }
       if (count > 0) log.debug(`Exported ${count} GenAI spans to SQLite`);

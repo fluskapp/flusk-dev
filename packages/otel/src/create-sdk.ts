@@ -56,14 +56,16 @@ export function createSdk(config: FluskOtelConfig, opts?: CreateSdkOptions): Nod
   // We must wrap the exporter in a BatchSpanProcessor ourselves.
   const spanProcessors: SpanProcessor[] = [
     new SanitizeSpanProcessor(),
-    new BatchSpanProcessor(traceExporter as unknown as import('@opentelemetry/sdk-trace-base').SpanExporter),
+    // @ts-expect-error — dual OTel SDK versions (v1 + v2) cause exporter type mismatch
+    new BatchSpanProcessor(traceExporter),
     ...(opts?.spanProcessors ?? []),
   ];
 
   return new NodeSDK({
     resource,
     instrumentations,
-    spanProcessors: spanProcessors as unknown as import('@opentelemetry/sdk-trace-base').SpanProcessor[],
+    // @ts-expect-error — dual OTel SDK versions (v1 + v2) in workspace
+    spanProcessors,
   });
 }
 // --- END CUSTOM ---
