@@ -18,13 +18,14 @@ RUN pnpm build
 # ── Stage 3: runtime ───────────────────────────────
 FROM node:22-alpine AS runtime
 RUN apk add --no-cache tini && corepack enable
-ENV NODE_ENV=production PORT=3000
+ENV NODE_ENV=production PORT=3000 HOST=0.0.0.0
 WORKDIR /app
-COPY --from=build /app/dist ./dist
+COPY --from=build /app/packages ./packages
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./
-COPY docker-entrypoint.sh /usr/local/bin/
+COPY --from=build /app/server.ts ./
+COPY scripts/docker-entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 EXPOSE 3000
 ENTRYPOINT ["tini", "--"]
-CMD ["node", "dist/server.js"]
+CMD ["pnpm", "start"]

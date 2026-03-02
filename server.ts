@@ -7,7 +7,7 @@ import { createApp } from '@flusk/execution';
 const migrateOnly = process.argv.includes('--migrate-only');
 
 async function start() {
-  const PORT = Number(process.env.PORT) || 3000;
+  const PORT = Number(process.env.PORT) || (process.env.NODE_ENV === 'production' ? 8080 : 3000);
   const HOST = process.env.HOST || '0.0.0.0';
 
   const corsOriginRaw = process.env.FLUSK_CORS_ORIGIN || process.env.CORS_ORIGIN || 'http://localhost:3000';
