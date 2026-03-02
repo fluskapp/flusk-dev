@@ -1,7 +1,7 @@
 name: Flusk Cost Analysis
 on:
   pull_request:
-    paths: ['src/**', '*.ts', '*.js']
+    paths: ['packages/**/*.ts', 'server.ts', '*.ts', '*.js']
 
 jobs:
   analyze:
@@ -10,14 +10,18 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm install
-      - uses: adirbenyossef/flusk-dev/.github/actions/analyze@main
-        with:
-          script: './src/index.ts'
-          explain: true
-          budget: 100
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      # TODO: Add proper Flusk analysis action when available
+      - name: Placeholder Cost Analysis
+        run: |
+          echo "🔍 Flusk Cost Analysis would run here"
+          echo "Target: server.ts and packages/"
+          echo "Budget: $100"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

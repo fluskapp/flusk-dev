@@ -17,14 +17,23 @@ declare module 'fastify' {
   }
 }
 
-const HMAC_SECRET = process.env.HMAC_SECRET || process.env.FLUSK_HMAC_SECRET;
+function getHmacSecret(): string {
+  const secret = process.env.HMAC_SECRET || process.env.FLUSK_HMAC_SECRET;
+  if (!secret) {
+    log.error({
+      HMAC_SECRET: process.env.HMAC_SECRET ? 'exists' : 'missing',
+      FLUSK_HMAC_SECRET: process.env.FLUSK_HMAC_SECRET ? 'exists' : 'missing',
+      NODE_ENV: process.env.NODE_ENV
+    }, 'Environment variables debug');
+    throw new Error('HMAC_SECRET or FLUSK_HMAC_SECRET env var is required');
+  }
+  return secret;
+}
 
 /** Hash a token for constant-time comparison */
 function hashToken(token: string): Buffer {
-  if (!HMAC_SECRET) {
-    throw new Error('HMAC_SECRET or FLUSK_HMAC_SECRET env var is required');
-  }
-  return createHmac('sha256', HMAC_SECRET).update(token).digest();
+  const secret = getHmacSecret();
+  return createHmac('sha256', secret).update(token).digest();
 }
 
 /** Validate API key against configured FLUSK_API_KEY */
@@ -61,6 +70,11 @@ export async function authMiddleware(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
+  // Skip auth for health check endpoints
+  if (request.url === '/health' || request.url === '/health/ready') {
+    return;
+  }
+
   const token = parseToken(request.headers.authorization);
   if (!token) return sendUnauthorized(reply, 'Missing or invalid Authorization header');
 

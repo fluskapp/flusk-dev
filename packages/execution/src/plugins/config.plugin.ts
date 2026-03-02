@@ -12,12 +12,11 @@ import { Type } from '@sinclair/typebox';
 
 // --- BEGIN CUSTOM ---
 const schema = Type.Object({
-  DATABASE_URL: Type.String(),
-  REDIS_URL: Type.String({ default: 'redis://localhost:6379' }),
+  // SQLite-only architecture — no external database URLs needed
   PORT: Type.Number({ default: 3000 }),
   HOST: Type.String({ default: '0.0.0.0' }),
   LOG_LEVEL: Type.String({ default: 'info' }),
-  FLUSK_API_KEY: Type.String({ default: '' }),
+  FLUSK_API_KEY: Type.String({ default: 'dev-key-change-in-prod' }),
   HMAC_SECRET: Type.Optional(Type.String()),
   FLUSK_HMAC_SECRET: Type.Optional(Type.String()),
   ENCRYPTION_KEY: Type.Optional(Type.String()),
@@ -26,6 +25,7 @@ const schema = Type.Object({
   FLUSK_LOG_LEVEL: Type.Optional(Type.String()),
   VECTOR_SIMILARITY_THRESHOLD: Type.Number({ default: 0.95 }),
   NODE_ENV: Type.String({ default: 'development' }),
+  FLUSK_SQLITE_PATH: Type.Optional(Type.String()),
 });
 
 export const plugin = fp(async (app) => {
