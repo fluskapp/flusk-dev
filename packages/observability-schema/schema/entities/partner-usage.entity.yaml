@@ -1,0 +1,41 @@
+name: PartnerUsage
+description: Usage tracking for partner integrations
+storage: sqlite
+fields:
+  partnerId:
+    type: string
+    required: true
+    index: true
+    description: Partner ID
+  integrationId:
+    type: string
+    required: true
+    index: true
+    description: Integration ID
+  period:
+    type: string
+    required: true
+    description: Usage period (e.g. 2026-03-01)
+  calls:
+    type: integer
+    default: 0
+    description: Number of API calls
+  cost:
+    type: float
+    default: 0
+    description: Total cost in USD
+  errors:
+    type: integer
+    default: 0
+    description: Number of errors
+capabilities:
+  crud: true
+  time-range: true
+  aggregation: true
+relations:
+  - entity: Partner
+    type: belongsTo
+    foreignKey: partnerId
+  - entity: PartnerIntegration
+    type: belongsTo
+    foreignKey: integrationId

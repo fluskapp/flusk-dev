@@ -1,0 +1,94 @@
+name: runDriftScan
+description: 'Orchestrate drift detection: fetch data, detect, score, alert if needed'
+inputs:
+  - name: agentLabel
+    type: string
+  - name: baselinePeriod
+    type: json
+  - name: currentPeriod
+    type: json
+output:
+  type: DriftDetection
+steps:
+  - id: outputDrift
+    call: detectOutputDrift
+    with:
+      agentLabel: $agentLabel
+      baselinePeriod: $baselinePeriod
+      currentPeriod: $currentPeriod
+  - id: costDrift
+    call: detectCostDrift
+    with:
+      agentLabel: $agentLabel
+      baselinePeriod: $baselinePeriod
+      currentPeriod: $currentPeriod
+  - id: behaviorDrift
+    call: detectBehaviorDrift
+    with:
+      agentLabel: $agentLabel
+      baselinePeriod: $baselinePeriod
+      currentPeriod: $currentPeriod
+  - id: overallScore
+    call: calculateDriftScore
+    with:
+      outputDrift: $outputDrift
+      costDrift: $costDrift
+      behaviorDrift: $behaviorDrift
+  - id: severity
+    action: condition
+    if:
+      field: $overallScore
+      op: gte
+      value: 0.8
+    then:
+      - action: return
+        value: critical
+    else:
+      - action: condition
+        if:
+          field: $overallScore
+          op: gte
+          value: 0.6
+        then: high
+        else:
+          action: condition
+          if:
+            field: $overallScore
+            op: gte
+            value: 0.3
+          then: medium
+          else: low
+  - id: detection
+    action: call
+    entity: DriftDetection
+    data:
+      agentLabel: $agentLabel
+      detectionType: behavior-drift
+      severity: $severity
+      baselineHash: $outputDrift.baselineHash
+      currentHash: $outputDrift.currentHash
+      driftScore: $overallScore
+      sampleCount: $outputDrift.sampleCount
+      baselinePeriod: $baselinePeriod.start to $baselinePeriod.end
+      currentPeriod: $currentPeriod.start to $currentPeriod.end
+      details:
+        outputDrift: $outputDrift
+        costDrift: $costDrift
+        behaviorDrift: $behaviorDrift
+      status: active
+  - id: alert
+    action: condition
+    if:
+      field: $severity
+      op: in
+      value:
+        - critical
+        - high
+    then:
+      - call: dispatchAlert
+        with:
+          severity: $severity
+          message: 'Drift detected for agent $agentLabel: score $overallScore'
+  - id: result
+    action: return
+    value: $detection

@@ -1,0 +1,52 @@
+name: explainWithAi
+description: Loads recent LLM calls, costs, and patterns, sends to AI for analysis, returns actionable insights
+inputs:
+  - name: organizationId
+    type: string
+  - name: from
+    type: string
+  - name: to
+    type: string
+  - name: db
+    type: Database
+output:
+  type: json
+steps:
+  - id: calls
+    call: queryLlmCall
+    with:
+      query: costByModel
+      start: $from
+      end: $to
+      db: $db
+    store: calls
+  - id: duplicates
+    call: queryLlmCall
+    with:
+      query: duplicates
+      start: $from
+      end: $to
+      db: $db
+    store: duplicates
+  - id: agentCosts
+    call: queryLlmCall
+    with:
+      query: costByAgent
+      start: $from
+      end: $to
+      db: $db
+    store: agentCosts
+  - id: analysis
+    call: analyzeUsage
+    with:
+      data:
+        costByModel: $calls
+        duplicates: $duplicates
+        costByAgent: $agentCosts
+    store: analysis
+  - id: result
+    action: return
+    value: $analysis
+errors:
+  - type: AiAnalysisError
+    action: log-and-continue

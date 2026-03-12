@@ -1,0 +1,19 @@
+name: driftScan
+description: Run drift detection scan for an agent
+action:
+  call: driftScan
+args:
+  - name: agent
+    type: string
+    required: true
+    description: Agent label to scan
+  - name: baseline
+    type: string
+    description: Baseline period (e.g. "2026-02-01 to 2026-02-15")
+  - name: current
+    type: string
+    description: Current period (e.g. "2026-02-16 to 2026-02-24")
+  - name: days
+    type: integer
+    default: 14
+    description: Number of days for each period (auto-calculate if baseline/current not set)

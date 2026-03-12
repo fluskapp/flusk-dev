@@ -1,0 +1,13 @@
+name: DriftScanScheduler
+description: Periodically scan for prompt and output drift across organizations
+type: cron
+schedule: "0 */6 * * *"
+steps:
+  - id: scan
+    call: driftScan
+    with:
+      db: $db
+    action: call
+retry:
+  maxAttempts: 2
+  backoff: exponential

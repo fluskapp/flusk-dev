@@ -1,0 +1,17 @@
+name: smart-router
+description: Intercepts proxy requests to apply smart model routing
+phase: request
+inputs:
+  - name: model
+    from: request.body.model
+  - name: strategy
+    from: request.headers.x-flusk-strategy
+output:
+  selectedTarget: string
+steps:
+  - id: target
+    action: assign
+    value: null
+  - id: result
+    action: return
+    value: $target

@@ -1,0 +1,26 @@
+name: queryCostAttributionCostByTagAndModel
+description: Query cost breakdown by tag and model
+inputs:
+  - name: tagKey
+    type: string
+  - name: tagValue
+    type: string
+  - name: from
+    type: string
+  - name: to
+    type: string
+  - name: db
+    type: Database
+output:
+  type: CostByModel[]
+steps:
+  - id: results
+    action: call
+    entity: CostAttribution
+    queryName: costByTagAndModel
+    params:
+      - $from
+      - $to
+  - id: result
+    action: return
+    value: $results

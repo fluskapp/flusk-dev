@@ -1,0 +1,49 @@
+name: MarketplaceListing
+description: Public marketplace listing for partner integrations
+storage: sqlite
+fields:
+  partnerId:
+    type: string
+    required: true
+    index: true
+    description: Partner ID
+  integrationId:
+    type: string
+    required: true
+    index: true
+    description: Integration ID
+  name:
+    type: string
+    required: true
+    description: Listing name
+  description:
+    type: string
+    description: Listing description
+  category:
+    type: string
+    description: Listing category
+  pricing:
+    type: json
+    description: Pricing model (free, per-call, monthly)
+  featured:
+    type: boolean
+    default: false
+    description: Whether listing is featured
+  rating:
+    type: float
+    default: 0
+    description: Average rating
+  installCount:
+    type: integer
+    default: 0
+    description: Number of installs
+capabilities:
+  crud: true
+  time-range: true
+relations:
+  - entity: Partner
+    type: belongsTo
+    foreignKey: partnerId
+  - entity: PartnerIntegration
+    type: belongsTo
+    foreignKey: integrationId

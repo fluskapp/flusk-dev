@@ -1,0 +1,22 @@
+name: generateExplainReport
+description: Formats AI analysis into a structured report
+inputs:
+  - name: analysisData
+    type: json
+  - name: organizationId
+    type: string
+  - name: db
+    type: Database
+output:
+  type: json
+steps:
+  - id: report
+    call: generateExplainReport
+    with:
+      data:
+        analysis: $analysisData
+        organizationId: $organizationId
+    store: report
+  - id: result
+    action: return
+    value: $report

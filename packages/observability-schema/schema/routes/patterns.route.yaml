@@ -1,0 +1,17 @@
+name: patterns
+basePath: /api/patterns
+entity: Pattern
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listPatterns
+    description: List detected patterns
+  - method: GET
+    path: /:id
+    call: findPatternById
+    description: Get pattern by ID
+  - method: POST
+    path: /detect
+    call: detectPatterns
+    description: Run pattern detection

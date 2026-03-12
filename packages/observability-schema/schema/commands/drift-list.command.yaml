@@ -1,0 +1,29 @@
+name: driftList
+description: List detected drifts
+action:
+  call: driftList
+args:
+  - name: agent
+    type: string
+    description: Filter by agent
+  - name: severity
+    type: enum
+    values:
+      - critical
+      - high
+      - medium
+      - low
+    description: Filter by severity
+  - name: status
+    type: enum
+    values:
+      - active
+      - acknowledged
+      - resolved
+      - false-positive
+    default: active
+    description: Filter by status
+  - name: limit
+    type: integer
+    default: 20
+    description: Max results

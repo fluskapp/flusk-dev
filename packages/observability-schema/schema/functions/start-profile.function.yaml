@@ -1,0 +1,27 @@
+name: startProfile
+description: Start a CPU/heap profile session
+inputs:
+  - name: db
+    type: Database
+  - name: profileType
+    type: enum
+    values: [cpu, heap, both]
+  - name: pid
+    type: integer
+  - name: name
+    type: string
+output:
+  type: ProfileSession
+steps:
+  - id: session
+    call: createProfileSession
+    with:
+      db: $db
+      data:
+        name: $name
+        profileType: $profileType
+        pid: $pid
+        status: running
+  - id: result
+    action: return
+    value: $session

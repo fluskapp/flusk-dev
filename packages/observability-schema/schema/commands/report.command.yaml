@@ -1,0 +1,29 @@
+name: report
+description: Generate a cost report for a time period
+action:
+  call: report
+args:
+  - name: period
+    type: enum
+    values:
+      - day
+      - week
+      - month
+    default: month
+    description: Report period
+  - name: format
+    type: enum
+    values:
+      - table
+      - json
+      - csv
+    default: table
+    description: Output format
+  - name: groupBy
+    type: enum
+    values:
+      - model
+      - agent
+      - provider
+    default: model
+    description: Group costs by

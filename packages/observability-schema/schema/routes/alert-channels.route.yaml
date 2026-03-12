@@ -1,0 +1,27 @@
+name: alertChannels
+basePath: /api/alert-channels
+entity: AlertChannel
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listAlertChannels
+    description: List all alert channels
+  - method: POST
+    path: /
+    call: createAlertChannel
+    input: CreateAlertChannel
+    description: Create a new alert channel
+  - method: GET
+    path: /:id
+    call: findAlertChannelById
+    description: Get channel by ID
+  - method: PUT
+    path: /:id
+    call: updateAlertChannel
+    input: UpdateAlertChannel
+    description: Update a channel
+  - method: DELETE
+    path: /:id
+    call: deleteAlertChannel
+    description: Delete a channel

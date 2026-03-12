@@ -1,0 +1,23 @@
+name: usageRank
+description: Rank users by AI effectiveness
+action:
+  call: usageRank
+args:
+  - name: metric
+    type: enum
+    values:
+      - prompt-count
+      - token-count
+      - time-saved
+      - cost
+      - acceptance-rate
+    default: time-saved
+    description: Metric to rank by
+  - name: days
+    type: integer
+    default: 30
+    description: Look back N days
+  - name: limit
+    type: integer
+    default: 10
+    description: Top N users

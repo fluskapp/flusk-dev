@@ -1,0 +1,28 @@
+name: SolutionRunCompleted
+description: Emitted when a solution run completes successfully
+channel: redis
+topic: solution-run-completed
+payload:
+  fields:
+    - name: runId
+      type: string
+      required: true
+    - name: solutionId
+      type: string
+      required: true
+    - name: cost
+      type: number
+    - name: durationMs
+      type: number
+publish:
+  - trigger: afterCreate(SolutionRun)
+    transform:
+      runId: $entity.id
+      solutionId: $entity.solutionId
+      cost: $entity.cost
+      durationMs: $entity.durationMs
+subscribe:
+  handler: updateSolutionMetrics
+  retry:
+    maxAttempts: 3
+    backoff: exponential

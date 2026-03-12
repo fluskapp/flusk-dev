@@ -1,0 +1,14 @@
+{
+  "name": "@flusk/observability-schema",
+  "version": "0.1.0",
+  "private": true,
+  "description": "YAML schema definitions for the Flusk observability backend — source of truth for flusk-lang code generation",
+  "files": [
+    "schema"
+  ],
+  "scripts": {
+    "validate": "node scripts/validate-refs.mjs",
+    "test": "node --test scripts/validate-refs.test.mjs"
+  },
+  "license": "MIT"
+}

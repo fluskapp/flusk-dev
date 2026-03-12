@@ -1,0 +1,23 @@
+name: usageReport
+description: AI usage report per user or team
+action:
+  call: usageReport
+args:
+  - name: user
+    type: string
+    description: Filter by user ID
+  - name: tool
+    type: string
+    description: Filter by tool name
+  - name: period
+    type: enum
+    values:
+      - daily
+      - weekly
+      - monthly
+    default: weekly
+    description: Aggregation period
+  - name: days
+    type: integer
+    default: 30
+    description: Look back N days

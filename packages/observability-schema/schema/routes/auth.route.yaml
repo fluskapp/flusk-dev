@@ -1,0 +1,16 @@
+name: auth
+basePath: /auth
+auth: none
+operations:
+  - method: POST
+    path: /register
+    call: createOrganization
+    description: Register new organization and owner user
+  - method: POST
+    path: /login
+    call: authenticateUser
+    description: Login with email/password
+  - method: POST
+    path: /verify-key
+    call: validateApiKey
+    description: Verify an API key and return org/user context

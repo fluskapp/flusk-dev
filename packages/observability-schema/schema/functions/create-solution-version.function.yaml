@@ -1,0 +1,16 @@
+name: createSolutionVersion
+description: Create SolutionVersion
+inputs:
+  - name: data
+    type: json
+  - name: db
+    type: Database
+output:
+  type: SolutionVersion
+steps:
+  - id: result
+    action: assign
+    value: $data
+  - id: done
+    action: return
+    value: $result

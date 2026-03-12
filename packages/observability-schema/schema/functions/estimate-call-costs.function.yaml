@@ -1,0 +1,36 @@
+name: estimateCallCosts
+description: Estimate costs based on detected call patterns and usage frequency
+inputs:
+  - name: callSites
+    type: json
+output:
+  type: json
+steps:
+  - id: enriched
+    action: forEach
+    items: $callSites
+    do:
+      steps:
+        - id: pricing
+          action: lookup
+          table: modelPricing
+          key: $item.model
+        - id: estimate
+          action: compute
+          expression: $pricing.inputPricePerToken * 1000 + $pricing.outputPricePerToken * 500
+        - id: result
+          action: return
+          value:
+            file: $item.file
+            line: $item.line
+            provider: $item.provider
+            model: $item.model
+            estimatedCost: $estimate
+  - id: riskScore
+    action: call
+    expression: min(sum($enriched, 'estimatedCost') / 100.0, 1.0)
+  - id: result
+    action: return
+    value:
+      sites: $enriched
+      riskScore: $riskScore

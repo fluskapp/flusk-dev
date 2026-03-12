@@ -1,0 +1,16 @@
+name: findPartnerIntegrationById
+description: Find PartnerIntegration by ID
+inputs:
+  - name: id
+    type: string
+  - name: db
+    type: Database
+output:
+  type: PartnerIntegration
+steps:
+  - id: result
+    action: assign
+    value: $id
+  - id: done
+    action: return
+    value: $result

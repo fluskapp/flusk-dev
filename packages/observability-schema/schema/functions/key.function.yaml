@@ -1,0 +1,9 @@
+name: key
+description: key
+inputs: []
+output:
+  type: json
+steps:
+  - id: r
+    action: return
+    value: 'null'

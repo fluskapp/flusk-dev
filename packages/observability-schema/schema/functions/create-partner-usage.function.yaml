@@ -1,0 +1,16 @@
+name: createPartnerUsage
+description: Create PartnerUsage
+inputs:
+  - name: data
+    type: json
+  - name: db
+    type: Database
+output:
+  type: PartnerUsage
+steps:
+  - id: result
+    action: assign
+    value: $data
+  - id: done
+    action: return
+    value: $result

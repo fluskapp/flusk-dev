@@ -1,0 +1,22 @@
+name: routeRequest
+description: Pick the best provider target based on routing strategy
+inputs:
+  - name: strategy
+    type: string
+  - name: targets
+    type: json
+  - name: healthMap
+    type: json
+output:
+  type: json
+steps:
+  - id: healthy
+    action: filter
+    source: $targets
+    where:
+      field: enabled
+      op: eq
+      value: true
+  - id: result
+    action: return
+    value: $healthy

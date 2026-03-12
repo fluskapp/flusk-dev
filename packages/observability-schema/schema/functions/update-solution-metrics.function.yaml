@@ -1,0 +1,33 @@
+name: updateSolutionMetrics
+description: Update solution metrics after a run completes
+inputs:
+  - name: solutionId
+    type: string
+  - name: cost
+    type: number
+  - name: durationMs
+    type: number
+  - name: db
+    type: Database
+output:
+  type: json
+steps:
+  - id: solution
+    action: call
+    call: findSolutionById
+    with:
+      id: $solutionId
+      db: $db
+    store: solution
+  - id: updated
+    action: call
+    call: updateSolution
+    with:
+      id: $solutionId
+      data:
+        metrics: $solution.metrics
+      db: $db
+    store: updated
+  - id: result
+    action: return
+    value: $updated

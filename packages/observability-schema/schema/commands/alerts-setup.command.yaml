@@ -1,0 +1,19 @@
+name: alertsSetup
+description: Configure an alert channel
+args:
+  - name: config
+    type: json
+    required: true
+    description: Provider configuration JSON
+  - name: severity
+    type: AlertChannel.severityFilter
+    default: warning
+    description: Minimum severity filter
+action:
+  call: createAlertChannel
+  with:
+    name: $name
+    channelType: $type
+    config: $config
+    severityFilter: $severity
+    enabled: 'true'

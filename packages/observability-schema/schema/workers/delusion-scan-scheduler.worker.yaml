@@ -1,0 +1,13 @@
+name: DelusionScanScheduler
+description: Periodically scan for hallucinations and delusions in LLM outputs
+type: cron
+schedule: "0 */6 * * *"
+steps:
+  - id: scan
+    call: delusionScan
+    with:
+      db: $db
+    action: call
+retry:
+  maxAttempts: 2
+  backoff: exponential

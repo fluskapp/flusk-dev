@@ -1,0 +1,7 @@
+name: DatadogClient
+description: DatadogClient
+storage: sqlite
+fields:
+  - name: data
+    type: json
+    description: DatadogClient data

@@ -1,0 +1,22 @@
+name: getCostTrend
+description: Get daily cost trend for a specific tag over a time period
+inputs:
+  - name: dimension
+    type: string
+  - name: value
+    type: string
+  - name: from
+    type: string
+  - name: to
+    type: string
+  - name: db
+    type: Database
+output:
+  type: CostTrendPoint[]
+steps:
+  - id: trend
+    call: queryCostAttributionCostTrend
+    with: { tagKey: $dimension, from: $from, to: $to, db: $db }
+  - id: result
+    action: return
+    value: $trend

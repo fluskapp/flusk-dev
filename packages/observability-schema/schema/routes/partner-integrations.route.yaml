@@ -1,0 +1,27 @@
+name: partner-integrations
+basePath: /api/partner-integrations
+entity: PartnerIntegration
+auth: required
+operations:
+  - method: GET
+    path: /
+    call: listPartnerIntegration
+    description: List integrations
+  - method: POST
+    path: /
+    call: createPartnerIntegration
+    input: CreatePartnerIntegration
+    description: Create a new integration
+  - method: GET
+    path: /:id
+    call: findPartnerIntegrationById
+    description: Get integration by ID
+  - method: PUT
+    path: /:id
+    call: updatePartnerIntegration
+    input: UpdatePartnerIntegration
+    description: Update integration
+  - method: DELETE
+    path: /:id
+    call: deletePartnerIntegration
+    description: Delete integration

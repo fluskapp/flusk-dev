@@ -1,0 +1,7 @@
+name: DriftResult
+description: DriftResult
+storage: sqlite
+fields:
+  - name: data
+    type: json
+    description: DriftResult data

@@ -1,0 +1,17 @@
+name: analyzeSessions
+basePath: /api/analyze-sessions
+entity: AnalyzeSession
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listAnalyzeSessions
+    description: List analysis sessions
+  - method: GET
+    path: /:id
+    call: findAnalyzeSessionById
+    description: Get analysis session by ID
+  - method: POST
+    path: /
+    call: runAnalysis
+    description: Start a new analysis

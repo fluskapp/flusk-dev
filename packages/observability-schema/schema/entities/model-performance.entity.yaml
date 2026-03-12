@@ -1,0 +1,64 @@
+name: ModelPerformance
+description: Model quality and cost metrics per prompt category
+storage: sqlite
+fields:
+  model:
+    type: string
+    required: true
+    description: Model name
+  provider:
+    type: enum
+    values:
+      - openai
+      - anthropic
+      - google
+      - mistral
+      - cohere
+      - local
+      - other
+    required: true
+    description: LLM provider
+  promptCategory:
+    type: string
+    required: true
+    description: Prompt category
+  callCount:
+    type: integer
+    required: true
+    default: 0
+    description: Number of calls sampled
+  avgCostUsd:
+    type: float
+    description: Average cost per call
+  avgDurationMs:
+    type: float
+    description: Average response time
+  avgTokens:
+    type: float
+    description: Average tokens per call
+  qualityScore:
+    type: float
+    description: Quality score 0-1 (from evaluations)
+  errorRate:
+    type: float
+    default: 0
+    description: Percentage of calls that errored
+  p50DurationMs:
+    type: integer
+    description: Median response time
+  p99DurationMs:
+    type: integer
+    description: 99th percentile response time
+  lastUpdatedAt:
+    type: string
+    description: When metrics were last recalculated
+capabilities:
+  crud: true
+queries:
+  - name: leaderboard
+    sql: |-
+      SELECT model, provider, promptCategory, avgCostUsd, qualityScore,
+             (qualityScore / NULLIF(avgCostUsd, 0)) as value_ratio
+      FROM model_performance
+      WHERE promptCategory = $category
+      ORDER BY value_ratio DESC

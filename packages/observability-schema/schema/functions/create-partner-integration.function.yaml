@@ -1,0 +1,36 @@
+name: createPartnerIntegration
+description: Creates a new integration for a partner
+inputs:
+  - name: partnerId
+    type: string
+  - name: name
+    type: string
+  - name: type
+    type: string
+  - name: config
+    type: json
+  - name: endpointUrl
+    type: string
+  - name: documentation
+    type: string
+  - name: db
+    type: Database
+output:
+  type: PartnerIntegration
+steps:
+  - id: integration
+    call: createPartnerIntegration
+    with:
+      data:
+        partnerId: $partnerId
+        name: $name
+        type: $type
+        config: $config
+        endpointUrl: $endpointUrl
+        documentation: $documentation
+        status: pending-review
+      db: $db
+    store: integration
+  - id: result
+    action: return
+    value: $integration

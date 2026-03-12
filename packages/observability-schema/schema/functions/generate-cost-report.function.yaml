@@ -1,0 +1,52 @@
+name: generateCostReport
+description: Generate a comprehensive cost attribution report for a period
+inputs:
+  - name: reportType
+    type: string
+  - name: from
+    type: string
+  - name: to
+    type: string
+  - name: format
+    type: string
+  - name: db
+    type: Database
+output:
+  type: CostReport
+steps:
+  - id: byFeature
+    call: getCostByDimension
+    with: { dimension: feature, from: $from, to: $to, db: $db }
+  - id: byTeam
+    call: getCostByDimension
+    with: { dimension: team, from: $from, to: $to, db: $db }
+  - id: byCustomer
+    call: getCostByDimension
+    with: { dimension: customer, from: $from, to: $to, db: $db }
+  - id: byModel
+    call: getCostByDimension
+    with: { dimension: model, from: $from, to: $to, db: $db }
+  - id: totalCost
+    action: transform
+    value: $byFeature.reduce((sum, item) => sum + item.totalCost, 0)
+  - id: totalCalls
+    action: transform
+    value: $byFeature.reduce((sum, item) => sum + item.callCount, 0)
+  - id: insights
+    call: detectCostInsights
+    with: { byFeature: $byFeature, byTeam: $byTeam, byCustomer: $byCustomer, db: $db }
+  - id: report
+    call: createCostReport
+    with:
+      reportType: $reportType
+      periodStart: $from
+      periodEnd: $to
+      totalCostUsd: $totalCost
+      totalCalls: $totalCalls
+      breakdown: { feature: $byFeature, team: $byTeam, customer: $byCustomer, model: $byModel }
+      topInsights: $insights
+      format: $format
+      db: $db
+  - id: result
+    action: return
+    value: $report

@@ -1,0 +1,38 @@
+name: createAuditLog
+description: Record an immutable audit log entry
+inputs:
+  - name: organizationId
+    type: uuid
+    required: true
+  - name: userId
+    type: uuid
+  - name: action
+    type: string
+    required: true
+  - name: resource
+    type: string
+    required: true
+  - name: resourceId
+    type: string
+  - name: metadata
+    type: json
+  - name: ipAddress
+    type: string
+output:
+  type: AuditLog
+steps:
+  - id: entry
+    action: call
+    entity: AuditLog
+    method: create
+    with:
+      organizationId: $organizationId
+      userId: $userId
+      action: $action
+      resource: $resource
+      resourceId: $resourceId
+      metadata: $metadata
+      ipAddress: $ipAddress
+  - id: result
+    action: return
+    value: $entry

@@ -1,0 +1,23 @@
+name: CleanupWorker
+description: Purge old data based on each organization's retention_days setting
+type: cron
+schedule: "0 2 * * *"
+steps:
+  - id: orgs
+    action: call
+    entity: Organization
+    method: findMany
+  - id: purge
+    action: forEach
+    items: $orgs
+    do:
+      - id: clean
+        action: call
+        call: purge
+        with:
+          db: $db
+          organizationId: $item.id
+          retentionDays: $item.limits.retention_days
+retry:
+  maxAttempts: 2
+  backoff: exponential

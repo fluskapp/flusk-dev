@@ -1,0 +1,301 @@
+# UI Component: Prompt Panel
+# Left panel showing real-time feed of user prompts
+
+name: PromptPanel
+type: component
+category: display
+
+description: "Real-time feed of user prompts with filtering and translation"
+
+props:
+  # Data Source
+  organization_id:
+    type: uuid
+    required: true
+    description: "Organization to show prompts for"
+    
+  # Display Configuration
+  show_translations:
+    type: boolean
+    default: true
+    description: "Show English translations alongside original text"
+    
+  max_items:
+    type: integer
+    default: 50
+    description: "Maximum prompts to display"
+    
+  auto_refresh:
+    type: boolean
+    default: true
+    description: "Enable real-time updates"
+    
+  # Filtering
+  filters:
+    type: object
+    default: {}
+    schema:
+      properties:
+        status: { type: array, items: { type: string } }
+        intent_category: { type: array, items: { type: string } }
+        priority: { type: array, items: { type: string } }
+        date_range: { type: string }
+        search_query: { type: string }
+        complexity_range: { type: object }
+        
+  # Interaction
+  selectable:
+    type: boolean
+    default: true
+    description: "Allow selecting prompts"
+    
+  selected_prompt_id:
+    type: uuid
+    nullable: true
+    description: "Currently selected prompt"
+
+# Data Fetching
+data_sources:
+  prompts:
+    api: "/api/prompts"
+    method: "GET"
+    params:
+      organization_id: "{{ organization_id }}"
+      limit: "{{ max_items }}"
+      filters: "{{ filters }}"
+    websocket: "/ws/prompts"
+    refresh_on:
+      - organization_id
+      - filters
+      - max_items
+
+# Item Template
+item_template:
+  component: "PromptCard"
+  props:
+    prompt: "{{ item }}"
+    selected: "{{ item.id === selected_prompt_id }}"
+    show_translation: "{{ show_translations }}"
+    
+# Layout
+layout:
+  container: "flex flex-col h-full"
+  header: "p-4 border-b border-gray-200 bg-gray-50"
+  content: "flex-1 overflow-y-auto"
+  item_spacing: "p-2"
+
+# Styling
+styling:
+  container: "bg-white border-r border-gray-200"
+  header: "sticky top-0 z-10"
+  
+  # Item states
+  item:
+    base: "p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
+    selected: "bg-blue-50 border-l-4 border-l-blue-500"
+    urgent: "border-l-4 border-l-red-500"
+    completed: "opacity-60"
+    
+  # Status indicators
+  status_indicator:
+    analyzing: "bg-yellow-400 animate-pulse"
+    pipeline_created: "bg-blue-400" 
+    in_progress: "bg-green-400 animate-pulse"
+    completed: "bg-green-600"
+    failed: "bg-red-500"
+    requires_human: "bg-orange-400 animate-bounce"
+
+# Components
+components:
+  header:
+    component: "PromptPanelHeader"
+    props:
+      title: "User Prompts"
+      subtitle: "Real-time feed • {{ prompts.length }} active"
+      filters: "{{ filters }}"
+      
+  filter_bar:
+    component: "FilterBar"
+    props:
+      filters: "{{ filters }}"
+      on_change: "{{ on_filter_change }}"
+      
+  search_box:
+    component: "SearchInput"
+    props:
+      placeholder: "Search prompts..."
+      value: "{{ filters.search_query }}"
+      on_search: "{{ on_search }}"
+      
+  prompt_list:
+    component: "VirtualList"
+    props:
+      items: "{{ prompts }}"
+      item_height: 120
+      overscan: 3
+
+# PromptCard Component Definition
+prompt_card:
+  name: "PromptCard"
+  props:
+    prompt: { type: object, required: true }
+    selected: { type: boolean, default: false }
+    show_translation: { type: boolean, default: true }
+    
+  layout: |
+    <div className={cardStyles}>
+      <!-- Status Indicator -->
+      <div className={statusIndicatorStyles}>
+        <StatusBadge status={prompt.status} />
+      </div>
+      
+      <!-- Content -->
+      <div className="flex-1">
+        <!-- Header -->
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center space-x-2">
+            <UserAvatar user={prompt.user} size="sm" />
+            <span className="text-sm font-medium text-gray-700">
+              {prompt.user.name}
+            </span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <PriorityBadge priority={prompt.priority} />
+            <ComplexityIndicator score={prompt.complexity_score} />
+          </div>
+        </div>
+        
+        <!-- Original Text -->
+        <div className="mb-2">
+          <p className="text-sm text-gray-900 line-clamp-2">
+            {prompt.original_text}
+          </p>
+          {show_translation && prompt.original_text !== prompt.translated_text && (
+            <p className="text-xs text-gray-600 italic mt-1">
+              → {prompt.translated_text}
+            </p>
+          )}
+        </div>
+        
+        <!-- Business Goal -->
+        <div className="mb-2">
+          <p className="text-xs text-blue-700 font-medium">
+            🎯 {prompt.business_goal}
+          </p>
+        </div>
+        
+        <!-- Metadata -->
+        <div className="flex items-center justify-between text-xs text-gray-500">
+          <div className="flex items-center space-x-3">
+            <span>{prompt.intent_category}</span>
+            <span>~{prompt.estimated_duration}</span>
+            {prompt.pipeline && (
+              <span className="text-blue-600">
+                Pipeline: {prompt.pipeline.progress_percentage}%
+              </span>
+            )}
+          </div>
+          <RelativeTime timestamp={prompt.created_at} />
+        </div>
+      </div>
+      
+      <!-- Actions -->
+      <div className="flex items-center space-x-2 ml-3">
+        {prompt.status === 'requires_human' && (
+          <button className="p-1 text-orange-600 hover:bg-orange-50 rounded">
+            <AlertTriangleIcon size={16} />
+          </button>
+        )}
+        <button className="p-1 text-gray-400 hover:bg-gray-100 rounded">
+          <MoreVerticalIcon size={16} />
+        </button>
+      </div>
+    </div>
+
+# Real-time Updates
+real_time:
+  websocket_events:
+    - event: "prompt.created"
+      action: "prepend_to_list"
+      animation: "slide_in_from_top"
+      
+    - event: "prompt.updated"
+      action: "update_existing_item"
+      animation: "pulse"
+      
+    - event: "prompt.status_changed"
+      action: "update_status_indicator"
+      animation: "color_transition"
+      
+    - event: "pipeline.progress"
+      action: "update_progress_bar"
+      animation: "smooth_progress"
+
+# Filtering Logic
+filtering:
+  client_side:
+    search_fields: ["original_text", "translated_text", "business_goal"]
+    filter_functions:
+      status: "item.status === filter_value"
+      priority: "item.priority === filter_value"
+      complexity: "item.complexity_score >= min && item.complexity_score <= max"
+      
+  server_side:
+    date_range: true
+    organization_id: true
+
+# Virtualization for Performance
+virtualization:
+  enabled: true
+  item_height: 120
+  overscan_count: 5
+  scroll_tolerance: 10
+  
+# Events
+events:
+  on_prompt_select:
+    description: "Fired when a prompt is selected"
+    payload: { prompt_id: "uuid", prompt: "object" }
+    
+  on_filter_change:
+    description: "Fired when filters are updated"
+    payload: { filters: "object" }
+    
+  on_search:
+    description: "Fired when search query changes"
+    payload: { query: "string" }
+    debounce: 300
+    
+  on_action_menu:
+    description: "Fired when action menu is clicked"
+    payload: { prompt_id: "uuid", action: "string" }
+
+# Keyboard Shortcuts
+shortcuts:
+  - key: "ArrowUp"
+    action: "select_previous_prompt"
+    
+  - key: "ArrowDown"
+    action: "select_next_prompt"
+    
+  - key: "Enter"
+    action: "open_selected_prompt"
+    
+  - key: "Escape"
+    action: "clear_selection"
+
+# Accessibility
+accessibility:
+  role: "list"
+  aria_label: "User prompts feed"
+  
+  item_properties:
+    role: "listitem"
+    aria_label: "Prompt by {{ item.user.name }}: {{ item.business_goal }}"
+    
+  keyboard_navigation: true
+  screen_reader_announcements:
+    - trigger: "new_prompt"
+      message: "New prompt received from {{ prompt.user.name }}"
+    - trigger: "status_change"
+      message: "Prompt status changed to {{ prompt.status }}"

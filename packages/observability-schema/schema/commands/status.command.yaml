@@ -1,0 +1,9 @@
+name: status
+description: Show current spend and health summary
+action:
+  call: status
+args:
+  - name: verbose
+    type: boolean
+    default: false
+    description: Show detailed breakdown

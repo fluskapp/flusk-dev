@@ -1,0 +1,35 @@
+name: getTopUsers
+description: Get top N users by cost or call count
+inputs:
+  - name: organizationId
+    type: uuid
+    required: true
+  - name: start
+    type: string
+  - name: end
+    type: string
+  - name: limit
+    type: integer
+    default: 10
+  - name: sortBy
+    type: string
+    default: totalCost
+output:
+  type: json
+steps:
+  - id: topUsers
+    action: call
+    sql: |
+      SELECT agentName as userName,
+        COUNT(*) as callCount,
+        SUM(costUsd) as totalCost,
+        AVG(durationMs) as avgLatency
+      FROM llm_call
+      WHERE organizationId = $organizationId
+        AND createdAt >= $start AND createdAt <= $end
+      GROUP BY agentName
+      ORDER BY totalCost DESC
+      LIMIT $limit
+  - id: result
+    action: return
+    value: $topUsers

@@ -1,0 +1,28 @@
+name: profileSessions
+basePath: /api/profile-sessions
+entity: ProfileSession
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listProfileSessions
+    description: List profile sessions
+  - method: GET
+    path: /:id
+    call: findProfileSessionById
+    description: Get profile session by ID
+  - method: POST
+    path: /start
+    call: startProfile
+    description: Start a profiling session
+  - method: POST
+    path: /:id/stop
+    call: stopProfile
+    description: Stop a profiling session
+  - method: GET
+    path: /:id/patterns
+    call: listPerformancePatterns
+    with:
+      filter:
+        profileSessionId: ':id'
+    description: Get hotspots for a profile session

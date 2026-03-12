@@ -1,0 +1,39 @@
+name: detectBehaviorDrift
+description: Detect changes in agent decision patterns over time
+inputs:
+  - name: agentLabel
+    type: string
+  - name: baselinePeriod
+    type: json
+  - name: currentPeriod
+    type: json
+output:
+  type: DriftResult
+steps:
+  - id: baselinePatterns
+    action: call
+    sql: |
+      SELECT model, promptCategory, COUNT(*) as count
+      FROM llm_call
+      WHERE agentName = $agentLabel
+        AND createdAt >= $baselinePeriod.start AND createdAt <= $baselinePeriod.end
+      GROUP BY model, promptCategory
+  - id: currentPatterns
+    action: call
+    sql: |
+      SELECT model, promptCategory, COUNT(*) as count
+      FROM llm_call
+      WHERE agentName = $agentLabel
+        AND createdAt >= $currentPeriod.start AND createdAt <= $currentPeriod.end
+      GROUP BY model, promptCategory
+  - id: score
+    action: call
+    expression: comparePatternDistributions($baselinePatterns, $currentPatterns)
+  - id: result
+    action: return
+    value:
+      detectionType: behavior-drift
+      driftScore: $score
+      details:
+        baselinePatterns: $baselinePatterns
+        currentPatterns: $currentPatterns

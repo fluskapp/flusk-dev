@@ -1,0 +1,27 @@
+name: stopProfile
+description: Stop profiling, save results, and detect hotspots
+inputs:
+  - name: db
+    type: Database
+  - name: sessionId
+    type: string
+output:
+  type: ProfileSession
+steps:
+  - id: session
+    call: findProfileSessionById
+    with: { db: $db, id: $sessionId }
+  - id: hotspots
+    call: detectHotspots
+    with: { db: $db, profileSessionId: $sessionId }
+  - id: updated
+    call: updateProfileSession
+    with:
+      db: $db
+      id: $sessionId
+      data:
+        status: completed
+        hotspotCount: "$hotspots.length"
+  - id: result
+    action: return
+    value: $updated

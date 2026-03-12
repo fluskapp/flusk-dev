@@ -1,0 +1,45 @@
+name: CodeScanResult
+description: Results from scanning a codebase for LLM/AI usage patterns
+storage: sqlite
+fields:
+  projectPath:
+    type: string
+    required: true
+    description: Scanned project path
+  scanType:
+    type: enum
+    values:
+      - static
+      - runtime
+      - hybrid
+    required: true
+    description: Type of scan performed
+  totalLlmCalls:
+    type: integer
+    required: true
+    description: Number of LLM call sites found
+  totalProviders:
+    type: integer
+    required: true
+    description: Unique providers detected
+  totalModels:
+    type: integer
+    required: true
+    description: Unique models detected
+  callSites:
+    type: json
+    required: true
+    description: Array of {file, line, provider, model, estimatedCost}
+  recommendations:
+    type: json
+    description: Optimization recommendations
+  riskScore:
+    type: float
+    description: Overall AI risk score (0-1)
+  scanDuration:
+    type: integer
+    required: true
+    description: Scan time in milliseconds
+capabilities:
+  crud: true
+  time-range: true

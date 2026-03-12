@@ -1,0 +1,16 @@
+name: analyze
+description: Run cost analysis on a script — captures LLM calls, detects patterns, generates insights
+action:
+  call: analyze
+args:
+  - name: script
+    type: string
+    required: true
+    description: Path to the script to analyze
+  - name: depth
+    type: enum
+    values:
+      - quick
+      - full
+    default: full
+    description: Analysis depth

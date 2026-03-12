@@ -1,0 +1,25 @@
+name: calculateSavings
+description: Project savings from applying optimizations
+inputs:
+  - name: db
+    type: Database
+  - name: optimizations
+    type: Conversion[]
+output:
+  type: SavingsSummary
+steps:
+  - id: totalSavings
+    action: call
+    source: $optimizations
+    accumulator: 0
+    expression: $acc + $item.estimatedSavingsUsd
+  - id: monthlySpend
+    call: getMonthlySpend
+    with:
+      db: $db
+  - id: result
+    action: return
+    value:
+      totalMonthlySavings: $totalSavings
+      savingsPercent: $totalSavings / $monthlySpend.totalCostUsd * 100
+      optimizationCount: $optimizations.length

@@ -1,0 +1,29 @@
+name: delusionList
+description: List detected delusions
+action:
+  call: delusionList
+args:
+  - name: agent
+    type: string
+    description: Filter by agent
+  - name: type
+    type: enum
+    values:
+      - hallucination
+      - contradiction
+      - confidence-mismatch
+      - circular-reasoning
+      - fabricated-reference
+    description: Filter by delusion type
+  - name: status
+    type: enum
+    values:
+      - detected
+      - confirmed
+      - dismissed
+    default: detected
+    description: Filter by status
+  - name: limit
+    type: integer
+    default: 20
+    description: Max results

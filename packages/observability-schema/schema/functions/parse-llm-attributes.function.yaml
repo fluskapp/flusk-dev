@@ -1,0 +1,21 @@
+name: parseLlmAttributes
+description: Parse LLM-specific attributes from OpenTelemetry span attributes
+inputs:
+  - name: attributes
+    type: json
+output:
+  type: LlmAttributes
+steps:
+  - id: isLlm
+    action: call
+    expression: '''gen_ai.system'' in $attributes || ''llm.system'' in $attributes'
+  - id: result
+    action: return
+    value:
+      isLlm: $isLlm
+      model: $attributes['gen_ai.request.model'] || $attributes['llm.request.model']
+      provider: $attributes['gen_ai.system'] || $attributes['llm.system']
+      promptTokens: $attributes['gen_ai.usage.prompt_tokens'] || 0
+      completionTokens: $attributes['gen_ai.usage.completion_tokens'] || 0
+      cost: $attributes['gen_ai.usage.cost'] || null
+      durationMs: $attributes['llm.request.duration_ms'] || null

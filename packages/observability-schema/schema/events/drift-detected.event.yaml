@@ -1,0 +1,27 @@
+name: DriftDetected
+description: Fired when prompt or output drift is detected
+channel: webhook
+payload:
+  fields:
+    - name: driftDetectionId
+      type: string
+      required: true
+    - name: driftType
+      type: string
+      required: true
+    - name: severity
+      type: string
+      required: true
+    - name: score
+      type: number
+      required: true
+    - name: organizationId
+      type: string
+      required: true
+publish:
+  - trigger: manual
+subscribe:
+  handler: dispatchAlert
+  retry:
+    maxAttempts: 3
+    backoff: exponential

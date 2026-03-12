@@ -1,0 +1,9 @@
+name: id
+description: id
+inputs: []
+output:
+  type: json
+steps:
+  - id: r
+    action: return
+    value: 'null'

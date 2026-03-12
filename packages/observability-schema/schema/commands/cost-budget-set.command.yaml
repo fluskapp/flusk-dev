@@ -1,0 +1,23 @@
+name: costBudgetSet
+description: Set a cost budget for a dimension
+args:
+  - name: period
+    type: string
+    default: monthly
+  - name: alert-at
+    type: number
+    default: 80
+  - name: action
+    type: string
+    default: alert
+action:
+  call: createCostBudget
+  with:
+    tagKey: $dimension
+    tagValue: $value
+    limitUsd: $limit
+    period: $period
+    alertAt: $alertAt
+    action: $action
+    enabled: 'true'
+    db: $db

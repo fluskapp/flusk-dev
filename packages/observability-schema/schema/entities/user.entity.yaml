@@ -1,0 +1,41 @@
+name: User
+description: Organization member with role-based access
+storage: sqlite
+fields:
+  organizationId:
+    type: uuid
+    required: true
+    relation: Organization
+    description: Parent organization
+  email:
+    type: string
+    required: true
+    description: User email address
+  name:
+    type: string
+    required: true
+    description: Display name
+  role:
+    type: enum
+    values:
+      - owner
+      - admin
+      - member
+      - viewer
+    required: true
+    default: member
+    description: Access role within organization
+  status:
+    type: enum
+    values:
+      - active
+      - invited
+      - suspended
+    required: true
+    default: invited
+    description: Account status
+  lastLoginAt:
+    type: date
+    description: Last login timestamp
+capabilities:
+  crud: true

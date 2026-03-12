@@ -1,0 +1,18 @@
+name: costReports
+basePath: /api/cost-reports
+entity: CostReport
+auth: required
+operations:
+  - method: GET
+    path: /
+    call: listCostReports
+    description: List generated reports
+  - method: POST
+    path: /generate
+    call: generateCostReport
+    input: GenerateCostReport
+    description: Generate new report
+  - method: GET
+    path: /:id
+    call: findCostReportById
+    description: Get specific report

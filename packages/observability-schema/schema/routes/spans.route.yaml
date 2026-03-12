@@ -1,0 +1,13 @@
+name: spans
+basePath: /api/spans
+entity: Span
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listSpans
+    description: List spans with filtering
+  - method: GET
+    path: /:id
+    call: findSpanById
+    description: Get span by ID

@@ -1,0 +1,37 @@
+name: ExplainSession
+description: Tracks flusk explain command runs — AI-powered cost optimization insights
+storage: sqlite
+fields:
+  query:
+    type: string
+    required: true
+    description: User's question or topic
+  status:
+    type: enum
+    values:
+      - running
+      - completed
+      - failed
+    required: true
+    default: running
+    description: Session status
+  model:
+    type: string
+    description: LLM model used for explanation
+  responseText:
+    type: string
+    description: Generated explanation
+  callsAnalyzed:
+    type: integer
+    default: 0
+    description: Number of calls analyzed for context
+  costOfExplain:
+    type: float
+    default: 0
+    description: Cost of running the explain query itself
+  durationMs:
+    type: integer
+    description: How long the explain took
+capabilities:
+  crud: true
+  time-range: true

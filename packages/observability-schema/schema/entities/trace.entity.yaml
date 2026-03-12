@@ -1,0 +1,50 @@
+name: Trace
+description: Distributed trace record grouping related spans
+storage: sqlite
+fields:
+  traceId:
+    type: string
+    required: true
+    unique: true
+    description: Unique trace identifier (W3C trace ID format)
+  rootSpanId:
+    type: string
+    description: ID of the root span
+  serviceName:
+    type: string
+    required: true
+    description: Originating service name
+  operationName:
+    type: string
+    required: true
+    description: Top-level operation name
+  durationMs:
+    type: integer
+    description: Total trace duration in milliseconds
+  spanCount:
+    type: integer
+    default: 0
+    description: Number of spans in this trace
+  totalCostUsd:
+    type: float
+    default: 0
+    description: Sum of all LLM call costs within this trace
+  status:
+    type: enum
+    values:
+      - ok
+      - error
+      - timeout
+    default: ok
+    description: Trace outcome status
+  metadata:
+    type: json
+    description: Additional trace attributes
+capabilities:
+  crud: true
+  time-range: true
+relations:
+  - name: spans
+    entity: Span
+    type: hasMany
+    foreignKey: traceId

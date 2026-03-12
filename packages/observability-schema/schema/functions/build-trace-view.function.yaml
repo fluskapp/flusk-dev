@@ -1,0 +1,41 @@
+name: buildTraceView
+description: Assemble waterfall or flamegraph data from trace spans
+inputs:
+  - name: traceId
+    type: string
+  - name: viewType
+    type: string
+output:
+  type: TraceViewData
+steps:
+  - id: spans
+    action: call
+    entity: Span
+    where:
+      traceId: $traceId
+    orderBy: startTime
+  - id: stats
+    call: calculateTraceStats
+    with:
+      traceId: $traceId
+      spans: $spans
+  - id: criticalPath
+    call: findCriticalPath
+    with:
+      spans: $spans
+  - id: view
+    action: call
+    entity: TraceView
+    data:
+      traceId: $traceId
+      viewType: $viewType
+      totalDuration: $stats.totalDuration
+      totalCost: $stats.totalCost
+      spanCount: $stats.spanCount
+      criticalPath: $criticalPath
+  - id: result
+    action: return
+    value:
+      view: $view
+      spans: $spans
+      stats: $stats

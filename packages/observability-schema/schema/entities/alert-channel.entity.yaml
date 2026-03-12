@@ -1,0 +1,39 @@
+name: AlertChannel
+description: Configuration for an alert destination (PagerDuty, Slack, etc.)
+storage: sqlite
+fields:
+  name:
+    type: string
+    required: true
+    unique: true
+    description: Human-readable channel name
+  channelType:
+    type: enum
+    values:
+      - pagerduty
+      - slack
+      - discord
+      - webhook
+      - email
+    required: true
+    description: Alert provider type
+  config:
+    type: json
+    required: true
+    description: Provider-specific configuration (routing_key, webhook_url, etc.)
+  enabled:
+    type: boolean
+    required: true
+    default: true
+    description: Whether this channel is active
+  severityFilter:
+    type: enum
+    values:
+      - critical
+      - warning
+      - info
+    required: true
+    default: warning
+    description: Minimum severity level to trigger alerts on this channel
+capabilities:
+  crud: true

@@ -1,0 +1,8 @@
+name: alertsTest
+description: Send a test alert to all configured channels
+action:
+  call: alertsTest
+args:
+  - name: channel
+    type: string
+    description: Test specific channel by name

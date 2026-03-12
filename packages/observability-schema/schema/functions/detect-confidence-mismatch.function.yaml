@@ -1,0 +1,36 @@
+name: detectConfidenceMismatch
+description: Flag cases where model states high confidence but answer is wrong
+inputs:
+  - name: llmCallId
+    type: string
+  - name: statedConfidence
+    type: float
+  - name: actualAccuracy
+    type: float
+output:
+  type: DelusionResult
+steps:
+  - id: divergence
+    action: call
+    expression: $statedConfidence - $actualAccuracy
+  - id: detected
+    action: condition
+    if:
+      field: $divergence
+      op: gte
+      value: 0.3
+    then:
+      - action: return
+        value: 'true'
+    else:
+      - action: return
+        value: 'false'
+  - id: result
+    action: return
+    value:
+      delusionType: confidence-mismatch
+      confidence: $statedConfidence
+      actualAccuracy: $actualAccuracy
+      divergenceScore: $divergence
+      detected: $detected
+      explanation: Model claimed $statedConfidence confidence but actual accuracy was $actualAccuracy

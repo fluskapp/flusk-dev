@@ -1,0 +1,18 @@
+name: slack
+description: Slack incoming webhook
+type: webhook
+config:
+  fields:
+    - name: webhookUrl
+      type: string
+      required: true
+      description: Slack incoming webhook URL
+    - name: channel
+      type: string
+      description: Override channel
+methods:
+  - name: send
+    description: Send Slack message
+    input: AlertEvent
+  - name: test
+    description: Send test message

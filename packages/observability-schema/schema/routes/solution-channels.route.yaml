@@ -1,0 +1,31 @@
+name: solution-channels
+basePath: /api/solution-channels
+entity: SolutionChannel
+auth: required
+operations:
+  - method: GET
+    path: /
+    call: listSolutionChannel
+    description: List channels for a solution
+  - method: POST
+    path: /
+    call: publishToChannel
+    input: PublishToChannel
+    description: Publish solution to a channel
+  - method: GET
+    path: /:id
+    call: findSolutionChannelById
+    description: Get channel by ID
+  - method: PUT
+    path: /:id
+    call: updateSolutionChannel
+    input: UpdateSolutionChannel
+    description: Update channel config
+  - method: DELETE
+    path: /:id
+    call: unpublishFromChannel
+    description: Remove channel connection
+  - method: POST
+    path: /:id/test
+    call: testSolutionChannel
+    description: Send a test message through this channel

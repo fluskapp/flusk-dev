@@ -1,0 +1,54 @@
+name: routeModel
+description: Select the cheapest qualifying model for a prompt category
+inputs:
+  - name: db
+    type: Database
+  - name: promptCategory
+    type: string
+  - name: requestedModel
+    type: string
+output:
+  type: RoutingResult
+steps:
+  - id: rules
+    call: listRoutingRules
+    with:
+      db: $db
+      filter:
+        promptCategory: $promptCategory
+        enabled: true
+  - id: bestRule
+    action: call
+    source: $rules
+    sort:
+      priority: desc
+  - id: candidates
+    call: queryModelPerformance
+    with:
+      db: $db
+      query: leaderboard
+      params:
+        category: $promptCategory
+  - id: qualifying
+    action: filter
+    source: $candidates
+    condition: $item.qualityScore >= $bestRule.minQualityScore
+  - id: cheapest
+    action: call
+    source: $qualifying
+    sort:
+      avgCostUsd: asc
+  - id: decision
+    call: recordRoutingDecision
+    with:
+      db: $db
+      routingRuleId: id
+      promptCategory: $promptCategory
+      requestedModel: $requestedModel
+      selectedModel: model
+  - id: result
+    action: return
+    value:
+      model: $cheapest.model
+      provider: $cheapest.provider
+      ruleApplied: $bestRule.name

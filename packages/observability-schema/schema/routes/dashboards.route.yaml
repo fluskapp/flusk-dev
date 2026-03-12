@@ -1,0 +1,31 @@
+name: dashboards
+basePath: /api/dashboards
+entity: Dashboard
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listDashboards
+    description: List all dashboards
+  - method: POST
+    path: /
+    call: createDashboard
+    input: CreateDashboard
+    description: Create a new dashboard
+  - method: GET
+    path: /:id
+    call: findDashboardById
+    description: Get dashboard by ID
+  - method: PUT
+    path: /:id
+    call: updateDashboard
+    input: UpdateDashboard
+    description: Update a dashboard
+  - method: DELETE
+    path: /:id
+    call: deleteDashboard
+    description: Delete a dashboard
+  - method: GET
+    path: /:id/render
+    call: renderDashboardData
+    description: Fetch rendered data for all widgets in a dashboard

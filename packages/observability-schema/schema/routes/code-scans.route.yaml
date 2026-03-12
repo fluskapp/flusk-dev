@@ -1,0 +1,26 @@
+name: codeScans
+basePath: /api/code-scans
+entity: CodeScanResult
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listCodeScanResults
+    description: List code scan results
+  - method: POST
+    path: /
+    call: scanCodebase
+    input: ScanCodebaseRequest
+    description: Scan a codebase for AI usage
+  - method: GET
+    path: /:id
+    call: findCodeScanResultById
+    description: Get scan result by ID
+  - method: DELETE
+    path: /:id
+    call: deleteCodeScanResult
+    description: Delete scan result
+  - method: GET
+    path: /:id/report
+    call: generateScanReport
+    description: Generate detailed report for a scan

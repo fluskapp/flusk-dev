@@ -1,0 +1,28 @@
+name: calculateTraceStats
+description: Aggregate cost, duration, and call count per trace
+inputs:
+  - name: traceId
+    type: string
+  - name: spans
+    type: json
+output:
+  type: TraceStats
+steps:
+  - id: llmCalls
+    action: call
+    entity: LlmCall
+    where:
+      traceId: $traceId
+  - id: totalCost
+    action: call
+    expression: sum($llmCalls, 'costUsd')
+  - id: totalDuration
+    action: call
+    expression: max($spans, 'endTime') - min($spans, 'startTime')
+  - id: result
+    action: return
+    value:
+      totalDuration: $totalDuration
+      totalCost: $totalCost
+      spanCount: $spans.length
+      llmCallCount: $llmCalls.length

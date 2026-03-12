@@ -1,0 +1,33 @@
+name: trackPartnerUsage
+description: Records usage data for a partner integration
+inputs:
+  - name: partnerId
+    type: string
+  - name: integrationId
+    type: string
+  - name: calls
+    type: number
+  - name: cost
+    type: number
+  - name: errors
+    type: number
+  - name: db
+    type: Database
+output:
+  type: PartnerUsage
+steps:
+  - id: usage
+    call: createPartnerUsage
+    with:
+      data:
+        partnerId: $partnerId
+        integrationId: $integrationId
+        period: $today
+        calls: $calls
+        cost: $cost
+        errors: $errors
+      db: $db
+    store: usage
+  - id: result
+    action: return
+    value: $usage

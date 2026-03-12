@@ -1,0 +1,18 @@
+name: solution-templates
+basePath: /api/solution-templates
+entity: SolutionTemplate
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listSolutionTemplate
+    description: List public templates
+  - method: GET
+    path: /:id
+    call: findSolutionTemplateById
+    description: Get template by ID
+  - method: POST
+    path: /
+    call: createSolutionTemplate
+    input: CreateSolutionTemplate
+    description: Create a template from a solution

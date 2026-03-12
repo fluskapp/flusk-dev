@@ -1,0 +1,49 @@
+name: AlertEvent
+description: Record of an alert that was triggered
+storage: sqlite
+fields:
+  alertType:
+    type: enum
+    values:
+      - budget_exceeded
+      - budget_warning
+      - drift_detected
+      - cost_anomaly
+      - agent_stalled
+      - error_rate_spike
+      - token_rate_limit
+    required: true
+    description: Type of alert
+  severity:
+    type: enum
+    values:
+      - critical
+      - warning
+      - info
+    required: true
+    description: Alert severity level
+  title:
+    type: string
+    required: true
+    description: Short alert title
+  message:
+    type: string
+    required: true
+    description: Detailed alert message
+  channelName:
+    type: string
+    description: Which alert channel delivered this
+  delivered:
+    type: boolean
+    required: true
+    default: false
+    description: Whether the alert was successfully delivered
+  acknowledgedAt:
+    type: string
+    description: ISO datetime when acknowledged
+  metadata:
+    type: json
+    description: Additional context
+capabilities:
+  crud: true
+  time-range: true

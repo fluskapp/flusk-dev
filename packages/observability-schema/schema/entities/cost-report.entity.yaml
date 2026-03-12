@@ -1,0 +1,48 @@
+name: CostReport
+description: Generated cost attribution report snapshot
+storage: sqlite
+fields:
+  reportType:
+    type: enum
+    values:
+      - daily
+      - weekly
+      - monthly
+      - custom
+    required: true
+    description: Report type
+  periodStart:
+    type: string
+    required: true
+    description: Period start ISO datetime
+  periodEnd:
+    type: string
+    required: true
+    description: Period end ISO datetime
+  totalCostUsd:
+    type: number
+    required: true
+    description: Total cost in this period
+  totalCalls:
+    type: integer
+    required: true
+    description: Total LLM calls
+  breakdown:
+    type: json
+    required: true
+    description: Full breakdown by all dimensions
+  topInsights:
+    type: json
+    description: Auto-generated insights (spikes, anomalies, savings opportunities)
+  format:
+    type: enum
+    values:
+      - json
+      - html
+      - slack
+      - markdown
+    required: true
+    default: json
+capabilities:
+  crud: true
+  time-range: true

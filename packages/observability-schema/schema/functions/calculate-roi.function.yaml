@@ -1,0 +1,43 @@
+name: calculateRoi
+description: Estimate ROI from AI tool usage (cost of licenses vs productivity gains)
+inputs:
+  - name: timeRange
+    type: json
+output:
+  type: json
+steps:
+  - id: costs
+    action: call
+    sql: |
+      SELECT toolName, SUM(value) as totalCost
+      FROM ai_usage_metric
+      WHERE metricType = 'cost'
+        AND createdAt >= $timeRange.start AND createdAt <= $timeRange.end
+      GROUP BY toolName
+  - id: timeSaved
+    action: call
+    sql: |
+      SELECT toolName, SUM(value) as totalTimeSaved
+      FROM ai_usage_metric
+      WHERE metricType = 'time-saved'
+        AND createdAt >= $timeRange.start AND createdAt <= $timeRange.end
+      GROUP BY toolName
+  - id: roi
+    action: forEach
+    items: $costs
+    do:
+      action: compute
+      expression: |
+        {
+          tool: $item.toolName,
+          cost: $item.totalCost,
+          timeSaved: lookup($timeSaved, $item.toolName, 'totalTimeSaved'),
+          roi: (lookup($timeSaved, $item.toolName, 'totalTimeSaved') * 50) / max($item.totalCost, 1)
+        }
+  - id: result
+    action: return
+    value:
+      period: $timeRange
+      tools: $roi
+      totalCost: sum($costs, 'totalCost')
+      totalTimeSaved: sum($timeSaved, 'totalTimeSaved')

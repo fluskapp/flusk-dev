@@ -1,0 +1,45 @@
+name: detectOutputDrift
+description: Compare agent outputs over two time periods to detect drift
+inputs:
+  - name: agentLabel
+    type: string
+  - name: baselinePeriod
+    type: json
+  - name: currentPeriod
+    type: json
+output:
+  type: DriftResult
+steps:
+  - id: baselineCalls
+    action: call
+    entity: LlmCall
+    where:
+      agentName: $agentLabel
+      createdAt:
+        gte: $baselinePeriod.start
+        lte: $baselinePeriod.end
+  - id: currentCalls
+    action: call
+    entity: LlmCall
+    where:
+      agentName: $agentLabel
+      createdAt:
+        gte: $currentPeriod.start
+        lte: $currentPeriod.end
+  - id: baselineHash
+    action: call
+    expression: hashOutputDistribution($baselineCalls)
+  - id: currentHash
+    action: call
+    expression: hashOutputDistribution($currentCalls)
+  - id: score
+    action: call
+    expression: compareDistributions($baselineCalls, $currentCalls)
+  - id: result
+    action: return
+    value:
+      detectionType: output-drift
+      baselineHash: $baselineHash
+      currentHash: $currentHash
+      driftScore: $score
+      sampleCount: $currentCalls.length

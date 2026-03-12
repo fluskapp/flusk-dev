@@ -1,0 +1,35 @@
+name: authenticateUser
+description: Authenticate user with email and password
+inputs:
+  - name: email
+    type: string
+    required: true
+  - name: password
+    type: string
+    required: true
+output:
+  type: json
+steps:
+  - id: user
+    action: call
+    entity: User
+    method: findOne
+    where:
+      email: $email
+      status: active
+  - id: checkExists
+    action: condition
+    if:
+      field: $user
+      op: eq
+      value: null
+    then:
+      - action: return
+        value:
+          error: Invalid credentials
+  - id: result
+    action: return
+    value:
+      userId: $user.id
+      organizationId: $user.organizationId
+      role: $user.role

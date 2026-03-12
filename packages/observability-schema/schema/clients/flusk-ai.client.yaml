@@ -1,0 +1,37 @@
+name: fluskAi
+description: Internal AI client for the Explain feature — calls OpenAI/Anthropic for usage analysis
+baseUrl: https://api.openai.com/v1
+auth:
+  type: bearer
+  envVar: OPENAI_API_KEY
+endpoints:
+  - name: analyzeUsage
+    method: POST
+    path: /chat/completions
+    input:
+      - name: data
+        type: json
+        required: true
+    output:
+      type: json
+    timeout: 60000
+  - name: suggestOptimizations
+    method: POST
+    path: /chat/completions
+    input:
+      - name: data
+        type: json
+        required: true
+    output:
+      type: json
+    timeout: 60000
+  - name: generateReport
+    method: POST
+    path: /chat/completions
+    input:
+      - name: data
+        type: json
+        required: true
+    output:
+      type: json
+    timeout: 60000

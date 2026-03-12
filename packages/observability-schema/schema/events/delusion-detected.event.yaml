@@ -1,0 +1,27 @@
+name: DelusionDetected
+description: Fired when a hallucination or delusion is detected in LLM output
+channel: webhook
+payload:
+  fields:
+    - name: delusionDetectionId
+      type: string
+      required: true
+    - name: delusionType
+      type: string
+      required: true
+    - name: severity
+      type: string
+      required: true
+    - name: confidence
+      type: number
+      required: true
+    - name: organizationId
+      type: string
+      required: true
+publish:
+  - trigger: manual
+subscribe:
+  handler: dispatchAlert
+  retry:
+    maxAttempts: 3
+    backoff: exponential

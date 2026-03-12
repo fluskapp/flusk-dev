@@ -1,0 +1,366 @@
+# Core entity: Task
+# Represents individual work items within a pipeline
+
+name: Task
+description: "Individual work item executed by specialized agents"
+type: entity
+
+fields:
+  # Identity
+  id:
+    type: uuid
+    primary: true
+    auto: true
+    
+  pipeline_id:
+    type: uuid
+    required: true
+    index: true
+    description: "Pipeline this task belongs to"
+    
+  organization_id:
+    type: uuid
+    required: true
+    index: true
+    
+  # Task Definition
+  name:
+    type: string
+    required: true
+    description: "Human-readable task name"
+    
+  description:
+    type: text
+    required: true
+    description: "What this task accomplishes"
+    
+  task_type:
+    type: enum
+    values: ["yaml_generation", "code_review", "integration", "testing", "deployment", "ui_creation", "analysis", "optimization"]
+    required: true
+    index: true
+    description: "Type of work being performed"
+    
+  # Agent Assignment
+  agent_type:
+    type: enum
+    values: ["yaml_writer", "schema_validator", "compiler_enhancer", "integration_specialist", "automated_tester", "component_cloner", "orchestrator"]
+    required: true
+    description: "Type of agent required"
+    
+  agent_id:
+    type: uuid
+    nullable: true
+    index: true
+    description: "Specific agent assigned to this task"
+    
+  # Execution Details
+  priority:
+    type: enum
+    values: ["low", "medium", "high", "critical"]
+    default: "medium"
+    index: true
+    
+  complexity_score:
+    type: integer
+    range: [1, 10]
+    required: true
+    description: "Task complexity rating"
+    
+  estimated_duration_minutes:
+    type: integer
+    required: true
+    description: "Estimated completion time"
+    
+  actual_duration_minutes:
+    type: integer
+    nullable: true
+    description: "Actual completion time"
+    
+  # Dependencies
+  dependencies:
+    type: json
+    description: "Tasks that must complete before this task"
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          task_id: { type: string }
+          dependency_type: { type: string, enum: ["blocks", "input_required", "sequence"] }
+          
+  blockers:
+    type: json
+    description: "Current blockers preventing execution"
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          blocker_type: { type: string, enum: ["dependency", "resource", "approval", "clarification"] }
+          description: { type: string }
+          blocking_task_id: { type: string, nullable: true }
+          requires_human: { type: boolean, default: false }
+          created_at: { type: string }
+          
+  # Status Tracking
+  status:
+    type: enum
+    values: ["pending", "ready", "assigned", "in_progress", "blocked", "review_required", "completed", "failed", "skipped"]
+    default: "pending"
+    index: true
+    
+  progress_percentage:
+    type: integer
+    range: [0, 100]
+    default: 0
+    
+  # Work Specification
+  work_specification:
+    type: json
+    required: true
+    description: "Detailed specifications for the agent"
+    schema:
+      type: object
+      properties:
+        business_context: { type: string }
+        technical_requirements: { type: object }
+        acceptance_criteria: { type: array, items: { type: string } }
+        quality_gates: { type: array, items: { type: string } }
+        resources: { type: object }
+        
+  # Results
+  deliverables:
+    type: json
+    nullable: true
+    description: "Outputs produced by this task"
+    schema:
+      type: object
+      properties:
+        files_created: { type: array, items: { type: string } }
+        files_modified: { type: array, items: { type: string } }
+        apis_created: { type: array, items: { type: string } }
+        tests_created: { type: array, items: { type: string } }
+        documentation: { type: array, items: { type: string } }
+        
+  quality_metrics:
+    type: json
+    nullable: true
+    description: "Quality measurements for completed work"
+    schema:
+      type: object
+      properties:
+        code_quality_score: { type: number, minimum: 0, maximum: 100 }
+        test_coverage: { type: number, minimum: 0, maximum: 100 }
+        performance_score: { type: number, minimum: 0, maximum: 100 }
+        security_score: { type: number, minimum: 0, maximum: 100 }
+        
+  error_details:
+    type: json
+    nullable: true
+    description: "Error information when task fails"
+    schema:
+      type: object
+      properties:
+        error_type: { type: string }
+        error_message: { type: string }
+        stack_trace: { type: string, nullable: true }
+        recovery_suggestions: { type: array, items: { type: string } }
+        
+  # Approval and Review
+  requires_human_approval:
+    type: boolean
+    default: false
+    description: "Whether this task needs human sign-off"
+    
+  approval_status:
+    type: enum
+    values: ["not_required", "pending", "approved", "rejected"]
+    default: "not_required"
+    
+  reviewer_notes:
+    type: text
+    nullable: true
+    description: "Notes from human reviewer"
+    
+  # Timestamps
+  created_at:
+    type: timestamp
+    auto: true
+    index: true
+    
+  assigned_at:
+    type: timestamp
+    nullable: true
+    description: "When agent was assigned"
+    
+  started_at:
+    type: timestamp
+    nullable: true
+    description: "When work began"
+    
+  completed_at:
+    type: timestamp
+    nullable: true
+    description: "When task finished"
+    
+  updated_at:
+    type: timestamp
+    auto: true
+    on_update: true
+
+# Relationships
+relationships:
+  - name: pipeline
+    type: belongsTo
+    target: Pipeline
+    foreign_key: pipeline_id
+    
+  - name: agent
+    type: belongsTo
+    target: Agent
+    foreign_key: agent_id
+    
+  - name: dependent_tasks
+    type: hasMany
+    target: Task
+    description: "Tasks that depend on this task"
+    
+  - name: timeline_events
+    type: hasMany
+    target: TimelineEvent
+    description: "Events related to this task"
+    
+  - name: organization
+    type: belongsTo
+    target: Organization
+    foreign_key: organization_id
+
+# Indexes
+indexes:
+  - fields: [pipeline_id, status, priority]
+    name: "pipeline_execution_order"
+    
+  - fields: [agent_type, status]
+    name: "agent_workload"
+    
+  - fields: [status, requires_human_approval]
+    name: "approval_queue"
+    
+  - fields: [organization_id, task_type, created_at]
+    name: "org_task_analytics"
+
+# API endpoints
+endpoints:
+  - method: POST
+    path: "/tasks"
+    description: "Create new task in pipeline"
+    auth: required
+    body:
+      fields: [pipeline_id, name, task_type, agent_type, work_specification]
+      
+  - method: GET
+    path: "/tasks"
+    description: "List tasks with filtering"
+    auth: required
+    query:
+      pipeline_id: uuid
+      status: string
+      agent_type: string
+      requires_human_approval: boolean
+      limit: integer
+      offset: integer
+    include: [pipeline, agent]
+    
+  - method: GET
+    path: "/tasks/{id}"
+    description: "Get task details"
+    auth: required
+    include: [pipeline, agent, timeline_events]
+    
+  - method: PATCH
+    path: "/tasks/{id}"
+    description: "Update task status or assignment"
+    auth: required
+    body:
+      fields: [status, agent_id, progress_percentage, blockers]
+      
+  - method: POST
+    path: "/tasks/{id}/assign"
+    description: "Assign agent to task"
+    auth: required
+    body:
+      fields: [agent_id]
+      
+  - method: POST
+    path: "/tasks/{id}/approve"
+    description: "Human approval for task"
+    auth: required
+    body:
+      fields: [approval_status, reviewer_notes]
+      
+  - method: POST
+    path: "/tasks/{id}/complete"
+    description: "Mark task as completed with deliverables"
+    auth: required
+    body:
+      fields: [deliverables, quality_metrics]
+
+# Validation rules
+validation:
+  - field: name
+    min_length: 5
+    max_length: 100
+    
+  - field: estimated_duration_minutes
+    min: 1
+    max: 1440  # 24 hours max per task
+    
+  - field: complexity_score
+    min: 1
+    max: 10
+
+# Real-time events
+events:
+  - trigger: after_create
+    event: "task.created"
+    payload: [id, pipeline_id, task_type, agent_type, priority]
+    
+  - trigger: after_update
+    event: "task.assigned"
+    payload: [id, agent_id, assigned_at]
+    condition: "agent_id_changed AND agent_id IS NOT NULL"
+    
+  - trigger: after_update
+    event: "task.status_changed"
+    payload: [id, status, progress_percentage, updated_at]
+    condition: "status_changed"
+    
+  - trigger: after_update
+    event: "task.blocked"
+    payload: [id, blockers, requires_human_approval]
+    condition: "status = 'blocked'"
+    
+  - trigger: after_update
+    event: "task.completed"
+    payload: [id, deliverables, quality_metrics, actual_duration_minutes]
+    condition: "status = 'completed'"
+    
+  - trigger: after_update
+    event: "task.failed"
+    payload: [id, error_details, recovery_suggestions]
+    condition: "status = 'failed'"
+
+# Background jobs
+jobs:
+  - name: "check_task_dependencies"
+    schedule: "*/60 * * * * *"  # Every minute
+    description: "Check if blocked tasks can be unblocked"
+    
+  - name: "assign_ready_tasks"
+    schedule: "*/30 * * * * *"  # Every 30 seconds  
+    description: "Auto-assign ready tasks to available agents"
+    
+  - name: "escalate_stuck_tasks"
+    schedule: "0 */10 * * * *"   # Every 10 minutes
+    description: "Identify tasks stuck longer than expected"

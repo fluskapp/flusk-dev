@@ -1,0 +1,38 @@
+name: TraceView
+description: Visualization configuration for a distributed trace
+storage: sqlite
+fields:
+  traceId:
+    type: string
+    required: true
+    index: true
+    description: Reference to trace entity
+  viewType:
+    type: enum
+    values:
+      - waterfall
+      - flamegraph
+      - timeline
+      - tree
+    required: true
+    description: Visualization type
+  totalDuration:
+    type: integer
+    required: true
+    description: Total trace duration in milliseconds
+  totalCost:
+    type: float
+    required: true
+    description: Total trace cost in USD
+  spanCount:
+    type: integer
+    required: true
+    description: Number of spans in the trace
+  criticalPath:
+    type: json
+    description: List of span IDs on the critical path
+  annotations:
+    type: json
+    description: User annotations on the trace
+capabilities:
+  crud: true

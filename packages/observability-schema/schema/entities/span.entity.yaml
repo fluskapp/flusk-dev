@@ -1,0 +1,69 @@
+name: Span
+description: Individual span within a distributed trace
+storage: sqlite
+fields:
+  traceId:
+    type: string
+    required: true
+    description: Parent trace ID
+  spanId:
+    type: string
+    required: true
+    unique: true
+    description: Unique span identifier
+  parentSpanId:
+    type: string
+    description: Parent span ID (null for root spans)
+  operationName:
+    type: string
+    required: true
+    description: Span operation name
+  serviceName:
+    type: string
+    required: true
+    description: Service that generated this span
+  startTime:
+    type: string
+    required: true
+    description: ISO datetime span started
+  endTime:
+    type: string
+    description: ISO datetime span ended
+  durationMs:
+    type: integer
+    description: Span duration in milliseconds
+  kind:
+    type: enum
+    values:
+      - internal
+      - client
+      - server
+      - producer
+      - consumer
+    default: internal
+    description: OpenTelemetry span kind
+  status:
+    type: enum
+    values:
+      - ok
+      - error
+      - unset
+    default: unset
+    description: Span status
+  attributes:
+    type: json
+    description: OpenTelemetry span attributes
+  events:
+    type: json
+    description: Span events/logs
+  llmCallId:
+    type: string
+    description: Associated LLM call ID if this span represents an LLM invocation
+capabilities:
+  crud: true
+  time-range: true
+relations:
+  - name: trace
+    entity: Trace
+    type: belongsTo
+    foreignKey: traceId

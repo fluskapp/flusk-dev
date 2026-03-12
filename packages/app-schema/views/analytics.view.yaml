@@ -1,0 +1,50 @@
+name: Analytics
+type: dashboard
+description: Analytics dashboard with multiple charts and metrics
+route: /$tenant/admin/analytics
+layout: full
+auth: true
+ssr: false
+loader:
+  source: Analytics
+  params: [tenant]
+sections:
+  - name: Key Metrics
+    type: stat-cards
+    widgets:
+      - type: stat-card
+        source: metrics.totalQueries
+        label: Total Queries
+        format: number
+      - type: stat-card
+        source: metrics.avgLatency
+        label: Avg Latency (ms)
+        format: number
+      - type: stat-card
+        source: metrics.successRate
+        label: Success Rate
+        format: percent
+      - type: stat-card
+        source: metrics.costTotal
+        label: Total Cost
+        format: currency
+  - name: Queries Over Time
+    type: chart
+    source: analytics.queriesByDay
+    chart:
+      type: line
+      xAxis: date
+      yAxis: queries
+      color: indigo
+  - name: Cost Breakdown
+    type: chart
+    source: analytics.costByModel
+    chart:
+      type: donut
+      xAxis: model
+      yAxis: cost
+  - name: Top Solutions
+    type: data-table
+    source: analytics.topSolutions
+    columns: [name, queries, avgLatency, cost]
+    actions: [view]

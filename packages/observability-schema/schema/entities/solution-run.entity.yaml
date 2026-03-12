@@ -1,0 +1,64 @@
+name: SolutionRun
+description: Single execution of a solution with cost and performance tracking
+storage: sqlite
+fields:
+  solutionId:
+    type: string
+    required: true
+    index: true
+    description: Solution that was executed
+  organizationId:
+    type: string
+    required: true
+    index: true
+    description: Organization that owns this run
+  input:
+    type: json
+    description: Input data for the run
+  output:
+    type: json
+    description: Output data from the run
+  status:
+    type: enum
+    values: [running, completed, failed, timeout]
+    required: true
+    default: running
+    description: Execution status
+  cost:
+    type: float
+    description: Total cost in USD
+  durationMs:
+    type: integer
+    description: Execution duration in milliseconds
+  modelUsed:
+    type: string
+    description: Model used for this run
+  tokensIn:
+    type: integer
+    description: Input tokens consumed
+  tokensOut:
+    type: integer
+    description: Output tokens generated
+  error:
+    type: string
+    description: Error message if failed
+  traceId:
+    type: string
+    description: Links to distributed trace
+capabilities:
+  crud: true
+  time-range: true
+  aggregation: true
+queries:
+  - name: runsBySolution
+    sql: |-
+      SELECT solutionId, COUNT(*) as run_count,
+             SUM(cost) as total_cost, AVG(durationMs) as avg_duration
+      FROM solution_run
+      WHERE createdAt >= $start AND createdAt <= $end
+      GROUP BY solutionId
+      ORDER BY total_cost DESC
+relations:
+  - entity: Solution
+    type: belongsTo
+    foreignKey: solutionId

@@ -1,0 +1,25 @@
+name: detectContradiction
+description: Find contradictions within a conversation or across outputs
+inputs:
+  - name: llmCallId
+    type: string
+  - name: conversationHistory
+    type: json
+output:
+  type: DelusionResult
+steps:
+  - id: call
+    action: call
+    entity: LlmCall
+    entityId: $llmCallId
+  - id: analysis
+    action: call
+    expression: findContradictions($conversationHistory, $call)
+  - id: result
+    action: return
+    value:
+      delusionType: contradiction
+      confidence: $call.metadata.confidence
+      divergenceScore: $analysis.contradictionScore
+      detected: $analysis.hasContradiction
+      explanation: $analysis.explanation

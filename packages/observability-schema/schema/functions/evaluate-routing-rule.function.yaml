@@ -1,0 +1,23 @@
+name: evaluateRoutingRule
+description: Check if a model meets quality threshold for a routing rule
+inputs:
+  - name: db
+    type: Database
+  - name: ruleId
+    type: string
+  - name: model
+    type: string
+  - name: promptCategory
+    type: string
+output:
+  type: boolean
+steps:
+  - id: rule
+    call: findRoutingRuleById
+    with: { db: $db, id: $ruleId }
+  - id: perf
+    call: listModelPerformances
+    with: { db: $db, filter: { model: $model, promptCategory: $promptCategory } }
+  - id: result
+    action: return
+    value: "$perf.qualityScore >= $rule.minQualityScore"

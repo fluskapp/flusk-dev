@@ -1,0 +1,37 @@
+name: solutions
+basePath: /api/solutions
+entity: Solution
+auth: required
+operations:
+  - method: GET
+    path: /
+    call: listSolutions
+    description: List solutions by organization
+  - method: POST
+    path: /
+    call: createSolution
+    input: CreateSolution
+    description: Create a new solution
+  - method: GET
+    path: /:id
+    call: findSolutionById
+    description: Get solution by ID
+  - method: PUT
+    path: /:id
+    call: updateSolution
+    input: UpdateSolution
+    description: Update a solution
+  - method: DELETE
+    path: /:id
+    call: deleteSolution
+    description: Delete a solution
+  - method: POST
+    path: /:id/deploy
+    call: deploySolution
+    input: DeploySolution
+    description: Deploy a solution (validate, activate, version)
+  - method: POST
+    path: /clone-from-template
+    call: cloneSolutionFromTemplate
+    input: CloneFromTemplate
+    description: Clone a solution from a template

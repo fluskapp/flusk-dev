@@ -1,0 +1,31 @@
+name: partners
+basePath: /api/partners
+entity: Partner
+auth: required
+operations:
+  - method: GET
+    path: /
+    call: listPartner
+    description: List partners
+  - method: POST
+    path: /register
+    call: registerPartner
+    input: RegisterPartner
+    description: Register a new partner
+  - method: GET
+    path: /:id
+    call: findPartnerById
+    description: Get partner by ID
+  - method: PUT
+    path: /:id
+    call: updatePartner
+    input: UpdatePartner
+    description: Update partner
+  - method: POST
+    path: /:id/approve
+    call: approvePartner
+    description: Approve a pending partner
+  - method: DELETE
+    path: /:id
+    call: deletePartner
+    description: Suspend/delete partner

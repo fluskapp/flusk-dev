@@ -1,0 +1,32 @@
+name: Dashboard
+description: Configurable dashboard for visualizing observability data
+storage: sqlite
+fields:
+  name:
+    type: string
+    required: true
+    unique: true
+    description: Dashboard name
+  description:
+    type: string
+    description: What this dashboard shows
+  layout:
+    type: json
+    required: true
+    description: Grid layout config (widgets, positions, sizes)
+  filters:
+    type: json
+    description: Default filters (time range, model, agent)
+  refreshInterval:
+    type: integer
+    default: 30
+    description: Auto-refresh interval in seconds
+  isDefault:
+    type: boolean
+    default: false
+    description: Show on home page
+  owner:
+    type: string
+    description: Who created this dashboard
+capabilities:
+  crud: true

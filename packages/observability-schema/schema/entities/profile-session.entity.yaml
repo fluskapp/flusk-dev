@@ -1,0 +1,57 @@
+name: ProfileSession
+description: Profiling session data from @platformatic/flame
+storage: sqlite
+fields:
+  name:
+    type: string
+    description: Session name
+  profileType:
+    type: enum
+    values:
+      - cpu
+      - heap
+      - both
+    required: true
+    description: Type of profiling
+  status:
+    type: enum
+    values:
+      - running
+      - completed
+      - failed
+    required: true
+    default: running
+    description: Session status
+  pid:
+    type: integer
+    description: Process ID being profiled
+  durationMs:
+    type: integer
+    description: Profiling duration
+  flameGraphPath:
+    type: string
+    description: Path to generated flamegraph SVG
+  cpuProfilePath:
+    type: string
+    description: Path to raw CPU profile JSON
+  heapSnapshotPath:
+    type: string
+    description: Path to heap snapshot
+  hotspotCount:
+    type: integer
+    default: 0
+    description: Number of hotspots detected
+  peakHeapMb:
+    type: float
+    description: Peak heap usage in MB
+  summary:
+    type: json
+    description: Summary statistics
+capabilities:
+  crud: true
+  time-range: true
+relations:
+  - name: patterns
+    entity: PerformancePattern
+    type: hasMany
+    foreignKey: profileSessionId

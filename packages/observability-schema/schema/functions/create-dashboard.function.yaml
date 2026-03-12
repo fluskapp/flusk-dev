@@ -1,0 +1,30 @@
+name: createDashboard
+description: Create a new dashboard with default widgets
+inputs:
+  - name: name
+    type: string
+  - name: description
+    type: string
+  - name: layout
+    type: json
+  - name: filters
+    type: json
+  - name: owner
+    type: string
+output:
+  type: Dashboard
+steps:
+  - id: dashboard
+    action: call
+    entity: Dashboard
+    data:
+      name: $name
+      description: $description
+      layout: $layout
+      filters: $filters
+      owner: $owner
+      refreshInterval: 30
+      isDefault: false
+  - id: result
+    action: return
+    value: $dashboard

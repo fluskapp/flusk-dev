@@ -1,0 +1,15 @@
+name: pagerduty
+description: PagerDuty Events API v2
+type: webhook
+config:
+  fields:
+    - name: routingKey
+      type: string
+      required: true
+      description: PagerDuty integration/routing key
+methods:
+  - name: send
+    description: Create PagerDuty incident
+    input: AlertEvent
+  - name: test
+    description: Send test event

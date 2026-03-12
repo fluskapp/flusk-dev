@@ -1,0 +1,17 @@
+name: buildProviderRegistry
+description: Build a map of channel types to their send functions
+inputs: []
+output:
+  type: ProviderRegistry
+steps:
+  - id: registry
+    action: assign
+    value:
+      pagerduty: sendPagerDutyAlert
+      slack: sendSlackAlert
+      discord: sendDiscordAlert
+      webhook: sendWebhookAlert
+      email: sendEmailAlert
+  - id: result
+    action: return
+    value: $registry

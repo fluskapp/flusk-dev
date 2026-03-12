@@ -1,0 +1,31 @@
+name: getModelComparison
+description: Compare cost and performance metrics across models
+inputs:
+  - name: organizationId
+    type: uuid
+    required: true
+  - name: start
+    type: string
+  - name: end
+    type: string
+output:
+  type: json
+steps:
+  - id: comparison
+    action: call
+    sql: |
+      SELECT model, provider,
+        COUNT(*) as callCount,
+        SUM(costUsd) as totalCost,
+        AVG(costUsd) as avgCost,
+        AVG(durationMs) as avgLatency,
+        AVG(totalTokens) as avgTokens,
+        SUM(CASE WHEN error IS NOT NULL THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as errorRate
+      FROM llm_call
+      WHERE organizationId = $organizationId
+        AND createdAt >= $start AND createdAt <= $end
+      GROUP BY model, provider
+      ORDER BY totalCost DESC
+  - id: result
+    action: return
+    value: $comparison

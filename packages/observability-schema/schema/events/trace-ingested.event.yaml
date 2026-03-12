@@ -1,0 +1,22 @@
+name: TraceIngested
+description: Fired after a new trace is recorded via OTLP ingestion
+channel: webhook
+payload:
+  fields:
+    - name: traceId
+      type: string
+      required: true
+    - name: spanCount
+      type: number
+      required: true
+    - name: organizationId
+      type: string
+      required: true
+publish:
+  - trigger: afterCreate
+    entity: Trace
+subscribe:
+  handler: buildTraceView
+  retry:
+    maxAttempts: 3
+    backoff: exponential

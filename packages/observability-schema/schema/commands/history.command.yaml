@@ -1,0 +1,18 @@
+name: history
+description: Show LLM call history
+action:
+  call: history
+args:
+  - name: limit
+    type: number
+    default: 50
+    description: Number of calls to show
+  - name: model
+    type: string
+    description: Filter by model
+  - name: agent
+    type: string
+    description: Filter by agent
+  - name: since
+    type: string
+    description: Show calls since (ISO date or relative like 1h, 1d)

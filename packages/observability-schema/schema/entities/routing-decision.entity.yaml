@@ -1,0 +1,40 @@
+name: RoutingDecision
+description: Records a model routing decision and associated savings
+storage: sqlite
+fields:
+  routingRuleId:
+    type: string
+    required: true
+    description: Rule that was applied
+  promptCategory:
+    type: string
+    required: true
+    description: Prompt category
+  requestedModel:
+    type: string
+    required: true
+    description: Model originally requested
+  selectedModel:
+    type: string
+    required: true
+    description: Model actually used
+  wasRerouted:
+    type: boolean
+    required: true
+    description: Whether the model was changed
+  savingsUsd:
+    type: float
+    default: 0
+    description: Cost savings from rerouting
+  qualityDelta:
+    type: float
+    description: Quality difference (selected - requested)
+  latencyDelta:
+    type: integer
+    description: Latency difference in ms
+  llmCallId:
+    type: string
+    description: Associated LLM call ID
+capabilities:
+  crud: true
+  time-range: true

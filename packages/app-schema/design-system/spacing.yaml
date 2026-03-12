@@ -1,0 +1,136 @@
+# Flusk Design System - Spacing & Layout
+# Consistent spacing system for professional layouts
+
+name: FluskSpacing
+description: "8-point grid spacing system with semantic naming"
+
+# Base Grid Unit
+base_unit: 4  # 4px base unit (0.25rem)
+
+# Spacing Scale (based on 8pt grid)
+spacing:
+  0: "0"           # 0px
+  1: "0.25rem"     # 4px
+  2: "0.5rem"      # 8px
+  3: "0.75rem"     # 12px
+  4: "1rem"        # 16px
+  5: "1.25rem"     # 20px
+  6: "1.5rem"      # 24px
+  7: "1.75rem"     # 28px
+  8: "2rem"        # 32px
+  9: "2.25rem"     # 36px
+  10: "2.5rem"     # 40px
+  11: "2.75rem"    # 44px
+  12: "3rem"       # 48px
+  14: "3.5rem"     # 56px
+  16: "4rem"       # 64px
+  20: "5rem"       # 80px
+  24: "6rem"       # 96px
+  28: "7rem"       # 112px
+  32: "8rem"       # 128px
+  36: "9rem"       # 144px
+  40: "10rem"      # 160px
+  44: "11rem"      # 176px
+  48: "12rem"      # 192px
+  52: "13rem"      # 208px
+  56: "14rem"      # 224px
+  60: "15rem"      # 240px
+  64: "16rem"      # 256px
+  72: "18rem"      # 288px
+  80: "20rem"      # 320px
+  96: "24rem"      # 384px
+
+# Semantic Spacing (for specific use cases)
+semantic:
+  # Content Spacing
+  content:
+    xs: "spacing.2"      # 8px - tight content
+    sm: "spacing.4"      # 16px - normal content
+    md: "spacing.6"      # 24px - comfortable content
+    lg: "spacing.8"      # 32px - spacious content
+    xl: "spacing.12"     # 48px - very spacious
+    
+  # Component Spacing  
+  component:
+    xs: "spacing.1"      # 4px - tight components
+    sm: "spacing.2"      # 8px - compact components
+    md: "spacing.4"      # 16px - normal components
+    lg: "spacing.6"      # 24px - comfortable components
+    xl: "spacing.8"      # 32px - spacious components
+    
+  # Layout Spacing
+  layout:
+    xs: "spacing.4"      # 16px - tight layouts
+    sm: "spacing.6"      # 24px - compact layouts
+    md: "spacing.8"      # 32px - normal layouts
+    lg: "spacing.12"     # 48px - comfortable layouts
+    xl: "spacing.16"     # 64px - spacious layouts
+    xxl: "spacing.24"    # 96px - very spacious layouts
+
+# Container Sizes
+containers:
+  sm: "640px"      # Small container
+  md: "768px"      # Medium container
+  lg: "1024px"     # Large container
+  xl: "1280px"     # Extra large container
+  xxl: "1536px"    # 2XL container
+  full: "100%"     # Full width
+
+# Responsive Breakpoints
+breakpoints:
+  xs: "0px"        # Extra small devices
+  sm: "640px"      # Small devices (phones)
+  md: "768px"      # Medium devices (tablets)
+  lg: "1024px"     # Large devices (small desktops)
+  xl: "1280px"     # Extra large devices (desktops)
+  xxl: "1536px"    # 2XL devices (large desktops)
+
+# Component-Specific Spacing
+components:
+  # Cards
+  card:
+    padding: "semantic.component.lg"     # 24px
+    gap: "semantic.component.md"         # 16px
+    
+  # Buttons
+  button:
+    padding_x:
+      sm: "semantic.component.md"        # 16px
+      md: "semantic.component.lg"        # 24px
+      lg: "semantic.component.xl"        # 32px
+    padding_y:
+      sm: "semantic.component.sm"        # 8px
+      md: "semantic.component.md"        # 16px  
+      lg: "semantic.component.lg"        # 24px
+      
+  # Forms
+  form:
+    field_spacing: "semantic.content.md"    # 24px
+    label_spacing: "semantic.component.sm"  # 8px
+    
+  # Navigation
+  nav:
+    item_spacing: "semantic.component.md"   # 16px
+    section_spacing: "semantic.layout.md"  # 32px
+    
+  # Dashboard
+  dashboard:
+    widget_gap: "semantic.layout.sm"        # 24px
+    section_gap: "semantic.layout.lg"       # 48px
+    page_padding: "semantic.layout.md"      # 32px
+
+# Z-Index Scale
+z_index:
+  hide: -1
+  auto: "auto"
+  base: 0
+  docked: 10
+  dropdown: 1000
+  sticky: 1020
+  banner: 1030
+  overlay: 1040
+  modal: 1050
+  popover: 1060
+  tooltip: 1070
+  notification: 1080
+  maximum: 9999

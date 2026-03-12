@@ -1,0 +1,31 @@
+name: organizations
+basePath: /api/organizations
+entity: Organization
+auth: required
+operations:
+  - method: GET
+    path: /me
+    call: findOrganizationById
+    description: Get current organization from auth context
+  - method: GET
+    path: /
+    call: listOrganizations
+    description: List organizations (admin only)
+  - method: POST
+    path: /
+    call: createOrganization
+    input: CreateOrganization
+    description: Create a new organization
+  - method: GET
+    path: /:id
+    call: findOrganizationById
+    description: Get organization by ID
+  - method: PUT
+    path: /:id
+    call: updateOrganization
+    input: UpdateOrganization
+    description: Update organization settings
+  - method: DELETE
+    path: /:id
+    call: deleteOrganization
+    description: Delete organization

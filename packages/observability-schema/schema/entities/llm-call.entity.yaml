@@ -1,0 +1,98 @@
+name: LlmCall
+description: Individual LLM API call with cost and token tracking
+storage: sqlite
+fields:
+  traceId:
+    type: string
+    description: Associated trace ID for distributed tracing
+  spanId:
+    type: string
+    description: Associated span ID
+  model:
+    type: string
+    required: true
+    description: Model name (e.g. gpt-4, claude-3-opus)
+  provider:
+    type: enum
+    values:
+      - openai
+      - anthropic
+      - google
+      - mistral
+      - cohere
+      - local
+      - other
+    required: true
+    description: LLM provider
+  promptHash:
+    type: string
+    description: SHA-256 hash of the prompt for dedup detection
+  promptTokens:
+    type: integer
+    required: true
+    description: Number of input tokens
+  completionTokens:
+    type: integer
+    required: true
+    description: Number of output tokens
+  totalTokens:
+    type: integer
+    required: true
+    description: Total tokens used
+  costUsd:
+    type: float
+    required: true
+    description: Cost in USD
+  durationMs:
+    type: integer
+    description: Response time in milliseconds
+  agentName:
+    type: string
+    description: Name of the agent or service that made the call
+  promptCategory:
+    type: string
+    description: Category for grouping (e.g. summarization, extraction)
+  cached:
+    type: boolean
+    default: false
+    description: Whether this was a cache hit
+  error:
+    type: string
+    description: Error message if the call failed
+  metadata:
+    type: json
+    description: Additional context (headers, params, etc.)
+capabilities:
+  crud: true
+  time-range: true
+queries:
+  - name: costByModel
+    sql: |-
+      SELECT model, provider, COUNT(*) as call_count,
+             SUM(costUsd) as total_cost, SUM(totalTokens) as total_tokens
+      FROM llm_call
+      WHERE createdAt >= $start AND createdAt <= $end
+      GROUP BY model, provider
+      ORDER BY total_cost DESC
+  - name: costByAgent
+    sql: |-
+      SELECT agentName, COUNT(*) as call_count,
+             SUM(costUsd) as total_cost, AVG(durationMs) as avg_duration
+      FROM llm_call
+      WHERE createdAt >= $start AND createdAt <= $end
+      GROUP BY agentName
+      ORDER BY total_cost DESC
+  - name: duplicates
+    sql: |-
+      SELECT promptHash, model, COUNT(*) as count, SUM(costUsd) as wasted_cost
+      FROM llm_call
+      WHERE promptHash IS NOT NULL
+        AND createdAt >= $start AND createdAt <= $end
+      GROUP BY promptHash, model
+      HAVING count > 1
+      ORDER BY wasted_cost DESC
+  - name: dailySpend
+    sql: |-
+      SELECT SUM(costUsd) as total_cost, COUNT(*) as call_count
+      FROM llm_call
+      WHERE date(createdAt) = date($day)

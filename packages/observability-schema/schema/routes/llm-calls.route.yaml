@@ -1,0 +1,34 @@
+name: llmCalls
+basePath: /api/llm-calls
+entity: LlmCall
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listLlmCalls
+    description: List LLM calls with filtering
+  - method: POST
+    path: /
+    call: createLlmCall
+    input: CreateLlmCall
+    description: Record a new LLM call
+  - method: GET
+    path: /:id
+    call: findLlmCallById
+    description: Get call by ID
+  - method: GET
+    path: /aggregate/by-model
+    call: queryLlmCall
+    with:
+      query: costByModel
+    description: Aggregate costs by model
+  - method: GET
+    path: /aggregate/by-agent
+    call: queryLlmCall
+    with:
+      query: costByAgent
+    description: Aggregate costs by agent
+  - method: GET
+    path: /duplicates
+    call: detectDuplicates
+    description: Find duplicate prompts

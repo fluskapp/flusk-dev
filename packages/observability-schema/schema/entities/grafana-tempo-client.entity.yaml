@@ -1,0 +1,7 @@
+name: GrafanaTempoClient
+description: GrafanaTempoClient
+storage: sqlite
+fields:
+  - name: data
+    type: json
+    description: GrafanaTempoClient data

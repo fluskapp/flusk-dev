@@ -1,0 +1,18 @@
+name: ChatUI
+type: chat
+description: AI chat interface with streaming and markdown support
+route: /$tenant/$slug
+layout: full
+auth: true
+ssr: false
+sections:
+  - name: Messages
+    type: chat-messages
+    source: messages
+    features:
+      streaming: true
+      markdown: true
+      codeBlocks: true
+      fileUpload: false
+  - name: Input
+    type: chat-input

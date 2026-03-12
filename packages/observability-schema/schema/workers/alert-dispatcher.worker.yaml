@@ -1,0 +1,14 @@
+name: AlertDispatcher
+description: Process alert jobs from the alerts queue and dispatch to configured channels
+type: bullmq
+queue: alerts
+steps:
+  - id: dispatch
+    call: dispatchAlert
+    with:
+      db: $db
+      alert: $job.data
+    action: call
+retry:
+  maxAttempts: 3
+  backoff: exponential

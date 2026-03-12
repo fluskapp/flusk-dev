@@ -1,0 +1,158 @@
+# Flusk Design System - Typography
+# Professional, readable, modern type system
+
+name: FluskTypography
+description: "Clean, professional typography for AI platform interfaces"
+
+fonts:
+  # Primary Font - Clean & Professional
+  primary:
+    family: "Inter"
+    fallback: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "sans-serif"]
+    weight_range: "300-800"
+    variable: true
+    
+  # Monospace - For Code & Data
+  mono:
+    family: "JetBrains Mono"
+    fallback: ["SF Mono", "Monaco", "Inconsolata", "Roboto Mono", "monospace"]
+    weight_range: "300-700"
+    variable: true
+
+# Font Weights
+weights:
+  light: 300
+  regular: 400
+  medium: 500
+  semibold: 600
+  bold: 700
+  extrabold: 800
+
+# Type Scale - Fluid & Responsive
+scale:
+  # Display Sizes - For Hero & Large Headers
+  display:
+    large:
+      size: "clamp(2.5rem, 5vw, 4rem)"     # 40px - 64px
+      line_height: 1.1
+      weight: "bold"
+      letter_spacing: "-0.025em"
+      
+    medium:
+      size: "clamp(2rem, 4vw, 3rem)"       # 32px - 48px
+      line_height: 1.15
+      weight: "bold"
+      letter_spacing: "-0.02em"
+      
+    small:
+      size: "clamp(1.75rem, 3vw, 2.25rem)" # 28px - 36px
+      line_height: 1.2
+      weight: "semibold"
+      letter_spacing: "-0.015em"
+
+  # Headlines - For Section Headers
+  headline:
+    large:
+      size: "clamp(1.5rem, 2.5vw, 2rem)"   # 24px - 32px
+      line_height: 1.25
+      weight: "semibold"
+      letter_spacing: "-0.01em"
+      
+    medium:
+      size: "clamp(1.25rem, 2vw, 1.5rem)"  # 20px - 24px
+      line_height: 1.3
+      weight: "semibold"
+      letter_spacing: "-0.005em"
+      
+    small:
+      size: "1.125rem"                      # 18px
+      line_height: 1.35
+      weight: "medium"
+      letter_spacing: "0"
+
+  # Body Text - For Content
+  body:
+    large:
+      size: "1rem"                          # 16px
+      line_height: 1.6
+      weight: "regular"
+      letter_spacing: "0"
+      
+    medium:
+      size: "0.875rem"                      # 14px
+      line_height: 1.5
+      weight: "regular"
+      letter_spacing: "0"
+      
+    small:
+      size: "0.75rem"                       # 12px
+      line_height: 1.5
+      weight: "regular"
+      letter_spacing: "0.01em"
+
+  # Labels & UI Text
+  label:
+    large:
+      size: "0.875rem"                      # 14px
+      line_height: 1.4
+      weight: "medium"
+      letter_spacing: "0.005em"
+      
+    medium:
+      size: "0.75rem"                       # 12px
+      line_height: 1.4
+      weight: "medium"
+      letter_spacing: "0.01em"
+      
+    small:
+      size: "0.6875rem"                     # 11px
+      line_height: 1.4
+      weight: "medium"
+      letter_spacing: "0.015em"
+
+  # Code & Data
+  code:
+    large:
+      size: "0.875rem"                      # 14px
+      line_height: 1.6
+      weight: "regular"
+      font: "mono"
+      
+    medium:
+      size: "0.75rem"                       # 12px
+      line_height: 1.5
+      weight: "regular"
+      font: "mono"
+      
+    small:
+      size: "0.6875rem"                     # 11px
+      line_height: 1.5
+      weight: "regular"
+      font: "mono"
+
+# Text Colors by Context
+text_colors:
+  primary: "text.primary"          # Main content
+  secondary: "text.secondary"      # Supporting text
+  tertiary: "text.tertiary"       # Less important text
+  inverse: "text.inverse"          # On dark backgrounds
+  accent: "text.accent"            # Brand/link text
+  muted: "text.muted"              # Disabled/placeholder
+  success: "success.600"           # Success messages
+  warning: "warning.600"           # Warning messages
+  error: "error.600"               # Error messages
+
+# Usage Examples
+usage:
+  page_title: "display.large"
+  section_header: "headline.large"
+  card_title: "headline.medium"
+  subsection: "headline.small"
+  paragraph: "body.large"
+  ui_text: "body.medium"
+  caption: "body.small"
+  button: "label.medium"
+  badge: "label.small"
+  code_snippet: "code.medium"
+  table_header: "label.medium"
+  table_data: "body.medium"

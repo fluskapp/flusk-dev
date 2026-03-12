@@ -1,0 +1,28 @@
+name: detectDuplicates
+description: Find duplicate prompts by hash within a time window
+inputs:
+  - name: db
+    type: Database
+  - name: start
+    type: string
+  - name: end
+    type: string
+  - name: minOccurrences
+    type: integer
+    default: 2
+output:
+  type: DuplicateResult[]
+steps:
+  - id: duplicates
+    call: queryLlmCall
+    with:
+      db: $db
+      query: duplicates
+      params: { start: $start, end: $end }
+  - id: filtered
+    action: filter
+    source: $duplicates
+    condition: "$item.count >= $minOccurrences"
+  - id: result
+    action: return
+    value: $filtered

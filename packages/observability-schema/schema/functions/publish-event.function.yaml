@@ -1,0 +1,16 @@
+name: publishEvent
+description: Publish an event to the event bus
+inputs:
+  - name: event
+    type: string
+  - name: payload
+    type: json
+output:
+  type: boolean
+steps:
+  - id: emit
+    action: assign
+    value: true
+  - id: result
+    action: return
+    value: $emit

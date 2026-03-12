@@ -1,0 +1,35 @@
+name: revokeApiKey
+description: Revoke an API key by setting its status to revoked
+inputs:
+  - name: id
+    type: uuid
+    required: true
+  - name: organizationId
+    type: uuid
+    required: true
+  - name: userId
+    type: uuid
+output:
+  type: ApiKey
+steps:
+  - id: revoked
+    action: call
+    entity: ApiKey
+    method: update
+    where:
+      id: $id
+      organizationId: $organizationId
+    with:
+      status: revoked
+  - id: audit
+    action: call
+    call: createAuditLog
+    with:
+      organizationId: $organizationId
+      userId: $userId
+      action: api_key.revoke
+      resource: ApiKey
+      resourceId: $id
+  - id: result
+    action: return
+    value: $revoked

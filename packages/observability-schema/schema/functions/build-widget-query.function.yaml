@@ -1,0 +1,25 @@
+name: buildWidgetQuery
+description: Translate widget query config into SQL/aggregation and execute
+inputs:
+  - name: query
+    type: json
+  - name: timeRange
+    type: json
+output:
+  type: json
+steps:
+  - id: sql
+    action: call
+    expression: |
+      SELECT $query.aggregation($query.field) as value
+      FROM $query.entity
+      WHERE createdAt >= $timeRange.start AND createdAt <= $timeRange.end
+      GROUP BY $query.groupBy
+  - id: data
+    action: call
+    sql: $sql
+  - id: result
+    action: return
+    value:
+      query: $query
+      data: $data

@@ -1,0 +1,13 @@
+name: explain
+basePath: /api/explain
+auth: required
+operations:
+  - method: POST
+    path: /
+    call: explainWithAi
+    input: ExplainRequest
+    description: Trigger AI analysis of LLM usage
+  - method: GET
+    path: /:sessionId
+    call: generateExplainReport
+    description: Get explain analysis results

@@ -1,0 +1,17 @@
+name: profileReport
+description: Show profiling results including hotspots and flamegraph
+action:
+  call: profileReport
+args:
+  - name: session-id
+    type: string
+    required: true
+    description: Profile session ID
+  - name: format
+    type: enum
+    values:
+      - summary
+      - detailed
+      - flamegraph
+    default: summary
+    description: Report format

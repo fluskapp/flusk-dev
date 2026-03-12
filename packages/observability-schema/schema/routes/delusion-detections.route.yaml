@@ -1,0 +1,27 @@
+name: delusionDetections
+basePath: /api/delusion-detections
+entity: DelusionDetection
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listDelusionDetections
+    description: List delusion detections
+  - method: GET
+    path: /:id
+    call: findDelusionDetectionById
+    description: Get delusion detection by ID
+  - method: PUT
+    path: /:id
+    call: updateDelusionDetection
+    input: UpdateDelusionDetection
+    description: Update delusion detection status
+  - method: DELETE
+    path: /:id
+    call: deleteDelusionDetection
+    description: Delete delusion detection
+  - method: POST
+    path: /scan
+    call: runDelusionScan
+    input: DelusionScanRequest
+    description: Run delusion detection scan

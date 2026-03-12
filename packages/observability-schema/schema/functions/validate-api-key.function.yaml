@@ -1,0 +1,53 @@
+name: validateApiKey
+description: Hash the raw key, look up by hash, check expiry/status/scopes
+inputs:
+  - name: rawKey
+    type: string
+    required: true
+  - name: requiredScope
+    type: string
+output:
+  type: json
+steps:
+  - id: hashed
+    action: call
+    call: sha256
+    with:
+      input: $rawKey
+  - id: record
+    action: call
+    entity: ApiKey
+    method: findOne
+    where:
+      key: $hashed
+      status: active
+  - id: checkExists
+    action: condition
+    if:
+      field: $record
+      op: eq
+      value: null
+    then:
+      - action: return
+        value:
+          valid: false
+          error: Invalid API key
+  - id: checkExpiry
+    action: condition
+    if:
+      field: $record.expiresAt
+      op: lt
+      value: $now
+    then:
+      - action: return
+        value:
+          valid: false
+          error: API key expired
+  - id: result
+    action: return
+    value:
+      valid: true
+      organizationId: $record.organizationId
+      userId: $record.userId
+      scopes: $record.scopes
+      apiKeyId: $record.id

@@ -1,0 +1,13 @@
+name: profileCompare
+description: Compare two profile sessions side by side
+action:
+  call: profileCompare
+args:
+  - name: session-a
+    type: string
+    required: true
+    description: First session ID
+  - name: session-b
+    type: string
+    required: true
+    description: Second session ID

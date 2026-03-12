@@ -1,0 +1,40 @@
+name: detectHotspots
+description: Find performance hotspots in profile data
+inputs:
+  - name: db
+    type: Database
+  - name: profileSessionId
+    type: string
+  - name: threshold
+    type: float
+    default: 0.05
+output:
+  type: PerformancePattern[]
+steps:
+  - id: session
+    call: findProfileSessionById
+    with:
+      db: $db
+      id: $profileSessionId
+  - id: patterns
+    action: call
+    source: $session.cpuProfilePath
+    method: hotspot-detection
+    threshold: $threshold
+  - id: saved
+    action: forEach
+    source: $patterns
+    call: createPerformancePattern
+    with:
+      db: $db
+      data:
+        patternType: $item.type
+        functionName: $item.functionName
+        filePath: $item.filePath
+        selfTime: $item.selfTime
+        totalTime: $item.totalTime
+        severity: '$item.selfTime > 100 ? ''critical'' : ''warning'''
+        profileSessionId: $profileSessionId
+  - id: result
+    action: return
+    value: $saved

@@ -1,0 +1,13 @@
+name: kill
+description: Emergency stop — kill an agent or trigger circuit breaker
+args:
+  - name: check
+    type: boolean
+    default: false
+    description: Check circuit breaker status only
+  - name: force
+    type: boolean
+    default: false
+    description: Force kill without confirmation
+action:
+  call: kill

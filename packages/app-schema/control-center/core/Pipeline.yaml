@@ -1,0 +1,334 @@
+# Core entity: Pipeline
+# Represents the execution workflow created from a user prompt
+
+name: Pipeline
+description: "Execution workflow with tasks and dependencies"
+type: entity
+
+fields:
+  # Identity
+  id:
+    type: uuid
+    primary: true
+    auto: true
+    
+  prompt_id:
+    type: uuid
+    required: true
+    index: true
+    description: "The prompt that created this pipeline"
+    
+  organization_id:
+    type: uuid
+    required: true
+    index: true
+    
+  # Pipeline Definition
+  name:
+    type: string
+    required: true
+    description: "Human-readable pipeline name"
+    
+  description:
+    type: text
+    required: true
+    description: "What this pipeline accomplishes"
+    
+  pipeline_type:
+    type: enum
+    values: ["sequential", "parallel", "hybrid", "conditional"]
+    required: true
+    description: "Execution pattern"
+    
+  # Execution Plan
+  execution_plan:
+    type: json
+    required: true
+    description: "Complete execution plan with dependencies"
+    schema:
+      type: object
+      properties:
+        phases:
+          type: array
+          items:
+            type: object
+            properties:
+              name: { type: string }
+              description: { type: string }
+              tasks: { type: array, items: { type: string } }
+              dependencies: { type: array, items: { type: string } }
+              parallel: { type: boolean, default: false }
+        dependencies:
+          type: array
+          items:
+            type: object
+            properties:
+              task_id: { type: string }
+              depends_on: { type: array, items: { type: string } }
+              
+  # Progress Tracking
+  status:
+    type: enum
+    values: ["created", "running", "paused", "completed", "failed", "cancelled"]
+    default: "created"
+    index: true
+    
+  progress_percentage:
+    type: integer
+    range: [0, 100]
+    default: 0
+    description: "Overall completion percentage"
+    
+  current_phase:
+    type: string
+    nullable: true
+    description: "Currently executing phase name"
+    
+  # Performance Metrics
+  estimated_duration_minutes:
+    type: integer
+    required: true
+    description: "Estimated total duration in minutes"
+    
+  actual_duration_minutes:
+    type: integer
+    nullable: true
+    description: "Actual duration when completed"
+    
+  tasks_total:
+    type: integer
+    required: true
+    description: "Total number of tasks in pipeline"
+    
+  tasks_completed:
+    type: integer
+    default: 0
+    description: "Number of completed tasks"
+    
+  tasks_failed:
+    type: integer
+    default: 0
+    description: "Number of failed tasks"
+    
+  tasks_blocked:
+    type: integer
+    default: 0
+    description: "Number of blocked tasks requiring intervention"
+    
+  # Resource Allocation
+  agents_assigned:
+    type: json
+    description: "Agents allocated to this pipeline"
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          agent_type: { type: string }
+          agent_id: { type: string }
+          tasks_assigned: { type: array, items: { type: string } }
+          
+  resource_requirements:
+    type: json
+    description: "Resources needed for execution"
+    schema:
+      type: object
+      properties:
+        compute_intensity: { type: string, enum: ["low", "medium", "high"] }
+        memory_requirements: { type: string, enum: ["low", "medium", "high"] }
+        external_apis: { type: array, items: { type: string } }
+        human_intervention_points: { type: array, items: { type: string } }
+        
+  # Quality Gates
+  quality_gates:
+    type: json
+    description: "Quality checkpoints throughout pipeline"
+    schema:
+      type: array
+      items:
+        type: object
+        properties:
+          gate_name: { type: string }
+          phase: { type: string }
+          criteria: { type: array, items: { type: string } }
+          status: { type: string, enum: ["pending", "passed", "failed"] }
+          
+  # Results
+  final_deliverables:
+    type: json
+    nullable: true
+    description: "Final outputs when pipeline completes"
+    schema:
+      type: object
+      properties:
+        artifacts: { type: array, items: { type: string } }
+        deployed_urls: { type: array, items: { type: string } }
+        generated_code: { type: array, items: { type: object } }
+        documentation: { type: array, items: { type: string } }
+        
+  error_details:
+    type: json
+    nullable: true
+    description: "Error information when pipeline fails"
+    schema:
+      type: object
+      properties:
+        error_type: { type: string }
+        error_message: { type: string }
+        failed_task_id: { type: string }
+        recovery_suggestions: { type: array, items: { type: string } }
+        
+  # Timestamps
+  created_at:
+    type: timestamp
+    auto: true
+    index: true
+    
+  started_at:
+    type: timestamp
+    nullable: true
+    
+  completed_at:
+    type: timestamp
+    nullable: true
+    
+  updated_at:
+    type: timestamp
+    auto: true
+    on_update: true
+
+# Relationships
+relationships:
+  - name: prompt
+    type: belongsTo
+    target: Prompt
+    foreign_key: prompt_id
+    
+  - name: tasks
+    type: hasMany
+    target: Task
+    description: "All tasks in this pipeline"
+    
+  - name: timeline_events
+    type: hasMany
+    target: TimelineEvent
+    description: "Chronological events in this pipeline"
+    
+  - name: organization
+    type: belongsTo
+    target: Organization
+    foreign_key: organization_id
+
+# Indexes
+indexes:
+  - fields: [organization_id, status, created_at]
+    name: "org_status_timeline"
+    
+  - fields: [status, current_phase]
+    name: "execution_state"
+    
+  - fields: [prompt_id]
+    name: "prompt_pipeline"
+    unique: true
+
+# API endpoints
+endpoints:
+  - method: POST
+    path: "/pipelines"
+    description: "Create pipeline from prompt analysis"
+    auth: required
+    body:
+      fields: [prompt_id, execution_plan, estimated_duration_minutes]
+      
+  - method: GET
+    path: "/pipelines"
+    description: "List pipelines with real-time status"
+    auth: required
+    query:
+      organization_id: uuid
+      status: string
+      current_phase: string
+      limit: integer
+      offset: integer
+    include: [prompt, tasks]
+    
+  - method: GET
+    path: "/pipelines/{id}"
+    description: "Get pipeline with full task details"
+    auth: required
+    include: [prompt, tasks, tasks.agent, timeline_events]
+    
+  - method: POST
+    path: "/pipelines/{id}/start"
+    description: "Start pipeline execution"
+    auth: required
+    
+  - method: POST
+    path: "/pipelines/{id}/pause"
+    description: "Pause pipeline execution"
+    auth: required
+    
+  - method: POST
+    path: "/pipelines/{id}/cancel"
+    description: "Cancel pipeline execution"
+    auth: required
+    
+  - method: GET
+    path: "/pipelines/{id}/timeline"
+    description: "Get real-time timeline view"
+    auth: required
+    websocket: true
+
+# Validation rules
+validation:
+  - field: name
+    min_length: 5
+    max_length: 100
+    
+  - field: estimated_duration_minutes
+    min: 1
+    max: 43200  # 30 days max
+    
+  - field: progress_percentage
+    min: 0
+    max: 100
+
+# Real-time events
+events:
+  - trigger: after_create
+    event: "pipeline.created"
+    payload: [id, prompt_id, pipeline_type, estimated_duration_minutes]
+    
+  - trigger: after_update
+    event: "pipeline.status_changed"
+    payload: [id, status, current_phase, progress_percentage]
+    condition: "status_changed OR current_phase_changed OR progress_percentage_changed"
+    
+  - trigger: after_update
+    event: "pipeline.completed"
+    payload: [id, status, actual_duration_minutes, final_deliverables]
+    condition: "status = 'completed'"
+    
+  - trigger: after_update
+    event: "pipeline.failed" 
+    payload: [id, error_details, failed_task_count]
+    condition: "status = 'failed'"
+    
+  - trigger: after_update
+    event: "pipeline.progress"
+    payload: [id, tasks_completed, tasks_total, progress_percentage]
+    condition: "tasks_completed_changed"
+
+# Background jobs
+jobs:
+  - name: "update_pipeline_progress"
+    schedule: "*/30 * * * * *"  # Every 30 seconds
+    description: "Calculate pipeline progress from task states"
+    
+  - name: "check_stuck_pipelines" 
+    schedule: "0 */15 * * * *"   # Every 15 minutes
+    description: "Identify pipelines that may be stuck"
+    
+  - name: "cleanup_old_pipelines"
+    schedule: "0 0 2 * * *"      # Daily at 2 AM
+    description: "Archive completed pipelines older than 30 days"

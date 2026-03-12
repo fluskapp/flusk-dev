@@ -1,0 +1,46 @@
+name: ApiKey
+description: Hashed API key for programmatic access
+storage: sqlite
+fields:
+  key:
+    type: string
+    required: true
+    description: SHA-256 hashed key (never store plaintext)
+  prefix:
+    type: string
+    required: true
+    description: First 8 chars of key for display
+  name:
+    type: string
+    required: true
+    description: Human-readable key name
+  organizationId:
+    type: uuid
+    required: true
+    relation: Organization
+    description: Owning organization
+  userId:
+    type: uuid
+    required: true
+    relation: User
+    description: User who created the key
+  scopes:
+    type: json
+    description: 'Allowed scopes, e.g. ["ingest","read","admin"]'
+    default: '["ingest","read"]'
+  expiresAt:
+    type: date
+    description: Key expiration timestamp
+  lastUsedAt:
+    type: date
+    description: Last time the key was used
+  status:
+    type: enum
+    values:
+      - active
+      - revoked
+    required: true
+    default: active
+    description: Key status
+capabilities:
+  crud: true

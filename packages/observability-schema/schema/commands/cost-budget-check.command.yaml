@@ -1,0 +1,4 @@
+name: costBudgetCheck
+description: Check budget status for all configured budgets
+action:
+  call: costBudgetCheck

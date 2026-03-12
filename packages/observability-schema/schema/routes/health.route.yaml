@@ -1,0 +1,8 @@
+name: health
+basePath: /api/health
+auth: none
+operations:
+  - method: GET
+    path: /
+    description: Health check endpoint
+    call: handler

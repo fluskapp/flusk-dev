@@ -1,0 +1,39 @@
+name: tagLlmCall
+description: Attribute an LLM call to one or more cost tags (feature, team, customer)
+inputs:
+  - name: llmCallId
+    type: string
+  - name: tags
+    type: json
+  - name: costUsd
+    type: number
+  - name: inputTokens
+    type: number
+  - name: outputTokens
+    type: number
+  - name: model
+    type: string
+  - name: provider
+    type: string
+  - name: db
+    type: Database
+output:
+  type: CostAttribution[]
+steps:
+  - id: attributions
+    action: forEach
+    source: $tags
+    call: createCostAttribution
+    with:
+      llmCallId: $llmCallId
+      tagKey: key
+      tagValue: value
+      costUsd: $costUsd
+      inputTokens: $inputTokens
+      outputTokens: $outputTokens
+      model: $model
+      provider: $provider
+    onError: log-and-continue
+  - id: result
+    action: return
+    value: $attributions

@@ -1,0 +1,23 @@
+name: SolutionDeployed
+description: Emitted when a solution is deployed
+channel: redis
+topic: solution-deployed
+payload:
+  fields:
+    - name: solutionId
+      type: string
+      required: true
+    - name: version
+      type: string
+      required: true
+    - name: deployedBy
+      type: string
+    - name: organizationId
+      type: string
+publish:
+  - trigger: manual
+subscribe:
+  handler: createAuditLog
+  retry:
+    maxAttempts: 3
+    backoff: exponential

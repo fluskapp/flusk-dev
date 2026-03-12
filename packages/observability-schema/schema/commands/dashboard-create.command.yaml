@@ -1,0 +1,16 @@
+name: dashboardCreate
+description: Create a new dashboard
+action:
+  call: dashboardCreate
+args:
+  - name: name
+    type: string
+    required: true
+    description: Dashboard name
+  - name: description
+    type: string
+    description: Dashboard description
+  - name: default
+    type: boolean
+    default: false
+    description: Set as default dashboard

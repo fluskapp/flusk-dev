@@ -1,0 +1,61 @@
+name: Insight
+description: AI-generated optimization insight
+storage: sqlite
+fields:
+  insightType:
+    type: enum
+    values:
+      - cost_reduction
+      - performance
+      - caching
+      - model_switch
+      - pattern_elimination
+      - quality_improvement
+    required: true
+    description: Type of insight
+  title:
+    type: string
+    required: true
+    description: Short insight title
+  description:
+    type: string
+    required: true
+    description: Detailed explanation
+  estimatedSavingsUsd:
+    type: float
+    description: Projected monthly savings
+  estimatedSavingsPercent:
+    type: float
+    description: Projected savings as percentage
+  priority:
+    type: enum
+    values:
+      - high
+      - medium
+      - low
+    required: true
+    description: Priority level
+  status:
+    type: enum
+    values:
+      - new
+      - viewed
+      - accepted
+      - dismissed
+    default: new
+    description: Insight status
+  affectedModel:
+    type: string
+    description: Model this insight relates to
+  affectedAgent:
+    type: string
+    description: Agent this insight relates to
+  analyzeSessionId:
+    type: string
+    description: Analysis session that generated this insight
+  evidence:
+    type: json
+    description: Supporting data
+capabilities:
+  crud: true
+  time-range: true

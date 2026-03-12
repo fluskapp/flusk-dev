@@ -1,0 +1,17 @@
+name: queryModelPerformance
+description: Query model performance metrics with filters
+inputs:
+  - name: filters
+    type: json
+  - name: db
+    type: Database
+output:
+  type: ModelPerformance[]
+steps:
+  - id: results
+    action: call
+    entity: ModelPerformance
+    filters: $filters
+  - id: result
+    action: return
+    value: $results

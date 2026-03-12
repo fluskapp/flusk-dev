@@ -1,0 +1,16 @@
+name: findCostAttributionByTagKey
+description: Find CostAttribution
+inputs:
+  - name: id
+    type: string
+  - name: db
+    type: Database
+output:
+  type: CostAttribution
+steps:
+  - id: result
+    action: assign
+    value: $id
+  - id: done
+    action: return
+    value: $result

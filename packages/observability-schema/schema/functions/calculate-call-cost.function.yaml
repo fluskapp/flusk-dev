@@ -1,0 +1,31 @@
+name: calculateCallCost
+description: Calculate cost from token counts and model pricing
+inputs:
+  - name: model
+    type: string
+  - name: provider
+    type: string
+  - name: promptTokens
+    type: integer
+  - name: completionTokens
+    type: integer
+output:
+  type: CostResult
+steps:
+  - id: pricing
+    action: call
+    table: modelPricing
+    key: $model
+  - id: inputCost
+    action: call
+    expression: $promptTokens * $pricing.inputPricePerToken
+  - id: outputCost
+    action: call
+    expression: $completionTokens * $pricing.outputPricePerToken
+  - id: result
+    action: return
+    value:
+      costUsd: $inputCost + $outputCost
+      model: $model
+      promptTokens: $promptTokens
+      completionTokens: $completionTokens

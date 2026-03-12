@@ -1,0 +1,15 @@
+name: ApiKeyUsed
+description: Fired from auth middleware when an API key is used, updates lastUsedAt
+channel: webhook
+payload:
+  fields:
+    - name: apiKeyId
+      type: string
+      required: true
+publish:
+  - trigger: manual
+subscribe:
+  handler: updateApiKeyLastUsed
+  retry:
+    maxAttempts: 2
+    backoff: linear

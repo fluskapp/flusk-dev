@@ -1,0 +1,19 @@
+name: CostTag
+description: Tag for attributing LLM costs to features, teams, customers, or any dimension
+storage: sqlite
+fields:
+  key:
+    type: string
+    required: true
+    index: true
+    description: Tag dimension (feature, team, customer, environment, project)
+  value:
+    type: string
+    required: true
+    index: true
+    description: Tag value (support-bot, engineering, acme-corp)
+  description:
+    type: string
+    description: Human-readable description of this tag
+capabilities:
+  crud: true

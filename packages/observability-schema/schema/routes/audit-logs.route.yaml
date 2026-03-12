@@ -1,0 +1,9 @@
+name: auditLogs
+basePath: /api/audit-logs
+entity: AuditLog
+auth: required
+operations:
+  - method: GET
+    path: /
+    call: listAuditLogs
+    description: List audit logs with filters (time range, action, user)

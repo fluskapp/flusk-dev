@@ -1,0 +1,10 @@
+name: grafanaTempo
+description: Grafana Tempo API for trace export
+baseUrl: '{{env.GRAFANA_TEMPO_URL}}'
+auth:
+  type: bearer
+  envVar: GRAFANA_API_KEY
+endpoints:
+  - name: invoke
+    method: POST
+    path: /

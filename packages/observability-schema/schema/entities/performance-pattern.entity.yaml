@@ -1,0 +1,54 @@
+name: PerformancePattern
+description: Detected performance pattern from CPU/heap profiling
+storage: sqlite
+fields:
+  patternType:
+    type: enum
+    values:
+      - hot_function
+      - memory_leak
+      - slow_io
+      - cpu_spike
+      - gc_pressure
+    required: true
+    description: Type of performance pattern
+  functionName:
+    type: string
+    required: true
+    description: Function or module name
+  filePath:
+    type: string
+    description: Source file path
+  lineNumber:
+    type: integer
+    description: Line number
+  selfTime:
+    type: float
+    description: Self time in milliseconds
+  totalTime:
+    type: float
+    description: Total time including children
+  callCount:
+    type: integer
+    description: Number of invocations
+  heapDelta:
+    type: integer
+    description: Heap size change in bytes
+  severity:
+    type: enum
+    values:
+      - critical
+      - warning
+      - info
+    required: true
+    description: Severity level
+  profileSessionId:
+    type: string
+    required: true
+    description: Associated profile session
+  recommendation:
+    type: string
+    description: Suggested fix
+capabilities:
+  crud: true
+  time-range: true

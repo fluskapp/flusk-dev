@@ -1,0 +1,51 @@
+name: Conversion
+description: Optimization suggestion — cache, downgrade, or remove an LLM call
+storage: sqlite
+fields:
+  conversionType:
+    type: enum
+    values:
+      - cache
+      - downgrade
+      - remove
+    required: true
+    description: Type of optimization
+  sourceModel:
+    type: string
+    required: true
+    description: Current model being used
+  targetModel:
+    type: string
+    description: Suggested replacement model (for downgrade)
+  promptHash:
+    type: string
+    description: Prompt hash this conversion applies to
+  promptCategory:
+    type: string
+    description: Prompt category
+  estimatedSavingsUsd:
+    type: float
+    required: true
+    description: Projected monthly savings
+  confidence:
+    type: float
+    required: true
+    description: Confidence score 0-1
+  status:
+    type: enum
+    values:
+      - pending
+      - accepted
+      - rejected
+      - applied
+    default: pending
+    description: Conversion status
+  appliedAt:
+    type: string
+    description: When the conversion was applied
+  metadata:
+    type: json
+    description: Additional context
+capabilities:
+  crud: true
+  time-range: true

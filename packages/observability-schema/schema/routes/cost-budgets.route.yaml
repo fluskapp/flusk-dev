@@ -1,0 +1,27 @@
+name: costBudgets
+basePath: /api/cost-budgets
+entity: CostBudget
+auth: required
+operations:
+  - method: GET
+    path: /
+    call: listCostBudgets
+    description: List all budgets
+  - method: POST
+    path: /
+    call: createCostBudget
+    input: CreateCostBudget
+    description: Create budget
+  - method: PUT
+    path: /:id
+    call: updateCostBudget
+    input: UpdateCostBudget
+    description: Update budget
+  - method: DELETE
+    path: /:id
+    call: deleteCostBudget
+    description: Delete budget
+  - method: GET
+    path: /check/:dimension/:value
+    call: checkCostBudget
+    description: Check budget status

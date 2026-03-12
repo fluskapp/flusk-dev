@@ -1,0 +1,29 @@
+name: listSolutions
+description: List solutions by organization with filters
+inputs:
+  - name: organizationId
+    type: string
+  - name: status
+    type: string
+  - name: type
+    type: string
+  - name: db
+    type: Database
+output:
+  type: Solution[]
+steps:
+  - id: solutions
+    call: listSolution
+    with:
+      db: $db
+    store: solutions
+  - id: filtered
+    action: filter
+    source: $solutions
+    where:
+      field: organizationId
+      op: eq
+      value: $organizationId
+  - id: result
+    action: return
+    value: $filtered

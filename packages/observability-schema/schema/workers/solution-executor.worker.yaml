@@ -1,0 +1,16 @@
+name: SolutionExecutor
+description: Handles async solution execution via job queue
+type: bullmq
+queue: solution-runs
+steps:
+  - id: run
+    call: runSolution
+    with:
+      solutionId: $input.solutionId
+      organizationId: $input.organizationId
+      input: $input.data
+      db: $db
+retry:
+  maxAttempts: 3
+  backoff: exponential
+timeout: 120s

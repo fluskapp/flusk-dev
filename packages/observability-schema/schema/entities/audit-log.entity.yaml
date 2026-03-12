@@ -1,0 +1,33 @@
+name: AuditLog
+description: Immutable audit trail of actions within an organization
+storage: sqlite
+fields:
+  organizationId:
+    type: uuid
+    required: true
+    relation: Organization
+    description: Organization context
+  userId:
+    type: uuid
+    relation: User
+    description: User who performed the action
+  action:
+    type: string
+    required: true
+    description: 'Action performed (e.g. api_key.create, user.invite)'
+  resource:
+    type: string
+    required: true
+    description: 'Resource type (e.g. ApiKey, User, Organization)'
+  resourceId:
+    type: string
+    description: ID of the affected resource
+  metadata:
+    type: json
+    description: Additional context about the action
+  ipAddress:
+    type: string
+    description: Client IP address
+capabilities:
+  crud: false
+  time-range: true

@@ -1,0 +1,38 @@
+name: RoutingRule
+description: Model routing rule per organization — route to cheapest qualifying model
+storage: sqlite
+fields:
+  name:
+    type: string
+    required: true
+    description: Rule name
+  promptCategory:
+    type: string
+    required: true
+    description: Which prompt category this rule applies to
+  minQualityScore:
+    type: float
+    required: true
+    description: Minimum acceptable quality score (0-1)
+  maxCostUsd:
+    type: float
+    description: Maximum cost per call
+  maxDurationMs:
+    type: integer
+    description: Maximum acceptable latency
+  preferredModels:
+    type: json
+    description: Ordered list of preferred models
+  excludedModels:
+    type: json
+    description: Models to never use
+  enabled:
+    type: boolean
+    default: true
+    description: Whether this rule is active
+  priority:
+    type: integer
+    default: 0
+    description: Rule priority (higher = checked first)
+capabilities:
+  crud: true

@@ -1,0 +1,20 @@
+name: costBy
+description: Show cost breakdown by dimension (feature, team, customer)
+args:
+  - name: from
+    type: string
+    description: Start date
+  - name: to
+    type: string
+    description: End date
+  - name: limit
+    type: number
+    default: 20
+    description: Max results
+action:
+  call: getCostByDimension
+  with:
+    dimension: $dimension
+    from: $from
+    to: $to
+    db: $db

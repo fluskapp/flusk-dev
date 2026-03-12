@@ -1,0 +1,23 @@
+name: webhook
+description: Generic HTTP webhook
+type: webhook
+config:
+  fields:
+    - name: url
+      type: string
+      required: true
+      description: Webhook URL (HTTPS required in production)
+    - name: headers
+      type: json
+      description: Custom headers
+    - name: method
+      type: enum
+      values:
+        - POST
+        - PUT
+      default: POST
+methods:
+  - name: send
+    description: Send alert via HTTP
+    input: AlertEvent
+  - name: test

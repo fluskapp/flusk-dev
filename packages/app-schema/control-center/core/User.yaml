@@ -1,0 +1,129 @@
+# Core entity: User
+# Represents a user of the Flusk platform
+
+name: User
+type: entity
+description: "User account entity"
+
+fields:
+  # Identity
+  id:
+    type: uuid
+    primary: true
+    auto: true
+    
+  email:
+    type: string
+    required: true
+    unique: true
+    description: "User email address"
+    
+  name:
+    type: string
+    required: true
+    description: "User display name"
+    
+  avatar:
+    type: string
+    nullable: true
+    description: "User avatar URL"
+    
+  # Organization relationship
+  organization_id:
+    type: uuid
+    required: true
+    index: true
+    description: "Organization this user belongs to"
+    
+  # Role and permissions
+  role:
+    type: enum
+    values: ["admin", "developer", "viewer"]
+    default: "developer"
+    
+  permissions:
+    type: json
+    description: "User-specific permissions"
+    schema:
+      type: array
+      items: { type: string }
+      
+  # User preferences
+  preferences:
+    type: json
+    description: "User interface preferences"
+    schema:
+      type: object
+      properties:
+        theme: { type: string }
+        language: { type: string }
+        timezone: { type: string }
+        notifications: { type: boolean }
+        
+  # Authentication
+  last_login:
+    type: timestamp
+    nullable: true
+    
+  # Timestamps
+  created_at:
+    type: timestamp
+    auto: true
+    
+  updated_at:
+    type: timestamp
+    auto: true
+    on_update: true
+
+# Relationships
+relationships:
+  - name: organization
+    type: belongsTo
+    target: Organization
+    foreign_key: organization_id
+    
+  - name: prompts
+    type: hasMany
+    target: Prompt
+    description: "Prompts created by this user"
+
+# Indexes for performance
+indexes:
+  - fields: [organization_id, role]
+    name: "org_role"
+    
+  - fields: [email]
+    name: "email"
+    unique: true
+
+# API endpoints
+endpoints:
+  - method: GET
+    path: "/api/users"
+    description: "List users in organization"
+    auth: required
+    
+  - method: GET
+    path: "/api/users/{id}"
+    description: "Get user details"
+    auth: required
+    
+  - method: POST
+    path: "/api/users"
+    description: "Create new user"
+    auth: required
+    
+  - method: PATCH
+    path: "/api/users/{id}"
+    description: "Update user"
+    auth: required
+
+# Validation rules
+validation:
+  - field: email
+    min_length: 3
+    max_length: 254
+    
+  - field: name
+    min_length: 1
+    max_length: 100

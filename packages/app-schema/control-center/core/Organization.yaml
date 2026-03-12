@@ -1,0 +1,80 @@
+# Core entity: Organization
+# Represents an organization using the Flusk platform
+
+name: Organization
+type: entity
+description: "Organization entity for multi-tenant support"
+
+fields:
+  # Identity
+  id:
+    type: uuid
+    primary: true
+    auto: true
+    
+  name:
+    type: string
+    required: true
+    description: "Organization display name"
+    
+  slug:
+    type: string
+    required: true
+    unique: true
+    description: "URL-friendly organization identifier"
+    
+  # Configuration
+  settings:
+    type: json
+    description: "Organization-specific settings"
+    schema:
+      type: object
+      properties:
+        timezone: { type: string }
+        language: { type: string }
+        theme: { type: string }
+        
+  # Subscription
+  plan:
+    type: enum
+    values: ["free", "pro", "enterprise"]
+    default: "free"
+    
+  # Timestamps
+  created_at:
+    type: timestamp
+    auto: true
+    
+  updated_at:
+    type: timestamp
+    auto: true
+    on_update: true
+
+# Relationships
+relationships:
+  - name: users
+    type: hasMany
+    target: User
+    description: "Users belonging to this organization"
+    
+  - name: prompts
+    type: hasMany
+    target: Prompt
+    description: "Prompts created in this organization"
+
+# API endpoints
+endpoints:
+  - method: GET
+    path: "/api/organizations"
+    description: "List organizations"
+    auth: required
+    
+  - method: GET
+    path: "/api/organizations/{id}"
+    description: "Get organization details"
+    auth: required
+    
+  - method: PATCH
+    path: "/api/organizations/{id}"
+    description: "Update organization"
+    auth: required

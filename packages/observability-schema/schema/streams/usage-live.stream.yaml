@@ -1,0 +1,14 @@
+name: UsageLive
+description: Real-time AI usage metrics feed
+type: sse
+path: /api/stream/usage
+source:
+  entity: AiUsageMetric
+  realtime: true
+transform:
+  fields:
+    metricType: metricType
+    value: value
+    toolName: toolName
+    timestamp: createdAt
+auth: required

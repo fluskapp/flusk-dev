@@ -1,0 +1,320 @@
+# Core entity: TimelineEvent
+# Real-time events for live timeline visualization
+
+name: TimelineEvent
+description: "Real-time events for live pipeline visualization"
+type: entity
+
+fields:
+  # Identity
+  id:
+    type: uuid
+    primary: true
+    auto: true
+    
+  pipeline_id:
+    type: uuid
+    required: true
+    index: true
+    description: "Pipeline this event belongs to"
+    
+  task_id:
+    type: uuid
+    nullable: true
+    index: true
+    description: "Specific task if event is task-related"
+    
+  organization_id:
+    type: uuid
+    required: true
+    index: true
+    
+  # Event Details
+  event_type:
+    type: enum
+    values: [
+      "pipeline_created", "pipeline_started", "pipeline_paused", "pipeline_completed", "pipeline_failed",
+      "task_created", "task_assigned", "task_started", "task_progress", "task_blocked", "task_completed", "task_failed",
+      "agent_assigned", "agent_started", "agent_completed", "agent_error",
+      "human_approval_required", "human_approved", "human_rejected",
+      "quality_gate_passed", "quality_gate_failed",
+      "dependency_resolved", "dependency_blocked",
+      "system_alert", "performance_warning"
+    ]
+    required: true
+    index: true
+    description: "Type of event that occurred"
+    
+  event_category:
+    type: enum
+    values: ["pipeline", "task", "agent", "quality", "dependency", "approval", "system"]
+    required: true
+    index: true
+    description: "High-level categorization for UI filtering"
+    
+  severity:
+    type: enum
+    values: ["info", "success", "warning", "error", "critical"]
+    default: "info"
+    index: true
+    description: "Event severity for visual indication"
+    
+  # Content
+  title:
+    type: string
+    required: true
+    description: "Short event description for timeline"
+    
+  description:
+    type: text
+    nullable: true
+    description: "Detailed event description"
+    
+  # Context
+  actor:
+    type: json
+    nullable: true
+    description: "Who or what triggered this event"
+    schema:
+      type: object
+      properties:
+        actor_type: { type: string, enum: ["user", "agent", "system"] }
+        actor_id: { type: string }
+        actor_name: { type: string }
+        
+  event_data:
+    type: json
+    nullable: true
+    description: "Structured data specific to event type"
+    schema:
+      type: object
+      # Dynamic schema based on event_type
+      
+  # Progress Tracking
+  progress_impact:
+    type: json
+    nullable: true
+    description: "How this event affects overall progress"
+    schema:
+      type: object
+      properties:
+        pipeline_progress_delta: { type: number }
+        task_progress_delta: { type: number }
+        estimated_completion_change: { type: number }
+        
+  # Visual Representation
+  ui_config:
+    type: json
+    description: "Configuration for UI display"
+    schema:
+      type: object
+      properties:
+        icon: { type: string }
+        color: { type: string }
+        animation: { type: string, nullable: true }
+        position: { type: string, enum: ["left", "center", "right"] }
+        show_duration: { type: number, default: 5000 }
+        
+  # Relationships
+  related_events:
+    type: json
+    nullable: true
+    description: "IDs of related timeline events"
+    schema:
+      type: array
+      items: { type: string }
+      
+  # Status
+  is_visible:
+    type: boolean
+    default: true
+    description: "Whether event should be shown in timeline"
+    
+  is_milestone:
+    type: boolean
+    default: false
+    description: "Whether this is a major milestone event"
+    
+  requires_attention:
+    type: boolean
+    default: false
+    description: "Whether this event needs human attention"
+    
+  # Timestamps
+  occurred_at:
+    type: timestamp
+    required: true
+    index: true
+    description: "When the event actually happened"
+    
+  created_at:
+    type: timestamp
+    auto: true
+    
+  # User Interaction
+  acknowledged_by:
+    type: uuid
+    nullable: true
+    description: "User who acknowledged this event"
+    
+  acknowledged_at:
+    type: timestamp
+    nullable: true
+    description: "When event was acknowledged"
+
+# Relationships
+relationships:
+  - name: pipeline
+    type: belongsTo
+    target: Pipeline
+    foreign_key: pipeline_id
+    
+  - name: task
+    type: belongsTo
+    target: Task
+    foreign_key: task_id
+    
+  - name: organization
+    type: belongsTo
+    target: Organization
+    foreign_key: organization_id
+
+# Indexes for real-time queries
+indexes:
+  - fields: [pipeline_id, occurred_at]
+    name: "pipeline_timeline"
+    order: "occurred_at DESC"
+    
+  - fields: [organization_id, event_category, occurred_at]
+    name: "org_category_timeline"
+    
+  - fields: [severity, requires_attention, occurred_at]
+    name: "attention_queue"
+    
+  - fields: [event_type, task_id]
+    name: "task_events"
+
+# API endpoints for real-time timeline
+endpoints:
+  - method: POST
+    path: "/timeline/events"
+    description: "Create new timeline event"
+    auth: required
+    body:
+      fields: [pipeline_id, task_id, event_type, title, event_data]
+      
+  - method: GET
+    path: "/timeline/events"
+    description: "Get timeline events with real-time updates"
+    auth: required
+    query:
+      pipeline_id: uuid
+      event_category: string
+      severity: string
+      since: timestamp
+      limit: integer
+    websocket: true
+    
+  - method: GET
+    path: "/timeline/events/live"
+    description: "WebSocket endpoint for live events"
+    auth: required
+    websocket: true
+    subscription_filters:
+      - pipeline_id
+      - organization_id
+      - event_category
+      - severity
+      
+  - method: PATCH
+    path: "/timeline/events/{id}/acknowledge"
+    description: "Acknowledge an event"
+    auth: required
+    
+  - method: GET
+    path: "/timeline/summary"
+    description: "Get timeline summary for dashboard"
+    auth: required
+    query:
+      pipeline_id: uuid
+      time_range: string  # "1h", "24h", "7d"
+
+# Event templates for consistent formatting
+event_templates:
+  pipeline_created:
+    title: "Pipeline Created"
+    description: "New execution pipeline generated from user prompt"
+    icon: "pipeline"
+    color: "blue"
+    
+  pipeline_started:
+    title: "Pipeline Started"
+    description: "Pipeline execution has begun"
+    icon: "play"
+    color: "green"
+    animation: "pulse"
+    
+  task_assigned:
+    title: "Task Assigned"
+    description: "Task assigned to {agent_name}"
+    icon: "user-check"
+    color: "purple"
+    
+  task_completed:
+    title: "Task Completed"
+    description: "{task_name} completed successfully"
+    icon: "check-circle"
+    color: "green"
+    animation: "bounce"
+    
+  task_blocked:
+    title: "Task Blocked"
+    description: "{task_name} is blocked and needs attention"
+    icon: "alert-triangle"
+    color: "orange"
+    requires_attention: true
+    
+  human_approval_required:
+    title: "Approval Required"
+    description: "{task_name} needs human review"
+    icon: "user-clock"
+    color: "yellow"
+    requires_attention: true
+    
+  pipeline_completed:
+    title: "Pipeline Complete"
+    description: "All tasks completed successfully"
+    icon: "check-circle-2"
+    color: "green"
+    animation: "celebrate"
+    is_milestone: true
+
+# Real-time streaming configuration
+streaming:
+  buffer_size: 100
+  max_connections_per_pipeline: 50
+  heartbeat_interval: 30000  # 30 seconds
+  
+  event_filters:
+    - name: "critical_only"
+      condition: "severity IN ('error', 'critical')"
+      
+    - name: "milestones_only"
+      condition: "is_milestone = true"
+      
+    - name: "attention_required"
+      condition: "requires_attention = true"
+
+# Background jobs
+jobs:
+  - name: "cleanup_old_events"
+    schedule: "0 0 1 * * *"    # Daily at 1 AM
+    description: "Archive timeline events older than 30 days"
+    
+  - name: "calculate_pipeline_progress"
+    schedule: "*/30 * * * * *"  # Every 30 seconds
+    description: "Update pipeline progress based on timeline events"
+    
+  - name: "send_attention_notifications"
+    schedule: "*/60 * * * * *"  # Every minute
+    description: "Notify users of events requiring attention"

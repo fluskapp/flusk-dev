@@ -1,0 +1,12 @@
+name: alertsAck
+description: Acknowledge alert events
+action:
+  call: alertsAck
+args:
+  - name: id
+    type: string
+    description: Acknowledge specific event by ID
+  - name: all
+    type: boolean
+    default: false
+    description: Acknowledge all unacknowledged events

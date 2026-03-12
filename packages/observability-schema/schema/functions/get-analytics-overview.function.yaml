@@ -1,0 +1,28 @@
+name: getAnalyticsOverview
+description: Aggregate overview — total cost, call count, avg latency, error rate, active models
+inputs:
+  - name: organizationId
+    type: uuid
+    required: true
+  - name: start
+    type: string
+  - name: end
+    type: string
+output:
+  type: json
+steps:
+  - id: stats
+    action: call
+    sql: |
+      SELECT
+        COUNT(*) as callCount,
+        SUM(costUsd) as totalCost,
+        AVG(durationMs) as avgLatency,
+        SUM(CASE WHEN error IS NOT NULL THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as errorRate,
+        COUNT(DISTINCT model) as activeModels
+      FROM llm_call
+      WHERE organizationId = $organizationId
+        AND createdAt >= $start AND createdAt <= $end
+  - id: result
+    action: return
+    value: $stats

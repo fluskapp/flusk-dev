@@ -1,0 +1,14 @@
+name: UsageAggregator
+description: Aggregate hourly AI usage metrics per organization
+type: cron
+schedule: "0 * * * *"
+steps:
+  - id: aggregate
+    action: call
+    call: createAiUsageMetric
+    with:
+      db: $db
+      period: hourly
+retry:
+  maxAttempts: 2
+  backoff: exponential

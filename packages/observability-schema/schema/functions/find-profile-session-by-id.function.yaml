@@ -1,0 +1,9 @@
+name: findProfileSessionById
+description: findProfileSessionById implementation
+inputs: []
+output:
+  type: json
+steps:
+  - id: result
+    action: return
+    value: 'null'

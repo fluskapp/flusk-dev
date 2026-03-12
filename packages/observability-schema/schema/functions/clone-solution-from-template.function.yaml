@@ -1,0 +1,44 @@
+name: cloneSolutionFromTemplate
+description: Creates a new solution from a template
+inputs:
+  - name: templateId
+    type: string
+  - name: organizationId
+    type: string
+  - name: name
+    type: string
+  - name: db
+    type: Database
+output:
+  type: Solution
+steps:
+  - id: template
+    call: findSolutionTemplateById
+    with:
+      id: $templateId
+      db: $db
+    store: template
+  - id: solution
+    call: createSolution
+    with:
+      data:
+        organizationId: $organizationId
+        name: $name
+        description: $template.description
+        type: agent
+        config: $template.config
+        status: draft
+        version: "0.1.0"
+        metrics: { runs: 0, cost: 0, avg_latency: 0 }
+      db: $db
+    store: solution
+  - id: incrementDownloads
+    call: updateSolutionTemplate
+    with:
+      id: $templateId
+      data:
+        downloads: $template.downloads
+      db: $db
+  - id: result
+    action: return
+    value: $solution

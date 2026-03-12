@@ -1,0 +1,14 @@
+name: costTrend
+description: Show daily cost trend for a specific tag
+args:
+  - name: days
+    type: number
+    default: 30
+action:
+  call: getCostTrend
+  with:
+    dimension: $dimension
+    value: $value
+    from: $from
+    to: $to
+    db: $db

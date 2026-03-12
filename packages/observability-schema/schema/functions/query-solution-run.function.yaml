@@ -1,0 +1,20 @@
+name: querySolutionRun
+description: Query solution runs with aggregations
+inputs:
+  - name: solutionId
+    type: string
+  - name: db
+    type: Database
+output:
+  type: json
+steps:
+  - id: runs
+    action: call
+    call: listSolutionRuns
+    with:
+      solutionId: $solutionId
+      db: $db
+    store: runs
+  - id: result
+    action: return
+    value: $runs

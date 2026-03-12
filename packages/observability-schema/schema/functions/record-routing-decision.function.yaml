@@ -1,0 +1,32 @@
+name: recordRoutingDecision
+description: Log a routing decision and calculate savings
+inputs:
+  - name: db
+    type: Database
+  - name: routingRuleId
+    type: string
+  - name: promptCategory
+    type: string
+  - name: requestedModel
+    type: string
+  - name: selectedModel
+    type: string
+output:
+  type: RoutingDecision
+steps:
+  - id: wasRerouted
+    action: call
+    expression: $requestedModel != $selectedModel
+  - id: decision
+    call: createRoutingDecision
+    with:
+      db: $db
+      data:
+        routingRuleId: $routingRuleId
+        promptCategory: $promptCategory
+        requestedModel: $requestedModel
+        selectedModel: $selectedModel
+        wasRerouted: $wasRerouted
+  - id: result
+    action: return
+    value: $decision

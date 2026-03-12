@@ -1,0 +1,16 @@
+name: deleteSolution
+description: Delete Solution
+inputs:
+  - name: id
+    type: string
+  - name: db
+    type: Database
+output:
+  type: boolean
+steps:
+  - id: result
+    action: assign
+    value: true
+  - id: done
+    action: return
+    value: $result

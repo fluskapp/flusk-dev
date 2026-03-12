@@ -1,0 +1,23 @@
+name: SolutionRunFailed
+description: Emitted when a solution run fails
+channel: redis
+topic: solution-run-failed
+payload:
+  fields:
+    - name: runId
+      type: string
+      required: true
+    - name: solutionId
+      type: string
+      required: true
+    - name: error
+      type: string
+    - name: organizationId
+      type: string
+publish:
+  - trigger: manual
+subscribe:
+  handler: dispatchAlert
+  retry:
+    maxAttempts: 3
+    backoff: exponential

@@ -1,0 +1,18 @@
+name: calculateDriftScore
+description: Compute overall drift score from multiple detection signals
+inputs:
+  - name: outputDrift
+    type: DriftResult
+  - name: costDrift
+    type: DriftResult
+  - name: behaviorDrift
+    type: DriftResult
+output:
+  type: float
+steps:
+  - id: weightedScore
+    action: call
+    expression: ($outputDrift.driftScore * 0.4) + ($costDrift.driftScore * 0.3) + ($behaviorDrift.driftScore * 0.3)
+  - id: result
+    action: return
+    value: $weightedScore

@@ -1,0 +1,13 @@
+name: explain
+description: AI-powered cost optimization insights — ask questions about your LLM spending
+action:
+  call: explain
+args:
+  - name: query
+    type: string
+    required: true
+    description: Question about your LLM costs
+  - name: model
+    type: string
+    default: gpt-4o-mini
+    description: Model to use for explanation

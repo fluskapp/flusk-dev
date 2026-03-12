@@ -1,0 +1,16 @@
+name: SolutionRunsLive
+description: Real-time solution run status updates
+type: sse
+path: /api/stream/solution-runs
+source:
+  entity: SolutionRun
+  realtime: true
+transform:
+  fields:
+    id: id
+    solutionId: solutionId
+    status: status
+    cost: cost
+    durationMs: durationMs
+    error: error
+auth: required

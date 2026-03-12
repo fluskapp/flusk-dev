@@ -1,0 +1,16 @@
+name: createPattern
+description: Create Pattern
+inputs:
+  - name: data
+    type: json
+  - name: db
+    type: Database
+output:
+  type: Pattern
+steps:
+  - id: result
+    action: assign
+    value: $data
+  - id: done
+    action: return
+    value: $result

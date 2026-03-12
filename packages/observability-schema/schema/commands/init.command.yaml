@@ -1,0 +1,9 @@
+name: init
+description: Initialize flusk configuration in the current project
+action:
+  call: init
+args:
+  - name: force
+    type: boolean
+    default: false
+    description: Overwrite existing config

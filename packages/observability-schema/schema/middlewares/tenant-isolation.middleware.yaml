@@ -1,0 +1,14 @@
+name: tenant-isolation
+description: Inject organizationId filter into all database queries for tenant isolation
+phase: request
+inputs:
+  - name: organizationId
+    from: middleware.auth.organizationId
+output:
+  filter: json
+steps:
+  - id: inject
+    action: assign
+    value:
+      filter:
+        organizationId: $organizationId

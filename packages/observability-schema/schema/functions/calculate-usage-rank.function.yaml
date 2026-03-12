@@ -1,0 +1,23 @@
+name: calculateUsageRank
+description: Rank users and teams by AI effectiveness
+inputs:
+  - name: timeRange
+    type: json
+  - name: metricType
+    type: string
+output:
+  type: json
+steps:
+  - id: rankings
+    action: call
+    sql: |
+      SELECT userId, toolName, SUM(value) as totalValue,
+             RANK() OVER (ORDER BY SUM(value) DESC) as rank
+      FROM ai_usage_metric
+      WHERE metricType = $metricType
+        AND createdAt >= $timeRange.start AND createdAt <= $timeRange.end
+      GROUP BY userId, toolName
+      ORDER BY rank
+  - id: result
+    action: return
+    value: $rankings

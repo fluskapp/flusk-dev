@@ -1,0 +1,42 @@
+name: DashboardWidget
+description: Individual widget within a dashboard
+storage: sqlite
+fields:
+  dashboardId:
+    type: string
+    required: true
+    index: true
+    description: Parent dashboard ID
+  widgetType:
+    type: enum
+    values:
+      - line-chart
+      - bar-chart
+      - pie-chart
+      - metric-card
+      - table
+      - heatmap
+      - waterfall
+      - timeline
+    required: true
+    description: Type of visualization widget
+  title:
+    type: string
+    required: true
+    description: Widget display title
+  query:
+    type: json
+    required: true
+    description: Data query config (entity, aggregation, groupBy, timeRange)
+  position:
+    type: json
+    required: true
+    description: Grid position {x, y, w, h}
+  config:
+    type: json
+    description: Widget-specific config (colors, thresholds, labels)
+  refreshOverride:
+    type: integer
+    description: Override dashboard refresh interval for this widget
+capabilities:
+  crud: true

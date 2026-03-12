@@ -1,0 +1,38 @@
+name: getBudgetStatus
+description: Get current spend vs limits summary for all budgets
+inputs:
+  - name: db
+    type: Database
+output:
+  type: BudgetStatus[]
+steps:
+  - id: alerts
+    call: listBudgetAlerts
+    with: { db: $db }
+  - id: dailySpend
+    call: getDailySpend
+    with: { db: $db }
+  - id: monthlySpend
+    call: getMonthlySpend
+    with: { db: $db }
+  - id: statuses
+    action: forEach
+    source: $alerts
+    steps:
+      - id: currentSpend
+        action: condition
+        if: { field: "$item.budgetType", op: eq, value: daily }
+        then: $dailySpend.totalCostUsd
+        else: $monthlySpend.totalCostUsd
+      - id: status
+        action: return
+        value:
+          name: $item.name
+          budgetType: $item.budgetType
+          thresholdUsd: $item.thresholdUsd
+          currentSpendUsd: $currentSpend
+          percentUsed: "$currentSpend / $item.thresholdUsd * 100"
+          exceeded: "$currentSpend >= $item.thresholdUsd"
+  - id: result
+    action: return
+    value: $statuses

@@ -1,0 +1,46 @@
+name: AnalyzeSession
+description: Tracks CLI analyze command runs
+storage: sqlite
+fields:
+  scriptPath:
+    type: string
+    required: true
+    description: Path to the analyzed script
+  status:
+    type: enum
+    values:
+      - running
+      - completed
+      - failed
+    required: true
+    default: running
+    description: Session status
+  callCount:
+    type: integer
+    default: 0
+    description: Number of LLM calls captured
+  totalCostUsd:
+    type: float
+    default: 0
+    description: Total cost of all calls in session
+  totalTokens:
+    type: integer
+    default: 0
+    description: Total tokens used
+  durationMs:
+    type: integer
+    description: Total analysis duration
+  patternsFound:
+    type: integer
+    default: 0
+    description: Number of patterns detected
+  insightsGenerated:
+    type: integer
+    default: 0
+    description: Number of insights generated
+  summary:
+    type: json
+    description: Summary results of the analysis
+capabilities:
+  crud: true
+  time-range: true

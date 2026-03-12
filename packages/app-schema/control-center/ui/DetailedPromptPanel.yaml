@@ -1,0 +1,511 @@
+# UI Component: Detailed Prompt Panel  
+# Enhanced prompt panel with full layout and styling definitions
+
+name: DetailedPromptPanel
+type: component
+category: panel
+
+description: "Complete prompt management interface with detailed layout, styling, and interactions"
+
+props:
+  organization_id:
+    type: uuid
+    required: true
+    description: "Organization context for filtering prompts"
+    
+  auto_refresh:
+    type: boolean
+    default: true
+    description: "Enable real-time prompt updates"
+    
+  refresh_interval:
+    type: integer
+    default: 5000
+    description: "Update interval in milliseconds"
+
+# Complete Visual Layout Definition
+layout:
+  type: "flex_column"
+  height: "100%"
+  background: "white"
+  border_radius: "lg"
+  shadow: "sm"
+  
+  sections:
+    header:
+      type: "flex_row"
+      justify: "space-between"  
+      align: "center"
+      padding: "lg"
+      border_bottom: "1px solid"
+      border_color: "secondary.200"
+      background: "white"
+      
+      elements:
+        - type: "heading"
+          text: "פרומפטים חדשים"
+          size: "xl"
+          weight: "semibold"
+          color: "secondary.900"
+          
+        - type: "flex_row"
+          gap: "sm"
+          align: "center"
+          elements:
+            - type: "badge"
+              text: "{{ prompt_count }}"
+              variant: "primary"
+              size: "sm"
+              
+            - type: "icon_button"
+              icon: "RefreshCw"
+              variant: "ghost"
+              size: "sm"
+              tooltip: "רענן"
+              action: "refresh_prompts"
+              
+    filters:
+      type: "flex_row"
+      gap: "sm"
+      padding: "md lg"
+      background: "secondary.50"
+      border_bottom: "1px solid"
+      border_color: "secondary.200"
+      
+      elements:
+        - type: "search_input"
+          placeholder: "חיפוש פרומפטים..."
+          icon: "Search"  
+          flex: 1
+          value: "{{ search_query }}"
+          onChange: "update_search_filter"
+          background: "white"
+          border: "1px solid"
+          border_color: "secondary.300"
+          border_radius: "md"
+          padding: "sm md"
+          
+        - type: "select"
+          width: "150px"
+          background: "white"
+          border: "1px solid"
+          border_color: "secondary.300"
+          border_radius: "md"
+          padding: "sm md"
+          options:
+            - { label: "הכל", value: "all" }
+            - { label: "בהמתנה", value: "pending" }
+            - { label: "בעיבוד", value: "processing" }  
+            - { label: "הושלם", value: "completed" }
+          value: "{{ status_filter }}"
+          onChange: "update_status_filter"
+          
+    content:
+      type: "scroll_area"
+      flex: 1
+      padding: "sm lg"
+      background: "secondary.25"
+      
+      elements:
+        - type: "conditional"
+          condition: "{{ is_loading }}"
+          true_element:
+            type: "loading_skeleton"
+            count: 5
+            height: "120px"
+            
+          false_element:
+            type: "conditional"
+            condition: "{{ filtered_prompts.length > 0 }}"
+            true_element:
+              type: "prompt_list"
+              data: "{{ filtered_prompts }}"
+              gap: "md"
+              
+              item_template:
+                type: "prompt_card"
+                layout:
+                  type: "flex_column"
+                  gap: "sm"
+                  padding: "lg"
+                  background: "white"
+                  border: "1px solid"
+                  border_color: "secondary.200"
+                  border_radius: "md"
+                  shadow: "xs"
+                  transition: "all 200ms ease"
+                  cursor: "pointer"
+                  hover:
+                    border_color: "primary.300"
+                    shadow: "md"
+                    transform: "translateY(-1px)"
+                  
+                  sections:
+                    header:
+                      type: "flex_row"
+                      justify: "space-between"
+                      align: "start"
+                      margin_bottom: "sm"
+                      
+                      elements:
+                        - type: "flex_column"
+                          gap: "xs"
+                          elements:
+                            - type: "text"
+                              content: "{{ prompt.user.name }}"
+                              size: "sm"
+                              weight: "medium"
+                              color: "secondary.700"
+                              
+                            - type: "text"
+                              content: "{{ prompt.created_at | timeAgo }}"
+                              size: "xs"
+                              color: "secondary.500"
+                              
+                        - type: "status_badge"
+                          status: "{{ prompt.status }}"
+                          size: "sm"
+                          color_map:
+                            pending: "warning"
+                            processing: "info"
+                            completed: "success"
+                            failed: "danger"
+                          
+                    content:
+                      type: "flex_column"
+                      gap: "sm"
+                      margin_bottom: "sm"
+                      
+                      elements:
+                        - type: "text_block"
+                          layout:
+                            type: "flex_column"
+                            gap: "xs"
+                            elements:
+                              - type: "label"
+                                text: "טקסט מקורי:"
+                                size: "xs"
+                                weight: "medium"
+                                color: "secondary.600"
+                                
+                              - type: "text"
+                                content: "{{ prompt.original_text }}"
+                                max_lines: 3
+                                line_height: "1.4"
+                                direction: "rtl"
+                                color: "secondary.900"
+                                font_family: "sans"
+                                
+                        - type: "conditional"
+                          condition: "{{ prompt.translated_text }}"
+                          true_element:
+                            type: "text_block"
+                            layout:
+                              type: "flex_column"
+                              gap: "xs"
+                              elements:
+                                - type: "label"
+                                  text: "תרגום:"
+                                  size: "xs"
+                                  weight: "medium"
+                                  color: "secondary.600"
+                                  
+                                - type: "text"
+                                  content: "{{ prompt.translated_text }}"
+                                  max_lines: 2
+                                  line_height: "1.4"
+                                  direction: "ltr"
+                                  color: "secondary.600"
+                                  font_style: "italic"
+                                  
+                        - type: "category_tag"
+                          category: "{{ prompt.intent_category }}"
+                          background: "primary.100"
+                          color: "primary.800"
+                          padding: "xs sm"
+                          border_radius: "sm"
+                          font_size: "xs"
+                          font_weight: "medium"
+                          
+                    footer:
+                      type: "flex_row"
+                      justify: "end"
+                      gap: "sm"
+                      
+                      elements:
+                        - type: "button"
+                          variant: "outline"
+                          size: "sm"
+                          icon: "Maximize2"
+                          text: "הרחב"
+                          action: "expand_prompt"
+                          payload: "{{ prompt.id }}"
+                          background: "transparent"
+                          border: "1px solid"
+                          border_color: "secondary.300"
+                          color: "secondary.700"
+                          hover:
+                            background: "secondary.50"
+                            
+                        - type: "button"
+                          variant: "primary"
+                          size: "sm"
+                          icon: "Play"
+                          text: "צור פייפליין"
+                          action: "create_pipeline"
+                          payload: "{{ prompt.id }}"
+                          background: "primary.500"
+                          color: "white"
+                          hover:
+                            background: "primary.600"
+            
+            false_element:
+              type: "empty_state"
+              layout:
+                type: "flex_column"
+                align: "center"
+                justify: "center"
+                padding: "2xl"
+                text_align: "center"
+                
+                elements:
+                  - type: "icon"
+                    name: "MessageSquare"
+                    size: "4xl"
+                    color: "secondary.400"
+                    margin_bottom: "lg"
+                    
+                  - type: "heading"
+                    text: "אין פרומפטים חדשים"
+                    size: "lg"
+                    weight: "semibold"
+                    color: "secondary.700"
+                    margin_bottom: "sm"
+                    
+                  - type: "text"
+                    text: "פרומפטים חדשים יופיעו כאן כשהם יגיעו"
+                    color: "secondary.500"
+
+# Interactive Behaviors with Detailed Specifications
+interactions:
+  click_prompt_card:
+    trigger: "click"
+    target: ".prompt-card"
+    action: "select_prompt"
+    payload: "{{ prompt.id }}"
+    animation:
+      type: "scale"
+      duration: "100ms"
+      scale: "0.98"
+    
+  refresh_data:
+    trigger: "click"
+    target: "[data-action='refresh_prompts']"
+    action: "refetch_prompts"
+    loading_state: true
+    loading_element: "icon"
+    loading_animation: "spin"
+    
+  search_change:
+    trigger: "input"
+    target: "[data-field='search_query']"
+    action: "update_search_filter"
+    debounce: 300
+    
+  status_filter_change:
+    trigger: "change"  
+    target: "[data-field='status_filter']"
+    action: "update_status_filter"
+    
+  expand_prompt:
+    trigger: "click"
+    target: "[data-action='expand_prompt']"
+    action: "open_prompt_modal"
+    payload: "{{ prompt }}"
+    
+  create_pipeline:
+    trigger: "click"
+    target: "[data-action='create_pipeline']"
+    action: "create_pipeline_from_prompt"
+    payload: "{{ prompt }}"
+    confirmation:
+      title: "צור פייפליין"
+      message: "האם ברצונך לצור פייפליין מהפרומפט הזה?"
+      confirm_text: "צור"
+      cancel_text: "בטל"
+
+# Data Integration with React Query
+data_hooks:
+  prompts:
+    query: "usePrompts"
+    params:
+      organization_id: "{{ organization_id }}"
+      status: "{{ status_filter }}"
+      search: "{{ search_query }}"
+      limit: 50
+      order: "created_at desc"
+    
+    real_time: true
+    refetch_interval: "{{ refresh_interval }}"
+    stale_time: 5000
+    
+  prompt_count:
+    query: "usePromptCount"
+    params:
+      organization_id: "{{ organization_id }}"
+      status: ["pending", "processing"]
+
+# Local State Management
+local_state:
+  search_query:
+    type: "string"
+    default: ""
+    
+  status_filter:
+    type: "string"
+    default: "all"
+    
+  selected_prompt_id:
+    type: "string"
+    default: null
+    
+  is_loading:
+    type: "boolean"
+    default: false
+
+# WebSocket Real-time Updates
+websocket:
+  channel: "prompts:{{ organization_id }}"
+  events:
+    new_prompt:
+      action: "add_prompt_to_list"
+      animation:
+        type: "slide_in_from_top"
+        duration: "300ms"
+        easing: "ease-out"
+        
+    prompt_updated:
+      action: "update_prompt_in_list"
+      animation:
+        type: "highlight_flash"
+        duration: "1000ms"
+        color: "primary.200"
+        
+    prompt_deleted:
+      action: "remove_prompt_from_list"
+      animation:
+        type: "slide_out"
+        duration: "200ms"
+        easing: "ease-in"
+
+# Responsive Design Breakpoints
+responsive:
+  breakpoints:
+    sm: "640px"
+    md: "768px"
+    lg: "1024px"
+    
+  mobile:
+    max_width: "sm"
+    layout:
+      sections:
+        header:
+          padding: "md"
+          elements:
+            - type: "heading"
+              size: "lg"
+              
+        filters:
+          type: "flex_column"
+          gap: "sm"
+          padding: "sm md"
+          
+        content:
+          padding: "sm md"
+          
+    components:
+      prompt_card:
+        layout:
+          padding: "md"
+          
+        sections:
+          footer:
+            type: "flex_column"
+            gap: "xs"
+            
+            elements:
+              - type: "button"
+                width: "100%"
+                
+              - type: "button"  
+                width: "100%"
+
+# Accessibility Features
+accessibility:
+  landmarks:
+    role: "region"
+    aria_label: "פאנל פרומפטים"
+    
+  focus_management:
+    initial_focus: "search_input"
+    focus_trap: false
+    
+  keyboard_navigation:
+    tab_order: ["search", "filter", "prompt-list", "actions"]
+    
+    shortcuts:
+      - key: "/"
+        action: "focus_search"
+        description: "פוקוס על חיפוש"
+        
+      - key: "r"
+        action: "refresh_data"
+        description: "רענן נתונים"
+        
+      - key: "ArrowDown"
+        action: "select_next_prompt"
+        description: "בחר פרומפט הבא"
+        
+      - key: "ArrowUp" 
+        action: "select_previous_prompt"
+        description: "בחר פרומפט קודם"
+        
+      - key: "Enter"
+        action: "expand_selected_prompt"
+        description: "הרחב פרומפט נבחר"
+        
+      - key: "Space"
+        action: "create_pipeline_from_selected"
+        description: "צור פייפליין מפרומפט נבחר"
+        
+  screen_reader:
+    announcements:
+      new_prompt: "פרומפט חדש התקבל מ{{ user_name }}"
+      prompt_updated: "פרומפט עודכן"
+      loading: "טוען פרומפטים..."
+      loaded: "{{ count }} פרומפטים נטענו"
+
+# Performance Optimizations
+performance:
+  virtual_scrolling:
+    enabled: true
+    item_height: 160
+    overscan: 5
+    threshold: 20
+    
+  memoization:
+    prompt_card: ["prompt.id", "prompt.updated_at"]
+    search_results: ["search_query", "status_filter"]
+    filtered_prompts: ["prompts", "search_query", "status_filter"]
+    
+  debouncing:
+    search_input: 300
+    filter_changes: 200
+    
+  lazy_loading:
+    images: true
+    threshold: "50px"
+    
+  code_splitting:
+    modal_component: "lazy"
+    charts: "lazy"

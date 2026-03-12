@@ -1,0 +1,47 @@
+name: Pattern
+description: Detected repetitive prompt pattern
+storage: sqlite
+fields:
+  promptHash:
+    type: string
+    required: true
+    description: Hash of the repeated prompt
+  model:
+    type: string
+    required: true
+    description: Model used
+  occurrences:
+    type: integer
+    required: true
+    description: Number of times this pattern appeared
+  totalCostUsd:
+    type: float
+    required: true
+    description: Total cost of all occurrences
+  avgTokens:
+    type: float
+    description: Average tokens per occurrence
+  firstSeenAt:
+    type: string
+    required: true
+    description: When first detected
+  lastSeenAt:
+    type: string
+    required: true
+    description: When last seen
+  samplePrompt:
+    type: string
+    description: Example prompt text (truncated)
+  recommendation:
+    type: enum
+    values:
+      - cache
+      - batch
+      - ignore
+    description: Suggested action
+  agentName:
+    type: string
+    description: Agent generating this pattern
+capabilities:
+  crud: true
+  time-range: true

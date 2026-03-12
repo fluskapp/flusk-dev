@@ -1,0 +1,17 @@
+name: getDailySpend
+description: Get total spending for the current day
+inputs:
+  - name: db
+    type: Database
+  - name: day
+    type: string
+    default: today
+output:
+  type: SpendSummary
+steps:
+  - id: spend
+    call: queryLlmCall
+    with: { db: $db, query: dailySpend, params: { day: $day } }
+  - id: result
+    action: return
+    value: $spend

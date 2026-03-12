@@ -1,0 +1,43 @@
+name: mapSpanToLlmCall
+description: Extract LLM call data from an OpenTelemetry span
+inputs:
+  - name: db
+    type: Database
+  - name: span
+    type: json
+  - name: serviceName
+    type: string
+output:
+  type: LlmCall
+steps:
+  - id: attrs
+    call: parseLlmAttributes
+    with:
+      attributes: attributes
+  - id: isLlmSpan
+    action: condition
+    if:
+      field: $attrs.isLlm
+      op: eq
+      value: true
+    then:
+      - call: createLlmCall
+        with:
+          db: $db
+          data:
+            traceId: $span.traceId
+            spanId: $span.spanId
+            model: $attrs.model
+            provider: $attrs.provider
+            promptTokens: $attrs.promptTokens
+            completionTokens: $attrs.completionTokens
+            totalTokens: $attrs.promptTokens + $attrs.completionTokens
+            costUsd: $attrs.cost
+            durationMs: $attrs.durationMs
+            agentName: $serviceName
+    else:
+      - action: return
+        value: null
+  - id: result
+    action: return
+    value: $isLlmSpan

@@ -1,0 +1,34 @@
+name: installIntegration
+description: Adds a marketplace integration to an organization's solution as a tool
+inputs:
+  - name: solutionId
+    type: string
+  - name: integrationId
+    type: string
+  - name: db
+    type: Database
+output:
+  type: SolutionTool
+steps:
+  - id: integration
+    call: findPartnerIntegrationById
+    with:
+      id: $integrationId
+      db: $db
+    store: integration
+  - id: tool
+    call: createSolutionTool
+    with:
+      data:
+        solutionId: $solutionId
+        name: $integration.name
+        description: "Partner integration"
+        type: api
+        config:
+          endpointUrl: $integration.endpointUrl
+          integrationId: $integrationId
+      db: $db
+    store: tool
+  - id: result
+    action: return
+    value: $tool

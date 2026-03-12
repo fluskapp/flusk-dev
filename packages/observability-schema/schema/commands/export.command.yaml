@@ -1,0 +1,33 @@
+name: export
+description: Export observability data to various formats and destinations
+action:
+  call: export
+args:
+  - name: target
+    type: enum
+    values:
+      - csv
+      - json
+      - grafana
+      - datadog
+    required: true
+    description: Export destination
+  - name: type
+    type: enum
+    values:
+      - calls
+      - traces
+      - metrics
+    default: calls
+    description: Data type to export
+  - name: start
+    type: string
+    default: 30d-ago
+    description: Start of time range
+  - name: end
+    type: string
+    default: now
+    description: End of time range
+  - name: output
+    type: string
+    description: Output file path (for csv/json)

@@ -1,0 +1,10 @@
+name: openai
+description: OpenAI API client for the explain feature and model evaluation
+baseUrl: https://api.openai.com/v1
+auth:
+  type: bearer
+  envVar: OPENAI_API_KEY
+endpoints:
+  - name: invoke
+    method: POST
+    path: /

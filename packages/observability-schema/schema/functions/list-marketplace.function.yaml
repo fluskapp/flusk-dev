@@ -1,0 +1,20 @@
+name: listMarketplace
+description: List public marketplace listings with search and filter
+inputs:
+  - name: category
+    type: string
+  - name: query
+    type: string
+  - name: db
+    type: Database
+output:
+  type: MarketplaceListing[]
+steps:
+  - id: listings
+    call: listMarketplaceListing
+    with:
+      db: $db
+    store: listings
+  - id: result
+    action: return
+    value: $listings

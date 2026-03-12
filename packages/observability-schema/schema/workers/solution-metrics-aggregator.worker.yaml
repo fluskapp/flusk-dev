@@ -1,0 +1,23 @@
+name: SolutionMetricsAggregator
+description: Periodically aggregates solution metrics from recent runs
+type: cron
+schedule: "*/15 * * * *"
+steps:
+  - id: solutions
+    call: listSolution
+    with:
+      db: $db
+    store: solutions
+  - id: aggregate
+    action: forEach
+    source: $solutions
+    call: getSolutionMetrics
+    with:
+      solutionId: $item.id
+      from: $fifteenMinutesAgo
+      to: $now
+      db: $db
+    onError: log-and-continue
+retry:
+  maxAttempts: 1
+timeout: 300s

@@ -1,0 +1,190 @@
+# Core entity: User Prompt
+# Represents the original user request that initiates a pipeline
+
+name: Prompt
+description: "Original user request that triggers pipeline creation"
+type: entity
+
+fields:
+  # Identity
+  id:
+    type: uuid
+    primary: true
+    auto: true
+    
+  user_id:
+    type: uuid
+    required: true
+    index: true
+    description: "User who submitted the prompt"
+    
+  organization_id:
+    type: uuid
+    required: true
+    index: true
+    description: "Organization context"
+    
+  # Content
+  original_text:
+    type: text
+    required: true
+    description: "Original user prompt in any language"
+    
+  translated_text:
+    type: text
+    required: true
+    description: "English translation of the prompt"
+    
+  intent_category:
+    type: enum
+    values: ["build_feature", "fix_bug", "create_schema", "generate_ui", "deploy_app", "analyze_data", "other"]
+    required: true
+    description: "Categorized intent of the prompt"
+    
+  complexity_score:
+    type: integer
+    range: [1, 10]
+    required: true
+    description: "Estimated complexity (1=simple, 10=very complex)"
+    
+  estimated_duration:
+    type: enum
+    values: ["minutes", "hours", "days", "weeks"]
+    required: true
+    description: "Estimated time to completion"
+    
+  # Context
+  business_goal:
+    type: text
+    required: true
+    description: "Extracted business objective"
+    
+  technical_requirements:
+    type: json
+    description: "Parsed technical specifications"
+    schema:
+      type: object
+      properties:
+        frameworks: { type: array, items: { type: string } }
+        databases: { type: array, items: { type: string } }
+        apis: { type: array, items: { type: string } }
+        platforms: { type: array, items: { type: string } }
+    
+  # Status
+  status:
+    type: enum
+    values: ["analyzing", "pipeline_created", "in_progress", "completed", "failed", "requires_human"]
+    default: "analyzing"
+    index: true
+    
+  priority:
+    type: enum
+    values: ["low", "medium", "high", "critical"]
+    default: "medium"
+    index: true
+    
+  # Timestamps
+  created_at:
+    type: timestamp
+    auto: true
+    index: true
+    
+  updated_at:
+    type: timestamp
+    auto: true
+    on_update: true
+    
+  completed_at:
+    type: timestamp
+    nullable: true
+
+# Relationships
+relationships:
+  - name: pipeline
+    type: hasOne
+    target: Pipeline
+    description: "The pipeline created from this prompt"
+    
+  - name: user
+    type: belongsTo
+    target: User
+    foreign_key: user_id
+    
+  - name: organization
+    type: belongsTo
+    target: Organization
+    foreign_key: organization_id
+
+# Indexes for performance
+indexes:
+  - fields: [organization_id, created_at]
+    name: "org_chronological"
+    
+  - fields: [status, priority, created_at]
+    name: "status_priority_timeline"
+    
+  - fields: [user_id, status]
+    name: "user_status"
+
+# API endpoints
+endpoints:
+  - method: POST
+    path: "/prompts"
+    description: "Submit a new prompt"
+    auth: required
+    body: 
+      fields: [original_text, intent_category, priority]
+      
+  - method: GET
+    path: "/prompts"
+    description: "List prompts with filtering"
+    auth: required
+    query:
+      organization_id: uuid
+      status: string
+      priority: string
+      limit: integer
+      offset: integer
+      
+  - method: GET  
+    path: "/prompts/{id}"
+    description: "Get prompt details with pipeline"
+    auth: required
+    include: [pipeline, pipeline.tasks, pipeline.tasks.agent]
+    
+  - method: PATCH
+    path: "/prompts/{id}"
+    description: "Update prompt status or priority"
+    auth: required
+    body:
+      fields: [status, priority]
+
+# Validation rules
+validation:
+  - field: original_text
+    min_length: 10
+    max_length: 5000
+    
+  - field: translated_text
+    min_length: 10
+    max_length: 5000
+    
+  - field: business_goal
+    min_length: 20
+    max_length: 500
+
+# Real-time events
+events:
+  - trigger: after_create
+    event: "prompt.created"
+    payload: [id, user_id, organization_id, intent_category, priority]
+    
+  - trigger: after_update
+    event: "prompt.updated"  
+    payload: [id, status, updated_at]
+    condition: "status_changed"
+    
+  - trigger: after_update
+    event: "prompt.completed"
+    payload: [id, completed_at, final_status]
+    condition: "status IN ('completed', 'failed')"

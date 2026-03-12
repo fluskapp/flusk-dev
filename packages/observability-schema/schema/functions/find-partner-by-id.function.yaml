@@ -1,0 +1,16 @@
+name: findPartnerById
+description: Find Partner by ID
+inputs:
+  - name: id
+    type: string
+  - name: db
+    type: Database
+output:
+  type: Partner
+steps:
+  - id: result
+    action: assign
+    value: $id
+  - id: done
+    action: return
+    value: $result

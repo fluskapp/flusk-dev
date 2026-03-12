@@ -1,0 +1,259 @@
+# Flusk Design System - Component Tokens
+# Semantic design tokens for consistent component styling
+
+name: FluskComponentTokens
+description: "Semantic tokens that map design decisions to components"
+
+# Button Tokens
+button:
+  # Base button styles
+  base:
+    font: "typography.scale.label.medium"
+    border_radius: "effects.radius.lg"
+    border_width: "effects.border_width.1"
+    transition: "transitions.common.interactive"
+    
+  # Size variants
+  sizes:
+    sm:
+      padding_x: "spacing.4"      # 16px
+      padding_y: "spacing.2"      # 8px
+      height: "spacing.8"         # 32px
+      font: "typography.scale.label.small"
+      
+    md:
+      padding_x: "spacing.6"      # 24px  
+      padding_y: "spacing.3"      # 12px
+      height: "spacing.10"        # 40px
+      font: "typography.scale.label.medium"
+      
+    lg:
+      padding_x: "spacing.8"      # 32px
+      padding_y: "spacing.4"      # 16px
+      height: "spacing.12"        # 48px
+      font: "typography.scale.label.large"
+      
+  # Color variants (Uneevo-inspired warm orange primary)
+  variants:
+    primary:
+      background: "colors.primary.500"     # Warm orange #ff6900
+      color: "colors.white"
+      border: "colors.primary.500"
+      hover_background: "colors.primary.600"  # Deeper orange
+      hover_shadow: "effects.colored_shadows.primary.sm"
+      active_background: "colors.primary.700"
+      
+    secondary:
+      background: "colors.secondary.500"   # Professional blue #0693e3
+      color: "colors.white"
+      border: "colors.secondary.500"
+      hover_background: "colors.secondary.600"
+      active_background: "colors.secondary.700"
+      
+    outline:
+      background: "transparent"
+      color: "colors.primary.600"
+      border: "colors.border.default"
+      hover_background: "colors.primary.50"
+      
+    ghost:
+      background: "transparent"
+      color: "colors.text.primary"
+      border: "transparent"
+      hover_background: "colors.gray.100"
+
+# Card Tokens
+card:
+  base:
+    background: "colors.backgrounds.card"
+    border: "colors.border.default"
+    border_radius: "effects.radius.xl"
+    border_width: "effects.border_width.1"
+    shadow: "effects.shadows.sm"
+    padding: "spacing.6"
+    
+  hover:
+    shadow: "effects.shadows.md"
+    transform: "translateY(-1px)"
+    
+  variants:
+    elevated:
+      shadow: "effects.shadows.lg"
+      border: "none"
+      
+    outlined:
+      shadow: "none"
+      border: "colors.border.medium"
+
+# Input Tokens
+input:
+  base:
+    background: "colors.white"
+    border: "colors.border.default"
+    border_radius: "effects.radius.lg"
+    border_width: "effects.border_width.1"
+    padding_x: "spacing.4"
+    padding_y: "spacing.3"
+    font: "typography.scale.body.medium"
+    transition: "transitions.common.interactive"
+    
+  states:
+    focus:
+      border: "colors.border.focus"
+      shadow: "effects.colored_shadows.primary.sm"
+      outline: "none"
+      
+    error:
+      border: "colors.border.error"
+      shadow: "effects.colored_shadows.error.sm"
+      
+    disabled:
+      background: "colors.gray.50"
+      color: "colors.text.muted"
+      cursor: "not-allowed"
+
+# Badge Tokens
+badge:
+  base:
+    font: "typography.scale.label.small"
+    padding_x: "spacing.2"
+    padding_y: "spacing.1"
+    border_radius: "effects.radius.full"
+    border_width: "effects.border_width.1"
+    
+  variants:
+    primary:
+      background: "colors.primary.100"
+      color: "colors.primary.800"
+      border: "colors.primary.200"
+      
+    success:
+      background: "colors.success.100"
+      color: "colors.success.800"
+      border: "colors.success.200"
+      
+    warning:
+      background: "colors.warning.100"
+      color: "colors.warning.800"
+      border: "colors.warning.200"
+      
+    error:
+      background: "colors.error.100"
+      color: "colors.error.800"
+      border: "colors.error.200"
+
+# Navigation Tokens
+navigation:
+  base:
+    background: "colors.white"
+    border: "colors.border.light"
+    shadow: "effects.shadows.sm"
+    
+  item:
+    padding_x: "spacing.4"
+    padding_y: "spacing.3"
+    border_radius: "effects.radius.md"
+    font: "typography.scale.body.medium"
+    transition: "transitions.common.interactive"
+    
+    states:
+      active:
+        background: "colors.primary.50"
+        color: "colors.primary.600"
+        
+      hover:
+        background: "colors.gray.50"
+
+# Table Tokens  
+table:
+  base:
+    background: "colors.white"
+    border: "colors.border.default"
+    border_radius: "effects.radius.xl"
+    overflow: "hidden"
+    
+  header:
+    background: "colors.gray.50"
+    font: "typography.scale.label.medium"
+    color: "colors.text.secondary"
+    padding_x: "spacing.4"
+    padding_y: "spacing.4"
+    border_bottom: "colors.border.default"
+    
+  cell:
+    padding_x: "spacing.4"
+    padding_y: "spacing.4"
+    border_bottom: "colors.border.light"
+    font: "typography.scale.body.medium"
+    
+  row:
+    hover_background: "colors.gray.25"
+
+# Modal Tokens
+modal:
+  overlay:
+    background: "colors.backgrounds.overlay"
+    backdrop_filter: "effects.blur.sm"
+    
+  content:
+    background: "colors.white"
+    border_radius: "effects.radius.xxl"
+    shadow: "effects.shadows.xxl"
+    padding: "spacing.8"
+    max_width: "containers.md"
+
+# Alert Tokens
+alert:
+  base:
+    padding: "spacing.4"
+    border_radius: "effects.radius.lg"
+    border_width: "effects.border_width.1"
+    font: "typography.scale.body.medium"
+    
+  variants:
+    info:
+      background: "colors.primary.50"
+      color: "colors.primary.800"
+      border: "colors.primary.200"
+      
+    success:
+      background: "colors.success.50"
+      color: "colors.success.800"
+      border: "colors.success.200"
+      
+    warning:
+      background: "colors.warning.50"
+      color: "colors.warning.800"
+      border: "colors.warning.200"
+      
+    error:
+      background: "colors.error.50"
+      color: "colors.error.800"
+      border: "colors.error.200"
+
+# Dashboard Specific Tokens
+dashboard:
+  metric_card:
+    background: "colors.white"
+    border: "colors.border.light"
+    border_radius: "effects.radius.xl"
+    shadow: "effects.shadows.sm"
+    padding: "spacing.6"
+    hover_shadow: "effects.shadows.md"
+    
+  widget:
+    background: "colors.white"
+    border_radius: "effects.radius.xl"
+    shadow: "effects.shadows.sm"
+    padding: "spacing.6"
+    
+  sidebar:
+    background: "colors.white"
+    border: "colors.border.light"
+    width: "280px"
+    
+  header:
+    background: "colors.white"
+    border_bottom: "colors.border.light"
+    height: "64px"
+    padding_x: "spacing.6"

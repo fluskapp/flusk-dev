@@ -1,0 +1,13 @@
+name: delusionScan
+description: Run delusion detection on recent LLM calls
+action:
+  call: delusionScan
+args:
+  - name: agent
+    type: string
+    required: true
+    description: Agent label to scan
+  - name: hours
+    type: integer
+    default: 24
+    description: Scan calls from the last N hours

@@ -1,0 +1,43 @@
+name: Partner
+description: External partner/integrator in the Flusk ecosystem
+storage: sqlite
+fields:
+  name:
+    type: string
+    required: true
+    description: Partner name
+  email:
+    type: string
+    required: true
+    unique: true
+    description: Contact email
+  website:
+    type: string
+    description: Partner website
+  status:
+    type: enum
+    values: [pending, approved, suspended]
+    required: true
+    default: pending
+    description: Partner status
+  apiKey:
+    type: string
+    unique: true
+    description: API key for partner access
+  tier:
+    type: enum
+    values: [free, standard, premium]
+    required: true
+    default: free
+    description: Partner tier
+  organizationId:
+    type: string
+    index: true
+    description: Associated organization
+capabilities:
+  crud: true
+  time-range: true
+relations:
+  - entity: Organization
+    type: belongsTo
+    foreignKey: organizationId

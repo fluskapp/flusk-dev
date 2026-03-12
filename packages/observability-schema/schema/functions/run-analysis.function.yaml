@@ -1,0 +1,45 @@
+name: runAnalysis
+description: Full analysis pipeline — ingest calls, detect patterns, generate insights
+inputs:
+  - name: db
+    type: Database
+  - name: scriptPath
+    type: string
+  - name: start
+    type: string
+  - name: end
+    type: string
+output:
+  type: AnalyzeSession
+steps:
+  - id: session
+    call: createAnalyzeSession
+    with:
+      db: $db
+      data:
+        scriptPath: $scriptPath
+        status: running
+  - id: patterns
+    call: detectPatterns
+    with:
+      db: $db
+      start: $start
+      end: $end
+  - id: insights
+    call: generateInsights
+    with:
+      db: $db
+      patterns: $patterns
+      analyzeSessionId: id
+  - id: update
+    call: updateAnalyzeSession
+    with:
+      db: $db
+      id: id
+      data:
+        status: completed
+        patternsFound: $patterns.length
+        insightsGenerated: $insights.length
+  - id: result
+    action: return
+    value: $session

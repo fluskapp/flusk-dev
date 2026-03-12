@@ -1,0 +1,41 @@
+name: listAuditLogs
+description: List audit log entries with filters
+inputs:
+  - name: organizationId
+    type: uuid
+    required: true
+  - name: userId
+    type: uuid
+  - name: action
+    type: string
+  - name: start
+    type: string
+  - name: end
+    type: string
+  - name: limit
+    type: integer
+    default: 50
+  - name: offset
+    type: integer
+    default: 0
+output:
+  type: AuditLog[]
+steps:
+  - id: logs
+    action: call
+    entity: AuditLog
+    method: findMany
+    where:
+      organizationId: $organizationId
+      userId: $userId
+      action: $action
+      createdAt:
+        gte: $start
+        lte: $end
+    limit: $limit
+    offset: $offset
+    orderBy:
+      createdAt: desc
+  - id: result
+    action: return
+    value: $logs

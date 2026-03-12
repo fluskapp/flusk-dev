@@ -1,0 +1,21 @@
+name: costEvents
+basePath: /api/cost-events
+entity: LlmCall
+auth: optional
+operations:
+  - method: GET
+    path: /stream
+    description: Server-sent events stream for live cost tracking
+    protocol: sse
+    call: listLlmCalls
+    with:
+      since: last-event
+      limit: 100
+  - method: GET
+    path: /daily
+    call: getDailySpend
+    description: Get daily spend summary
+  - method: GET
+    path: /monthly
+    call: getMonthlySpend
+    description: Get monthly spend summary

@@ -1,0 +1,27 @@
+name: dashboardWidgets
+basePath: /api/dashboard-widgets
+entity: DashboardWidget
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listDashboardWidgets
+    description: List widgets (filter by dashboardId)
+  - method: POST
+    path: /
+    call: createDashboardWidget
+    input: CreateDashboardWidget
+    description: Create a new widget
+  - method: GET
+    path: /:id
+    call: findDashboardWidgetById
+    description: Get widget by ID
+  - method: PUT
+    path: /:id
+    call: updateDashboardWidget
+    input: UpdateDashboardWidget
+    description: Update a widget
+  - method: DELETE
+    path: /:id
+    call: deleteDashboardWidget
+    description: Delete a widget

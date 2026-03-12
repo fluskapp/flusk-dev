@@ -1,0 +1,31 @@
+name: budget
+description: Manage budget thresholds
+action:
+  call: budget
+args:
+  - name: action
+    type: enum
+    values:
+      - list
+      - set
+      - remove
+      - status
+    default: list
+    description: Budget action
+  - name: name
+    type: string
+    description: Budget alert name
+  - name: type
+    type: enum
+    values:
+      - daily
+      - weekly
+      - monthly
+    description: Budget period type
+  - name: threshold
+    type: number
+    description: Threshold in USD
+  - name: auto-pause
+    type: boolean
+    default: false
+    description: Auto-pause agents when exceeded

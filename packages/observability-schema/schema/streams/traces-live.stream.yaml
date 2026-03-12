@@ -1,0 +1,14 @@
+name: TracesLive
+description: Real-time trace ingestion feed
+type: sse
+path: /api/stream/traces
+source:
+  entity: Trace
+  realtime: true
+transform:
+  fields:
+    traceId: traceId
+    spanCount: spanCount
+    duration: durationMs
+    timestamp: createdAt
+auth: required

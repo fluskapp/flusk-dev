@@ -1,0 +1,27 @@
+name: driftDetections
+basePath: /api/drift-detections
+entity: DriftDetection
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listDriftDetections
+    description: List drift detections
+  - method: GET
+    path: /:id
+    call: findDriftDetectionById
+    description: Get drift detection by ID
+  - method: PUT
+    path: /:id
+    call: updateDriftDetection
+    input: UpdateDriftDetection
+    description: Update drift detection status
+  - method: DELETE
+    path: /:id
+    call: deleteDriftDetection
+    description: Delete drift detection
+  - method: POST
+    path: /scan
+    call: runDriftScan
+    input: DriftScanRequest
+    description: Run a drift detection scan

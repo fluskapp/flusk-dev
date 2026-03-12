@@ -1,0 +1,9 @@
+name: baselineStart
+description: baselineStart
+inputs: []
+output:
+  type: json
+steps:
+  - id: r
+    action: return
+    value: 'null'

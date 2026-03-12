@@ -1,0 +1,11 @@
+name: datadog
+description: Datadog metrics API for metrics export
+baseUrl: https://api.datadoghq.{{env.DD_SITE || 'com'}}
+auth:
+  type: header
+  header: DD-API-KEY
+  envVar: DD_API_KEY
+endpoints:
+  - name: invoke
+    method: POST
+    path: /

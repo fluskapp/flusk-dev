@@ -1,0 +1,40 @@
+name: createUser
+description: Create a user within an organization
+inputs:
+  - name: organizationId
+    type: uuid
+    required: true
+  - name: email
+    type: string
+    required: true
+  - name: name
+    type: string
+    required: true
+  - name: role
+    type: string
+    default: member
+output:
+  type: User
+steps:
+  - id: user
+    action: call
+    entity: User
+    method: create
+    with:
+      organizationId: $organizationId
+      email: $email
+      name: $name
+      role: $role
+      status: invited
+  - id: audit
+    action: call
+    call: createAuditLog
+    with:
+      organizationId: $organizationId
+      userId: $user.id
+      action: user.create
+      resource: User
+      resourceId: $user.id
+  - id: result
+    action: return
+    value: $user

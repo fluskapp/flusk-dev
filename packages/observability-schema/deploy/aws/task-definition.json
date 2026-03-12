@@ -1,0 +1,58 @@
+{
+  "family": "flusk-observability",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "executionRoleArn": "arn:aws:iam::ACCOUNT_ID:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::ACCOUNT_ID:role/fluskTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "flusk-api",
+      "image": "ACCOUNT_ID.dkr.ecr.REGION.amazonaws.com/flusk-observability:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3042,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        { "name": "PLT_SERVER_PORT", "value": "3042" },
+        { "name": "PLT_LOG_LEVEL", "value": "info" },
+        { "name": "DATABASE_PATH", "value": "/data/flusk.db" },
+        { "name": "CORS_ORIGIN", "value": "*" }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "flusk-data",
+          "containerPath": "/data"
+        }
+      ],
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:3042/api/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 10
+      },
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/flusk-observability",
+          "awslogs-region": "REGION",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "name": "flusk-data",
+      "efsVolumeConfiguration": {
+        "fileSystemId": "EFS_ID",
+        "rootDirectory": "/flusk"
+      }
+    }
+  ]
+}

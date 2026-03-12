@@ -1,0 +1,14 @@
+name: CostLive
+description: Real-time cost attribution feed — see spending as it happens
+type: sse
+path: /api/cost-live
+source:
+  entity: CostAttribution
+  realtime: true
+transform:
+  fields:
+    feature: tagValue
+    cost: costUsd
+    model: model
+    timestamp: createdAt
+auth: required

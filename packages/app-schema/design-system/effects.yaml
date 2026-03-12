@@ -1,0 +1,165 @@
+# Flusk Design System - Shadows & Effects
+# Professional shadow system and visual effects
+
+name: FluskEffects
+description: "Elevation-based shadow system and modern visual effects"
+
+# Shadow Scale (based on elevation levels)
+shadows:
+  # No shadow
+  none: "none"
+  
+  # Subtle shadows for slight elevation
+  xs: "0 1px 2px 0 rgb(0 0 0 / 0.05)"
+  sm: "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)"
+  
+  # Default shadows for cards and components
+  md: "0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)"
+  lg: "0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)"
+  
+  # Strong shadows for elevated components
+  xl: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
+  xxl: "0 25px 50px -12px rgb(0 0 0 / 0.25)"
+  
+  # Special shadows
+  inner: "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)"
+  
+# Colored Shadows (for interactive elements)
+colored_shadows:
+  primary:
+    sm: "0 1px 3px 0 rgb(79 99 246 / 0.2), 0 1px 2px -1px rgb(79 99 246 / 0.2)"
+    md: "0 4px 6px -1px rgb(79 99 246 / 0.2), 0 2px 4px -2px rgb(79 99 246 / 0.2)"
+    lg: "0 10px 15px -3px rgb(79 99 246 / 0.3), 0 4px 6px -4px rgb(79 99 246 / 0.3)"
+    
+  secondary:
+    sm: "0 1px 3px 0 rgb(162 89 241 / 0.2), 0 1px 2px -1px rgb(162 89 241 / 0.2)"
+    md: "0 4px 6px -1px rgb(162 89 241 / 0.2), 0 2px 4px -2px rgb(162 89 241 / 0.2)"
+    lg: "0 10px 15px -3px rgb(162 89 241 / 0.3), 0 4px 6px -4px rgb(162 89 241 / 0.3)"
+    
+  success:
+    sm: "0 1px 3px 0 rgb(34 197 94 / 0.2), 0 1px 2px -1px rgb(34 197 94 / 0.2)"
+    md: "0 4px 6px -1px rgb(34 197 94 / 0.2), 0 2px 4px -2px rgb(34 197 94 / 0.2)"
+    
+  error:
+    sm: "0 1px 3px 0 rgb(239 68 68 / 0.2), 0 1px 2px -1px rgb(239 68 68 / 0.2)"
+    md: "0 4px 6px -1px rgb(239 68 68 / 0.2), 0 2px 4px -2px rgb(239 68 68 / 0.2)"
+
+# Border Radius
+radius:
+  none: "0"
+  xs: "0.125rem"    # 2px
+  sm: "0.25rem"     # 4px
+  md: "0.375rem"    # 6px
+  lg: "0.5rem"      # 8px
+  xl: "0.75rem"     # 12px
+  xxl: "1rem"       # 16px
+  xxxl: "1.5rem"    # 24px
+  full: "9999px"    # Fully rounded
+
+# Border Widths
+border_width:
+  0: "0"
+  1: "1px"
+  2: "2px"
+  4: "4px"
+  8: "8px"
+
+# Opacity Scale
+opacity:
+  0: "0"
+  5: "0.05"
+  10: "0.1"
+  20: "0.2"
+  25: "0.25"
+  30: "0.3"
+  40: "0.4"
+  50: "0.5"
+  60: "0.6"
+  70: "0.7"
+  75: "0.75"
+  80: "0.8"
+  90: "0.9"
+  95: "0.95"
+  100: "1"
+
+# Blur Effects
+blur:
+  none: "0"
+  sm: "4px"
+  md: "8px"
+  lg: "16px"
+  xl: "24px"
+  xxl: "40px"
+  xxxl: "64px"
+
+# Component-Specific Effects
+component_effects:
+  # Cards
+  card:
+    default: "shadows.sm"
+    hover: "shadows.md"
+    pressed: "shadows.xs"
+    
+  # Buttons
+  button:
+    default: "shadows.xs"
+    hover: "colored_shadows.primary.sm"
+    pressed: "shadows.inner"
+    
+  # Dropdowns/Modals
+  elevated:
+    dropdown: "shadows.lg"
+    modal: "shadows.xxl"
+    tooltip: "shadows.md"
+    
+  # Interactive elements
+  interactive:
+    focus: "colored_shadows.primary.md"
+    error: "colored_shadows.error.sm"
+    success: "colored_shadows.success.sm"
+
+# Transition Timings
+transitions:
+  # Duration
+  duration:
+    instant: "0ms"
+    fast: "150ms"
+    normal: "200ms"
+    slow: "300ms"
+    slower: "500ms"
+    
+  # Easing Functions
+  easing:
+    linear: "linear"
+    ease: "ease"
+    ease_in: "ease-in"
+    ease_out: "ease-out"
+    ease_in_out: "ease-in-out"
+    bounce: "cubic-bezier(0.68, -0.55, 0.265, 1.55)"
+    spring: "cubic-bezier(0.175, 0.885, 0.32, 1.275)"
+    
+  # Common Transition Combinations
+  common:
+    default: "transitions.duration.normal transitions.easing.ease_out"
+    interactive: "transitions.duration.fast transitions.easing.ease_in_out"
+    modal: "transitions.duration.slow transitions.easing.spring"
+
+# Animation Presets
+animations:
+  # Fade animations
+  fade_in: "opacity-0 to opacity-100"
+  fade_out: "opacity-100 to opacity-0"
+  
+  # Scale animations  
+  scale_in: "scale-95 to scale-100"
+  scale_out: "scale-100 to scale-95"
+  
+  # Slide animations
+  slide_up: "translate-y-2 to translate-y-0"
+  slide_down: "translate-y-0 to translate-y-2"
+  slide_left: "translate-x-2 to translate-x-0"
+  slide_right: "translate-x-0 to translate-x-2"
+  
+  # Combined animations
+  enter: "fade_in scale_in slide_up"
+  exit: "fade_out scale_out slide_down"

@@ -1,0 +1,22 @@
+name: solution-runs
+basePath: /api/solution-runs
+entity: SolutionRun
+auth: required
+operations:
+  - method: POST
+    path: /run
+    call: runSolution
+    input: RunSolution
+    description: Execute a solution
+  - method: GET
+    path: /
+    call: listSolutionRuns
+    description: List solution runs with aggregations
+  - method: GET
+    path: /:id
+    call: findSolutionRunById
+    description: Get run by ID
+  - method: GET
+    path: /metrics
+    call: getSolutionMetrics
+    description: Get solution metrics (cost, latency, success rate)

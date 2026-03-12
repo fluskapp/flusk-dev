@@ -1,0 +1,38 @@
+name: aiUsage
+basePath: /api/ai-usage
+entity: AiUsageMetric
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listAiUsageMetrics
+    description: List AI usage metrics
+  - method: POST
+    path: /
+    call: createAiUsageMetric
+    input: CreateAiUsageMetric
+    description: Record an AI usage metric
+  - method: GET
+    path: /:id
+    call: findAiUsageMetricById
+    description: Get metric by ID
+  - method: DELETE
+    path: /:id
+    call: deleteAiUsageMetric
+    description: Delete metric
+  - method: GET
+    path: /by-user/:userId
+    call: aggregateUsageByUser
+    description: Aggregate usage for a specific user
+  - method: GET
+    path: /by-tool/:toolName
+    call: aggregateUsageByTool
+    description: Aggregate usage by tool
+  - method: GET
+    path: /rankings
+    call: calculateUsageRank
+    description: Get user rankings by AI effectiveness
+  - method: GET
+    path: /roi
+    call: calculateRoi
+    description: Calculate ROI from AI tool usage

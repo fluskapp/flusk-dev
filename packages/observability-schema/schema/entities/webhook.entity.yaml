@@ -1,0 +1,64 @@
+name: Webhook
+description: Webhook delivery configuration for reports and alerts
+fields:
+  - name: id
+    type: uuid
+    required: true
+  - name: name
+    type: string
+    required: true
+    description: Human-readable webhook name
+  - name: url
+    type: url
+    required: true
+    description: Target URL for webhook delivery
+  - name: method
+    type: string
+    required: true
+    values:
+      - POST
+      - PUT
+      - PATCH
+    default: POST
+  - name: headers
+    type: json
+    required: false
+    description: Custom HTTP headers as key-value pairs
+  - name: payloadTemplate
+    type: text
+    required: false
+    description: Mustache/handlebars template for payload body
+  - name: retryMaxAttempts
+    type: integer
+    required: false
+    default: 3
+    description: Maximum retry attempts on failure
+  - name: retryDelayMs
+    type: integer
+    required: false
+    default: 1000
+    description: Delay between retries in milliseconds
+  - name: retryBackoffMultiplier
+    type: number
+    required: false
+    default: 2
+    description: Exponential backoff multiplier
+  - name: timeoutMs
+    type: integer
+    required: false
+    default: 10000
+    description: Request timeout in milliseconds
+  - name: secret
+    type: string
+    required: false
+    description: HMAC secret for signature verification
+  - name: enabled
+    type: boolean
+    required: true
+    default: true
+  - name: createdAt
+    type: datetime
+    required: true
+  - name: updatedAt
+    type: datetime
+    required: true

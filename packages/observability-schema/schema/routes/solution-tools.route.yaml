@@ -1,0 +1,27 @@
+name: solution-tools
+basePath: /api/solution-tools
+entity: SolutionTool
+auth: required
+operations:
+  - method: GET
+    path: /
+    call: listSolutionTool
+    description: List tools for a solution
+  - method: POST
+    path: /
+    call: createSolutionTool
+    input: CreateSolutionTool
+    description: Add a tool to a solution
+  - method: GET
+    path: /:id
+    call: findSolutionToolById
+    description: Get tool by ID
+  - method: PUT
+    path: /:id
+    call: updateSolutionTool
+    input: UpdateSolutionTool
+    description: Update tool config
+  - method: DELETE
+    path: /:id
+    call: deleteSolutionTool
+    description: Remove tool from solution

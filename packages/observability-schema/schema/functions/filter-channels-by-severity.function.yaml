@@ -1,0 +1,33 @@
+name: filterChannelsBySeverity
+description: Filter alert channels that match the given severity level
+inputs:
+  - name: channels
+    type: AlertChannel[]
+  - name: severity
+    type: string
+output:
+  type: AlertChannel[]
+steps:
+  - id: severityOrder
+    action: assign
+    value:
+      critical: 3
+      warning: 2
+      info: 1
+  - id: filtered
+    action: filter
+    source: $channels
+    where:
+      field: enabled
+      op: eq
+      value: true
+  - id: bySeverity
+    action: filter
+    source: $filtered
+    where:
+      field: severityFilter
+      op: custom
+      expression: "severityOrder[$item.severityFilter] <= severityOrder[$severity]"
+  - id: result
+    action: return
+    value: $bySeverity

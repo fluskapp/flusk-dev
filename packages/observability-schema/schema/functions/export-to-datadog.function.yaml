@@ -1,0 +1,43 @@
+name: exportToDatadog
+description: Export metrics to Datadog
+inputs:
+  - name: db
+    type: Database
+  - name: client
+    type: DatadogClient
+  - name: start
+    type: string
+  - name: end
+    type: string
+output:
+  type: ExportResult
+steps:
+  - id: costs
+    with:
+      db: $db
+      groupBy: model
+      start: $start
+      end: $end
+    action: call
+  - id: metrics
+    action: call
+    source: $costs
+    with:
+      series:
+        - metric: flusk.llm.cost
+          points:
+            - - $end
+              - $item.total_cost
+          tags:
+            - model:$item.model
+            - provider:$item.provider
+        - metric: flusk.llm.calls
+          points:
+            - - $end
+              - $item.call_count
+          tags:
+            - model:$item.model
+  - id: result
+    action: return
+    value:
+      metricsExported: $costs.length

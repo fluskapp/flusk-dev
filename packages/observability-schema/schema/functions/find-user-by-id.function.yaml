@@ -1,0 +1,16 @@
+name: findUserById
+description: Find User by ID
+inputs:
+  - name: id
+    type: string
+  - name: db
+    type: Database
+output:
+  type: User
+steps:
+  - id: result
+    action: assign
+    value: $id
+  - id: done
+    action: return
+    value: $result

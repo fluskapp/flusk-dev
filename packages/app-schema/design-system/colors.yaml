@@ -1,0 +1,173 @@
+# Flusk Design System - Color Palette
+# Inspired by uneevo.com's sophisticated warm professional aesthetic
+
+name: FluskDesignSystem
+version: "1.0.0"
+description: "Professional AI platform design system inspired by uneevo's warm, sophisticated palette"
+
+colors:
+  # Primary Brand Colors - Warm Orange (Inspired by Uneevo)
+  primary:
+    50: "#fff8f1"   # Very light warm orange
+    100: "#fef0e7"  # Light warm orange
+    200: "#fcddc3"  # Lighter orange
+    300: "#fac394"  # Medium light orange
+    400: "#f7a265"  # Medium orange
+    500: "#ff6900"  # Primary orange (uneevo inspired)
+    600: "#e55a00"  # Darker orange
+    700: "#cc4d00"  # Deep orange
+    800: "#b8470a"  # Very deep orange
+    900: "#8f3a0c"  # Darkest orange
+    950: "#4d1e06"  # Almost black orange
+    
+  # Secondary - Professional Blue (Inspired by Uneevo)
+  secondary:
+    50: "#f0f9ff"   # Very light blue
+    100: "#e0f2fe"  # Light blue
+    200: "#bae6fd"  # Lighter blue
+    300: "#7dd3fc"  # Medium light blue
+    400: "#38bdf8"  # Medium blue
+    500: "#0693e3"  # Professional blue (uneevo inspired)
+    600: "#0284c7"  # Darker blue
+    700: "#0369a1"  # Deep blue
+    800: "#075985"  # Very deep blue
+    900: "#0c4a6e"  # Darkest blue
+    950: "#082f49"  # Almost black blue
+
+  # Success - Modern Green
+  success:
+    50: "#f0fdf4"   # Very light green
+    100: "#dcfce7"  # Light green
+    200: "#bbf7d0"  # Lighter green
+    300: "#86efac"  # Medium light green
+    400: "#4ade80"  # Medium green
+    500: "#22c55e"  # Primary green
+    600: "#16a34a"  # Darker green
+    700: "#15803d"  # Deep green
+    800: "#166534"  # Very deep green
+    900: "#14532d"  # Darkest green
+    950: "#052e16"  # Almost black green
+
+  # Warning - Warm Orange
+  warning:
+    50: "#fffbeb"   # Very light orange
+    100: "#fef3c7"  # Light orange
+    200: "#fde68a"  # Lighter orange
+    300: "#fcd34d"  # Medium light orange
+    400: "#fbbf24"  # Medium orange
+    500: "#f59e0b"  # Primary orange
+    600: "#d97706"  # Darker orange
+    700: "#b45309"  # Deep orange
+    800: "#92400e"  # Very deep orange
+    900: "#78350f"  # Darkest orange
+    950: "#451a03"  # Almost black orange
+
+  # Error - Sophisticated Red
+  error:
+    50: "#fef2f2"   # Very light red
+    100: "#fee2e2"  # Light red
+    200: "#fecaca"  # Lighter red
+    300: "#fca5a5"  # Medium light red
+    400: "#f87171"  # Medium red
+    500: "#ef4444"  # Primary red
+    600: "#dc2626"  # Darker red
+    700: "#b91c1c"  # Deep red
+    800: "#991b1b"  # Very deep red
+    900: "#7f1d1d"  # Darkest red
+    950: "#450a0a"  # Almost black red
+
+  # Neutral Grays - Warm Professional (Uneevo-inspired warm grays)
+  gray:
+    50: "#fafaf9"   # Almost white with warm tint
+    100: "#f5f5f4"  # Very light warm gray
+    200: "#e7e5e4"  # Light warm gray
+    300: "#d6d3d1"  # Medium light warm gray
+    400: "#a8a29e"  # Medium warm gray
+    500: "#78716c"  # Primary warm gray
+    600: "#57534e"  # Darker warm gray
+    700: "#44403c"  # Deep warm gray
+    800: "#292524"  # Very deep warm gray
+    900: "#1c1917"  # Darkest warm gray
+    950: "#0c0a09"  # Almost black warm
+
+  # Special Colors for AI/Tech Theme
+  accent:
+    electric: "#00d4ff"    # Electric blue
+    cyber: "#8b5cf6"       # Cyber purple
+    ai: "#06b6d4"          # AI teal
+    neural: "#8b5a2b"      # Neural orange
+    quantum: "#ec4899"     # Quantum pink
+    
+  # Semantic Colors
+  semantic:
+    info: "#0ea5e9"        # Info blue
+    focus: "#3b82f6"       # Focus blue
+    shadow_ai: "#ef4444"   # Shadow AI red
+    approved: "#10b981"    # Approved green
+    pending: "#f59e0b"     # Pending orange
+
+# Gradients - Warm Professional (Uneevo-inspired)
+gradients:
+  primary: 
+    from: "primary.500"     # Warm orange
+    to: "secondary.500"     # Professional blue
+    direction: "135deg"
+    
+  hero:
+    from: "primary.600"     # Deep orange
+    to: "secondary.400"     # Medium blue
+    direction: "120deg"
+    description: "Warm to cool professional gradient"
+    
+  card:
+    from: "primary.50"      # Very light orange
+    to: "secondary.50"      # Very light blue
+    direction: "145deg"
+    description: "Subtle warm card background"
+    
+  button:
+    from: "primary.500"     # Primary orange
+    to: "primary.600"       # Darker orange
+    direction: "180deg"
+    description: "Orange button hover effect"
+    
+  dashboard:
+    from: "gray.50"         # Warm white
+    via: "primary.50"       # Light orange tint
+    to: "secondary.50"      # Light blue tint
+    direction: "225deg"
+    description: "Professional dashboard background"
+    
+  accent:
+    from: "primary.400"     # Medium orange
+    via: "secondary.400"    # Medium blue  
+    to: "success.400"       # Medium green
+    direction: "90deg"
+    description: "Colorful accent gradient"
+
+# Background Variations
+backgrounds:
+  app: "gray.50"
+  card: "white"
+  elevated: "white"
+  overlay: "gray.900/80"
+  gradient_hero: "gradient.hero"
+  gradient_dashboard: "gradient.dashboard"
+
+# Text Colors
+text:
+  primary: "gray.900"
+  secondary: "gray.600" 
+  tertiary: "gray.500"
+  inverse: "white"
+  accent: "primary.600"
+  muted: "gray.400"
+
+# Border Colors  
+border:
+  default: "gray.200"
+  light: "gray.100"
+  medium: "gray.300"
+  focus: "primary.500"
+  error: "error.300"
+  success: "success.300"

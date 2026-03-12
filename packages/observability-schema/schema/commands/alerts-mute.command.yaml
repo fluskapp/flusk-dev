@@ -1,0 +1,13 @@
+name: alertsMute
+description: Mute or unmute alert channels
+args:
+  - name: unmute
+    type: boolean
+    default: false
+    description: Unmute instead of mute
+action:
+  call: updateAlertChannel
+  with:
+    db: $db
+    name: $name
+    data: '{"enabled":"$unmute"}'

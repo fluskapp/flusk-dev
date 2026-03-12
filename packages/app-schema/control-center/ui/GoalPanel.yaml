@@ -1,0 +1,398 @@
+# UI Component: Goal Panel
+# Right panel showing business objectives and pipeline visualization
+
+name: GoalPanel
+type: component
+category: display
+
+description: "Business goals visualization with real-time pipeline progress"
+
+props:
+  # Data Source
+  organization_id:
+    type: uuid
+    required: true
+    description: "Organization context"
+    
+  selected_prompt_id:
+    type: uuid
+    nullable: true
+    description: "Currently selected prompt to show goal for"
+    
+  # Display Configuration
+  show_technical_details:
+    type: boolean
+    default: false
+    description: "Show technical requirements alongside business goals"
+    
+  auto_update:
+    type: boolean
+    default: true
+    description: "Auto-update pipeline progress"
+    
+  # Filters
+  filters:
+    type: object
+    default: {}
+    schema:
+      properties:
+        status: { type: array, items: { type: string } }
+        priority: { type: array, items: { type: string } }
+        date_range: { type: string }
+
+# Data Sources
+data_sources:
+  current_goal:
+    api: "/api/prompts/{{ selected_prompt_id }}/goal"
+    method: "GET"
+    include: ["pipeline", "pipeline.tasks", "pipeline.timeline_events"]
+    websocket: "/ws/pipeline/{{ pipeline_id }}"
+    
+  organization_goals:
+    api: "/api/goals/summary"
+    method: "GET"
+    params:
+      organization_id: "{{ organization_id }}"
+      timeframe: "current"
+
+# Layout Structure
+layout:
+  container: "flex flex-col h-full"
+  sections:
+    header: "h-16 border-b border-gray-200 bg-gray-50"
+    main_content: "flex-1 overflow-y-auto"
+    footer: "h-12 border-t border-gray-200 bg-gray-50"
+
+# Components
+components:
+  # When no prompt selected
+  empty_state:
+    component: "GoalEmptyState"
+    condition: "!selected_prompt_id"
+    props:
+      title: "Select a Prompt"
+      subtitle: "Choose a prompt to see its business objective and execution pipeline"
+      icon: "target"
+      
+  # Goal display
+  goal_header:
+    component: "GoalHeader"
+    condition: "selected_prompt_id && current_goal"
+    props:
+      goal: "{{ current_goal }}"
+      progress: "{{ current_goal.pipeline.progress_percentage }}"
+      
+  # Pipeline visualization
+  pipeline_view:
+    component: "PipelineVisualization"
+    condition: "selected_prompt_id && current_goal.pipeline"
+    props:
+      pipeline: "{{ current_goal.pipeline }}"
+      show_technical: "{{ show_technical_details }}"
+      
+  # Organization summary
+  org_summary:
+    component: "OrganizationGoalsSummary"
+    props:
+      goals: "{{ organization_goals }}"
+
+# Goal Header Component
+goal_header:
+  name: "GoalHeader"
+  props:
+    goal: { type: object, required: true }
+    progress: { type: number, default: 0 }
+    
+  layout: |
+    <div className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50">
+      <!-- Status Badge -->
+      <div className="flex items-center justify-between mb-4">
+        <StatusBadge status={goal.status} size="lg" />
+        <div className="flex items-center space-x-2">
+          <PriorityIndicator priority={goal.priority} />
+          <ComplexityScore score={goal.complexity_score} />
+        </div>
+      </div>
+      
+      <!-- Business Goal -->
+      <div className="mb-4">
+        <h2 className="text-lg font-semibold text-gray-900 mb-2">
+          🎯 Business Objective
+        </h2>
+        <p className="text-gray-700 leading-relaxed">
+          {goal.business_goal}
+        </p>
+      </div>
+      
+      <!-- Progress -->
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm font-medium text-gray-700">
+            Overall Progress
+          </span>
+          <span className="text-sm text-gray-500">
+            {progress}%
+          </span>
+        </div>
+        <ProgressBar 
+          value={progress} 
+          className="h-3 bg-gray-200 rounded-full"
+          fillClassName="bg-gradient-to-r from-blue-500 to-indigo-600"
+        />
+      </div>
+      
+      <!-- Estimated Completion -->
+      <div className="flex items-center justify-between text-sm text-gray-600">
+        <span>Est. Duration: {goal.estimated_duration}</span>
+        <span>Started: <RelativeTime timestamp={goal.created_at} /></span>
+      </div>
+    </div>
+
+# Pipeline Visualization Component
+pipeline_visualization:
+  name: "PipelineVisualization"
+  props:
+    pipeline: { type: object, required: true }
+    show_technical: { type: boolean, default: false }
+    
+  layout: |
+    <div className="p-6">
+      <!-- Pipeline Header -->
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="text-lg font-semibold text-gray-900">
+          🔄 Execution Pipeline
+        </h3>
+        <div className="flex items-center space-x-4">
+          <span className="text-sm text-gray-600">
+            {pipeline.tasks_completed} of {pipeline.tasks_total} tasks
+          </span>
+          <button 
+            onClick={() => setShowTechnical(!show_technical)}
+            className="text-xs bg-gray-100 hover:bg-gray-200 px-3 py-1 rounded-full"
+          >
+            {show_technical ? 'Business View' : 'Technical View'}
+          </button>
+        </div>
+      </div>
+      
+      <!-- Phase Progress -->
+      <div className="mb-6">
+        <PhaseProgress 
+          phases={pipeline.execution_plan.phases}
+          current_phase={pipeline.current_phase}
+        />
+      </div>
+      
+      <!-- Task Flow -->
+      <div className="space-y-4">
+        {pipeline.execution_plan.phases.map(phase => (
+          <PhaseCard 
+            key={phase.name}
+            phase={phase}
+            tasks={getTasksForPhase(pipeline.tasks, phase)}
+            current={phase.name === pipeline.current_phase}
+            show_technical={show_technical}
+          />
+        ))}
+      </div>
+      
+      <!-- Agents Working -->
+      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+        <h4 className="text-sm font-medium text-gray-900 mb-3">
+          🤖 Active Agents
+        </h4>
+        <div className="flex flex-wrap gap-2">
+          {pipeline.agents_assigned.map(agent => (
+            <AgentBadge 
+              key={agent.agent_id}
+              agent={agent}
+              status={getAgentStatus(agent, pipeline.tasks)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+
+# Phase Card Component
+phase_card:
+  name: "PhaseCard"
+  props:
+    phase: { type: object, required: true }
+    tasks: { type: array, required: true }
+    current: { type: boolean, default: false }
+    show_technical: { type: boolean, default: false }
+    
+  layout: |
+    <div className={`border-l-4 pl-4 py-3 ${
+      current ? 'border-blue-500 bg-blue-50' : 'border-gray-200'
+    }`}>
+      <!-- Phase Header -->
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center space-x-3">
+          <PhaseIcon phase={phase.name} current={current} />
+          <h4 className="font-medium text-gray-900">
+            {phase.name}
+          </h4>
+          {current && (
+            <span className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full">
+              Current
+            </span>
+          )}
+        </div>
+        <PhaseProgress 
+          completed={tasks.filter(t => t.status === 'completed').length}
+          total={tasks.length}
+        />
+      </div>
+      
+      <!-- Phase Description -->
+      <p className="text-sm text-gray-600 mb-3">
+        {phase.description}
+      </p>
+      
+      <!-- Tasks -->
+      <div className="space-y-2">
+        {tasks.map(task => (
+          <TaskItem 
+            key={task.id}
+            task={task}
+            show_technical={show_technical}
+          />
+        ))}
+      </div>
+      
+      <!-- Parallel Indicator -->
+      {phase.parallel && (
+        <div className="mt-2 text-xs text-purple-600 flex items-center">
+          <ParallelIcon className="mr-1" size={12} />
+          Running in parallel
+        </div>
+      )}
+    </div>
+
+# Task Item Component  
+task_item:
+  name: "TaskItem"
+  props:
+    task: { type: object, required: true }
+    show_technical: { type: boolean, default: false }
+    
+  layout: |
+    <div className={`flex items-center justify-between p-3 rounded-lg border ${
+      getTaskStatusStyles(task.status)
+    }`}>
+      <!-- Task Info -->
+      <div className="flex items-center space-x-3 flex-1">
+        <TaskStatusIcon status={task.status} />
+        <div className="flex-1">
+          <div className="flex items-center space-x-2">
+            <span className="text-sm font-medium text-gray-900">
+              {task.name}
+            </span>
+            {task.requires_human_approval && (
+              <span className="px-2 py-1 text-xs bg-orange-100 text-orange-700 rounded-full">
+                Needs Review
+              </span>
+            )}
+          </div>
+          
+          {show_technical ? (
+            <div className="text-xs text-gray-600 mt-1">
+              Agent: {task.agent_type} • Est: {task.estimated_duration_minutes}m
+            </div>
+          ) : (
+            <div className="text-xs text-gray-600 mt-1">
+              {task.description}
+            </div>
+          )}
+        </div>
+      </div>
+      
+      <!-- Task Actions -->
+      <div className="flex items-center space-x-2">
+        {task.status === 'blocked' && (
+          <button className="p-1 text-orange-500 hover:bg-orange-50 rounded">
+            <AlertTriangleIcon size={16} />
+          </button>
+        )}
+        
+        {task.progress_percentage > 0 && task.progress_percentage < 100 && (
+          <div className="w-12 h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-blue-500 transition-all duration-500"
+              style={{ width: `${task.progress_percentage}%` }}
+            />
+          </div>
+        )}
+        
+        <TaskTimer 
+          started_at={task.started_at}
+          estimated_duration={task.estimated_duration_minutes}
+        />
+      </div>
+    </div>
+
+# Real-time Updates
+real_time:
+  websocket_events:
+    - event: "pipeline.progress"
+      action: "update_progress_bars"
+      animation: "smooth_progress"
+      
+    - event: "task.status_changed" 
+      action: "update_task_status"
+      animation: "status_transition"
+      
+    - event: "task.blocked"
+      action: "highlight_blocked_task"
+      animation: "urgent_pulse"
+      
+    - event: "phase.started"
+      action: "activate_phase"
+      animation: "phase_transition"
+      
+    - event: "pipeline.completed"
+      action: "celebration_animation"
+      animation: "confetti"
+
+# Styling
+styling:
+  container: "bg-white"
+  
+  # Status-based styling
+  task_status:
+    pending: "border-gray-200 bg-gray-50"
+    ready: "border-blue-200 bg-blue-50"
+    in_progress: "border-green-200 bg-green-50 animate-pulse"
+    blocked: "border-orange-200 bg-orange-50"
+    completed: "border-green-300 bg-green-100"
+    failed: "border-red-200 bg-red-50"
+    
+  phase_status:
+    waiting: "opacity-60"
+    current: "ring-2 ring-blue-500 ring-opacity-50"
+    completed: "bg-green-50 border-green-200"
+
+# Events
+events:
+  on_task_click:
+    description: "Show task details"
+    payload: { task_id: "uuid", task: "object" }
+    
+  on_phase_expand:
+    description: "Expand/collapse phase details"
+    payload: { phase_name: "string" }
+    
+  on_agent_click:
+    description: "Show agent details"
+    payload: { agent_id: "uuid" }
+    
+  on_technical_toggle:
+    description: "Toggle technical/business view"
+    payload: { show_technical: "boolean" }
+
+# Performance
+performance:
+  update_throttle: 100  # ms
+  animation_duration: 300  # ms
+  max_visible_tasks: 50

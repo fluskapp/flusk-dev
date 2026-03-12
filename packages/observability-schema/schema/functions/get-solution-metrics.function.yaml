@@ -1,0 +1,34 @@
+name: getSolutionMetrics
+description: Get solution metrics — cost, latency, success rate, usage over time
+inputs:
+  - name: solutionId
+    type: string
+  - name: from
+    type: string
+  - name: to
+    type: string
+  - name: db
+    type: Database
+output:
+  type: json
+steps:
+  - id: solution
+    call: findSolutionById
+    with:
+      id: $solutionId
+      db: $db
+    store: solution
+  - id: runs
+    call: querySolutionRun
+    with:
+      query: runsBySolution
+      start: $from
+      end: $to
+      db: $db
+    store: runs
+  - id: result
+    action: return
+    value:
+      solutionId: $solutionId
+      metrics: $solution.metrics
+      timeRange: $runs

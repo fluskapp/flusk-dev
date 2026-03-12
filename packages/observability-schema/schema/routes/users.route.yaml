@@ -1,0 +1,37 @@
+name: users
+basePath: /api/users
+entity: User
+auth: required
+operations:
+  - method: GET
+    path: /
+    call: listUsers
+    description: List users in organization
+  - method: POST
+    path: /
+    call: createUser
+    input: CreateUser
+    description: Create/invite a user
+  - method: GET
+    path: /:id
+    call: findUserById
+    description: Get user by ID
+  - method: PUT
+    path: /:id
+    call: updateUser
+    input: UpdateUser
+    description: Update user details
+  - method: POST
+    path: /:id/invite
+    call: createUser
+    description: Re-send invitation
+  - method: POST
+    path: /:id/suspend
+    call: updateUser
+    with:
+      status: suspended
+    description: Suspend a user
+  - method: DELETE
+    path: /:id
+    call: deleteUser
+    description: Remove user from organization

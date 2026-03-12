@@ -1,0 +1,38 @@
+name: alertEvents
+basePath: /api/alert-events
+entity: AlertEvent
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listAlertEvents
+    description: List alert events
+  - method: POST
+    path: /
+    call: createAlertEvent
+    input: CreateAlertEvent
+    description: Record an alert event
+  - method: GET
+    path: /:id
+    call: findAlertEventById
+    description: Get event by ID
+  - method: PUT
+    path: /:id
+    call: updateAlertEvent
+    input: UpdateAlertEvent
+    description: Update an event (e.g. acknowledge)
+  - method: DELETE
+    path: /:id
+    call: deleteAlertEvent
+    description: Delete an event
+  - method: GET
+    path: /by-time-range
+    call: findAlertEventsByTimeRange
+    query:
+      - name: from
+        type: string
+        required: true
+      - name: to
+        type: string
+        required: true
+    description: Get events in time range

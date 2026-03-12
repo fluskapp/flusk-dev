@@ -1,0 +1,18 @@
+name: updateUser
+description: Update User
+inputs:
+  - name: id
+    type: string
+  - name: data
+    type: json
+  - name: db
+    type: Database
+output:
+  type: User
+steps:
+  - id: result
+    action: assign
+    value: $data
+  - id: done
+    action: return
+    value: $result

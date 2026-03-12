@@ -1,0 +1,9 @@
+name: periodEnd
+description: periodEnd
+inputs: []
+output:
+  type: json
+steps:
+  - id: r
+    action: return
+    value: 'null'

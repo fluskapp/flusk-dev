@@ -1,0 +1,14 @@
+name: generateRandomKey
+description: Generate a cryptographically random key string
+inputs:
+  - name: length
+    type: number
+output:
+  type: string
+steps:
+  - id: key
+    action: assign
+    value: randomKeyPlaceholder
+  - id: result
+    action: return
+    value: $key

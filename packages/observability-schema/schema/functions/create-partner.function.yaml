@@ -1,0 +1,16 @@
+name: createPartner
+description: Create Partner
+inputs:
+  - name: data
+    type: json
+  - name: db
+    type: Database
+output:
+  type: Partner
+steps:
+  - id: result
+    action: assign
+    value: $data
+  - id: done
+    action: return
+    value: $result

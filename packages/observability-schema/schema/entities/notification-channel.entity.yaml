@@ -1,0 +1,47 @@
+name: NotificationChannel
+description: Notification delivery channel configuration
+fields:
+  - name: id
+    type: uuid
+    required: true
+  - name: name
+    type: string
+    required: true
+    description: Channel display name
+  - name: type
+    type: string
+    required: true
+    values:
+      - email
+      - slack
+      - webhook
+      - stdout
+    description: Delivery channel type
+  - name: config
+    type: json
+    required: true
+    description: Channel-specific configuration
+  - name: enabled
+    type: boolean
+    required: true
+    default: true
+  - name: severityFilter
+    type: string
+    required: false
+    values:
+      - info
+      - warning
+      - critical
+      - all
+    default: all
+    description: Minimum severity to deliver
+  - name: webhookId
+    type: uuid
+    required: false
+    description: Associated webhook ID (for webhook type)
+  - name: createdAt
+    type: datetime
+    required: true
+  - name: updatedAt
+    type: datetime
+    required: true

@@ -1,0 +1,31 @@
+name: SolutionTool
+description: Tool attached to a solution (function, API, database, file)
+storage: sqlite
+fields:
+  solutionId:
+    type: string
+    required: true
+    index: true
+    description: Solution this tool belongs to
+  name:
+    type: string
+    required: true
+    description: Tool name
+  description:
+    type: string
+    description: Tool description
+  type:
+    type: enum
+    values: [function, api, database, file]
+    required: true
+    description: Tool type
+  config:
+    type: json
+    description: Tool configuration (endpoint, auth, schema)
+capabilities:
+  crud: true
+  time-range: true
+relations:
+  - entity: Solution
+    type: belongsTo
+    foreignKey: solutionId

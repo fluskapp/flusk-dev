@@ -1,0 +1,39 @@
+name: AdminDashboard
+type: dashboard
+description: Main admin dashboard with usage stats and solutions overview
+route: /$tenant/admin
+layout: full
+auth: true
+ssr: false
+loader:
+  source: Dashboard
+  params: [tenant]
+sections:
+  - name: Usage Stats
+    type: stat-cards
+    widgets:
+      - type: stat-card
+        source: stats.totalUsers
+        label: Total Users
+        format: number
+      - type: stat-card
+        source: stats.revenue
+        label: Monthly Revenue
+        format: currency
+      - type: stat-card
+        source: stats.growth
+        label: Growth
+        format: percent
+  - name: Usage Over Time
+    type: chart
+    source: queries.byDay
+    chart:
+      type: area
+      xAxis: date
+      yAxis: count
+      color: blue
+  - name: Solutions
+    type: data-table
+    source: solutions
+    columns: [name, status, createdAt, usage]
+    actions: [edit, delete]

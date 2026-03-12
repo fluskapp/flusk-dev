@@ -1,0 +1,19 @@
+name: findCriticalPath
+description: Identify the critical path in a trace (longest sequential chain)
+inputs:
+  - name: spans
+    type: json
+output:
+  type: json
+steps:
+  - id: graph
+    action: call
+    expression: buildDependencyGraph($spans)
+  - id: longestPath
+    action: call
+    expression: findLongestPath($graph)
+  - id: result
+    action: return
+    value:
+      spanIds: $longestPath.spanIds
+      totalDuration: $longestPath.duration

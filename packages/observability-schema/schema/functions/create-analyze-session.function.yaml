@@ -1,0 +1,16 @@
+name: createAnalyzeSession
+description: Create AnalyzeSession
+inputs:
+  - name: data
+    type: json
+  - name: db
+    type: Database
+output:
+  type: AnalyzeSession
+steps:
+  - id: result
+    action: assign
+    value: $data
+  - id: done
+    action: return
+    value: $result

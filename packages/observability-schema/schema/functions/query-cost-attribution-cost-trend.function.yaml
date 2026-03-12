@@ -1,0 +1,25 @@
+name: queryCostAttributionCostTrend
+description: Query daily cost trend for a specific tag dimension
+inputs:
+  - name: tagKey
+    type: string
+  - name: from
+    type: string
+  - name: to
+    type: string
+  - name: db
+    type: Database
+output:
+  type: CostTrendPoint[]
+steps:
+  - id: results
+    action: call
+    entity: CostAttribution
+    queryName: costTrend
+    params:
+      - $tagKey
+      - $from
+      - $to
+  - id: result
+    action: return
+    value: $results

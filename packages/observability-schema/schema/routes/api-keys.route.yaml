@@ -1,0 +1,18 @@
+name: apiKeys
+basePath: /api/api-keys
+entity: ApiKey
+auth: required
+operations:
+  - method: POST
+    path: /
+    call: createApiKey
+    input: CreateApiKey
+    description: Create API key (returns plaintext key once)
+  - method: GET
+    path: /
+    call: listApiKeys
+    description: List API keys (shows prefix only)
+  - method: POST
+    path: /:id/revoke
+    call: revokeApiKey
+    description: Revoke an API key

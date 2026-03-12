@@ -1,0 +1,40 @@
+name: aggregateCosts
+description: Aggregate costs by model, time period, or agent
+inputs:
+  - name: db
+    type: Database
+  - name: groupBy
+    type: enum
+    values:
+      - model
+      - agent
+      - provider
+  - name: start
+    type: string
+  - name: end
+    type: string
+output:
+  type: CostAggregation[]
+steps:
+  - id: result
+    action: condition
+    if:
+      field: $groupBy
+      op: eq
+      value: model
+    then:
+      - call: queryLlmCall
+        with:
+          db: $db
+          query: costByModel
+          params:
+            start: $start
+            end: $end
+    else:
+      - call: queryLlmCall
+        with:
+          db: $db
+          query: costByAgent
+          params:
+            start: $start
+            end: $end

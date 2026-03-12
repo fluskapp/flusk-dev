@@ -1,0 +1,64 @@
+name: runSolution
+description: Executes a solution — loads config, calls LLM, tracks run, emits events
+inputs:
+  - name: solutionId
+    type: string
+  - name: organizationId
+    type: string
+  - name: input
+    type: json
+  - name: db
+    type: Database
+output:
+  type: SolutionRun
+steps:
+  - id: solution
+    call: findSolutionById
+    with:
+      id: $solutionId
+      db: $db
+    store: solution
+  - id: run
+    call: createSolutionRun
+    with:
+      data:
+        solutionId: $solutionId
+        organizationId: $organizationId
+        input: $input
+        status: running
+      db: $db
+    store: run
+  - id: llmResult
+    call: invokeModel
+    with:
+      model: $solution.config.model
+      messages:
+        - role: system
+          content: $solution.config.systemPrompt
+        - role: user
+          content: $input
+    store: llmResult
+  - id: completed
+    call: updateSolutionRun
+    with:
+      id: $run.id
+      data:
+        status: completed
+        output: $llmResult.choices
+        modelUsed: $solution.config.model
+        tokensIn: $llmResult.usage.prompt_tokens
+        tokensOut: $llmResult.usage.completion_tokens
+        cost: $llmResult.usage.cost
+      db: $db
+    store: completed
+  - id: emitCompleted
+    call: emitSolutionRunCompleted
+    with:
+      runId: $run.id
+      solutionId: $solutionId
+  - id: result
+    action: return
+    value: $completed
+errors:
+  - type: LlmError
+    action: log-and-continue

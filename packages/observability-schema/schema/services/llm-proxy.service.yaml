@@ -1,0 +1,36 @@
+name: llm-proxy
+description: Transparent LLM API proxy for zero-code instrumentation
+type: http-proxy
+listen:
+  port: 8787
+  host: 0.0.0.0
+upstream:
+  providers:
+    - name: openai
+      baseUrl: https://api.openai.com
+      pathPrefix: /v1
+      detect:
+        - /v1/chat/completions
+        - /v1/completions
+        - /v1/embeddings
+    - name: anthropic
+      baseUrl: https://api.anthropic.com
+      pathPrefix: /v1
+      detect:
+        - /v1/messages
+middleware:
+  - cost-calculator
+  - duplicate-detector
+  - request-capture
+capture:
+  entity: LlmCall
+  async: true
+  fields:
+    model: response.model
+    inputTokens: response.usage.prompt_tokens
+    outputTokens: response.usage.completion_tokens
+    latencyMs: computed.latencyMs
+    promptHash: computed.sha256(request.messages)
+    status: response.status
+    provider: detected.provider
+streaming: false

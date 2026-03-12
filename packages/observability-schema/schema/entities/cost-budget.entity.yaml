@@ -1,0 +1,46 @@
+name: CostBudget
+description: Budget limit for a specific tag (e.g. team=engineering has $500/month budget)
+storage: sqlite
+fields:
+  tagKey:
+    type: string
+    required: true
+    index: true
+    description: Which dimension (feature, team, customer)
+  tagValue:
+    type: string
+    required: true
+    index: true
+    description: Which value (support-bot, engineering)
+  limitUsd:
+    type: number
+    required: true
+    description: Budget limit in USD
+  period:
+    type: enum
+    values:
+      - daily
+      - weekly
+      - monthly
+    required: true
+    description: Budget period
+  alertAt:
+    type: number
+    required: true
+    default: 80
+    description: Alert when reaching this percentage of budget
+  action:
+    type: enum
+    values:
+      - alert
+      - throttle
+      - block
+    required: true
+    default: alert
+    description: What to do when budget exceeded
+  enabled:
+    type: boolean
+    required: true
+    default: true
+capabilities:
+  crud: true

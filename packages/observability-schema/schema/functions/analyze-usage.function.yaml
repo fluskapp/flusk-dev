@@ -1,0 +1,16 @@
+name: analyzeUsage
+description: Analyze usage data using AI
+inputs:
+  - name: data
+    type: json
+  - name: db
+    type: Database
+output:
+  type: json
+steps:
+  - id: result
+    action: assign
+    value: $data
+  - id: done
+    action: return
+    value: $result

@@ -1,0 +1,11 @@
+name: anthropic
+description: Anthropic API client for Claude models
+baseUrl: https://api.anthropic.com/v1
+auth:
+  type: header
+  header: x-api-key
+  envVar: ANTHROPIC_API_KEY
+endpoints:
+  - name: invoke
+    method: POST
+    path: /

@@ -1,0 +1,40 @@
+name: PartnerIntegration
+description: Integration provided by a partner (model, tool, data source, etc.)
+storage: sqlite
+fields:
+  partnerId:
+    type: string
+    required: true
+    index: true
+    description: Partner that owns this integration
+  name:
+    type: string
+    required: true
+    description: Integration name
+  type:
+    type: enum
+    values: [model-provider, tool, data-source, notification]
+    required: true
+    description: Integration type
+  config:
+    type: json
+    description: Integration configuration
+  status:
+    type: enum
+    values: [active, inactive, pending-review]
+    required: true
+    default: pending-review
+    description: Integration status
+  endpointUrl:
+    type: string
+    description: Integration endpoint URL
+  documentation:
+    type: string
+    description: Documentation URL or markdown
+capabilities:
+  crud: true
+  time-range: true
+relations:
+  - entity: Partner
+    type: belongsTo
+    foreignKey: partnerId

@@ -1,0 +1,14 @@
+name: discord
+description: Discord webhook
+type: webhook
+config:
+  fields:
+    - name: webhookUrl
+      type: string
+      required: true
+      description: Discord webhook URL
+methods:
+  - name: send
+    description: Send Discord embed
+    input: AlertEvent
+  - name: test

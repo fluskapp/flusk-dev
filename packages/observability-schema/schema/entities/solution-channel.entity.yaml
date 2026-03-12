@@ -1,0 +1,37 @@
+name: SolutionChannel
+description: Channel connection for publishing a solution (Slack, WhatsApp, etc.)
+storage: sqlite
+fields:
+  solutionId:
+    type: string
+    required: true
+    index: true
+    description: Solution this channel belongs to
+  channel:
+    type: enum
+    values: [slack, whatsapp, telegram, discord, api, web]
+    required: true
+    description: Channel type
+  config:
+    type: json
+    description: Channel configuration (webhook URL, bot token, etc.)
+  status:
+    type: enum
+    values: [active, inactive]
+    required: true
+    default: inactive
+    description: Channel status
+  messageCount:
+    type: integer
+    default: 0
+    description: Total messages sent through this channel
+  lastMessageAt:
+    type: date
+    description: Last message timestamp
+capabilities:
+  crud: true
+  time-range: true
+relations:
+  - entity: Solution
+    type: belongsTo
+    foreignKey: solutionId

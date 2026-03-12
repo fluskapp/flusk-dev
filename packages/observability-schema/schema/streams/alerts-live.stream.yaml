@@ -1,0 +1,15 @@
+name: AlertsLive
+description: Real-time alert event feed
+type: sse
+path: /api/stream/alerts
+source:
+  entity: AlertEvent
+  realtime: true
+transform:
+  fields:
+    alertType: alertType
+    severity: severity
+    title: title
+    message: message
+    timestamp: createdAt
+auth: required

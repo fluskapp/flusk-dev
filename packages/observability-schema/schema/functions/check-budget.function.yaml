@@ -1,0 +1,41 @@
+name: checkBudget
+description: Check if current spending exceeds any budget thresholds
+inputs:
+  - name: db
+    type: Database
+output:
+  type: BudgetCheckResult[]
+steps:
+  - id: alerts
+    call: listBudgetAlerts
+    with: { db: $db, filter: { enabled: true } }
+  - id: dailySpend
+    call: getDailySpend
+    with: { db: $db }
+  - id: monthlySpend
+    call: getMonthlySpend
+    with: { db: $db }
+  - id: results
+    action: forEach
+    source: $alerts
+    steps:
+      - id: currentSpend
+        action: condition
+        if: { field: "$item.budgetType", op: eq, value: daily }
+        then: $dailySpend.totalCostUsd
+        else: $monthlySpend.totalCostUsd
+      - id: exceeded
+        action: compute
+        expression: "$currentSpend >= $item.thresholdUsd"
+      - id: warning
+        action: compute
+        expression: "$currentSpend >= ($item.thresholdUsd * $item.warningPercent / 100)"
+      - id: triggerAlert
+        action: condition
+        if: { field: $exceeded, op: eq, value: true }
+        then:
+          call: createBudgetAlert_event
+          with: { db: $db, budgetAlert: $item, currentSpend: $currentSpend }
+  - id: result
+    action: return
+    value: $results

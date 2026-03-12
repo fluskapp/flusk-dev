@@ -1,0 +1,34 @@
+name: shouldAutoPause
+description: Determine if agent should be auto-paused based on circuit breaker
+inputs:
+  - name: db
+    type: Database
+  - name: config
+    type: CircuitBreakerConfig
+output:
+  type: boolean
+steps:
+  - id: status
+    call: checkCircuit
+    with: { db: $db, config: $config }
+  - id: check
+    action: condition
+    if:
+      field: $status.tripped
+      op: eq
+      value: true
+    then:
+      - id: alert
+        call: dispatchAlert
+        with:
+          db: $db
+          alert:
+            alertType: budget_exceeded
+            severity: critical
+            title: "Circuit breaker tripped"
+            message: "$status.reason: spent $status.actual (limit: $status.limit)"
+      - action: return
+        value: true
+  - id: notTripped
+    action: return
+    value: false

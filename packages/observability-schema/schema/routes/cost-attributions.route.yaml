@@ -1,0 +1,26 @@
+name: costAttributions
+basePath: /api/cost-attributions
+entity: CostAttribution
+auth: required
+operations:
+  - method: GET
+    path: /
+    call: listCostAttributions
+    description: List all cost attributions
+  - method: POST
+    path: /
+    call: createCostAttribution
+    input: CreateCostAttribution
+    description: Create attribution
+  - method: GET
+    path: /by-dimension/:dimension
+    call: getCostByDimension
+    description: Get cost breakdown by dimension
+  - method: GET
+    path: /trend/:dimension/:value
+    call: getCostTrend
+    description: Get cost trend for specific tag
+  - method: GET
+    path: /top-spenders/:dimension
+    call: getTopSpenders
+    description: Get top spenders in a dimension

@@ -1,0 +1,29 @@
+name: profile
+description: Start or stop CPU/heap profiling
+action:
+  call: profile
+args:
+  - name: action
+    type: enum
+    values:
+      - start
+      - stop
+    required: true
+    description: Start or stop profiling
+  - name: type
+    type: enum
+    values:
+      - cpu
+      - heap
+      - both
+    default: cpu
+    description: Profile type
+  - name: pid
+    type: number
+    description: Process ID to profile
+  - name: name
+    type: string
+    description: Session name
+  - name: session-id
+    type: string
+    description: Session ID (for stop)

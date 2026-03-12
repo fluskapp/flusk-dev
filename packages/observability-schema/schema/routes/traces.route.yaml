@@ -1,0 +1,26 @@
+name: traces
+basePath: /api/traces
+entity: Trace
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listTraces
+    description: List traces
+  - method: GET
+    path: /:id
+    call: findTraceById
+    description: Get trace by ID
+  - method: GET
+    path: /:id/spans
+    call: listSpans
+    with: { filter: { traceId: ":id" } }
+    description: Get all spans in a trace
+  - method: POST
+    path: /otlp
+    call: ingestOtlpTraces
+    description: Ingest OTLP trace data
+  - method: DELETE
+    path: /:id
+    call: deleteTrace
+    description: Delete a trace

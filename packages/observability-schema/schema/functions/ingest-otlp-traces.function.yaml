@@ -1,0 +1,56 @@
+name: ingestOtlpTraces
+description: Receive and parse OTLP trace data into traces and spans
+inputs:
+  - name: db
+    type: Database
+  - name: otlpPayload
+    type: json
+output:
+  type: IngestResult
+steps:
+  - id: resourceSpans
+    action: call
+    source: $otlpPayload
+    path: resourceSpans
+  - id: traces
+    action: forEach
+    source: $resourceSpans
+    steps:
+      - id: serviceName
+        action: extract
+        source: $item
+        path: resource.attributes.service.name
+      - id: spans
+        action: extract
+        source: $item
+        path: scopeSpans[*].spans[*]
+      - id: processedSpans
+        action: forEach
+        source: $spans
+        steps:
+          - id: llmCall
+            call: mapSpanToLlmCall
+            with:
+              db: $db
+              span: $item
+              serviceName: $serviceName
+          - id: savedSpan
+            call: createSpan
+            with:
+              db: $db
+              data:
+                traceId: $item.traceId
+                spanId: $item.spanId
+                parentSpanId: $item.parentSpanId
+                operationName: $item.name
+                serviceName: $serviceName
+                startTime: $item.startTimeUnixNano
+                endTime: $item.endTimeUnixNano
+                kind: $item.kind
+                attributes: $item.attributes
+                llmCallId: $llmCall.id
+  - id: result
+    action: return
+    value:
+      tracesIngested: $traces.length
+      spansIngested: $processedSpans.length

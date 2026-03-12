@@ -1,0 +1,35 @@
+name: budgetAlerts
+basePath: /api/budget-alerts
+entity: BudgetAlert
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listBudgetAlerts
+    description: List budget alerts
+  - method: POST
+    path: /
+    call: createBudgetAlert
+    input: CreateBudgetAlert
+    description: Create a budget alert
+  - method: GET
+    path: /:id
+    call: findBudgetAlertById
+    description: Get budget alert by ID
+  - method: PUT
+    path: /:id
+    call: updateBudgetAlert
+    input: UpdateBudgetAlert
+    description: Update a budget alert
+  - method: DELETE
+    path: /:id
+    call: deleteBudgetAlert
+    description: Delete a budget alert
+  - method: GET
+    path: /status
+    call: getBudgetStatus
+    description: Get current budget status summary
+  - method: POST
+    path: /check
+    call: checkBudget
+    description: Run budget check now

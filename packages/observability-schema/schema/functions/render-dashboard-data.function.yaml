@@ -1,0 +1,32 @@
+name: renderDashboardData
+description: Fetch data for all widgets in a dashboard
+inputs:
+  - name: dashboardId
+    type: string
+  - name: timeRange
+    type: json
+output:
+  type: DashboardRenderResult
+steps:
+  - id: dashboard
+    action: call
+    entity: Dashboard
+    entityId: $dashboardId
+  - id: widgets
+    action: call
+    entity: DashboardWidget
+    where:
+      dashboardId: $dashboardId
+  - id: widgetData
+    action: forEach
+    items: $widgets
+    do:
+      call: buildWidgetQuery
+      with:
+        query: $item.query
+        timeRange: $timeRange
+  - id: result
+    action: return
+    value:
+      dashboard: $dashboard
+      widgets: $widgetData

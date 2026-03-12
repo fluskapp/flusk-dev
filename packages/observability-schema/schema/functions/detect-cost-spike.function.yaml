@@ -1,0 +1,38 @@
+name: detectCostSpike
+description: Detect if a feature/team cost has spiked compared to baseline
+inputs:
+  - name: item
+    type: json
+  - name: db
+    type: Database
+output:
+  type: CostInsight
+steps:
+  - id: baseline
+    call: getCostTrend
+    with:
+      dimension: tagKey
+      value: tagValue
+      from: baselineStart
+      to: baselineEnd
+      db: $db
+  - id: avgBaseline
+    action: transform
+    value: $baseline.reduce((sum, d) => sum + d.dailyCost, 0) / $baseline.length
+  - id: isSpike
+    action: condition
+    if:
+      field: $item.totalCost
+      op: gt
+      value: $avgBaseline * 2
+    then:
+      - action: return
+        value:
+          type: spike
+          dimension: $item.tagKey
+          value: $item.tagValue
+          message: Cost is 2x+ above baseline
+          severity: warning
+  - id: noSpike
+    action: return
+    value: null

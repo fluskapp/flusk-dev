@@ -1,0 +1,27 @@
+name: detectHallucination
+description: Check LLM output against known facts and documents for hallucinations
+inputs:
+  - name: llmCallId
+    type: string
+  - name: output
+    type: string
+  - name: context
+    type: json
+output:
+  type: DelusionResult
+steps:
+  - id: call
+    action: call
+    entity: LlmCall
+    entityId: $llmCallId
+  - id: factCheck
+    action: call
+    expression: compareOutputToContext($output, $context)
+  - id: result
+    action: return
+    value:
+      delusionType: hallucination
+      confidence: $call.metadata.confidence
+      divergenceScore: $factCheck.divergenceScore
+      detected: $factCheck.hasHallucination
+      explanation: $factCheck.explanation

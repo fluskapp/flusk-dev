@@ -1,0 +1,35 @@
+name: sendToProvider
+description: Send an alert to a specific provider based on channel type
+inputs:
+  - name: channel
+    type: AlertChannel
+  - name: alert
+    type: AlertEvent
+output:
+  type: boolean
+steps:
+  - id: provider
+    action: condition
+    field: $channel.channelType
+    cases:
+      pagerduty:
+        call: sendPagerDutyAlert
+        with: { config: $channel.config, alert: $alert }
+      slack:
+        call: sendSlackAlert
+        with: { config: $channel.config, alert: $alert }
+      discord:
+        call: sendDiscordAlert
+        with: { config: $channel.config, alert: $alert }
+      webhook:
+        call: sendWebhookAlert
+        with: { config: $channel.config, alert: $alert }
+      email:
+        call: sendEmailAlert
+        with: { config: $channel.config, alert: $alert }
+  - id: result
+    action: return
+    value: true
+errors:
+  - type: ProviderError
+    action: log-and-return-false

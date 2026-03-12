@@ -1,0 +1,26 @@
+name: analytics
+basePath: /api/analytics
+auth: required
+operations:
+  - method: GET
+    path: /overview
+    call: getAnalyticsOverview
+    description: Summary with total cost, call count, avg latency, error rate, active models
+  - method: GET
+    path: /cost-trend
+    call: getCostTrend
+    description: Cost time series data
+  - method: GET
+    path: /model-comparison
+    call: getModelComparison
+    description: Cost and performance comparison per model
+  - method: GET
+    path: /top-users
+    call: getTopUsers
+    description: Top N users by cost/calls
+  - method: GET
+    path: /cost-by-feature
+    call: getCostByDimension
+    with:
+      dimension: feature
+    description: Cost breakdown by feature

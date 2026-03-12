@@ -1,0 +1,31 @@
+name: aggregateUsageByUser
+description: Aggregate AI usage metrics per user
+inputs:
+  - name: userId
+    type: string
+  - name: timeRange
+    type: json
+output:
+  type: json
+steps:
+  - id: metrics
+    action: call
+    entity: AiUsageMetric
+    where:
+      userId: $userId
+      createdAt:
+        gte: $timeRange.start
+        lte: $timeRange.end
+  - id: byTool
+    action: call
+    expression: groupBy($metrics, 'toolName')
+  - id: byType
+    action: call
+    expression: groupBy($metrics, 'metricType')
+  - id: result
+    action: return
+    value:
+      userId: $userId
+      totalMetrics: $metrics.length
+      byTool: $byTool
+      byType: $byType

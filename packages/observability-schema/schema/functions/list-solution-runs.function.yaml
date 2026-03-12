@@ -1,0 +1,39 @@
+name: listSolutionRuns
+description: List solution runs with aggregations (total cost, avg duration)
+inputs:
+  - name: solutionId
+    type: string
+  - name: from
+    type: string
+  - name: to
+    type: string
+  - name: db
+    type: Database
+output:
+  type: json
+steps:
+  - id: runs
+    call: listSolutionRun
+    with:
+      db: $db
+    store: runs
+  - id: filtered
+    action: filter
+    source: $runs
+    where:
+      field: solutionId
+      op: eq
+      value: $solutionId
+  - id: aggregations
+    call: querySolutionRun
+    with:
+      query: runsBySolution
+      start: $from
+      end: $to
+      db: $db
+    store: aggregations
+  - id: result
+    action: return
+    value:
+      runs: $filtered
+      aggregations: $aggregations

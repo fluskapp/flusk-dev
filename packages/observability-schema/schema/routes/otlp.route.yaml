@@ -1,0 +1,8 @@
+name: otlp
+basePath: /v1
+auth: required
+operations:
+  - method: POST
+    path: /traces
+    call: ingestOtlpTraces
+    description: OTLP HTTP trace ingestion endpoint

@@ -1,0 +1,22 @@
+name: aggregateUsageByTool
+description: Aggregate AI usage by tool across the organization
+inputs:
+  - name: toolName
+    type: string
+  - name: timeRange
+    type: json
+output:
+  type: json
+steps:
+  - id: metrics
+    action: call
+    sql: |
+      SELECT toolName, metricType, COUNT(DISTINCT userId) as userCount,
+             SUM(value) as totalValue, AVG(value) as avgValue
+      FROM ai_usage_metric
+      WHERE createdAt >= $timeRange.start AND createdAt <= $timeRange.end
+      GROUP BY toolName, metricType
+      ORDER BY totalValue DESC
+  - id: result
+    action: return
+    value: $metrics

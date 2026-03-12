@@ -1,0 +1,22 @@
+name: findAlertEventsByTimeRange
+description: Find alert events within a given time range
+inputs:
+  - name: startTime
+    type: string
+  - name: endTime
+    type: string
+  - name: db
+    type: Database
+output:
+  type: AlertEvent[]
+steps:
+  - id: results
+    action: call
+    entity: AlertEvent
+    filters:
+      createdAt:
+        gte: $startTime
+        lte: $endTime
+  - id: result
+    action: return
+    value: $results

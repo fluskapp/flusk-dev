@@ -1,0 +1,48 @@
+name: PromptVersion
+description: Immutable prompt version with performance metrics
+storage: sqlite
+fields:
+  templateId:
+    type: string
+    required: true
+    description: Parent template ID
+  version:
+    type: integer
+    required: true
+    description: Version number
+  promptText:
+    type: string
+    required: true
+    description: The prompt text
+  model:
+    type: string
+    description: Intended model
+  callCount:
+    type: integer
+    default: 0
+    description: Number of calls using this version
+  avgCostUsd:
+    type: float
+    description: Average cost per call
+  avgDurationMs:
+    type: float
+    description: Average response time
+  avgQualityScore:
+    type: float
+    description: Average quality score
+  isActive:
+    type: boolean
+    default: true
+    description: Whether this version is in rotation
+  trafficPercent:
+    type: integer
+    default: 100
+    description: Percentage of traffic for A/B testing
+capabilities:
+  crud: true
+  time-range: true
+relations:
+  - name: template
+    entity: PromptTemplate
+    type: belongsTo
+    foreignKey: templateId

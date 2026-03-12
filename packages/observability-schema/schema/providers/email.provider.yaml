@@ -1,0 +1,22 @@
+name: email
+description: Email alerts via SMTP relay
+type: smtp
+config:
+  fields:
+    - name: smtpUrl
+      type: string
+      required: true
+      description: SMTP connection URL
+    - name: from
+      type: string
+      required: true
+      description: Sender email address
+    - name: to
+      type: string
+      required: true
+      description: Recipient email address
+methods:
+  - name: send
+    description: Send alert email
+    input: AlertEvent
+  - name: test

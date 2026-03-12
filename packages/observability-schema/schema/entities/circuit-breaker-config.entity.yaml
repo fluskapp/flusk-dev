@@ -1,0 +1,7 @@
+name: CircuitBreakerConfig
+description: CircuitBreakerConfig
+storage: sqlite
+fields:
+  - name: data
+    type: json
+    description: CircuitBreakerConfig data

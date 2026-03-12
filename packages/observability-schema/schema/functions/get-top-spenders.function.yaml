@@ -1,0 +1,22 @@
+name: getTopSpenders
+description: Get top spenders in a dimension (e.g. top 10 customers by cost)
+inputs:
+  - name: dimension
+    type: string
+  - name: from
+    type: string
+  - name: to
+    type: string
+  - name: limit
+    type: number
+  - name: db
+    type: Database
+output:
+  type: TopSpender[]
+steps:
+  - id: spenders
+    call: queryCostAttributionTopSpenders
+    with: { tagKey: $dimension, from: $from, to: $to, limit: $limit, db: $db }
+  - id: result
+    action: return
+    value: $spenders

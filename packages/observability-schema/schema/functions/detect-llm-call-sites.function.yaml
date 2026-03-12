@@ -1,0 +1,30 @@
+name: detectLlmCallSites
+description: Parse source files for provider SDK usage patterns
+inputs:
+  - name: projectPath
+    type: string
+output:
+  type: json
+steps:
+  - id: files
+    action: call
+    expression: glob($projectPath, '**/*.{js,ts,py,go,rb}')
+  - id: patterns
+    action: call
+    expression: |
+      [
+        { provider: "openai", patterns: ["openai.chat.completions", "OpenAI(", "from openai"] },
+        { provider: "anthropic", patterns: ["anthropic.messages", "Anthropic(", "from anthropic"] },
+        { provider: "google", patterns: ["generativeai", "genai.GenerativeModel"] },
+        { provider: "cohere", patterns: ["cohere.Client", "co.chat"] },
+        { provider: "mistral", patterns: ["MistralClient", "from mistralai"] }
+      ]
+  - id: callSites
+    action: forEach
+    items: $files
+    do:
+      action: compute
+      expression: matchPatterns($item, $patterns)
+  - id: result
+    action: return
+    value: $callSites

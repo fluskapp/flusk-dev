@@ -1,0 +1,24 @@
+name: approvePartner
+description: Approves a pending partner and generates API key
+inputs:
+  - name: partnerId
+    type: string
+  - name: tier
+    type: string
+  - name: db
+    type: Database
+output:
+  type: Partner
+steps:
+  - id: updated
+    call: updatePartner
+    with:
+      id: $partnerId
+      data:
+        status: approved
+        tier: $tier
+      db: $db
+    store: updated
+  - id: result
+    action: return
+    value: $updated

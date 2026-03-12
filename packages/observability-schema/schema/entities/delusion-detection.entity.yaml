@@ -1,0 +1,60 @@
+name: DelusionDetection
+description: Detected hallucination or confidence mismatch in LLM output
+storage: sqlite
+fields:
+  agentLabel:
+    type: string
+    required: true
+    index: true
+    description: Which agent produced the delusional output
+  llmCallId:
+    type: string
+    index: true
+    description: Specific LLM call that was delusional
+  delusionType:
+    type: enum
+    values:
+      - hallucination
+      - contradiction
+      - confidence-mismatch
+      - circular-reasoning
+      - fabricated-reference
+    required: true
+    description: Type of delusion detected
+  confidence:
+    type: float
+    required: true
+    description: Model's stated confidence (0-1)
+  actualAccuracy:
+    type: float
+    description: Verified accuracy (0-1)
+  divergenceScore:
+    type: float
+    required: true
+    description: Confidence minus accuracy
+  inputSample:
+    type: string
+    required: true
+    description: The input that triggered the delusional output
+  outputSample:
+    type: string
+    required: true
+    description: The delusional output
+  explanation:
+    type: string
+    description: Why this was flagged as delusional
+  verified:
+    type: boolean
+    default: false
+    description: Whether a human has verified this detection
+  status:
+    type: enum
+    values:
+      - detected
+      - confirmed
+      - dismissed
+    default: detected
+    description: Current status
+capabilities:
+  crud: true
+  time-range: true

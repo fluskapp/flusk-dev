@@ -1,0 +1,258 @@
+# Flusk Design System - Main Configuration
+# Complete design system inspired by uneevo.com's sophisticated aesthetic
+
+name: FluskDesignSystem
+version: "1.0.0"
+description: "Professional AI platform design system with sophisticated visual language"
+
+# Design Philosophy
+philosophy:
+  clarity: "From chaos to clarity - clean, organized, and purposeful design"
+  sophistication: "Professional and modern aesthetic for enterprise AI platforms"
+  accessibility: "Inclusive design that works for all users"
+  scalability: "Consistent patterns that scale across the entire platform"
+
+# Import Base Tokens
+imports:
+  colors: "./colors.yaml"
+  typography: "./typography.yaml" 
+  spacing: "./spacing.yaml"
+  effects: "./effects.yaml"
+  components: "./component-tokens.yaml"
+
+# Brand Identity
+brand:
+  name: "Flusk"
+  tagline: "From chaos to clarity"
+  voice: "Professional, intelligent, trustworthy"
+  personality: ["innovative", "reliable", "sophisticated", "approachable"]
+
+# Theme Configuration
+theme:
+  # Default light theme
+  default:
+    background: "colors.backgrounds.app"
+    surface: "colors.backgrounds.card"
+    primary: "colors.primary.500"
+    secondary: "colors.secondary.500"
+    text_primary: "colors.text.primary"
+    text_secondary: "colors.text.secondary"
+    border: "colors.border.default"
+    
+  # Dark theme (future)
+  dark:
+    enabled: false
+    background: "colors.gray.900"
+    surface: "colors.gray.800"
+    primary: "colors.primary.400"
+    secondary: "colors.secondary.400"
+    text_primary: "colors.gray.100"
+    text_secondary: "colors.gray.300"
+    border: "colors.gray.700"
+
+# Component Library Structure
+components:
+  # Primitive Components (atomic)
+  primitives:
+    - Button
+    - Input
+    - Badge
+    - Avatar
+    - Icon
+    - Spinner
+    - Divider
+    - Link
+    
+  # Layout Components
+  layout:
+    - Container
+    - Grid
+    - Stack
+    - Flex
+    - Spacer
+    - AspectRatio
+    
+  # Form Components
+  forms:
+    - FormField
+    - TextInput
+    - TextArea
+    - Select
+    - Checkbox
+    - RadioButton
+    - Toggle
+    - DatePicker
+    - FileUpload
+    
+  # Feedback Components
+  feedback:
+    - Alert
+    - Toast
+    - Modal
+    - Tooltip
+    - Progress
+    - Skeleton
+    - EmptyState
+    
+  # Navigation Components  
+  navigation:
+    - Navigation
+    - Breadcrumb
+    - Tabs
+    - Pagination
+    - Stepper
+    
+  # Data Display
+  data:
+    - Table
+    - Card
+    - List
+    - Tree
+    - Chart
+    - Metric
+    - Timeline
+    
+  # Dashboard Specific
+  dashboard:
+    - MetricCard
+    - UsageChart
+    - AlertBanner
+    - DataTable
+    - FilterPanel
+    - ActionToolbar
+
+# Design Tokens Mapping
+tokens:
+  # Semantic color mapping
+  colors:
+    brand_primary: "colors.primary.500"
+    brand_secondary: "colors.secondary.500"
+    success: "colors.success.500"
+    warning: "colors.warning.500"
+    error: "colors.error.500"
+    neutral: "colors.gray.500"
+    
+  # Typography mapping
+  fonts:
+    heading: "typography.fonts.primary"
+    body: "typography.fonts.primary"
+    code: "typography.fonts.mono"
+    
+  # Spacing mapping
+  space:
+    component: "spacing.semantic.component"
+    content: "spacing.semantic.content"
+    layout: "spacing.semantic.layout"
+
+# Responsive Design Rules
+responsive:
+  # Mobile-first approach
+  mobile_first: true
+  
+  # Breakpoint strategy
+  breakpoints:
+    xs: "0px"        # 0px and up
+    sm: "640px"      # 640px and up
+    md: "768px"      # 768px and up  
+    lg: "1024px"     # 1024px and up
+    xl: "1280px"     # 1280px and up
+    xxl: "1536px"    # 1536px and up
+    
+  # Component behavior per breakpoint
+  components:
+    MetricCard:
+      xs: "width-full"
+      sm: "width-1/2"
+      lg: "width-1/4"
+      
+    DataTable:
+      xs: "scroll-x"
+      md: "normal"
+      
+    Navigation:
+      xs: "mobile-menu"
+      md: "horizontal"
+
+# Accessibility Standards
+accessibility:
+  # WCAG compliance level
+  wcag_level: "AA"
+  
+  # Color contrast requirements
+  contrast:
+    normal_text: 4.5   # 4.5:1 ratio minimum
+    large_text: 3.0    # 3:1 ratio minimum
+    ui_components: 3.0 # 3:1 ratio minimum
+    
+  # Focus management
+  focus:
+    visible_outline: true
+    skip_links: true
+    keyboard_navigation: true
+    
+  # Screen reader support
+  screen_reader:
+    aria_labels: required
+    semantic_html: required
+    alt_text: required
+
+# Animation Guidelines
+animation:
+  # Performance guidelines
+  performance:
+    prefer_transforms: true
+    use_will_change: "sparingly"
+    reduce_motion_respect: true
+    
+  # Duration guidelines
+  durations:
+    micro: "transitions.duration.fast"      # 150ms - hover states
+    macro: "transitions.duration.normal"    # 200ms - component transitions
+    modal: "transitions.duration.slow"      # 300ms - modal/overlay
+    
+  # Easing preferences
+  easing:
+    interactive: "transitions.easing.ease_out"
+    entrance: "transitions.easing.ease_out"
+    exit: "transitions.easing.ease_in"
+
+# Code Generation Configuration
+generation:
+  # Output targets
+  targets:
+    - "tailwind-config"
+    - "css-custom-properties" 
+    - "javascript-tokens"
+    - "typescript-types"
+    - "react-components"
+    
+  # Naming conventions
+  naming:
+    css_variables: "kebab-case"
+    javascript: "camelCase"
+    components: "PascalCase"
+    files: "kebab-case"
+    
+  # File organization
+  structure:
+    tokens: "./generated/tokens/"
+    components: "./generated/components/"
+    styles: "./generated/styles/"
+    types: "./generated/types/"
+
+# Quality Assurance
+qa:
+  # Design consistency checks
+  consistency:
+    color_usage: "audit-unused-colors"
+    spacing_usage: "audit-spacing-violations"
+    typography_usage: "audit-font-inconsistencies"
+    
+  # Performance checks  
+  performance:
+    bundle_size: "monitor-css-size"
+    unused_styles: "detect-unused-styles"
+    
+  # Accessibility checks
+    contrast_validation: "validate-all-combinations"
+    focus_management: "audit-focus-traps"

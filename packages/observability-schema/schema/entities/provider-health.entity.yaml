@@ -1,0 +1,41 @@
+name: ProviderHealth
+description: Tracks provider health metrics for smart routing decisions
+storage: sqlite
+fields:
+  provider:
+    type: string
+    required: true
+    index: true
+    description: Provider name (openai, anthropic, google)
+  model:
+    type: string
+    required: true
+    index: true
+    description: Model identifier
+  successCount:
+    type: integer
+    default: 0
+    description: Successful requests in current window
+  failureCount:
+    type: integer
+    default: 0
+    description: Failed requests in current window
+  avgLatencyMs:
+    type: float
+    default: 0
+    description: Average latency in current window
+  lastFailureAt:
+    type: date
+    description: Timestamp of last failure
+  rateLimitedUntil:
+    type: date
+    description: Rate limit backoff expiry
+  enabled:
+    type: boolean
+    default: true
+    description: Whether provider is available for routing
+  windowStart:
+    type: date
+    description: Start of current sliding window
+capabilities:
+  crud: true

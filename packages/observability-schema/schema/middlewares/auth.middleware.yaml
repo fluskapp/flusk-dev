@@ -1,0 +1,27 @@
+name: auth
+description: Validate API key from Authorization header and decorate request with org/user context
+phase: request
+inputs:
+  - name: request
+    from: request
+output:
+  organizationId: uuid
+  userId: uuid
+  scopes: json
+steps:
+  - id: extractKey
+    action: assign
+    value:
+      rawKey: $request.headers.authorization
+  - id: validated
+    action: call
+    call: validateApiKey
+    with:
+      rawKey: $extractKey.rawKey
+      db: $db
+  - id: decorate
+    action: return
+    value:
+      organizationId: $validated.organizationId
+      userId: $validated.userId
+      scopes: $validated.scopes

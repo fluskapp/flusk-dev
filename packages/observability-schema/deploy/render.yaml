@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: flusk-observability
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: starter
+    region: frankfurt
+    healthCheckPath: /api/health
+    envVars:
+      - key: PLT_SERVER_PORT
+        value: "3042"
+      - key: PLT_LOG_LEVEL
+        value: "info"
+      - key: DATABASE_PATH
+        value: "/data/flusk.db"
+      - key: CORS_ORIGIN
+        value: "*"
+    disk:
+      name: flusk-data
+      mountPath: /data
+      sizeGB: 1

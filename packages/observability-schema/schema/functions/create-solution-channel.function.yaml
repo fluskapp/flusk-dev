@@ -1,0 +1,16 @@
+name: createSolutionChannel
+description: Create SolutionChannel
+inputs:
+  - name: data
+    type: json
+  - name: db
+    type: Database
+output:
+  type: SolutionChannel
+steps:
+  - id: result
+    action: assign
+    value: $data
+  - id: done
+    action: return
+    value: $result

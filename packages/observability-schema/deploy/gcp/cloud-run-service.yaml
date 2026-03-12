@@ -1,0 +1,48 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: flusk-observability
+  labels:
+    cloud.googleapis.com/location: me-west1
+  annotations:
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "10"
+        run.googleapis.com/execution-environment: gen2
+        run.googleapis.com/cpu-throttling: "false"
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      containers:
+        - image: me-west1-docker.pkg.dev/PROJECT_ID/flusk/flusk-observability:latest
+          ports:
+            - containerPort: 3042
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+          env:
+            - name: PLT_SERVER_PORT
+              value: "3042"
+            - name: PLT_LOG_LEVEL
+              value: "info"
+            - name: DATABASE_PATH
+              value: "/data/flusk.db"
+            - name: CORS_ORIGIN
+              value: "*"
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: 3042
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3042
+            periodSeconds: 30

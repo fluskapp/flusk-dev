@@ -1,0 +1,12 @@
+name: dashboardList
+description: List all dashboards
+action:
+  call: dashboardList
+args:
+  - name: owner
+    type: string
+    description: Filter by owner
+  - name: default-only
+    type: boolean
+    default: false
+    description: Show only default dashboards

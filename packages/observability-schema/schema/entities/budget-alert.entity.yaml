@@ -1,0 +1,44 @@
+name: BudgetAlert
+description: Budget threshold alert configuration
+storage: sqlite
+fields:
+  name:
+    type: string
+    required: true
+    description: Alert name
+  budgetType:
+    type: enum
+    values:
+      - daily
+      - weekly
+      - monthly
+    required: true
+    description: Budget period type
+  thresholdUsd:
+    type: float
+    required: true
+    description: Spending threshold in USD
+  warningPercent:
+    type: integer
+    default: 80
+    description: Percentage of threshold to trigger warning
+  currentSpendUsd:
+    type: float
+    default: 0
+    description: Current spend in this period
+  enabled:
+    type: boolean
+    default: true
+    description: Whether this alert is active
+  autoPause:
+    type: boolean
+    default: false
+    description: Auto-pause agents when exceeded
+  lastTriggeredAt:
+    type: string
+    description: ISO datetime of last trigger
+  agentFilter:
+    type: string
+    description: Optional agent name filter (null = all agents)
+capabilities:
+  crud: true

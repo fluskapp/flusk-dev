@@ -1,0 +1,20 @@
+name: getCostByDimension
+description: Get cost breakdown by a specific dimension (feature, team, customer)
+inputs:
+  - name: dimension
+    type: string
+  - name: from
+    type: string
+  - name: to
+    type: string
+  - name: db
+    type: Database
+output:
+  type: CostBreakdown[]
+steps:
+  - id: data
+    call: findCostAttributionByTagKey
+    with: { tagKey: $dimension, from: $from, to: $to, db: $db }
+  - id: result
+    action: return
+    value: $data

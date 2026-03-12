@@ -1,0 +1,126 @@
+{
+  "$schema": "https://platformatic.dev/schemas/v2.36.0/db",
+  "db": {
+    "connectionString": "sqlite://./flusk.db",
+    "graphql": false,
+    "openapi": true,
+    "authorization": {
+      "adminSecret": "{PLT_ADMIN_SECRET}",
+      "rules": [
+        {
+          "role": "anonymous",
+          "entity": "tenant",
+          "find": false,
+          "save": false,
+          "delete": false
+        },
+        {
+          "role": "anonymous",
+          "entity": "user",
+          "find": false,
+          "save": false,
+          "delete": false
+        },
+        {
+          "role": "anonymous",
+          "entity": "oktaSession",
+          "find": false,
+          "save": false,
+          "delete": false
+        },
+        {
+          "role": "anonymous",
+          "entity": "publishLog",
+          "find": false,
+          "save": false,
+          "delete": false
+        },
+        {
+          "role": "platformatic-admin",
+          "entity": "tenant",
+          "find": true,
+          "save": true,
+          "delete": true
+        },
+        {
+          "role": "platformatic-admin",
+          "entity": "user",
+          "find": {
+            "checks": {
+              "tenantId": "X-PLATFORMATIC-TENANT-ID"
+            }
+          },
+          "save": true,
+          "delete": true
+        },
+        {
+          "role": "platformatic-admin",
+          "entity": "solution",
+          "find": true,
+          "save": true,
+          "delete": true
+        },
+        {
+          "role": "platformatic-admin",
+          "entity": "query",
+          "find": true,
+          "save": true,
+          "delete": true
+        },
+        {
+          "role": "platformatic-admin",
+          "entity": "featureRequest",
+          "find": true,
+          "save": true,
+          "delete": true
+        },
+        {
+          "role": "platformatic-admin",
+          "entity": "role",
+          "find": true,
+          "save": true,
+          "delete": true
+        },
+        {
+          "role": "platformatic-admin",
+          "entity": "solutionAccess",
+          "find": true,
+          "save": true,
+          "delete": true
+        },
+        {
+          "role": "platformatic-admin",
+          "entity": "guard",
+          "find": true,
+          "save": true,
+          "delete": true
+        },
+        {
+          "role": "platformatic-admin",
+          "entity": "oktaSession",
+          "find": true,
+          "save": true,
+          "delete": true
+        },
+        {
+          "role": "platformatic-admin",
+          "entity": "publishLog",
+          "find": true,
+          "save": true,
+          "delete": true
+        }
+      ]
+    }
+  },
+  "migrations": {
+    "dir": "./migrations",
+    "autoApply": true
+  },
+  "server": {
+    "hostname": "127.0.0.1",
+    "port": 3042,
+    "logger": {
+      "level": "info"
+    }
+  }
+}

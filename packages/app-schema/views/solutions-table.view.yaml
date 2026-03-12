@@ -1,0 +1,16 @@
+name: SolutionsTable
+type: table
+description: Data table listing all solutions with management actions
+route: /$tenant/solutions
+layout: full
+auth: true
+ssr: false
+loader:
+  source: Solution
+  params: [tenant]
+sections:
+  - name: All Solutions
+    type: data-table
+    source: solutions
+    columns: [name, model, status, queries, createdAt]
+    actions: [view, edit, duplicate, delete]

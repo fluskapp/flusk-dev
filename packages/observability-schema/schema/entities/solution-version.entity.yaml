@@ -1,0 +1,30 @@
+name: SolutionVersion
+description: Versioned snapshot of a solution's configuration
+storage: sqlite
+fields:
+  solutionId:
+    type: string
+    required: true
+    index: true
+    description: Parent solution ID
+  version:
+    type: string
+    required: true
+    description: Semantic version string
+  config:
+    type: json
+    required: true
+    description: Solution configuration at this version
+  changelog:
+    type: string
+    description: What changed in this version
+  publishedBy:
+    type: string
+    description: User who published this version
+capabilities:
+  crud: true
+  time-range: true
+relations:
+  - entity: Solution
+    type: belongsTo
+    foreignKey: solutionId

@@ -1,0 +1,47 @@
+name: AiUsageMetric
+description: AI tool usage metrics per user for tracking adoption and ROI
+storage: sqlite
+fields:
+  userId:
+    type: string
+    required: true
+    index: true
+    description: Employee or user identifier
+  toolName:
+    type: string
+    required: true
+    index: true
+    description: Which AI tool (copilot, chatgpt, claude, internal)
+  metricType:
+    type: enum
+    values:
+      - prompt-count
+      - token-count
+      - time-saved
+      - cost
+      - acceptance-rate
+    required: true
+    description: Type of metric
+  value:
+    type: float
+    required: true
+    description: Metric value
+  period:
+    type: string
+    required: true
+    description: Period identifier (e.g. "2026-02-24" or "2026-W08")
+  periodType:
+    type: enum
+    values:
+      - daily
+      - weekly
+      - monthly
+    required: true
+    description: Granularity of the period
+  metadata:
+    type: json
+    description: Extra context (project, language, task type)
+capabilities:
+  crud: true
+  time-range: true
+  aggregation: true

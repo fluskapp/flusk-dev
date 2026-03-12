@@ -1,0 +1,38 @@
+name: SolutionTemplate
+description: Pre-built solution template for quick start
+storage: sqlite
+fields:
+  name:
+    type: string
+    required: true
+    description: Template name
+  description:
+    type: string
+    description: Template description
+  category:
+    type: enum
+    values: [customer-support, data-analysis, content-generation, code-review, custom]
+    required: true
+    description: Template category
+  config:
+    type: json
+    required: true
+    description: Default solution configuration
+  isPublic:
+    type: boolean
+    default: true
+    description: Whether template is publicly visible
+  author:
+    type: string
+    description: Template author
+  downloads:
+    type: integer
+    default: 0
+    description: Number of times cloned
+  rating:
+    type: float
+    default: 0
+    description: Average user rating
+capabilities:
+  crud: true
+  time-range: true

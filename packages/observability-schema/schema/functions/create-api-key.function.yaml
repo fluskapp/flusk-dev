@@ -1,0 +1,65 @@
+name: createApiKey
+description: Generate an API key, hash it, store the hash, return plaintext once
+inputs:
+  - name: organizationId
+    type: uuid
+    required: true
+  - name: userId
+    type: uuid
+    required: true
+  - name: name
+    type: string
+    required: true
+  - name: scopes
+    type: json
+    default: '["ingest","read"]'
+  - name: expiresAt
+    type: date
+output:
+  type: json
+steps:
+  - id: rawKey
+    action: call
+    call: generateRandomKey
+    with:
+      length: 48
+  - id: prefix
+    action: assign
+    value:
+      prefix: $rawKey[0:8]
+  - id: hashed
+    action: call
+    call: sha256
+    with:
+      input: $rawKey
+  - id: record
+    action: call
+    entity: ApiKey
+    method: create
+    with:
+      key: $hashed
+      prefix: $prefix.prefix
+      name: $name
+      organizationId: $organizationId
+      userId: $userId
+      scopes: $scopes
+      expiresAt: $expiresAt
+      status: active
+  - id: audit
+    action: call
+    call: createAuditLog
+    with:
+      organizationId: $organizationId
+      userId: $userId
+      action: api_key.create
+      resource: ApiKey
+      resourceId: $record.id
+  - id: result
+    action: return
+    value:
+      id: $record.id
+      key: $rawKey
+      prefix: $prefix.prefix
+      name: $name
+      scopes: $scopes
+      expiresAt: $expiresAt

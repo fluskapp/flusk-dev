@@ -1,0 +1,31 @@
+name: Organization
+description: Tenant organization with plan and limits
+storage: sqlite
+fields:
+  name:
+    type: string
+    required: true
+    description: Organization display name
+  slug:
+    type: string
+    required: true
+    unique: true
+    description: URL-safe unique identifier
+  plan:
+    type: enum
+    values:
+      - free
+      - pro
+      - enterprise
+    required: true
+    default: free
+    description: Subscription plan
+  limits:
+    type: json
+    description: 'Plan limits: max_users, max_api_keys, retention_days'
+    default: '{"max_users":5,"max_api_keys":3,"retention_days":30}'
+  settings:
+    type: json
+    description: Organization-level settings
+capabilities:
+  crud: true

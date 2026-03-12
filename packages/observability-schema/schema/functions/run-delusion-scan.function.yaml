@@ -1,0 +1,73 @@
+name: runDelusionScan
+description: Orchestrate all delusion checks on recent LLM calls
+inputs:
+  - name: agentLabel
+    type: string
+  - name: timeRange
+    type: json
+output:
+  type: json
+steps:
+  - id: recentCalls
+    action: call
+    entity: LlmCall
+    where:
+      agentName: $agentLabel
+      createdAt:
+        gte: $timeRange.start
+        lte: $timeRange.end
+    limit: 100
+  - id: results
+    action: forEach
+    items: $recentCalls
+    do:
+      steps:
+        - id: hallucination
+          call: detectHallucination
+          with:
+            llmCallId: $item.id
+            output: $item.metadata.output
+            context: $item.metadata.context
+        - id: contradiction
+          call: detectContradiction
+          with:
+            llmCallId: $item.id
+            conversationHistory: $item.metadata.history
+        - id: confidenceMismatch
+          call: detectConfidenceMismatch
+          with:
+            llmCallId: $item.id
+            statedConfidence: $item.metadata.confidence
+            actualAccuracy: $item.metadata.accuracy
+        - id: detected
+          action: filter
+          items:
+            - $hallucination
+            - $contradiction
+            - $confidenceMismatch
+          where:
+            field: detected
+            op: eq
+            value: true
+        - id: save
+          action: forEach
+          items: $detected
+          do:
+            action: create
+            entity: DelusionDetection
+            data:
+              agentLabel: $agentLabel
+              llmCallId: $item.id
+              delusionType: $detection.delusionType
+              confidence: $detection.confidence
+              actualAccuracy: $detection.actualAccuracy
+              divergenceScore: $detection.divergenceScore
+              inputSample: $item.metadata.input
+              outputSample: $item.metadata.output
+              explanation: $detection.explanation
+              status: detected
+  - id: result
+    action: return
+    value:
+      scanned: $recentCalls.length
+      detections: $results

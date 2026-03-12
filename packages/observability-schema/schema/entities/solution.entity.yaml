@@ -1,0 +1,48 @@
+name: Solution
+description: AI solution built by users (agent, workflow, pipeline, or chatbot)
+storage: sqlite
+fields:
+  organizationId:
+    type: string
+    required: true
+    index: true
+    description: Organization that owns this solution
+  name:
+    type: string
+    required: true
+    description: Solution name
+  description:
+    type: string
+    description: Solution description
+  type:
+    type: enum
+    values: [agent, workflow, pipeline, chatbot]
+    required: true
+    description: Solution type
+  status:
+    type: enum
+    values: [draft, active, paused, archived]
+    required: true
+    default: draft
+    description: Current status
+  config:
+    type: json
+    description: Solution configuration (model, system prompt, tools, etc.)
+  version:
+    type: string
+    default: "0.1.0"
+    description: Current version (semver)
+  publishedAt:
+    type: date
+    description: When the solution was last published
+  metrics:
+    type: json
+    description: Aggregated metrics (runs, cost, avg_latency)
+capabilities:
+  crud: true
+  time-range: true
+  aggregation: true
+relations:
+  - entity: Organization
+    type: belongsTo
+    foreignKey: organizationId

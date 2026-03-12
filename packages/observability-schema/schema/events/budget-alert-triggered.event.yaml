@@ -1,0 +1,30 @@
+name: BudgetAlertTriggered
+description: Fired when a cost budget threshold is reached
+channel: webhook
+payload:
+  fields:
+    - name: tagKey
+      type: string
+      required: true
+    - name: tagValue
+      type: string
+      required: true
+    - name: spent
+      type: number
+      required: true
+    - name: limit
+      type: number
+      required: true
+    - name: percentage
+      type: number
+      required: true
+    - name: action
+      type: string
+      required: true
+publish:
+  - trigger: manual
+subscribe:
+  handler: dispatchAlert
+  retry:
+    maxAttempts: 3
+    backoff: exponential

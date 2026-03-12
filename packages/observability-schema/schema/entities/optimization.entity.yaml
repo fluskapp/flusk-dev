@@ -1,0 +1,53 @@
+name: Optimization
+description: Generated code optimization suggestion
+storage: sqlite
+fields:
+  optimizationType:
+    type: enum
+    values:
+      - caching
+      - batching
+      - model_switch
+      - prompt_compression
+      - deduplication
+      - streaming
+    required: true
+    description: Type of code optimization
+  title:
+    type: string
+    required: true
+    description: Short title
+  description:
+    type: string
+    required: true
+    description: Detailed explanation of the optimization
+  codeBefore:
+    type: string
+    description: Original code snippet
+  codeAfter:
+    type: string
+    description: Suggested optimized code
+  filePath:
+    type: string
+    description: File path in the user's project
+  lineNumber:
+    type: integer
+    description: Line number in the file
+  estimatedSavingsUsd:
+    type: float
+    description: Projected monthly savings
+  status:
+    type: enum
+    values:
+      - pending
+      - accepted
+      - rejected
+      - applied
+    default: pending
+    description: Optimization status
+  analyzeSessionId:
+    type: string
+    description: Analysis session that generated this
+capabilities:
+  crud: true
+  time-range: true

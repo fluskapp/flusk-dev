@@ -1,0 +1,17 @@
+name: queryLlmCall
+description: Query LLM calls with flexible filters (time range, model, status)
+inputs:
+  - name: filters
+    type: json
+  - name: db
+    type: Database
+output:
+  type: LlmCall[]
+steps:
+  - id: results
+    action: call
+    entity: LlmCall
+    filters: $filters
+  - id: result
+    action: return
+    value: $results

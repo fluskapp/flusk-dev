@@ -1,0 +1,18 @@
+name: updateSolutionChannel
+description: Update SolutionChannel
+inputs:
+  - name: id
+    type: string
+  - name: data
+    type: json
+  - name: db
+    type: Database
+output:
+  type: SolutionChannel
+steps:
+  - id: result
+    action: assign
+    value: $data
+  - id: done
+    action: return
+    value: $result

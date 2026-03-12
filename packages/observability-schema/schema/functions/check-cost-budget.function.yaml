@@ -1,0 +1,81 @@
+name: checkCostBudget
+description: Check if a tag's spending is within budget, alert if approaching/exceeded
+inputs:
+  - name: tagKey
+    type: string
+  - name: tagValue
+    type: string
+  - name: db
+    type: Database
+output:
+  type: BudgetStatus
+steps:
+  - id: budget
+    call: findCostBudgetByTagKeyAndTagValue
+    with:
+      tagKey: $tagKey
+      tagValue: $tagValue
+      db: $db
+  - id: checkExists
+    action: condition
+    if:
+      field: $budget
+      op: eq
+      value: null
+    then:
+      - action: return
+        value:
+          status: no-budget
+          spent: 0
+          limit: 0
+          percentage: 0
+  - id: currentSpend
+    call: getCostByDimension
+    with:
+      dimension: $tagKey
+      from: periodStart
+      to: periodEnd
+      db: $db
+  - id: totalSpent
+    action: transform
+    value: $currentSpend.reduce((sum, item) => sum + item.totalCost, 0)
+  - id: percentage
+    action: assign
+    value: ($totalSpent / $budget.limitUsd) * 100
+  - id: checkAlert
+    action: condition
+    if:
+      field: $percentage
+      op: gte
+      value: $budget.alertAt
+    then:
+      - call: dispatchAlert
+        with:
+          db: $db
+          alert:
+            alertType: budget_warning
+            severity: warning
+            title: 'Budget alert: $tagKey=$tagValue'
+            message: Spent $$totalSpent of $$budget.limitUsd ($percentage%)
+  - id: checkExceeded
+    action: condition
+    if:
+      field: $percentage
+      op: gte
+      value: 100
+    then:
+      - call: dispatchAlert
+        with:
+          db: $db
+          alert:
+            alertType: budget_exceeded
+            severity: critical
+            title: 'Budget exceeded: $tagKey=$tagValue'
+            message: Spent $$totalSpent — limit is $$budget.limitUsd
+  - id: result
+    action: return
+    value:
+      status: ok
+      spent: $totalSpent
+      limit: $budget.limitUsd
+      percentage: $percentage

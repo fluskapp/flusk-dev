@@ -1,0 +1,34 @@
+{
+  "name": "@flusk/app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Flusk web application — TanStack Start shell with dashboard, workflows, integrations",
+  "type": "module",
+  "scripts": {
+    "dev": "vinxi dev",
+    "build": "vinxi build",
+    "start": "vinxi start",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@flusk/ui": "workspace:*",
+    "@tanstack/react-router": "^1.120.0",
+    "@tanstack/react-table": "^8.21.0",
+    "@tanstack/start": "^1.120.0",
+    "clsx": "^2.1.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^2.15.0",
+    "vinxi": "^0.5.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "autoprefixer": "^10.4.27",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19",
+    "typescript": "^5.7.0",
+    "vite": "^6.2.0"
+  },
+  "license": "MIT"
+}

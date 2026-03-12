@@ -1,0 +1,16 @@
+name: createSolutionTool
+description: Create a new SolutionTool
+inputs:
+  - name: data
+    type: json
+  - name: db
+    type: Database
+output:
+  type: SolutionTool
+steps:
+  - id: result
+    action: assign
+    value: $data
+  - id: done
+    action: return
+    value: $result

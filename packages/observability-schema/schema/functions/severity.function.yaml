@@ -1,0 +1,9 @@
+name: severity
+description: severity
+inputs: []
+output:
+  type: json
+steps:
+  - id: r
+    action: return
+    value: 'null'

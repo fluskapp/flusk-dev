@@ -1,0 +1,19 @@
+name: trackProviderOutcome
+description: Record outcome of a provider call for health tracking
+inputs:
+  - name: provider
+    type: string
+  - name: model
+    type: string
+  - name: latencyMs
+    type: number
+  - name: success
+    type: boolean
+  - name: statusCode
+    type: number
+output:
+  type: void
+steps:
+  - id: result
+    action: return
+    value: undefined

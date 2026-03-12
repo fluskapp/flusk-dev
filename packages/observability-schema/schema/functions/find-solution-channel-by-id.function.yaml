@@ -1,0 +1,16 @@
+name: findSolutionChannelById
+description: Find SolutionChannel by ID
+inputs:
+  - name: id
+    type: string
+  - name: db
+    type: Database
+output:
+  type: SolutionChannel
+steps:
+  - id: result
+    action: assign
+    value: $id
+  - id: done
+    action: return
+    value: $result

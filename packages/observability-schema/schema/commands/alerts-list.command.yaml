@@ -1,0 +1,13 @@
+name: alertsList
+description: List configured alert channels or recent events
+action:
+  call: alertsList
+args:
+  - name: events
+    type: boolean
+    default: false
+    description: Show recent alert events instead of channels
+  - name: limit
+    type: number
+    default: 20
+    description: Number of items to show

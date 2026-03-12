@@ -1,0 +1,43 @@
+name: dispatchAlert
+description: Send alert to all matching channels and record delivery
+inputs:
+  - name: alert
+    type: AlertEvent
+  - name: db
+    type: Database
+output:
+  type: DispatchResult[]
+steps:
+  - id: channels
+    call: listAlertChannels
+    with:
+      db: $db
+  - id: matched
+    call: filterChannelsBySeverity
+    with:
+      channels: $channels
+      severity: severity
+  - id: results
+    action: forEach
+    source: $matched
+    call: sendToProvider
+    with:
+      channel: $item
+      alert: $alert
+    onError: log-and-continue
+  - id: recordDelivery
+    action: forEach
+    source: $matched
+    call: createAlertEvent
+    with:
+      db: $db
+      data:
+        alertType: $alert.alertType
+        severity: $alert.severity
+        title: $alert.title
+        message: $alert.message
+        channelName: $item.name
+        delivered: true
+  - id: result
+    action: return
+    value: $results

@@ -1,0 +1,16 @@
+{
+  "name": "@flusk/platform",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Flusk platform database — multi-tenant schema, auth/roles, solutions, guards",
+  "type": "module",
+  "scripts": {
+    "migrate": "platformatic db migrations apply",
+    "seed": "platformatic db seed seed.js",
+    "start": "platformatic db start"
+  },
+  "dependencies": {
+    "@platformatic/db": "^3.39.0"
+  },
+  "license": "MIT"
+}

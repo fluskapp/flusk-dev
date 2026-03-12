@@ -1,0 +1,26 @@
+name: scan
+description: Scan a codebase for AI/LLM usage (flusk scan ./src)
+action:
+  call: scan
+args:
+  - name: path
+    type: string
+    required: true
+    positional: true
+    description: Path to scan
+  - name: type
+    type: enum
+    values:
+      - static
+      - runtime
+      - hybrid
+    default: static
+    description: Scan type
+  - name: output
+    type: enum
+    values:
+      - table
+      - json
+      - report
+    default: table
+    description: Output format

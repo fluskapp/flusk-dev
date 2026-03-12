@@ -1,0 +1,16 @@
+name: findSolutionToolById
+description: Find SolutionTool by ID
+inputs:
+  - name: id
+    type: string
+  - name: db
+    type: Database
+output:
+  type: SolutionTool
+steps:
+  - id: result
+    action: assign
+    value: $id
+  - id: done
+    action: return
+    value: $result

@@ -1,0 +1,36 @@
+name: PromptTemplate
+description: Prompt template for A/B testing and version tracking
+storage: sqlite
+fields:
+  name:
+    type: string
+    required: true
+    unique: true
+    description: Template identifier
+  description:
+    type: string
+    description: What this template does
+  category:
+    type: string
+    description: Prompt category
+  currentVersionId:
+    type: string
+    description: ID of the active version
+  totalVersions:
+    type: integer
+    default: 0
+    description: Number of versions
+  abTestingEnabled:
+    type: boolean
+    default: false
+    description: Whether A/B testing is active
+  metadata:
+    type: json
+    description: Additional template metadata
+capabilities:
+  crud: true
+relations:
+  - name: versions
+    entity: PromptVersion
+    type: hasMany
+    foreignKey: templateId

@@ -1,0 +1,14 @@
+name: sha256
+description: Compute SHA-256 hash of input string
+inputs:
+  - name: input
+    type: string
+output:
+  type: string
+steps:
+  - id: hash
+    action: assign
+    value: sha256HashPlaceholder
+  - id: result
+    action: return
+    value: $hash

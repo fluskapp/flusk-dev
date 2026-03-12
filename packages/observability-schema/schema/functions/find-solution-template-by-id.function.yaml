@@ -1,0 +1,16 @@
+name: findSolutionTemplateById
+description: Find SolutionTemplate by ID
+inputs:
+  - name: id
+    type: string
+  - name: db
+    type: Database
+output:
+  type: SolutionTemplate
+steps:
+  - id: result
+    action: assign
+    value: $id
+  - id: done
+    action: return
+    value: $result

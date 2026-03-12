@@ -1,0 +1,16 @@
+name: watch
+description: Live monitoring mode — stream LLM calls and costs in real time
+action:
+  call: watch
+args:
+  - name: interval
+    type: number
+    default: 2
+    description: Refresh interval in seconds
+  - name: agent
+    type: string
+    description: Filter by agent name
+  - name: budget
+    type: boolean
+    default: true
+    description: Show budget status bar

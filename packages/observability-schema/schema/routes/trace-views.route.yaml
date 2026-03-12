@@ -1,0 +1,27 @@
+name: traceViews
+basePath: /api/trace-views
+entity: TraceView
+auth: optional
+operations:
+  - method: GET
+    path: /
+    call: listTraceViews
+    description: List trace views
+  - method: POST
+    path: /
+    call: buildTraceView
+    input: CreateTraceView
+    description: Build a trace visualization
+  - method: GET
+    path: /:id
+    call: findTraceViewById
+    description: Get trace view by ID
+  - method: PUT
+    path: /:id
+    call: updateTraceView
+    input: UpdateTraceView
+    description: Update trace view
+  - method: DELETE
+    path: /:id
+    call: deleteTraceView
+    description: Delete trace view

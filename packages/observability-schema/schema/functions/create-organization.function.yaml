@@ -1,0 +1,34 @@
+name: createOrganization
+description: Create a new organization with default plan limits
+inputs:
+  - name: name
+    type: string
+    required: true
+  - name: slug
+    type: string
+    required: true
+  - name: plan
+    type: string
+    default: free
+output:
+  type: Organization
+steps:
+  - id: defaults
+    action: assign
+    value:
+      limits:
+        free: '{"max_users":5,"max_api_keys":3,"retention_days":30}'
+        pro: '{"max_users":25,"max_api_keys":20,"retention_days":90}'
+        enterprise: '{"max_users":999,"max_api_keys":100,"retention_days":365}'
+  - id: org
+    action: call
+    entity: Organization
+    method: create
+    with:
+      name: $name
+      slug: $slug
+      plan: $plan
+      limits: $defaults.limits[$plan]
+  - id: result
+    action: return
+    value: $org

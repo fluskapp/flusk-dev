@@ -1,0 +1,263 @@
+# UI Component: Control Center Layout
+# Main layout for the Flusk Control Center interface
+
+name: ControlCenterLayout
+type: component
+category: layout
+
+description: "Main control center interface with dual-pane prompt/goal layout and live timeline"
+
+props:
+  # Core Data
+  organization_id:
+    type: uuid
+    required: true
+    description: "Current organization context"
+    
+  current_user:
+    type: object
+    required: true
+    schema:
+      properties:
+        id: { type: string }
+        name: { type: string }
+        role: { type: string }
+        permissions: { type: array, items: { type: string } }
+        
+  # Display Configuration
+  layout_mode:
+    type: enum
+    values: ["dual_pane", "timeline_focus", "grid_view"]
+    default: "dual_pane"
+    description: "Primary layout mode"
+    
+  show_sidebar:
+    type: boolean
+    default: true
+    description: "Whether to show the navigation sidebar"
+    
+  sidebar_collapsed:
+    type: boolean
+    default: false
+    description: "Whether sidebar is collapsed"
+    
+  # Real-time Configuration
+  auto_refresh_enabled:
+    type: boolean
+    default: true
+    description: "Enable real-time updates"
+    
+  refresh_interval:
+    type: integer
+    default: 1000
+    description: "Refresh interval in milliseconds"
+    
+  # Filters and Views
+  active_filters:
+    type: object
+    default: {}
+    schema:
+      properties:
+        status: { type: array, items: { type: string } }
+        priority: { type: array, items: { type: string } }
+        date_range: { type: string }
+        agent_types: { type: array, items: { type: string } }
+
+# Layout Structure
+layout:
+  type: "grid"
+  template_areas: |
+    "sidebar header header"
+    "sidebar prompt-panel goal-panel"  
+    "sidebar timeline timeline"
+    "sidebar footer footer"
+  columns: "250px 1fr 1fr"
+  rows: "60px 1fr 400px 40px"
+  
+  responsive:
+    tablet:
+      template_areas: |
+        "header header"
+        "prompt-panel goal-panel"
+        "timeline timeline"
+        "footer footer"
+      columns: "1fr 1fr"
+      rows: "60px 1fr 400px 40px"
+      
+    mobile:
+      template_areas: |
+        "header"
+        "tabs"
+        "content"
+        "footer"
+      columns: "1fr"
+      rows: "60px 50px 1fr 40px"
+
+# Component Slots
+slots:
+  header:
+    component: "ControlCenterHeader"
+    area: "header"
+    props:
+      organization_name: "{{ organization.name }}"
+      current_user: "{{ current_user }}"
+      active_filters: "{{ active_filters }}"
+      
+  sidebar:
+    component: "NavigationSidebar"
+    area: "sidebar"
+    props:
+      collapsed: "{{ sidebar_collapsed }}"
+      current_route: "{{ current_route }}"
+      
+  prompt_panel:
+    component: "PromptPanel"
+    area: "prompt-panel"
+    props:
+      organization_id: "{{ organization_id }}"
+      filters: "{{ active_filters }}"
+      auto_refresh: "{{ auto_refresh_enabled }}"
+      
+  goal_panel:
+    component: "GoalPanel"
+    area: "goal-panel"
+    props:
+      organization_id: "{{ organization_id }}"
+      filters: "{{ active_filters }}"
+      
+  timeline:
+    component: "LiveTimeline"
+    area: "timeline"
+    props:
+      organization_id: "{{ organization_id }}"
+      refresh_interval: "{{ refresh_interval }}"
+      filters: "{{ active_filters }}"
+      
+  footer:
+    component: "StatusFooter"
+    area: "footer"
+    props:
+      system_status: "{{ system_status }}"
+
+# Styling
+styling:
+  container: "min-h-screen bg-gray-50"
+  grid: "grid h-screen"
+  
+  # Area-specific styles
+  areas:
+    header: "bg-white border-b border-gray-200 z-10"
+    sidebar: "bg-white border-r border-gray-200 overflow-y-auto"
+    prompt-panel: "bg-white border-r border-gray-200 overflow-y-auto"
+    goal-panel: "bg-white overflow-y-auto"
+    timeline: "bg-gray-50 border-t border-gray-200 overflow-y-auto"
+    footer: "bg-gray-100 border-t border-gray-200 flex items-center px-4"
+
+# Animations and Transitions  
+animations:
+  panel_transition: "transition-all duration-300 ease-in-out"
+  sidebar_collapse: "transform transition-transform duration-200"
+  live_update: "animate-pulse duration-1000"
+
+# Real-time WebSocket Configuration
+websocket:
+  endpoints:
+    - path: "/ws/timeline"
+      filters: ["organization_id", "pipeline_id"]
+      
+    - path: "/ws/prompts"
+      filters: ["organization_id", "status"]
+      
+    - path: "/ws/system"
+      filters: ["organization_id"]
+
+# Event Handlers
+events:
+  on_filter_change:
+    action: "update_all_panels"
+    debounce: 300
+    
+  on_layout_change:
+    action: "save_user_preferences"
+    
+  on_websocket_message:
+    action: "update_relevant_components"
+    
+  on_error:
+    action: "show_error_toast"
+    
+  on_prompt_selected:
+    action: "highlight_related_pipeline"
+
+# Keyboard Shortcuts
+shortcuts:
+  - key: "Cmd+/"
+    action: "toggle_sidebar"
+    
+  - key: "Cmd+F"
+    action: "focus_search"
+    
+  - key: "Cmd+R"
+    action: "refresh_data"
+    
+  - key: "Esc"
+    action: "clear_selection"
+    
+  - key: "Space"
+    action: "pause_auto_refresh"
+
+# Accessibility
+accessibility:
+  landmarks:
+    header: "banner"
+    sidebar: "navigation"
+    prompt-panel: "region"
+    goal-panel: "region" 
+    timeline: "main"
+    footer: "contentinfo"
+    
+  skip_links:
+    - target: "#prompt-panel"
+      text: "Skip to prompts"
+      
+    - target: "#timeline"
+      text: "Skip to timeline"
+      
+  announcements:
+    - trigger: "new_prompt"
+      message: "New prompt received: {{ prompt.title }}"
+      
+    - trigger: "pipeline_complete"
+      message: "Pipeline completed: {{ pipeline.name }}"
+
+# Performance Optimization
+performance:
+  virtualization:
+    enabled: true
+    item_height: 80
+    overscan: 5
+    
+  lazy_loading:
+    enabled: true
+    threshold: "200px"
+    
+  memoization:
+    - component: "PromptPanel"
+      dependencies: ["prompts", "filters"]
+      
+    - component: "GoalPanel"
+      dependencies: ["goals", "filters"]
+
+# State Management
+state:
+  global:
+    - current_user
+    - organization_id
+    - active_filters
+    - layout_preferences
+    
+  local:
+    - selected_prompt
+    - selected_pipeline
+    - sidebar_collapsed
+    - auto_refresh_enabled

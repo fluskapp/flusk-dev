@@ -1,0 +1,35 @@
+name: detectPatterns
+description: Find repetitive prompt patterns in LLM calls
+inputs:
+  - name: db
+    type: Database
+  - name: start
+    type: string
+  - name: end
+    type: string
+  - name: minOccurrences
+    type: integer
+    default: 3
+output:
+  type: Pattern[]
+steps:
+  - id: duplicates
+    call: detectDuplicates
+    with: { db: $db, start: $start, end: $end, minOccurrences: $minOccurrences }
+  - id: patterns
+    action: forEach
+    source: $duplicates
+    call: createPattern
+    with:
+      db: $db
+      data:
+        promptHash: $item.promptHash
+        model: $item.model
+        occurrences: $item.count
+        totalCostUsd: $item.wasted_cost
+        firstSeenAt: $start
+        lastSeenAt: $end
+        recommendation: cache
+  - id: result
+    action: return
+    value: $patterns

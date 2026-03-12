@@ -1,0 +1,16 @@
+name: invokeModel
+description: Invoke an LLM model
+inputs:
+  - name: config
+    type: json
+  - name: input
+    type: json
+output:
+  type: json
+steps:
+  - id: result
+    action: assign
+    value: $input
+  - id: done
+    action: return
+    value: $result

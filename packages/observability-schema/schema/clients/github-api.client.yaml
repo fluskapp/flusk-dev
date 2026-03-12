@@ -1,0 +1,10 @@
+name: githubApi
+description: GitHub API client for code scanning (fetch repository contents)
+baseUrl: https://api.github.com
+auth:
+  type: bearer
+  envVar: GITHUB_TOKEN
+endpoints:
+  - name: invoke
+    method: POST
+    path: /

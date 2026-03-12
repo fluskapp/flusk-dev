@@ -1,0 +1,9 @@
+name: listTraces
+description: listTraces implementation
+inputs: []
+output:
+  type: json
+steps:
+  - id: result
+    action: return
+    value: 'null'

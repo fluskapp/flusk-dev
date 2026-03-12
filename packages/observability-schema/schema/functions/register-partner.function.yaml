@@ -1,0 +1,31 @@
+name: registerPartner
+description: Registers a new partner with pending status
+inputs:
+  - name: name
+    type: string
+  - name: email
+    type: string
+  - name: website
+    type: string
+  - name: organizationId
+    type: string
+  - name: db
+    type: Database
+output:
+  type: Partner
+steps:
+  - id: partner
+    call: createPartner
+    with:
+      data:
+        name: $name
+        email: $email
+        website: $website
+        organizationId: $organizationId
+        status: pending
+        tier: free
+      db: $db
+    store: partner
+  - id: result
+    action: return
+    value: $partner

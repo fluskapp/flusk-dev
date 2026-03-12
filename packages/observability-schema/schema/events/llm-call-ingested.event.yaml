@@ -1,0 +1,28 @@
+name: LlmCallIngested
+description: Fired after a new LLM call is recorded
+channel: webhook
+payload:
+  fields:
+    - name: llmCallId
+      type: string
+      required: true
+    - name: model
+      type: string
+      required: true
+    - name: provider
+      type: string
+      required: true
+    - name: costUsd
+      type: number
+      required: true
+    - name: organizationId
+      type: string
+      required: true
+publish:
+  - trigger: afterCreate
+    entity: LlmCall
+subscribe:
+  handler: detectPatterns
+  retry:
+    maxAttempts: 3
+    backoff: exponential

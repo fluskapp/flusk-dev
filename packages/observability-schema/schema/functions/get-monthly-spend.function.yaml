@@ -1,0 +1,23 @@
+name: getMonthlySpend
+description: Get total spending for the current month
+inputs:
+  - name: db
+    type: Database
+output:
+  type: SpendSummary
+steps:
+  - id: calls
+    call: listLlmCalls
+    with:
+      db: $db
+      timeRange: currentMonth
+  - id: total
+    action: call
+    source: $calls
+    accumulator: 0
+    expression: $acc + $item.costUsd
+  - id: result
+    action: return
+    value:
+      totalCostUsd: $total
+      callCount: $calls.length

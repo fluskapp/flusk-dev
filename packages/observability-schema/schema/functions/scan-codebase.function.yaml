@@ -1,0 +1,49 @@
+name: scanCodebase
+description: Static analysis to find all LLM call sites in a project
+inputs:
+  - name: projectPath
+    type: string
+  - name: scanType
+    type: string
+output:
+  type: CodeScanResult
+steps:
+  - id: startTime
+    action: call
+    expression: now()
+  - id: callSites
+    call: detectLlmCallSites
+    with:
+      projectPath: $projectPath
+  - id: costs
+    call: estimateCallCosts
+    with:
+      callSites: $callSites
+  - id: providers
+    action: call
+    expression: unique($callSites, 'provider')
+  - id: models
+    action: call
+    expression: unique($callSites, 'model')
+  - id: duration
+    action: call
+    expression: now() - $startTime
+  - id: result
+    action: call
+    entity: CodeScanResult
+    data:
+      projectPath: $projectPath
+      scanType: $scanType
+      totalLlmCalls: $callSites.length
+      totalProviders: $providers.length
+      totalModels: $models.length
+      callSites: $costs
+      riskScore: $costs.riskScore
+      scanDuration: $duration
+  - id: report
+    call: generateScanReport
+    with:
+      scanResult: $result
+  - id: return
+    action: return
+    value: $result

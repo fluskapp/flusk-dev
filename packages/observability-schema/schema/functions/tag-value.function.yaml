@@ -1,0 +1,9 @@
+name: tagValue
+description: tagValue
+inputs: []
+output:
+  type: json
+steps:
+  - id: r
+    action: return
+    value: 'null'

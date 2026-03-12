@@ -1,0 +1,18 @@
+name: traceView
+description: View a trace visualization (waterfall in terminal)
+action:
+  call: traceView
+args:
+  - name: trace-id
+    type: string
+    required: true
+    description: Trace ID to visualize
+  - name: type
+    type: enum
+    values:
+      - waterfall
+      - flamegraph
+      - timeline
+      - tree
+    default: waterfall
+    description: Visualization type

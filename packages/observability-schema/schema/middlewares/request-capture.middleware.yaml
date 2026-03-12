@@ -1,0 +1,28 @@
+name: request-capture
+description: Capture LLM call data to SQLite for analysis
+phase: response
+inputs:
+  - name: request
+    from: request
+  - name: response
+    from: response
+  - name: provider
+    from: detected.provider
+  - name: costUsd
+    from: middleware.cost-calculator.costUsd
+  - name: promptHash
+    from: middleware.duplicate-detector.promptHash
+  - name: isDuplicate
+    from: middleware.duplicate-detector.isDuplicate
+  - name: latencyMs
+    from: computed.latencyMs
+output:
+  captured: boolean
+steps:
+  - id: capture
+    action: call
+    value: createLlmCall
+  - id: result
+    action: return
+    value:
+      captured: true

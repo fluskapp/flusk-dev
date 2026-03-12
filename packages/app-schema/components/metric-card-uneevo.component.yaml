@@ -1,0 +1,235 @@
+# Uneevo-Inspired MetricCard Component
+# Warm, professional design with orange/blue accents
+
+name: MetricCardUneevo
+type: atomic
+reusable: true
+description: "Professional metric card inspired by uneevo.com's warm aesthetic"
+
+props:
+  - name: title
+    type: string
+    required: true
+    description: "Card title (e.g., 'Shadow AI Usage')"
+    
+  - name: value
+    type: number | string
+    required: true
+    description: "Main metric value"
+    
+  - name: change
+    type: number
+    optional: true
+    description: "Percentage change from previous period"
+    
+  - name: trend
+    type: "up" | "down" | "neutral"
+    default: "neutral"
+    description: "Trend direction for styling"
+    
+  - name: icon
+    type: string
+    optional: true
+    description: "Icon name (e.g., 'users', 'activity')"
+    
+  - name: format
+    type: "number" | "currency" | "percentage"
+    default: "number"
+    description: "How to format the value"
+    
+  - name: variant
+    type: "default" | "highlighted" | "warning" | "critical"
+    default: "default"
+    description: "Visual variant"
+
+# Uneevo-inspired styling
+styles:
+  base:
+    background: "linear-gradient(145deg, #fafaf9 0%, #fff8f1 100%)"  # Warm white gradient
+    border: "1px solid #e7e5e4"  # Warm gray border
+    border_radius: "16px"        # Rounded corners like uneevo
+    padding: "24px"
+    box_shadow: "0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05)"
+    transition: "all 200ms ease-out"
+    
+  hover:
+    transform: "translateY(-1px)"
+    box_shadow: "0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -2px rgba(0, 0, 0, 0.08)"
+    border_color: "#d6d3d1"  # Slightly darker warm gray
+    
+  variants:
+    default:
+      accent_color: "#ff6900"      # Primary orange
+      icon_background: "#fff8f1"   # Very light orange
+      
+    highlighted:
+      background: "linear-gradient(145deg, #fff8f1 0%, #fef0e7 100%)"  # Orange gradient
+      border_color: "#fcddc3"      # Light orange border
+      accent_color: "#ff6900"
+      
+    warning:
+      background: "linear-gradient(145deg, #fffbeb 0%, #fef3c7 100%)"  # Yellow gradient
+      border_color: "#fde68a"      # Light yellow border
+      accent_color: "#f59e0b"
+      
+    critical:
+      background: "linear-gradient(145deg, #fef2f2 0%, #fee2e2 100%)"  # Red gradient
+      border_color: "#fecaca"      # Light red border
+      accent_color: "#ef4444"
+
+# Typography using design system
+typography:
+  title:
+    font: "typography.scale.label.large"
+    color: "colors.gray.700"        # Warm dark gray
+    weight: "typography.weights.medium"
+    
+  value:
+    font: "typography.scale.headline.large"
+    color: "colors.gray.900"        # Darkest warm gray
+    weight: "typography.weights.bold"
+    
+  change:
+    font: "typography.scale.body.small"
+    weight: "typography.weights.medium"
+    
+  change_positive:
+    color: "colors.success.600"     # Green for positive
+    
+  change_negative:
+    color: "colors.error.600"       # Red for negative
+    
+  change_neutral:
+    color: "colors.gray.500"        # Warm gray for neutral
+
+# Icon styling
+icon:
+  size: "24px"
+  padding: "8px"
+  border_radius: "8px"
+  
+  default:
+    background: "#fff8f1"           # Very light orange
+    color: "#ff6900"                # Primary orange
+    
+  highlighted:
+    background: "#ff6900"           # Primary orange
+    color: "#ffffff"                # White
+    
+  warning:
+    background: "#f59e0b"           # Warning orange
+    color: "#ffffff"
+    
+  critical:
+    background: "#ef4444"           # Error red
+    color: "#ffffff"
+
+# Layout structure
+layout:
+  display: "flex"
+  flex_direction: "column"
+  gap: "16px"
+  
+  header:
+    display: "flex"
+    justify_content: "space-between"
+    align_items: "flex-start"
+    
+  content:
+    display: "flex"
+    flex_direction: "column"
+    gap: "8px"
+    
+  footer:
+    display: "flex" 
+    justify_content: "space-between"
+    align_items: "center"
+
+# Responsive behavior
+responsive:
+  mobile:
+    padding: "16px"
+    font_size_title: "typography.scale.label.medium"
+    font_size_value: "typography.scale.headline.medium"
+    
+  tablet:
+    padding: "20px"
+    
+  desktop:
+    padding: "24px"
+    hover_enabled: true
+
+# Animation
+animation:
+  enter:
+    from: "opacity: 0, transform: translateY(8px)"
+    to: "opacity: 1, transform: translateY(0px)"
+    duration: "200ms"
+    easing: "ease-out"
+    
+  value_change:
+    type: "number-counter"
+    duration: "800ms"
+    easing: "ease-out"
+    
+  hover:
+    duration: "150ms"
+    easing: "ease-out"
+
+# Component composition template
+template: |
+  <div className="metric-card-uneevo ${variant}" onHover="hover">
+    <div className="header">
+      <div className="icon ${variant}">
+        <Icon name="${icon}" size="24" />
+      </div>
+      <div className="title">${title}</div>
+    </div>
+    
+    <div className="content">
+      <div className="value">
+        <AnimatedNumber 
+          value="${value}" 
+          format="${format}"
+          duration="800ms"
+        />
+      </div>
+      
+      {change && (
+        <div className="change ${trend}">
+          <TrendIcon direction="${trend}" size="16" />
+          ${Math.abs(change)}%
+        </div>
+      )}
+    </div>
+  </div>
+
+# Usage examples
+examples:
+  - name: "AI Usage Metric"
+    props:
+      title: "Active AI Users"
+      value: 1247
+      change: 12.5
+      trend: "up"
+      icon: "users"
+      variant: "highlighted"
+      
+  - name: "Cost Metric"
+    props:
+      title: "Monthly AI Spend"
+      value: 15420
+      change: -8.2
+      trend: "down"
+      icon: "dollar-sign"
+      format: "currency"
+      variant: "default"
+      
+  - name: "Risk Alert"
+    props:
+      title: "Shadow AI Detections"
+      value: 23
+      change: 45.3
+      trend: "up"
+      icon: "alert-triangle"
+      variant: "critical"

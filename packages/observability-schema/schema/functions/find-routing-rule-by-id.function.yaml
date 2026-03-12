@@ -1,0 +1,16 @@
+name: findRoutingRuleById
+description: Find RoutingRule
+inputs:
+  - name: id
+    type: string
+  - name: db
+    type: Database
+output:
+  type: RoutingRule
+steps:
+  - id: result
+    action: assign
+    value: $id
+  - id: done
+    action: return
+    value: $result

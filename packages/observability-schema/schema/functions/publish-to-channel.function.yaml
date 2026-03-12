@@ -1,0 +1,42 @@
+name: publishToChannel
+description: Connects a solution to a messaging channel
+inputs:
+  - name: solutionId
+    type: string
+  - name: channel
+    type: string
+  - name: config
+    type: json
+  - name: db
+    type: Database
+output:
+  type: SolutionChannel
+steps:
+  - id: solution
+    call: findSolutionById
+    with:
+      id: $solutionId
+      db: $db
+    store: solution
+  - id: checkActive
+    action: condition
+    if:
+      field: $solution.status
+      op: neq
+      value: active
+    then:
+      - action: throw
+        error: "Solution must be active before publishing to a channel"
+  - id: channelRecord
+    call: createSolutionChannel
+    with:
+      data:
+        solutionId: $solutionId
+        channel: $channel
+        config: $config
+        status: active
+      db: $db
+    store: channelRecord
+  - id: result
+    action: return
+    value: $channelRecord

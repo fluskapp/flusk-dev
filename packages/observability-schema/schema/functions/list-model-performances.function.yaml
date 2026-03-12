@@ -1,0 +1,14 @@
+name: listModelPerformances
+description: List ModelPerformance records
+inputs:
+  - name: db
+    type: Database
+output:
+  type: json
+steps:
+  - id: result
+    action: assign
+    value: []
+  - id: done
+    action: return
+    value: $result

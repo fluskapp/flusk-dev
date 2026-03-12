@@ -1,0 +1,9 @@
+name: createLlmCall
+description: createLlmCall implementation
+inputs: []
+output:
+  type: json
+steps:
+  - id: result
+    action: return
+    value: 'null'

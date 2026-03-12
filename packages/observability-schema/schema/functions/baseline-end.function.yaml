@@ -1,0 +1,9 @@
+name: baselineEnd
+description: baselineEnd
+inputs: []
+output:
+  type: json
+steps:
+  - id: r
+    action: return
+    value: 'null'

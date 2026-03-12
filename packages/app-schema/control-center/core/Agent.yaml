@@ -1,0 +1,146 @@
+# Core entity: Agent
+# Represents a specialized AI agent in the platform
+
+name: Agent
+type: entity
+description: "AI agent that performs specific tasks in pipelines"
+
+fields:
+  # Identity
+  id:
+    type: uuid
+    primary: true
+    auto: true
+    
+  name:
+    type: string
+    required: true
+    description: "Human-readable agent name"
+    
+  agent_type:
+    type: enum
+    values: ["yaml_writer", "schema_validator", "compiler_enhancer", "integration_specialist", "automated_tester", "component_cloner", "orchestrator"]
+    required: true
+    description: "Specialized agent type"
+    
+  # Configuration
+  capabilities:
+    type: json
+    required: true
+    description: "Agent capabilities and configuration"
+    schema:
+      type: object
+      properties:
+        skills: { type: array, items: { type: string } }
+        max_concurrent_tasks: { type: integer }
+        estimated_speed: { type: string }
+        
+  model_config:
+    type: json
+    description: "AI model configuration"
+    schema:
+      type: object
+      properties:
+        model: { type: string }
+        temperature: { type: number }
+        max_tokens: { type: integer }
+        
+  # Status
+  status:
+    type: enum
+    values: ["available", "busy", "offline", "maintenance"]
+    default: "available"
+    index: true
+    
+  current_task_id:
+    type: uuid
+    nullable: true
+    description: "Currently assigned task"
+    
+  # Performance metrics
+  tasks_completed:
+    type: integer
+    default: 0
+    description: "Total tasks completed"
+    
+  average_completion_time:
+    type: integer
+    nullable: true
+    description: "Average task completion time in minutes"
+    
+  success_rate:
+    type: integer
+    default: 100
+    description: "Success rate percentage"
+    range: [0, 100]
+    
+  # Timestamps
+  created_at:
+    type: timestamp
+    auto: true
+    
+  updated_at:
+    type: timestamp
+    auto: true
+    on_update: true
+    
+  last_active:
+    type: timestamp
+    nullable: true
+
+# Relationships
+relationships:
+  - name: tasks
+    type: hasMany
+    target: Task
+    description: "Tasks assigned to this agent"
+
+# Indexes for performance
+indexes:
+  - fields: [agent_type, status]
+    name: "type_status"
+    
+  - fields: [status, last_active]
+    name: "availability"
+
+# API endpoints
+endpoints:
+  - method: GET
+    path: "/api/agents"
+    description: "List all agents"
+    auth: required
+    query:
+      status: string
+      agent_type: string
+      
+  - method: GET
+    path: "/api/agents/{id}"
+    description: "Get agent details"
+    auth: required
+    
+  - method: POST
+    path: "/api/agents"
+    description: "Register new agent"
+    auth: required
+    
+  - method: PATCH
+    path: "/api/agents/{id}"
+    description: "Update agent status"
+    auth: required
+    
+  - method: POST
+    path: "/api/agents/{id}/assign"
+    description: "Assign task to agent"
+    auth: required
+
+# Real-time events
+entity_events:
+  - trigger: after_update
+    event: "agent.status_changed"
+    payload: [id, status, current_task_id]
+    condition: "status_changed"
+    
+  - trigger: after_update
+    event: "agent.task_completed"
+    payload: [id, tasks_completed, average_completion_time]
+    condition: "tasks_completed_changed"

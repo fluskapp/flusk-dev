@@ -1,0 +1,21 @@
+name: updateApiKeyLastUsed
+description: Update the lastUsedAt timestamp on an API key
+inputs:
+  - name: apiKeyId
+    type: uuid
+    required: true
+output:
+  type: json
+steps:
+  - id: updated
+    action: call
+    entity: ApiKey
+    method: update
+    where:
+      id: $apiKeyId
+    with:
+      lastUsedAt: $now
+  - id: result
+    action: return
+    value:
+      updated: true

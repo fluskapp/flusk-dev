@@ -1,0 +1,14 @@
+name: listRoutingRules
+description: List RoutingRule records
+inputs:
+  - name: db
+    type: Database
+output:
+  type: json
+steps:
+  - id: result
+    action: assign
+    value: []
+  - id: done
+    action: return
+    value: $result

@@ -1,0 +1,46 @@
+name: detectSavingsOpportunity
+description: Detect potential savings (e.g. expensive model used for simple tasks)
+inputs:
+  - name: item
+    type: json
+  - name: db
+    type: Database
+output:
+  type: CostInsight
+steps:
+  - id: modelBreakdown
+    call: queryCostAttributionCostByTagAndModel
+    with:
+      tagKey: tagKey
+      tagValue: tagValue
+      from: periodStart
+      to: periodEnd
+      db: $db
+  - id: expensiveModels
+    action: filter
+    source: $modelBreakdown
+    where:
+      field: model
+      op: in
+      value:
+        - gpt-4o
+        - claude-3-opus
+        - claude-opus-4
+  - id: hasSavings
+    action: condition
+    if:
+      field: $expensiveModels.length
+      op: gt
+      value: 0
+    then:
+      - action: return
+        value:
+          type: savings
+          dimension: $item.tagKey
+          value: $item.tagValue
+          message: Consider cheaper model for this workload
+          severity: info
+          potentialSavings: $expensiveModels[0].totalCost * 0.9
+  - id: noSavings
+    action: return
+    value: null

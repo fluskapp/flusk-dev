@@ -1,0 +1,28 @@
+name: queryCostAttributionTopSpenders
+description: Query top spenders in a specific cost dimension
+inputs:
+  - name: tagKey
+    type: string
+  - name: from
+    type: string
+  - name: to
+    type: string
+  - name: limit
+    type: number
+  - name: db
+    type: Database
+output:
+  type: TopSpender[]
+steps:
+  - id: results
+    action: call
+    entity: CostAttribution
+    queryName: topSpenders
+    params:
+      - $tagKey
+      - $from
+      - $to
+      - $limit
+  - id: result
+    action: return
+    value: $results

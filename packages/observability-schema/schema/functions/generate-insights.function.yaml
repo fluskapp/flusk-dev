@@ -1,0 +1,31 @@
+name: generateInsights
+description: Generate AI-powered optimization suggestions from detected patterns
+inputs:
+  - name: db
+    type: Database
+  - name: patterns
+    type: Pattern[]
+  - name: analyzeSessionId
+    type: string
+output:
+  type: Insight[]
+steps:
+  - id: costData
+    call: aggregateCosts
+    with: { db: $db, groupBy: model, start: "30d-ago", end: now }
+  - id: insights
+    action: forEach
+    source: $patterns
+    call: createInsight
+    with:
+      db: $db
+      data:
+        insightType: cost_reduction
+        title: "Duplicate prompt detected: $item.occurrences occurrences"
+        description: "Prompt hash $item.promptHash repeated $item.occurrences times on $item.model"
+        estimatedSavingsUsd: "$item.totalCostUsd * 0.8"
+        priority: "$item.totalCostUsd > 10 ? 'high' : 'medium'"
+        analyzeSessionId: $analyzeSessionId
+  - id: result
+    action: return
+    value: $insights

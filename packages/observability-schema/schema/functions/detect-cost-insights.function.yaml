@@ -1,0 +1,32 @@
+name: detectCostInsights
+description: Auto-detect cost insights — spikes, anomalies, savings opportunities
+inputs:
+  - name: byFeature
+    type: json
+  - name: byTeam
+    type: json
+  - name: byCustomer
+    type: json
+  - name: db
+    type: Database
+output:
+  type: CostInsight[]
+steps:
+  - id: insights
+    action: assign
+    value: []
+  - id: checkSpikes
+    action: forEach
+    source: $byFeature
+    call: detectCostSpike
+    with: { item: $item, db: $db }
+    onError: log-and-continue
+  - id: checkSavings
+    action: forEach
+    source: $byFeature
+    call: detectSavingsOpportunity
+    with: { item: $item, db: $db }
+    onError: log-and-continue
+  - id: result
+    action: return
+    value: $insights

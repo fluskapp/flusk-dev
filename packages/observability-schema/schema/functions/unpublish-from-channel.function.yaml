@@ -1,0 +1,19 @@
+name: unpublishFromChannel
+description: Disconnects a solution from a messaging channel
+inputs:
+  - name: channelId
+    type: string
+  - name: db
+    type: Database
+output:
+  type: boolean
+steps:
+  - id: deleted
+    call: deleteSolutionChannel
+    with:
+      id: $channelId
+      db: $db
+    store: deleted
+  - id: result
+    action: return
+    value: $deleted
