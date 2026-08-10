@@ -2,6 +2,8 @@
 export const CLIENT_LIST_JS = `
 var current = null;
 var brainOpen = false;
+var runsOpen = false;
+var docsOpen = false;
 var lastListJson = "";
 var lastList = [];
 var query = "";

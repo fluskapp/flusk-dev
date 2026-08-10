@@ -4,18 +4,9 @@
  * live view aihub used to provide.
  */
 export const CLIENT_RUNS_JS = `
-var runsOpen = false;
 var openJournal = null;
 
-function toggleRuns() {
-	runsOpen = !runsOpen;
-	if (runsOpen && brainOpen) toggleBrain();
-	$("#runs").hidden = !runsOpen;
-	$("#detail").hidden = runsOpen || !current;
-	$("#empty").hidden = runsOpen || !!current;
-	$("#runs-btn").classList.toggle("on", runsOpen);
-	if (runsOpen) loadRuns();
-}
+function toggleRuns() { togglePanel("runs"); }
 
 var STAGE_CLASS = {
 	done: "completed", running: "running", failed: "error",

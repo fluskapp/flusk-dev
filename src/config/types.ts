@@ -46,6 +46,8 @@ export interface AhConfig {
 	ui: {
 		/** Globs (one `*` level) of harness journal directories to display. */
 		harnessDirs: string[];
+		/** Globs (one `*` level) of project roots whose markdown is indexed. */
+		projectDirs: string[];
 	};
 	watch: {
 		/** Queues to poll: "gh-prs" (open PRs) and/or "gh-failing-ci". */

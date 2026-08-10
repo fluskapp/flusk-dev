@@ -38,6 +38,7 @@ export const DEFAULT_CONFIG: AhConfig = {
 	},
 	ui: {
 		harnessDirs: ["~/projects/*/docs/runs", "~/projects/playground/*/docs/runs"],
+		projectDirs: ["~/projects/*", "~/projects/playground/*"],
 	},
 	watch: {
 		queues: ["gh-prs", "gh-failing-ci"],

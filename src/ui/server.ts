@@ -1,11 +1,9 @@
 import { spawn } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { loadConfig } from "../config/config.js";
 import { createServer, type Server, type ServerResponse } from "node:http";
 import { join, resolve } from "node:path";
 import { ahHome } from "../session/paths.js";
 import { loadSessionDetail } from "./detail.js";
-import { expandHome, resolveJournalDirs, scanJournals } from "./journal-scan.js";
+import { handleContent } from "./api-content.js";
 import { buildMemoryView } from "./memory-view.js";
 import { renderPage } from "./page.js";
 import { scanSessions, sessionsRoot } from "./scan.js";
@@ -38,6 +36,7 @@ function handle(
 	repo: string | null,
 	res: ServerResponse,
 ): void {
+	if (handleContent(method, pathname, repo, res)) return;
 	if (method === "GET" && pathname === "/") {
 		res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
 		res.end(renderPage(ahHome()));
@@ -54,28 +53,6 @@ function handle(
 			return;
 		}
 		json(res, 200, { ...loadSessionDetail(path), path });
-		return;
-	}
-	if (method === "GET" && pathname === "/api/journals") {
-		json(res, 200, scanJournals(loadConfig(process.cwd()).ui.harnessDirs));
-		return;
-	}
-	if (method === "GET" && pathname === "/api/journal") {
-		// Only files inside a configured journal directory are readable.
-		const target = repo === null ? "" : resolve(expandHome(repo));
-		const dirs = resolveJournalDirs(loadConfig(process.cwd()).ui.harnessDirs).map((d) =>
-			resolve(d),
-		);
-		if (target === "" || !dirs.some((d) => target.startsWith(`${d}/`))) {
-			json(res, 400, { error: "not a configured journal path" });
-			return;
-		}
-		try {
-			res.writeHead(200, { "content-type": "text/plain; charset=utf-8" });
-			res.end(readFileSync(target, "utf8"));
-		} catch (e) {
-			json(res, 404, { error: e instanceof Error ? e.message : String(e) });
-		}
 		return;
 	}
 	if (method === "GET" && pathname === "/api/memory") {

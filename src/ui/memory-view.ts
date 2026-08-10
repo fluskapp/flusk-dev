@@ -31,12 +31,17 @@ export interface LedgerItem {
 	cooldownUntil?: string;
 }
 
+import { buildLocalKnowledge, type LocalKnowledge } from "./local-knowledge.js";
+
 export interface MemoryView {
 	connected: boolean;
 	namespace: string;
 	goals: GoalView[];
 	lessons: MemFact[];
 	ledger: LedgerItem[];
+	/** Always present: derived from session files, so the panel is useful
+	 * even when the graph is unreachable. */
+	local: LocalKnowledge;
 	note?: string;
 }
 
@@ -115,7 +120,15 @@ async function collect(client: MemoryClient, ns: string): Promise<MemFact[]> {
 export async function buildMemoryView(repoRoot: string): Promise<MemoryView> {
 	const cfg = loadConfig(repoRoot);
 	const ns = resolveNamespace(repoRoot, loadRepoConfig(repoRoot));
-	const empty: MemoryView = { connected: false, namespace: ns, goals: [], lessons: [], ledger: [] };
+	const local = buildLocalKnowledge(repoRoot);
+	const empty: MemoryView = {
+		connected: false,
+		namespace: ns,
+		goals: [],
+		lessons: [],
+		ledger: [],
+		local,
+	};
 	if (!cfg.memory.enabled) return { ...empty, note: "memory disabled in config" };
 	const client = createMemoryClient({ baseUrl: cfg.memory.baseUrl, apiKey: cfg.memory.apiKey });
 	if (!(await client.health())) {
@@ -125,6 +138,7 @@ export async function buildMemoryView(repoRoot: string): Promise<MemoryView> {
 		return {
 			connected: true,
 			namespace: ns,
+			local,
 			goals: buildGoals(await collect(client, ns)),
 			lessons: await collect(client, LESSONS_NS),
 			ledger: buildLedger(await collect(client, AH_NS)),

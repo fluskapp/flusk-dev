@@ -54,8 +54,10 @@ document.addEventListener("keydown", function (e) {
 	if (e.key === "/") { e.preventDefault(); search.focus(); search.select(); return; }
 	if (e.key === "?") { $("#help").hidden = false; return; }
 	if (e.key === "t") { toggleTheme(); return; }
-	if (e.key === "b") { toggleBrain(); return; }
-	if (e.key === "n") { toggleRuns(); return; }
+	if (e.key === "o") { togglePanel("overview"); return; }
+	if (e.key === "n") { togglePanel("runs"); return; }
+	if (e.key === "b") { togglePanel("brain"); return; }
+	if (e.key === "d") { togglePanel("docs"); return; }
 	if (e.key === "r") { loadList(true); toast("Refreshed"); return; }
 	if (e.key === "j" || e.key === "ArrowDown") { e.preventDefault(); moveSel(1); }
 	else if (e.key === "k" || e.key === "ArrowUp") { e.preventDefault(); moveSel(-1); }

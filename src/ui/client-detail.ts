@@ -12,7 +12,7 @@ async function loadDetail(userClicked) {
 	$("#empty").hidden = true;
 	// The 4s poll must not yank the Brain or Runs panel out from under the
 	// reader — both live in #main alongside the transcript.
-	$("#detail").hidden = brainOpen === true || runsOpen === true;
+	$("#detail").hidden = brainOpen || runsOpen || overviewOpen || docsOpen;
 	var t = d.header.task;
 	$("#tab-title").textContent = t.length > 64 ? t.slice(0, 64) + "\\u2026" : t;
 	$("#meta").innerHTML = metaHtml(d);

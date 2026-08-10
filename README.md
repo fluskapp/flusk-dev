@@ -67,13 +67,22 @@ ah ui [--port <n>] [--no-open]
   run ends `completed`.
 - **`ah ui`** — IntelliJ-styled dashboard over `~/.ah/sessions/`
   (loopback-only HTTP; `--port`, default 4877; `--no-open` skips opening the
-  browser). Three panels: **sessions** (list + full transcripts),
-  **Runs** (`n`) — live pipeline view of other harnesses' run journals, read
-  from the `docs/runs/*.md` files they already write, so a watch autopilot
-  can be followed here; and **Brain** (`b`) — goal graphs, learned lessons,
-  and the unattended attempt ledger. Configure which journal directories to
-  follow with `ui.harnessDirs` in `~/.ah/config.json` (defaults to
-  `~/projects/*/docs/runs` and `~/projects/playground/*/docs/runs`).
+  browser). Panels: **sessions** (list + full transcripts), **Overview**
+  (`o`) — stat tiles, recent activity across sessions and harness runs,
+  repos and harnesses; **Runs** (`n`) — live pipeline view of other
+  harnesses' run journals, read from the `docs/runs/*.md` files they already
+  write, so a watch autopilot can be followed here; **Docs** (`d`) — every
+  markdown file across your projects (context files, plans, skills, docs)
+  with a rendered preview; and **Brain** (`b`) — what ah knows about a repo:
+  goal graphs, lessons and the unattended ledger from abagraph when it is
+  reachable, plus knowledge derived from ah's own sessions (files it edits,
+  commands it runs, recent failures) which is always available.
+
+  Configure what is indexed with `ui.harnessDirs` and `ui.projectDirs` in
+  `~/.ah/config.json`; both default to `~/projects/*` and
+  `~/projects/playground/*`. The markdown renderer is dependency-free and
+  escapes its input before rendering, so an indexed document cannot inject
+  markup into the dashboard.
 - **`ah resume <path-or-id>`** — continue a stopped or crashed session,
   repairing any tool call left dangling by the interruption. `--steer` adds
   a new instruction on the way back in.

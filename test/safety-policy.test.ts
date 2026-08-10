@@ -38,7 +38,7 @@ function config(onUnknownCommand: "deny" | "allow"): AhConfig {
 			budgets: { repo: 2000, lessons: 1000 },
 		},
 		verify: { retries: 3, evidenceLines: 40 },
-		ui: { harnessDirs: [] },
+		ui: { harnessDirs: [], projectDirs: [] },
 		watch: {
 			queues: [],
 			maxRunsPerNight: 10,
