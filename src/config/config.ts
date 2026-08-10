@@ -18,6 +18,7 @@ interface ConfigLayer {
 	compaction?: Partial<AhConfig["compaction"]>;
 	memory?: Partial<AhConfig["memory"]>;
 	verify?: Partial<AhConfig["verify"]>;
+	ui?: Partial<AhConfig["ui"]>;
 	watch?: Partial<AhConfig["watch"]>;
 }
 
@@ -55,6 +56,7 @@ function mergeLayer(base: AhConfig, layer: ConfigLayer | null): AhConfig {
 			budgets: { ...base.memory.budgets, ...layer.memory?.budgets },
 		},
 		verify: { ...base.verify, ...layer.verify },
+		ui: { ...base.ui, ...layer.ui },
 		watch: { ...base.watch, ...layer.watch },
 	};
 }

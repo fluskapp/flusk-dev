@@ -43,6 +43,10 @@ export interface AhConfig {
 		retries: number;
 		evidenceLines: number;
 	};
+	ui: {
+		/** Globs (one `*` level) of harness journal directories to display. */
+		harnessDirs: string[];
+	};
 	watch: {
 		/** Queues to poll: "gh-prs" (open PRs) and/or "gh-failing-ci". */
 		queues: string[];

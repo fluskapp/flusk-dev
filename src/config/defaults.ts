@@ -36,6 +36,9 @@ export const DEFAULT_CONFIG: AhConfig = {
 		retries: 3,
 		evidenceLines: 40,
 	},
+	ui: {
+		harnessDirs: ["~/projects/*/docs/runs", "~/projects/playground/*/docs/runs"],
+	},
 	watch: {
 		queues: ["gh-prs", "gh-failing-ci"],
 		maxRunsPerNight: 10,

@@ -7,6 +7,7 @@ export const CLIENT_BRAIN_JS = `
 
 function toggleBrain() {
 	brainOpen = !brainOpen;
+	if (brainOpen && runsOpen) toggleRuns();
 	$("#brain").hidden = !brainOpen;
 	$("#detail").hidden = brainOpen || !current;
 	$("#empty").hidden = brainOpen || !!current;

@@ -37,7 +37,26 @@ kbd {
 #brain-btn { font-size: 12px; padding: 2px 10px; border: 1px solid var(--border); border-radius: 5px; }
 #brain-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-#brain { padding: 14px 20px 40px; max-width: 940px; }
+#brain, #runs { padding: 14px 20px 40px; max-width: 940px; }
+#runs-btn { font-size: 12px; padding: 2px 10px; border: 1px solid var(--border); border-radius: 5px; }
+#runs-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.journal {
+	border: 1px solid var(--border); border-radius: 6px; background: var(--panel);
+	padding: 8px 12px; margin-bottom: 8px;
+}
+.journal.open { background: var(--bg); border-color: var(--accent); }
+.journal-head { display: flex; align-items: center; gap: 9px; cursor: pointer; }
+.journal-head .dim { margin-left: auto; white-space: nowrap; }
+.journal .stages { display: flex; flex-wrap: wrap; gap: 4px; margin: 7px 0 4px; }
+.stage {
+	font: 10.5px var(--font-code); padding: 1px 6px; border-radius: 3px;
+	background: var(--hover); color: var(--dim); border: 1px solid transparent;
+}
+.stage.completed { background: transparent; border-color: var(--ok); color: var(--ok); }
+.stage.running { background: var(--accent); color: #fff; }
+.stage.error { background: transparent; border-color: var(--err); color: var(--err); }
+.stage.stopped { border-color: var(--warn); color: var(--warn); background: transparent; }
+#journal-body { margin-top: 8px; max-height: 420px; }
 .brain-head { font-size: 12px; color: var(--dim); margin-bottom: 14px; }
 .brain-sec { margin-bottom: 26px; }
 .brain-sec h3 {

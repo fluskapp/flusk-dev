@@ -67,7 +67,13 @@ ah ui [--port <n>] [--no-open]
   run ends `completed`.
 - **`ah ui`** — IntelliJ-styled dashboard over `~/.ah/sessions/`
   (loopback-only HTTP; `--port`, default 4877; `--no-open` skips opening the
-  browser). Run list, full transcripts, reveal-in-Finder.
+  browser). Three panels: **sessions** (list + full transcripts),
+  **Runs** (`n`) — live pipeline view of other harnesses' run journals, read
+  from the `docs/runs/*.md` files they already write, so a watch autopilot
+  can be followed here; and **Brain** (`b`) — goal graphs, learned lessons,
+  and the unattended attempt ledger. Configure which journal directories to
+  follow with `ui.harnessDirs` in `~/.ah/config.json` (defaults to
+  `~/projects/*/docs/runs` and `~/projects/playground/*/docs/runs`).
 - **`ah resume <path-or-id>`** — continue a stopped or crashed session,
   repairing any tool call left dangling by the interruption. `--steer` adds
   a new instruction on the way back in.

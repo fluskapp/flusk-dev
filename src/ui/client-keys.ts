@@ -55,6 +55,7 @@ document.addEventListener("keydown", function (e) {
 	if (e.key === "?") { $("#help").hidden = false; return; }
 	if (e.key === "t") { toggleTheme(); return; }
 	if (e.key === "b") { toggleBrain(); return; }
+	if (e.key === "n") { toggleRuns(); return; }
 	if (e.key === "r") { loadList(true); toast("Refreshed"); return; }
 	if (e.key === "j" || e.key === "ArrowDown") { e.preventDefault(); moveSel(1); }
 	else if (e.key === "k" || e.key === "ArrowUp") { e.preventDefault(); moveSel(-1); }
