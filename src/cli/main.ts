@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
-import type { TaskKind } from "../config/types.js";
 import { feedbackCmd } from "./feedback-cmd.js";
 import { goalCmd } from "./goal-cmd.js";
 import { resumeCmd } from "./resume-cmd.js";
+import { parseRunArgs } from "./run-args.js";
 import { runCmd } from "./run-cmd.js";
 import { runsCmd } from "./runs-cmd.js";
 import { uiCmd } from "./ui-cmd.js";
+import { watchCmd } from "./watch-cmd.js";
 
 const USAGE = `Usage:
   hit run <task> [--model <provider/id>] [--kind <plan|code|review|summarize>]
@@ -18,21 +19,13 @@ const USAGE = `Usage:
   hit goal --list [--repo <path>]
   hit feedback <good|bad>
   hit runs [-n <count>]
+  hit watch [--repo <path>] [--once]
   hit ui [--port <n>] [--no-open]
 `;
-
-const KINDS: ReadonlySet<string> = new Set(["plan", "code", "review", "summarize"]);
 
 function fail(message: string): void {
 	process.stderr.write(message);
 	process.exitCode = 1;
-}
-
-/** "2h", "30m", "45s", "1h30m" → milliseconds; null when unparseable. */
-function parseDuration(text: string): number | null {
-	const m = /^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/.exec(text);
-	if (!m || m[0] === "") return null;
-	return (Number(m[1] ?? 0) * 3600 + Number(m[2] ?? 0) * 60 + Number(m[3] ?? 0)) * 1000;
 }
 
 async function main(): Promise<void> {
@@ -59,6 +52,7 @@ async function main(): Promise<void> {
 				n: { type: "string", short: "n" },
 				port: { type: "string" },
 				"no-open": { type: "boolean" },
+				once: { type: "boolean" },
 			},
 		});
 	} catch (e) {
@@ -74,6 +68,13 @@ async function main(): Promise<void> {
 			return fail("hit: --port must be a valid port number\n");
 		}
 		await uiCmd({ port, open: v["no-open"] !== true });
+		return;
+	}
+	if (command === "watch") {
+		process.exitCode = await watchCmd({
+			repo: typeof v.repo === "string" ? v.repo : process.cwd(),
+			once: v.once === true,
+		});
 		return;
 	}
 	if (command === "runs") {
@@ -113,35 +114,9 @@ async function main(): Promise<void> {
 		return;
 	}
 	if (command !== "run" || arg === undefined) return fail(USAGE);
-	const maxTurns = v["max-turns"] === undefined ? undefined : Number(v["max-turns"]);
-	if (maxTurns !== undefined && (!Number.isInteger(maxTurns) || maxTurns <= 0)) {
-		return fail("hit: --max-turns must be a positive integer\n");
-	}
-	const maxCost = v["max-cost"] === undefined ? undefined : Number(v["max-cost"]);
-	if (maxCost !== undefined && !(maxCost > 0)) {
-		return fail("hit: --max-cost must be a positive number of dollars\n");
-	}
-	const deadlineMs = typeof v.for === "string" ? parseDuration(v.for) : undefined;
-	if (deadlineMs === null) return fail("hit: --for must look like 2h, 30m, 45s or 1h30m\n");
-	const kind = typeof v.kind === "string" ? v.kind : undefined;
-	if (kind !== undefined && !KINDS.has(kind)) {
-		return fail("hit: --kind must be plan, code, review or summarize\n");
-	}
-	const reason = await runCmd({
-		task: arg,
-		repo: typeof v.repo === "string" ? v.repo : process.cwd(),
-		...(typeof v.fake === "string" ? { fake: v.fake } : { real: true }),
-		...(typeof v.model === "string" ? { model: v.model } : {}),
-		...(kind !== undefined ? { kind: kind as TaskKind } : {}),
-		...(maxCost !== undefined ? { maxCostUsd: maxCost } : {}),
-		...(deadlineMs !== undefined ? { deadlineMs } : {}),
-		...(maxTurns !== undefined ? { maxTurns } : {}),
-		dry: v.dry === true,
-		noIsolation: v["no-isolation"] === true,
-		allowDirty: v["allow-dirty"] === true,
-		noVerify: v["no-verify"] === true,
-		quiet: v.quiet === true,
-	});
+	const parsedRun = parseRunArgs(arg, v, process.cwd());
+	if (!parsedRun.ok) return fail(parsedRun.error);
+	const reason = await runCmd(parsedRun.opts);
 	process.exitCode = reason === "completed" ? 0 : 1;
 }
 

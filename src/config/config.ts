@@ -18,6 +18,7 @@ interface ConfigLayer {
 	compaction?: Partial<HitConfig["compaction"]>;
 	memory?: Partial<HitConfig["memory"]>;
 	verify?: Partial<HitConfig["verify"]>;
+	watch?: Partial<HitConfig["watch"]>;
 }
 
 function readLayer(path: string): ConfigLayer | null {
@@ -54,6 +55,7 @@ function mergeLayer(base: HitConfig, layer: ConfigLayer | null): HitConfig {
 			budgets: { ...base.memory.budgets, ...layer.memory?.budgets },
 		},
 		verify: { ...base.verify, ...layer.verify },
+		watch: { ...base.watch, ...layer.watch },
 	};
 }
 

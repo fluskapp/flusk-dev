@@ -43,6 +43,23 @@ export interface HitConfig {
 		retries: number;
 		evidenceLines: number;
 	};
+	watch: {
+		/** Queues to poll: "gh-prs" (open PRs) and/or "gh-failing-ci". */
+		queues: string[];
+		maxRunsPerNight: number;
+		maxCostUsdPerRun: number;
+		maxRunMinutes: number;
+		pollIntervalMinutes: number;
+		/** Hours an item rests after a successful attempt. */
+		cooldownHours: number;
+		/** Base hours after a failure; backs off as failures^2. */
+		failCooldownHours: number;
+		/**
+		 * Push branches and open PRs. Off by default: unattended runs stay
+		 * local until you explicitly opt in to publishing.
+		 */
+		push: boolean;
+	};
 }
 
 /** Per-repo <repo>/.hit.json — sections deep-merge over the global config. */

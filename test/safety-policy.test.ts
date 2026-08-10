@@ -38,6 +38,16 @@ function config(onUnknownCommand: "deny" | "allow"): HitConfig {
 			budgets: { repo: 2000, lessons: 1000 },
 		},
 		verify: { retries: 3, evidenceLines: 40 },
+		watch: {
+			queues: [],
+			maxRunsPerNight: 10,
+			maxCostUsdPerRun: 2,
+			maxRunMinutes: 30,
+			pollIntervalMinutes: 10,
+			cooldownHours: 4,
+			failCooldownHours: 8,
+			push: false,
+		},
 	};
 }
 

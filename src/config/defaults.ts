@@ -36,4 +36,14 @@ export const DEFAULT_CONFIG: HitConfig = {
 		retries: 3,
 		evidenceLines: 40,
 	},
+	watch: {
+		queues: ["gh-prs", "gh-failing-ci"],
+		maxRunsPerNight: 10,
+		maxCostUsdPerRun: 2,
+		maxRunMinutes: 30,
+		pollIntervalMinutes: 10,
+		cooldownHours: 4,
+		failCooldownHours: 8,
+		push: false,
+	},
 };

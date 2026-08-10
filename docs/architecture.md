@@ -116,15 +116,27 @@ budget, so children cannot multiply spend.
 
 - **Phase 1 — done.** The loop, tools, JSONL sessions, steering, CLI against
   FakeProvider, and the IntelliJ-styled `hit ui` dashboard.
-- **Phase 2 — this change.** The real provider adapter (pi-ai catalog) with
-  model routing, the full safety stack (classification, path jail, git
-  isolation, budgets), context compaction, subagents, config loading, and
-  resume. After Phase 2 hit can run real, unattended tasks.
-- **Phase 3 — planned.** The abagraph-backed `MemoryPort`: bitemporal facts
+- **Phase 2 — done.** The real provider adapter (pi-ai catalog) with model
+  routing, the full safety stack (classification, path jail, git isolation,
+  budgets), context compaction, subagents, config loading, and resume.
+- **Phase 3 — done.** The abagraph-backed `MemoryPort`: bitemporal facts
   (repo conventions, verify commands, cross-repo lessons — see
-  `docs/vocabulary.md`), a verification gate (detect/verify commands,
-  retry-with-evidence before a run may claim done), and goal/task graphs
-  worked across sessions. None of this exists in the tree yet beyond the
-  port and the vocabulary.
-- **Phase 4 — planned.** `hit watch`: an unattended queue loop over open PRs
-  and failing CI with fact-based cooldowns. Does not exist yet.
+  `docs/vocabulary.md`), the verification gate (detected verify commands,
+  retry-with-evidence, then claim-checking the run's own report), and
+  goal/task graphs worked across sessions. Server behavior this depends on
+  is written down in `docs/abagraph-notes.md` — read it before changing the
+  transport.
+- **Phase 4 — done.** `hit watch`: the unattended queue loop over open PRs
+  and failing CI, worktree-per-item isolation, a fact-based attempt ledger
+  with quadratic backoff, nightly caps, opt-in publishing, and lesson
+  promotion gated on an `ALLOW` verdict (`src/watch/`).
+
+### Known gaps
+
+- The Phase 3 adversarial review was cut short; the goal scheduler's edge
+  cases and the gate's retry semantics have had less hostile scrutiny than
+  the safety layer did.
+- Memory is exercised against a mock that mirrors the abagraph source. There
+  is no test against a live abagraph binary.
+- `hit watch` queues are GitHub-only (`gh`); other sources mean writing a
+  poller returning `WorkItem[]`.
