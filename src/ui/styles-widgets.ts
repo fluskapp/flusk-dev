@@ -34,6 +34,33 @@ kbd {
 	border-radius: 4px; padding: 1px 7px; text-align: center;
 }
 
+#brain-btn { font-size: 12px; padding: 2px 10px; border: 1px solid var(--border); border-radius: 5px; }
+#brain-btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+#brain { padding: 14px 20px 40px; max-width: 940px; }
+.brain-head { font-size: 12px; color: var(--dim); margin-bottom: 14px; }
+.brain-sec { margin-bottom: 26px; }
+.brain-sec h3 {
+	margin: 0 0 8px; font-size: 12px; text-transform: uppercase;
+	letter-spacing: .5px; color: var(--dim);
+	border-bottom: 1px solid var(--border); padding-bottom: 5px;
+}
+.goal {
+	border: 1px solid var(--border); border-radius: 6px;
+	padding: 8px 12px; margin-bottom: 10px; background: var(--panel);
+}
+.goal-head { display: flex; align-items: center; gap: 9px; margin-bottom: 6px; }
+.goal-head .dim { margin-left: auto; }
+.task {
+	display: flex; align-items: center; gap: 9px;
+	padding: 3px 0 3px 4px; font-size: 12.5px;
+}
+.fact {
+	display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+	padding: 4px 0; font-size: 12.5px; border-bottom: 1px solid var(--border);
+}
+.fact .dim { margin-left: auto; }
+
 .meta-actions { display: flex; gap: 6px; margin-left: auto; }
 .act {
 	font-size: 11.5px; color: var(--text); padding: 2px 10px;

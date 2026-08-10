@@ -10,7 +10,7 @@
 import { AbagraphError, createClient, type FactInput as SdkFactInput, type TransactBody } from "@abagraph/client";
 import type { MemFact, MemoryClient, MemVerdict } from "./client-types.js";
 import { CONTEXT_FETCH_CAP, trimToBudget } from "./rank.js";
-import { fromWire, inNs, toWire, type WireFact } from "./wire.js";
+import { asFactArray, fromWire, inNs, toWire, type WireFact } from "./wire.js";
 
 export interface MemoryClientOptions {
 	baseUrl: string;
@@ -72,7 +72,7 @@ export function createMemoryClient(opts: MemoryClientOptions): MemoryClient {
 		},
 
 		async query(ns, p): Promise<MemFact[]> {
-			const facts = await sdk.query({
+			const raw = await sdk.query({
 				subject: p.subject,
 				predicate: p.predicate,
 				object: p.object,
@@ -80,7 +80,7 @@ export function createMemoryClient(opts: MemoryClientOptions): MemoryClient {
 				limit: p.limit,
 				as_of: p.asOf,
 			});
-			return facts.filter(inNs(ns)).map(fromWire);
+			return asFactArray(raw, "GET /api/facts").filter(inNs(ns)).map(fromWire);
 		},
 
 		async contextPack(ns, req) {

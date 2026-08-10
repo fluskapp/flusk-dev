@@ -97,7 +97,7 @@ export async function watchTick(deps: WatchDeps): Promise<TickResult> {
 		result = { outcome: "error", runId: "", verdict: undefined };
 		deps.log(`run threw: ${e instanceof Error ? e.message : String(e)}`);
 	}
-	await recordOutcome(client, chosen.key, result.outcome);
+	await recordOutcome(client, chosen.key, result.outcome, failures);
 
 	if (result.outcome === "completed") {
 		const promo = await promoteLessons(

@@ -82,6 +82,10 @@ export async function watchCmd(opts: WatchCmdOpts): Promise<number> {
 					deadlineMs: cfg.watch.maxRunMinutes * 60_000,
 					quiet: true,
 					out,
+					// The worktree holds a branch under review: never read config
+					// from it, and keep memory in the main repo's namespace so
+					// what the run learns is still there tomorrow.
+					trustedConfig: { cfg, repoConfig, namespace: repoNs },
 				});
 				const seen = await observeRun(client, repoNs, startedAt);
 				return { outcome, runId: seen.runId, verdict: seen.verdict };

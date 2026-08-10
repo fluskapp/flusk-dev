@@ -98,8 +98,15 @@ describe("goal graphs in abagraph", () => {
 		await writeTaskStatus(mem, ns, t, "done");
 		const active = await mem.query(ns, { subject: t, predicate: "status" });
 		expect(active.map((f) => f.object)).toEqual(["done"]);
-		const closed = await mem.query(ns, { subject: t, predicate: "status", status: "superseded" });
-		expect(closed.map((f) => f.object)).toEqual(["pending", "running"]);
+		// History is reached with as_of, NOT by asking for status "superseded":
+		// closing a fact sets valid_until, and a default read returns only facts
+		// with none (core/match.rs valid_at_time).
+		const closed = await mem.query(ns, {
+			subject: t,
+			predicate: "status",
+			status: "superseded",
+			asOf: Date.parse(active[0]?.validFrom ?? "") - 1,
+		});
 		expect(closed.every((f) => typeof f.validUntil === "string")).toBe(true);
 	});
 

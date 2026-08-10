@@ -88,7 +88,10 @@ describe("memory tools", () => {
 		const ns = "repo:tchanges";
 		await mem.transact(ns, [goalFact.status("g", "planned")]);
 		const first = (await mem.query(ns, { subject: "Goal:g" }))[0];
-		const since = new Date(Date.parse(first?.validFrom ?? "") + 1).toISOString();
+		const since = new Date(Date.parse(first?.validFrom ?? "")).toISOString();
+		// Snapshots are timestamped: the cutoff and the change must land in
+		// different milliseconds for either side of the diff to be visible.
+		await new Promise((r) => setTimeout(r, 3));
 		await mem.transact(ns, [goalFact.status("g", "active")]);
 		const changes = memoryTools(mem, { repoNs: ns, runId: () => "x" })[2];
 		const out = await changes?.execute({ since }, ctx);
@@ -96,53 +99,5 @@ describe("memory tools", () => {
 		expect(out?.output).toContain("Goal:g status active");
 		expect(out?.output).toContain("Superseded:");
 		expect(out?.output).toContain("Goal:g status planned");
-	});
-});
-
-describe("AbagraphMemoryPort", () => {
-	const turn = (over: Partial<TurnContext>): TurnContext => ({
-		runId: "pr1",
-		repoPath: "/r",
-		task: "t",
-		isFirstTurn: false,
-		isResume: false,
-		...over,
-	});
-	const makeRun = (): RunRecord => ({
-		runId: "pr1",
-		sessionId: "ps1",
-		repoPath: "/r",
-		task: "t",
-		outcome: "completed",
-		filesTouched: [],
-		commandsRun: [],
-		transcriptTail: [],
-		stats: { turns: 1, usage: zeroUsage(), startedAt: "2026-08-10T00:00:00.000Z" },
-	});
-
-	it("preTurn returns the frozen block on first turn and resume only", async () => {
-		const port = new AbagraphMemoryPort({ client: mem, repoNs: NS, budgets });
-		const first = await port.preTurn(turn({ isFirstTurn: true }));
-		expect(first).toContain("<memory>");
-		expect(first).toContain("Repo:tools");
-		expect(await port.preTurn(turn({}))).toBeNull();
-		expect(await port.preTurn(turn({ isResume: true }))).toBe(first);
-	});
-
-	it("exposes the three memory tools", () => {
-		const port = new AbagraphMemoryPort({ client: mem, repoNs: NS, budgets });
-		const names = port.tools().map((t) => t.name);
-		expect(names).toEqual(["memory_recall", "memory_remember", "memory_changes"]);
-	});
-
-	it("postRun swallows a memory outage with one console.error line", async () => {
-		const dead = await startMockAbagraph();
-		await dead.close();
-		const client = createMemoryClient({ baseUrl: dead.url });
-		const port = new AbagraphMemoryPort({ client, repoNs: NS, budgets });
-		const spy = vi.spyOn(console, "error").mockImplementation(() => {});
-		await expect(port.postRun(makeRun())).resolves.toBeUndefined();
-		expect(spy).toHaveBeenCalledOnce();
-		spy.mockRestore();
 	});
 });

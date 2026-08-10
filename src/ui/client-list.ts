@@ -1,6 +1,7 @@
 /** Sidebar, search filter, polling. Plain JS shipped as a string. */
 export const CLIENT_LIST_JS = `
 var current = null;
+var brainOpen = false;
 var lastListJson = "";
 var lastList = [];
 var query = "";

@@ -137,4 +137,12 @@ export const watchFact = {
 	}),
 	runsCount: (date: string, count: number, confidence?: number) =>
 		fact(`Night:${date}`, "runs_count", String(count), confidence),
+	/**
+	 * Explicit counter rather than counting superseded `outcome` facts:
+	 * supersession sets `valid_until`, and a default read excludes those
+	 * (core/match.rs), so history archaeology silently under-counts and the
+	 * backoff would never escalate.
+	 */
+	failureCount: (itemKey: string, count: number, confidence?: number) =>
+		fact(`Item:${itemKey}`, "failure_count", String(count), confidence),
 };

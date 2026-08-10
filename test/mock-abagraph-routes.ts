@@ -53,6 +53,21 @@ export function transact(store: Store, body: Body, res: ServerResponse): void {
 export function listFacts(store: Store, params: URLSearchParams, res: ServerResponse): void {
 	const statuses = params.get("status")?.split(",") ?? ["active"];
 	let out = store.facts.filter((f) => statuses.includes(f.status));
+	// core/match.rs valid_at_time: a DEFAULT read returns only facts with no
+	// valid_until; an `as_of` read returns those live at that instant. Getting
+	// this wrong once hid a retry storm (docs/review-findings.md #2), so the
+	// mock must keep mirroring it.
+	const asOfRaw = params.get("as_of");
+	if (asOfRaw === null) {
+		out = out.filter((f) => f.valid_until === null || f.valid_until === undefined);
+	} else {
+		const asOf = Number(asOfRaw);
+		out = out.filter(
+			(f) =>
+				f.valid_from <= asOf &&
+				(f.valid_until === null || f.valid_until === undefined || f.valid_until > asOf),
+		);
+	}
 	for (const k of ["subject", "predicate", "object"] as const) {
 		const v = params.get(k);
 		if (v !== null) out = out.filter((f) => String(f[k] ?? "") === v);

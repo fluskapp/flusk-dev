@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { createAgent } from "../agent/agent.js";
 import { buildSystemPrompt } from "../agent/system-prompt.js";
 import { loadConfig, loadRepoConfig } from "../config/config.js";
-import type { TaskKind } from "../config/types.js";
+import type { HitConfig, RepoConfig, TaskKind } from "../config/types.js";
 import { createEventBus } from "../core/events.js";
 import { createMemory } from "../memory/bootstrap.js";
 import { FakeProvider } from "../provider/fake.js";
@@ -36,6 +36,13 @@ export interface RunCmdOpts {
 	noVerify?: boolean;
 	quiet?: boolean;
 	out?: NodeJS.WritableStream;
+	/**
+	 * Config resolved by the caller, used INSTEAD of reading `<repo>/.hit.json`.
+	 * Unattended mode passes this because its `repo` is a worktree of a branch
+	 * under review: a hostile `.hit.json` there could otherwise disable the
+	 * command classifier, add a verify command to execute, or redirect memory.
+	 */
+	trustedConfig?: { cfg: HitConfig; repoConfig: RepoConfig | undefined; namespace?: string };
 }
 
 /** Phase 3 run command: config → routed model, hit policy, git isolation,
@@ -43,8 +50,13 @@ export interface RunCmdOpts {
  * process.exit; returns the CLI outcome ("blocked" = gate failure, exit 1). */
 export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 	const out = opts.out ?? process.stdout;
-	const cfg = loadConfig(opts.repo);
-	const repoConfig = loadRepoConfig(opts.repo);
+	const cfg = opts.trustedConfig?.cfg ?? loadConfig(opts.repo);
+	const repoConfig =
+		opts.trustedConfig !== undefined
+			? // Keep the caller's namespace so the run's memory lands where the
+				// caller will read it, not in a namespace derived from a temp path.
+				{ ...opts.trustedConfig.repoConfig, ...(opts.trustedConfig.namespace !== undefined ? { namespace: opts.trustedConfig.namespace } : {}) }
+			: loadRepoConfig(opts.repo);
 	if (opts.maxCostUsd !== undefined) cfg.budgets.maxCostUsd = opts.maxCostUsd;
 	if (opts.deadlineMs !== undefined) cfg.budgets.deadlineMinutes = opts.deadlineMs / 60_000;
 	if (opts.maxTurns !== undefined) cfg.budgets.maxTurns = opts.maxTurns;

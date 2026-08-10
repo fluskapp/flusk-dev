@@ -68,6 +68,24 @@ export function fromWire(f: WireFact): MemFact {
 }
 
 /**
+ * `GET /api/facts` answers with a bare JSON array (abagraph
+ * src/server/dto/render.rs `facts_to_json`), while `/api/context` wraps its
+ * rows in `{facts}`. Accept either, and fail with a legible message rather
+ * than a `.filter is not a function` stack when a server answers with
+ * something else entirely.
+ */
+export function asFactArray(raw: unknown, endpoint: string): WireFact[] {
+	if (Array.isArray(raw)) return raw as WireFact[];
+	if (typeof raw === "object" && raw !== null) {
+		const wrapped = (raw as { facts?: unknown }).facts;
+		if (Array.isArray(wrapped)) return wrapped as WireFact[];
+	}
+	throw new Error(
+		`${endpoint} did not return facts (got ${typeof raw}) — is memory.baseUrl an abagraph server?`,
+	);
+}
+
+/**
  * Admin reads see every tenant — namespace isolation is enforced client-side,
  * accepting either the server-side tenant or our own `properties` tag (see
  * NS_PROP: the tenant is dropped entirely on auth-free servers).

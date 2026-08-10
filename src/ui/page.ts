@@ -1,3 +1,4 @@
+import { CLIENT_BRAIN_JS } from "./client-brain.js";
 import { CLIENT_DETAIL_JS } from "./client-detail.js";
 import { CLIENT_KEYS_JS } from "./client-keys.js";
 import { CLIENT_LIST_JS } from "./client-list.js";
@@ -17,6 +18,7 @@ const HELP_ROWS: Array<[string, string]> = [
 	["j", "Next session"],
 	["k", "Previous session"],
 	["Enter", "Open first result"],
+	["b", "Brain (goals, lessons, ledger)"],
 	["r", "Refresh"],
 	["t", "Toggle theme"],
 	["Esc", "Clear / close"],
@@ -40,6 +42,7 @@ export function renderPage(home: string): string {
 		<div class="crumb">sessions</div>
 		<div class="spacer"></div>
 		<span id="count" class="dim small"></span>
+		<button id="brain-btn" title="Goals, lessons, unattended ledger (b)">Brain</button>
 		<button id="help-btn" title="Shortcuts (?)">?</button>
 		<button id="theme" title="Toggle light/dark (t)">&#9681;</button>
 	</header>
@@ -49,6 +52,7 @@ export function renderPage(home: string): string {
 		<div id="list"></div>
 	</aside>
 	<main id="main">
+		<div id="brain" hidden></div>
 		<div id="empty" class="empty">Select a session</div>
 		<div id="detail" hidden>
 			<div id="tabs"><div class="tab" id="tab-title"></div></div>
@@ -66,7 +70,7 @@ export function renderPage(home: string): string {
 <div id="help" class="overlay" hidden>
 	<div class="help-card"><h3>Shortcuts</h3><div class="keys">${helpRows}</div></div>
 </div>
-<script>${CLIENT_LIST_JS}${CLIENT_DETAIL_JS}${CLIENT_KEYS_JS}</script>
+<script>${CLIENT_LIST_JS}${CLIENT_DETAIL_JS}${CLIENT_BRAIN_JS}${CLIENT_KEYS_JS}</script>
 </body>
 </html>`;
 }

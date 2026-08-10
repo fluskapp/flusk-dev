@@ -48,15 +48,16 @@ it("an attempt cools the item down, and expiry is by timestamp not presence", as
 	expect(await isCoolingDown(client, key, T0 + 5 * HOUR)).toBe(false);
 });
 
-it("counts only unsuccessful outcomes across supersessions", async () => {
+it("advances the backoff counter on failures only", async () => {
+	// The counter is explicit because supersession sets valid_until, which
+	// hides the old outcome facts from a default read (core/match.rs).
 	const key = "gh-prs-2";
 	expect(await failureCount(client, key)).toBe(0);
-	await recordOutcome(client, key, "error");
+	await recordOutcome(client, key, "error", 0);
 	expect(await failureCount(client, key)).toBe(1);
-	// `outcome` is functional, so this supersedes — history still counts.
-	await recordOutcome(client, key, "blocked");
+	await recordOutcome(client, key, "blocked", 1);
 	expect(await failureCount(client, key)).toBe(2);
-	await recordOutcome(client, key, "completed");
+	await recordOutcome(client, key, "completed", 2);
 	expect(await failureCount(client, key)).toBe(2);
 });
 

@@ -1,29 +1,26 @@
 /**
  * Resume brief: render a goal graph (tasks, statuses, deps) plus an optional
- * whats-changed summary. NOTE: src/memory/changes.ts did not exist when this
- * slice landed (a sibling agent owns it) — the two-query diff below is a
- * local stand-in; swap changedCounts for its export once it exists.
+ * whats-changed summary.
  */
 import type { MemoryClient } from "../memory/client-types.js";
+import { whatsChanged } from "../memory/changes.js";
 
+/**
+ * Counts scoped to this goal's subjects. Delegates the diff to changes.ts
+ * rather than re-querying: a hand-rolled version here queried superseded
+ * facts directly, which a real abagraph hides from default reads.
+ */
 async function changedCounts(
 	client: MemoryClient,
 	ns: string,
 	sinceIso: string,
 	subjects: Set<string>,
 ): Promise<{ added: number; superseded: number }> {
-	const [active, closed] = await Promise.all([
-		client.query(ns, {}),
-		client.query(ns, { status: "superseded" }),
-	]);
-	const t = Date.parse(sinceIso);
-	const added = active.filter(
-		(f) => subjects.has(f.subject) && Date.parse(f.validFrom ?? "") > t,
-	).length;
-	const superseded = closed.filter(
-		(f) => subjects.has(f.subject) && Date.parse(f.validUntil ?? "") > t,
-	).length;
-	return { added, superseded };
+	const changes = await whatsChanged(client, ns, sinceIso);
+	return {
+		added: changes.added.filter((f) => subjects.has(f.subject)).length,
+		superseded: changes.superseded.filter((f) => subjects.has(f.subject)).length,
+	};
 }
 
 /**

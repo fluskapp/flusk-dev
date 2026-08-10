@@ -27,9 +27,14 @@ export class Store {
 	dropTenantOnWrite = false;
 	private tx = 0;
 	private clock = Date.now();
-	/** Strictly monotonic ms clock so recorded_at tiebreaks are deterministic. */
+	/**
+	 * Wall-clock time, never ahead of it. An incrementing synthetic clock
+	 * invents future timestamps, which makes an `as_of: Date.now()` snapshot
+	 * miss facts written moments earlier — an artifact no real server has.
+	 * Ties are broken by insertion order via stable sorts.
+	 */
 	now(): number {
-		this.clock += 1;
+		this.clock = Date.now();
 		return this.clock;
 	}
 	nextTx(): number {

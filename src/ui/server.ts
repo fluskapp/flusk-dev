@@ -3,6 +3,7 @@ import { createServer, type Server, type ServerResponse } from "node:http";
 import { join, resolve } from "node:path";
 import { hitHome } from "../session/paths.js";
 import { loadSessionDetail } from "./detail.js";
+import { buildMemoryView } from "./memory-view.js";
 import { renderPage } from "./page.js";
 import { scanSessions, sessionsRoot } from "./scan.js";
 
@@ -27,7 +28,13 @@ function keyToPath(key: string | null): string | null {
 	return path.startsWith(root + "/") ? path : null;
 }
 
-function handle(method: string, pathname: string, key: string | null, res: ServerResponse): void {
+function handle(
+	method: string,
+	pathname: string,
+	key: string | null,
+	repo: string | null,
+	res: ServerResponse,
+): void {
 	if (method === "GET" && pathname === "/") {
 		res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
 		res.end(renderPage(hitHome()));
@@ -44,6 +51,19 @@ function handle(method: string, pathname: string, key: string | null, res: Serve
 			return;
 		}
 		json(res, 200, { ...loadSessionDetail(path), path });
+		return;
+	}
+	if (method === "GET" && pathname === "/api/memory") {
+		// `repo` comes from a session the dashboard already listed, so it is a
+		// path hit itself recorded — but resolve it before use regardless.
+		if (repo === null || !repo.startsWith("/")) {
+			json(res, 400, { error: "repo must be an absolute path" });
+			return;
+		}
+		void buildMemoryView(resolve(repo)).then(
+			(view) => json(res, 200, view),
+			(e: unknown) => json(res, 500, { error: e instanceof Error ? e.message : String(e) }),
+		);
 		return;
 	}
 	if (method === "POST" && pathname === "/api/reveal") {
@@ -68,7 +88,13 @@ export function startUiServer(port: number): Promise<UiServer> {
 	const server = createServer((req, res) => {
 		const url = new URL(req.url ?? "/", "http://localhost");
 		try {
-			handle(req.method ?? "GET", url.pathname, url.searchParams.get("k"), res);
+			handle(
+				req.method ?? "GET",
+				url.pathname,
+				url.searchParams.get("k"),
+				url.searchParams.get("repo"),
+				res,
+			);
 		} catch (e) {
 			json(res, 500, { error: e instanceof Error ? e.message : String(e) });
 		}

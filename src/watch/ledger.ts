@@ -30,9 +30,14 @@ export async function isCoolingDown(
 	key: string,
 	nowMs: number,
 ): Promise<boolean> {
+	// `as_of` is required, not an optimization: cooldown facts carry a
+	// `valid_until`, and abagraph's DEFAULT read only returns facts with none
+	// (core/match.rs), so a plain query finds nothing and every item would
+	// look eligible on every tick — a retry storm.
 	const facts = await client.query(HIT_NS, {
 		subject: `Item:${key}`,
 		predicate: "cooldown_until",
+		asOf: nowMs,
 	});
 	return facts.some((f) => {
 		const until = Date.parse(f.object);
@@ -42,17 +47,12 @@ export async function isCoolingDown(
 
 /** Past attempts that did not finish cleanly — drives the backoff exponent. */
 export async function failureCount(client: MemoryClient, key: string): Promise<number> {
-	const statuses = ["active", "superseded"];
-	const seen = new Map<string, string>();
-	for (const status of statuses) {
-		const facts = await client.query(HIT_NS, {
-			subject: `Item:${key}`,
-			predicate: "outcome",
-			status,
-		});
-		for (const f of facts) seen.set(f.id, f.object);
-	}
-	return [...seen.values()].filter((o) => o !== "completed").length;
+	const facts = await client.query(HIT_NS, {
+		subject: `Item:${key}`,
+		predicate: "failure_count",
+	});
+	const n = Number(facts[0]?.object ?? "0");
+	return Number.isFinite(n) ? n : 0;
 }
 
 /** Claim the item before working it: attempt + cooldown in one transact. */
@@ -68,12 +68,17 @@ export async function recordAttempt(
 	]);
 }
 
+/** Records the outcome and, on failure, advances the backoff counter. */
 export async function recordOutcome(
 	client: MemoryClient,
 	key: string,
 	outcome: string,
+	priorFailures = 0,
 ): Promise<void> {
 	await client.transact(HIT_NS, [watchFact.outcome(key, outcome)]);
+	if (outcome !== "completed") {
+		await client.transact(HIT_NS, [watchFact.failureCount(key, priorFailures + 1)]);
+	}
 }
 
 /** Re-stamp the cooldown after a failure so the backoff reflects the new count. */

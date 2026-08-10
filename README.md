@@ -83,9 +83,13 @@ hit ui [--port <n>] [--no-open]
 A run does not get to declare victory. When the repo has verify commands —
 from `.hit.json`, or auto-detected from `package.json` scripts, `Cargo.toml`,
 or a `Makefile` — hit runs them at the end. Failures come back to the agent as
-evidence to fix, up to a retry limit. Once they pass, hit checks the agent's
-own report against the facts it recorded itself: a claim of "tests pass" with
-no matching `verified_by` fact is BLOCKed rather than believed.
+evidence to fix, up to a retry limit. Once they pass, hit cross-checks the run against the facts it recorded
+itself.
+
+Honesty note: that claim check is **not yet trustworthy**. Its claims are
+built from harness state rather than from the agent's report, so they are
+self-fulfilling, and abagraph answers missing evidence with `WARN`, which the
+gate currently treats as a pass. See `docs/review-findings.md`.
 
 ## Safety model
 
@@ -138,9 +142,10 @@ than run unbounded.
 Pushing is **off by default** (`watch.push`): a night's work stays on local
 branches for you to review. Turn it on to have hit push and open PRs.
 
-Lessons only graduate from a repo's namespace into the shared `lessons`
-namespace when the run that produced them passed verification with an `ALLOW`
-verdict — an unverified guess never becomes cross-repo advice.
+Lessons are meant to graduate from a repo's namespace into the shared
+`lessons` namespace only when the producing run passed verification with an
+`ALLOW` verdict. The gate is in place, but promotion does not yet fire end to
+end on a real server (`docs/review-findings.md` items 3, 6 and 11).
 
 ## Status
 

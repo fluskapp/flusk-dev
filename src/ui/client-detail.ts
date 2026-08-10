@@ -10,7 +10,8 @@ async function loadDetail(userClicked) {
 	} catch (e) { return; }
 	window.__hitStatus = d.status;
 	$("#empty").hidden = true;
-	$("#detail").hidden = false;
+	// The 4s poll must not yank the Brain panel out from under the reader.
+	$("#detail").hidden = brainOpen === true;
 	var t = d.header.task;
 	$("#tab-title").textContent = t.length > 64 ? t.slice(0, 64) + "\\u2026" : t;
 	$("#meta").innerHTML = metaHtml(d);
