@@ -16,6 +16,8 @@ interface ConfigLayer {
 	unattended?: Partial<HitConfig["unattended"]>;
 	isolation?: Partial<HitConfig["isolation"]>;
 	compaction?: Partial<HitConfig["compaction"]>;
+	memory?: Partial<HitConfig["memory"]>;
+	verify?: Partial<HitConfig["verify"]>;
 }
 
 function readLayer(path: string): ConfigLayer | null {
@@ -46,6 +48,12 @@ function mergeLayer(base: HitConfig, layer: ConfigLayer | null): HitConfig {
 		unattended: { ...base.unattended, ...layer.unattended },
 		isolation: { ...base.isolation, ...layer.isolation },
 		compaction: { ...base.compaction, ...layer.compaction },
+		memory: {
+			...base.memory,
+			...layer.memory,
+			budgets: { ...base.memory.budgets, ...layer.memory?.budgets },
+		},
+		verify: { ...base.verify, ...layer.verify },
 	};
 }
 

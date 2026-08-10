@@ -27,6 +27,22 @@ export interface HitConfig {
 		reserveTokens: number;
 		keepRecentTokens: number;
 	};
+	memory: {
+		/** When true and the server is unreachable, hit warns once and degrades to noopMemory. */
+		enabled: boolean;
+		baseUrl: string;
+		apiKey: string | null;
+		/** Spawn serverBin --data dataDir when health-check fails. */
+		autoSpawn: boolean;
+		serverBin: string | null;
+		dataDir: string | null;
+		/** Context token budgets for the <memory> block. */
+		budgets: { repo: number; lessons: number };
+	};
+	verify: {
+		retries: number;
+		evidenceLines: number;
+	};
 }
 
 /** Per-repo <repo>/.hit.json — sections deep-merge over the global config. */
@@ -35,6 +51,8 @@ export interface RepoConfig {
 	budgets?: Partial<HitConfig["budgets"]>;
 	unattended?: Partial<HitConfig["unattended"]>;
 	isolation?: Partial<HitConfig["isolation"]>;
-	/** Verify commands (consumed by the Phase 3 verification gate). */
+	/** Verify commands; when set they win over auto-detection outright. */
 	verify?: string[];
+	/** Override the derived repo:<slug> memory namespace. */
+	namespace?: string;
 }

@@ -28,6 +28,16 @@ function config(onUnknownCommand: "deny" | "allow"): HitConfig {
 		unattended: { onUnknownCommand },
 		isolation: { requireGit: true, branchPrefix: "hit/" },
 		compaction: { reserveTokens: 4000, keepRecentTokens: 8000 },
+		memory: {
+			enabled: false,
+			baseUrl: "http://127.0.0.1:7777",
+			apiKey: null,
+			autoSpawn: false,
+			serverBin: null,
+			dataDir: null,
+			budgets: { repo: 2000, lessons: 1000 },
+		},
+		verify: { retries: 3, evidenceLines: 40 },
 	};
 }
 
