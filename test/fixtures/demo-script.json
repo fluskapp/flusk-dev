@@ -1,0 +1,26 @@
+[
+	{
+		"deltas": [{ "channel": "text", "text": "Let me run a command.\n" }],
+		"message": {
+			"role": "assistant",
+			"content": [
+				{ "type": "text", "text": "Let me run a command.\n" },
+				{
+					"type": "toolCall",
+					"id": "fx-1",
+					"name": "bash",
+					"args": { "command": "echo fixture works" }
+				}
+			],
+			"stopReason": "toolUse"
+		}
+	},
+	{
+		"message": {
+			"role": "assistant",
+			"content": [{ "type": "text", "text": "Fixture run finished." }],
+			"stopReason": "end",
+			"usage": { "input": 5, "output": 5, "cacheRead": 0, "costUsd": 0.002 }
+		}
+	}
+]
