@@ -39,6 +39,10 @@ export const runFact = {
 		fact(`Run:${runId}`, "verified_by", cmd, confidence),
 	failedBecause: (runId: string, reason: string, confidence?: number) =>
 		fact(`Run:${runId}`, "failed_because", reason, confidence),
+	/** Verdict of the report-vs-observations check. Its own predicate: writing
+	 * it to `outcome` would supersede the run's real outcome. */
+	reportCheck: (runId: string, verdict: string, confidence?: number) =>
+		fact(`Run:${runId}`, "report_check", verdict, confidence),
 };
 
 export const sessionFact = {

@@ -119,7 +119,11 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 			out,
 			noVerify: opts.noVerify === true,
 		});
-		out.write(`${res.reason} · ${res.stats.turns} turns · $${res.stats.usage.costUsd.toFixed(4)} · ${agent.session.path}\n`);
+		// The OUTCOME, not the loop's reason: a run whose report was blocked must
+		// not print "completed".
+		out.write(
+			`${res.outcome} · ${res.stats.turns} turns · $${res.stats.usage.costUsd.toFixed(4)} · ${agent.session.path}\n`,
+		);
 		if (isolation !== undefined) {
 			out.write(`${summarizeRun(opts.repo, isolation.branch, isolation.originalRef)}\n`);
 		}

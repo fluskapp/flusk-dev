@@ -138,9 +138,17 @@ case-insensitively), 13 (ledger keys are repo-qualified), 15 (explicit
 (portable subjects route to the lessons namespace), plus malformed queue rows
 are dropped instead of sorting first forever.
 
-STILL OPEN: 12 (coexist claims degrade to WARN — needs membership checks
-instead of `/api/verify`), 14 (night counter has no CAS), 18 (`preTurn` has no
-catch), 21 (a failed task wedges its goal; no resume of an active goal), 22
-(`/api/verify` is admin-global), and the headline one: **the claim check is
-still circular** — it must be rebuilt from the agent's report rather than from
-harness state before the verification gate can be trusted.
+ALSO FIXED since: 12 and 22 (the gate no longer asks `/api/verify` to judge —
+see below), 14 (guarded night-counter increment), 18 (`preTurn` catches and
+degrades), 21 (failed tasks reset to pending so a goal can be retried).
+
+**The claim check has been rebuilt.** `src/verify/report-check.ts` compares
+the agent's closing report against harness observations (gate command exit
+codes, commands actually run, files actually written) instead of asking memory
+to confirm facts the harness itself wrote. It can and does block: a fabricated
+"all tests pass" exits 1. Memory is now the ledger, not the judge, so the
+check still applies when abagraph is unreachable.
+
+STILL OPEN: nothing high-severity from these two reviews. Remaining known
+gaps live in `docs/architecture.md` — chiefly that no part of the memory layer
+has ever run against a real abagraph binary, only against the mock.

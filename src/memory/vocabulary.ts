@@ -21,6 +21,7 @@ const VOCABULARY: Record<string, Record<string, Cardinality>> = {
 	},
 	Run: {
 		outcome: "functional",
+		report_check: "functional",
 		touched: "coexist",
 		verified_by: "coexist",
 		failed_because: "coexist",

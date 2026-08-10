@@ -61,3 +61,27 @@ export async function writeTaskStatus(
 ): Promise<void> {
 	await client.transact(ns, [task.status(t, status)]);
 }
+
+/**
+ * Return failed tasks of a goal to `pending` so the goal can be retried.
+ * Without this a single failure wedges the graph forever: `frontier` only
+ * admits pending tasks and completion requires every task done.
+ */
+export async function resetFailedTasks(
+	client: MemoryClient,
+	ns: string,
+	goalId: string,
+): Promise<string[]> {
+	const [edges, statuses] = await Promise.all([
+		client.query(ns, { subject: goalId, predicate: "has_task", limit: 500 }),
+		client.query(ns, { predicate: "status", limit: 500 }),
+	]);
+	const failed = new Set(
+		statuses.filter((f) => f.object === "failed").map((f) => f.subject),
+	);
+	const mine = edges.map((e) => e.object).filter((t) => failed.has(t));
+	for (const taskId of mine) {
+		await writeTaskStatus(client, ns, taskId.replace(/^Task:/, ""), "pending");
+	}
+	return mine;
+}

@@ -11,7 +11,7 @@ import { createEventBus } from "../core/events.js";
 import { type GoalPlan, planGoal, writeGoalGraph } from "../goals/planner.js";
 import { goalBrief } from "../goals/resume.js";
 import { claimTask, completeTask, failTask, frontier } from "../goals/scheduler.js";
-import { writeGoalStatus } from "../goals/schema.js";
+import { resetFailedTasks, writeGoalStatus } from "../goals/schema.js";
 import { AbagraphMemoryPort } from "../memory/abagraph-port.js";
 import { createMemory, type MemorySetup } from "../memory/bootstrap.js";
 import { FakeProvider } from "../provider/fake.js";
@@ -81,7 +81,14 @@ export async function goalCmd(opts: GoalCmdOpts): Promise<CliOutcome> {
 				out.write("goal done\n");
 				return "completed";
 			}
-			out.write("goal stalled: no runnable tasks remain\n");
+			// A goal is only truly stuck if nothing can be retried: returning
+			// failed tasks to pending unwedges the graph for the next attempt.
+			const reset = await resetFailedTasks(mem.client, mem.ns, g);
+			if (reset.length > 0) {
+				out.write(`goal stalled: reset ${reset.length} failed task(s) — rerun to retry\n`);
+			} else {
+				out.write("goal stalled: no runnable tasks remain\n");
+			}
 			return "blocked";
 		}
 		// Try the whole frontier before giving up: a lost claim means another

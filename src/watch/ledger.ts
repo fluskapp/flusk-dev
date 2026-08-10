@@ -110,10 +110,19 @@ export async function nightCount(client: MemoryClient, date: string): Promise<nu
 	return Number.isFinite(n) ? n : 0;
 }
 
+/**
+ * Guarded increment: two watchers reading the same count would otherwise both
+ * write n+1 and quietly double the night's cap. A lost race throws
+ * (CompareFailed), which the caller treats as "someone else took this slot".
+ */
 export async function bumpNightCount(
 	client: MemoryClient,
 	date: string,
 	current: number,
 ): Promise<void> {
-	await client.transact(HIT_NS, [watchFact.runsCount(date, current + 1)]);
+	const compares =
+		current === 0
+			? undefined // no prior fact to guard against on the first run of a night
+			: [{ subject: `Night:${date}`, predicate: "runs_count", object: String(current) }];
+	await client.transact(HIT_NS, [watchFact.runsCount(date, current + 1)], compares);
 }

@@ -19,6 +19,7 @@ rejected with this list as the error message. Confidence conventions:
 | repo | `Task:<id>` | `depends_on` | `Task:<id>` | coexist | goals |
 | repo | `Task:<id>` | `attempted_by` | `Run:<id>` | coexist | goals |
 | repo | `Run:<id>` | `outcome` | literal | functional | harness |
+| repo | `Run:<id>` | `report_check` | ALLOW\|WARN\|BLOCK | functional | verify gate |
 | repo | `Run:<id>` | `touched` | `File:<path>` | coexist | harness |
 | repo | `Run:<id>` | `verified_by` | literal command | coexist | harness |
 | repo | `Run:<id>` | `failed_because` | literal | coexist | harness |

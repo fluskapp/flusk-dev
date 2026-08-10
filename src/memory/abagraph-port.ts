@@ -30,12 +30,20 @@ export class AbagraphMemoryPort implements MemoryPort {
 		this.runId = ctx.runId;
 		if (!ctx.isFirstTurn && !ctx.isResume) return null;
 		if (this.snapshot === undefined) {
-			this.snapshot = await buildMemoryBlock(this.opts.client, {
-				repoNs: this.opts.repoNs,
-				task: ctx.task,
-				goalId: ctx.goalId,
-				budgets: this.opts.budgets,
-			});
+			try {
+				this.snapshot = await buildMemoryBlock(this.opts.client, {
+					repoNs: this.opts.repoNs,
+					task: ctx.task,
+					goalId: ctx.goalId,
+					budgets: this.opts.budgets,
+				});
+			} catch (e) {
+				// abagraph can die between the bootstrap health check and turn 1.
+				// Running without memory is a degraded run; failing the run over
+				// it is a lost one. Cache the null so we warn once.
+				this.snapshot = null;
+				console.error(`memory: context unavailable — ${e instanceof Error ? e.message : e}`);
+			}
 		}
 		return this.snapshot;
 	}

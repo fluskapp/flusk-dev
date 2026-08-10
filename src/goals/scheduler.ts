@@ -17,10 +17,12 @@ export async function frontier(
 	ns: string,
 	goalId: string,
 ): Promise<string[]> {
+	// Generous limits: the server caps rows before hit filters by namespace,
+	// so a default page can contain none of this goal's tasks.
 	const [edges, statuses, deps] = await Promise.all([
-		client.query(ns, { subject: goalId, predicate: "has_task" }),
-		client.query(ns, { predicate: "status" }),
-		client.query(ns, { predicate: "depends_on" }),
+		client.query(ns, { subject: goalId, predicate: "has_task", limit: 500 }),
+		client.query(ns, { predicate: "status", limit: 500 }),
+		client.query(ns, { predicate: "depends_on", limit: 500 }),
 	]);
 	const statusOf = new Map(statuses.map((f) => [f.subject, f.object]));
 	const depsOf = new Map<string, string[]>();

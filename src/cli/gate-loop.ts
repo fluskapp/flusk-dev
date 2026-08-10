@@ -8,11 +8,11 @@
 import type { Agent } from "../agent/options.js";
 import type { HitConfig, RepoConfig } from "../config/types.js";
 import { collectRunRecord } from "../core/run-record.js";
+import { claimCheck, finalReport } from "./gate-report.js";
 import type { RunEndReason, RunStats } from "../core/types.js";
 import type { MemoryClient } from "../memory/client-types.js";
 import { runFact } from "../memory/facts.js";
 import type { RunRecord } from "../memory/port.js";
-import { buildClaims, checkReport } from "../verify/claims.js";
 import { detectVerifyCommands, persistVerifyCommands } from "../verify/detect.js";
 import { formatEvidence, runVerify, type VerifyCommandResult } from "../verify/gate.js";
 
@@ -52,34 +52,6 @@ function failure(results: VerifyCommandResult[]): VerifyCommandResult | undefine
 	return results.find((r) => !r.skipped && r.exitCode !== 0);
 }
 
-const reasonOf = (details: unknown): string =>
-	String((details as { reason?: unknown } | null)?.reason ?? "no details");
-
-/** Claim-check the report; degrades to a warning when memory misbehaves. */
-async function claimCheck(
-	client: MemoryClient,
-	opts: GateOpts,
-	run: RunRecord,
-	results: VerifyCommandResult[],
-): Promise<"completed" | "blocked"> {
-	try {
-		for (const r of results) {
-			// Harness-observed truth: the gate itself ran these successfully.
-			if (!r.skipped && r.exitCode === 0)
-				await client.transact(opts.ns, [runFact.verifiedBy(run.runId, r.cmd)]);
-		}
-		const { verdict, details } = await checkReport(client, opts.ns, buildClaims(run, results));
-		if (verdict === "BLOCK") {
-			opts.out.write(`blocked: memory contradicts the completion report — ${reasonOf(details)}\n`);
-			return "blocked"; // exit 1; the run's branch keeps the code untouched
-		}
-		if (verdict === "WARN") opts.out.write(`verify: claim check WARN — ${reasonOf(details)}\n`);
-	} catch (e) {
-		opts.out.write(`verify: claim check unavailable — ${e instanceof Error ? e.message : e}\n`);
-	}
-	return "completed";
-}
-
 /** Runs the agent, then the gate. Returns the final CLI outcome plus the
  * last attempt's reason/stats (for the stats line). Never throws mid-gate. */
 export async function runWithGate(
@@ -110,8 +82,8 @@ export async function runWithGate(
 			}
 			results = verdict.results;
 		}
-		if (opts.client === null) return { outcome: reason, reason, stats };
 		const rec = track.snapshot();
+		const report = finalReport(agent);
 		const outcome = await claimCheck(opts.client, opts, {
 			runId: rec.runId,
 			sessionId: agent.session.id,
@@ -122,7 +94,7 @@ export async function runWithGate(
 			commandsRun: rec.commandsRun,
 			transcriptTail: [],
 			stats,
-		}, results);
+		}, results, report);
 		return { outcome, reason, stats };
 	} finally {
 		track.stop();
