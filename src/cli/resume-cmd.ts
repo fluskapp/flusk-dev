@@ -1,14 +1,15 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { createAgent } from "../agent/agent.js";
-import { loadConfig } from "../config/config.js";
+import { loadConfig, loadRepoConfig } from "../config/config.js";
 import { createEventBus } from "../core/events.js";
-import type { RunEndReason } from "../core/types.js";
+import { createMemory } from "../memory/bootstrap.js";
 import { FakeProvider } from "../provider/fake.js";
 import { hasAuth, PiAiProvider } from "../provider/pi-ai.js";
 import { createHitPolicy } from "../safety/hit-policy.js";
 import { SessionStore } from "../session/store.js";
 import { sessionsRoot } from "../ui/scan.js";
+import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import { attachRenderer } from "./render.js";
 import { DEFAULT_TOOLS, envKeyVar, loadFakeScript } from "./run-cmd.js";
 
@@ -17,6 +18,8 @@ export interface ResumeCmdOpts {
 	ref: string;
 	steer?: string;
 	fake?: string;
+	/** Skip the verification gate (commands and claim check) entirely. */
+	noVerify?: boolean;
 	quiet?: boolean;
 	out?: NodeJS.WritableStream;
 }
@@ -59,12 +62,13 @@ function currentBranch(repoRoot: string): string | null {
  * file, same model, no new isolation branch (the run's branch, if any, is
  * whatever the tree is on; a mismatch only warns).
  */
-export async function resumeCmd(opts: ResumeCmdOpts): Promise<RunEndReason> {
+export async function resumeCmd(opts: ResumeCmdOpts): Promise<CliOutcome> {
 	const out = opts.out ?? process.stdout;
 	const path = resolveSessionPath(opts.ref);
 	const header = SessionStore.read(path)[0];
 	if (!header || header.type !== "header") throw new Error(`session file has no header: ${path}`);
 	const cfg = loadConfig(header.repoRoot);
+	const repoConfig = loadRepoConfig(header.repoRoot);
 	if (opts.fake === undefined && !(await hasAuth(header.model.provider))) {
 		throw new Error(
 			`no credentials for provider "${header.model.provider}"; set ${envKeyVar(header.model.provider)}`,
@@ -78,6 +82,7 @@ export async function resumeCmd(opts: ResumeCmdOpts): Promise<RunEndReason> {
 			`warning: ${header.repoRoot} is on ${branch ?? "a detached HEAD"} but the session ran on ${header.gitBranch}\n`,
 		);
 	}
+	const mem = await createMemory(cfg, header.repoRoot, repoConfig, opts.quiet === true ? () => {} : undefined);
 	const events = createEventBus();
 	if (opts.quiet !== true) attachRenderer(events, out);
 	const agent = createAgent({
@@ -86,6 +91,7 @@ export async function resumeCmd(opts: ResumeCmdOpts): Promise<RunEndReason> {
 		tools: DEFAULT_TOOLS,
 		task: header.task,
 		repoRoot: header.repoRoot,
+		memory: mem.port,
 		policy: createHitPolicy({ config: cfg, repoRoot: header.repoRoot }),
 		events,
 		config: cfg,
@@ -93,9 +99,17 @@ export async function resumeCmd(opts: ResumeCmdOpts): Promise<RunEndReason> {
 		...(opts.steer !== undefined ? { steer: opts.steer } : {}),
 	});
 	try {
-		const { reason, stats } = await agent.run();
-		out.write(`${reason} · ${stats.turns} turns · $${stats.usage.costUsd.toFixed(4)} · ${path}\n`);
-		return reason;
+		const res = await runWithGate(agent, {
+			cfg,
+			repoRoot: header.repoRoot,
+			repoConfig,
+			client: mem.client,
+			ns: mem.ns,
+			out,
+			noVerify: opts.noVerify === true,
+		});
+		out.write(`${res.reason} · ${res.stats.turns} turns · $${res.stats.usage.costUsd.toFixed(4)} · ${path}\n`);
+		return res.outcome;
 	} finally {
 		agent.session.close();
 	}

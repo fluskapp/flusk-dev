@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { hitHome } from "../session/paths.js";
 import { DEFAULT_CONFIG } from "./defaults.js";
-import type { HitConfig } from "./types.js";
+import type { HitConfig, RepoConfig } from "./types.js";
 
 /** Any config layer: sections of HitConfig, each partial. */
 interface ConfigLayer {
@@ -55,6 +55,15 @@ function mergeLayer(base: HitConfig, layer: ConfigLayer | null): HitConfig {
 		},
 		verify: { ...base.verify, ...layer.verify },
 	};
+}
+
+/**
+ * The RepoConfig view of <repo>/.hit.json: the fields loadConfig ignores
+ * (verify[] command list, namespace override). undefined when absent.
+ */
+export function loadRepoConfig(repoRoot: string): RepoConfig | undefined {
+	const layer = readLayer(join(repoRoot, ".hit.json"));
+	return layer === null ? undefined : (layer as unknown as RepoConfig);
 }
 
 export function loadConfig(repoRoot: string): HitConfig {

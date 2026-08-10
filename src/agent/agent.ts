@@ -117,9 +117,10 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 		}),
 		toolCtx,
 		signal: controller.signal,
-		runId: randomUUID().slice(0, 8),
+		runId: opts.runId ?? randomUUID().slice(0, 8),
 		repoPath: opts.repoRoot,
 		task: opts.task,
+		goalId: opts.goalId,
 		isResume,
 		limits,
 		initialContext,
@@ -133,6 +134,14 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 	};
 	return {
 		run: () => runLoop(deps),
+		// Continuation = resume-in-place: same session, fresh run id, steer appended.
+		continueRun: (steer: string) =>
+			runLoop({
+				...deps,
+				runId: randomUUID().slice(0, 8),
+				isResume: true,
+				initialContext: prepareResumeContext(session, steer),
+			}),
 		steer: (text: string) => steering.push(text),
 		abort: () => controller.abort(),
 		events,

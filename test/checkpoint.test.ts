@@ -5,6 +5,7 @@ import { createAgent } from "../src/agent/agent.js";
 import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
 import { bashTool } from "../src/tools/bash.js";
 import { writeTool } from "../src/tools/write.js";
+import { SLOW } from "./cli2-helpers.js";
 import { fakeModel, setupTestHome, spyMemory, teardownTestHome } from "./helpers.js";
 
 function sh(cwd: string, args: string[]): string {
@@ -61,7 +62,7 @@ test("isolation: a mutating turn is checkpointed as 'hit: turn N'", async () => 
 	} finally {
 		teardownTestHome();
 	}
-});
+}, SLOW);
 
 test("isolation: non-mutating turns produce no checkpoint commit", async () => {
 	const repo = await setupTestHome("hit-checkpoint-clean-");
@@ -89,4 +90,4 @@ test("isolation: non-mutating turns produce no checkpoint commit", async () => {
 	} finally {
 		teardownTestHome();
 	}
-});
+}, SLOW);

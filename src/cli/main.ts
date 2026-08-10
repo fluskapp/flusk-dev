@@ -2,6 +2,7 @@
 import { parseArgs } from "node:util";
 import type { TaskKind } from "../config/types.js";
 import { feedbackCmd } from "./feedback-cmd.js";
+import { goalCmd } from "./goal-cmd.js";
 import { resumeCmd } from "./resume-cmd.js";
 import { runCmd } from "./run-cmd.js";
 import { runsCmd } from "./runs-cmd.js";
@@ -10,8 +11,11 @@ import { uiCmd } from "./ui-cmd.js";
 const USAGE = `Usage:
   hit run <task> [--model <provider/id>] [--kind <plan|code|review|summarize>]
                  [--max-cost <usd>] [--for <2h|30m>] [--max-turns <n>] [--repo <path>]
-                 [--dry] [--no-isolation] [--allow-dirty] [--quiet] [--fake <script.json>]
-  hit resume <path-or-id> [--steer <msg>] [--fake <script.json>] [--quiet]
+                 [--dry] [--no-isolation] [--allow-dirty] [--no-verify] [--quiet]
+                 [--fake <script.json>]
+  hit resume <path-or-id> [--steer <msg>] [--fake <script.json>] [--no-verify] [--quiet]
+  hit goal <text> [--repo <path>] [--dry] [--fake <script.json>] [--no-verify] [--quiet]
+  hit goal --list [--repo <path>]
   hit feedback <good|bad>
   hit runs [-n <count>]
   hit ui [--port <n>] [--no-open]
@@ -48,6 +52,8 @@ async function main(): Promise<void> {
 				dry: { type: "boolean" },
 				"no-isolation": { type: "boolean" },
 				"allow-dirty": { type: "boolean" },
+				"no-verify": { type: "boolean" },
+				list: { type: "boolean" },
 				quiet: { type: "boolean" },
 				steer: { type: "string" },
 				n: { type: "string", short: "n" },
@@ -87,9 +93,23 @@ async function main(): Promise<void> {
 			ref: arg,
 			...(typeof v.steer === "string" ? { steer: v.steer } : {}),
 			...(typeof v.fake === "string" ? { fake: v.fake } : {}),
+			noVerify: v["no-verify"] === true,
 			quiet: v.quiet === true,
 		});
 		process.exitCode = reason === "completed" ? 0 : 1;
+		return;
+	}
+	if (command === "goal") {
+		const outcome = await goalCmd({
+			...(arg !== undefined ? { goal: arg } : {}),
+			list: v.list === true,
+			repo: typeof v.repo === "string" ? v.repo : process.cwd(),
+			dry: v.dry === true,
+			...(typeof v.fake === "string" ? { fake: v.fake } : {}),
+			noVerify: v["no-verify"] === true,
+			quiet: v.quiet === true,
+		});
+		process.exitCode = outcome === "completed" ? 0 : 1;
 		return;
 	}
 	if (command !== "run" || arg === undefined) return fail(USAGE);
@@ -119,6 +139,7 @@ async function main(): Promise<void> {
 		dry: v.dry === true,
 		noIsolation: v["no-isolation"] === true,
 		allowDirty: v["allow-dirty"] === true,
+		noVerify: v["no-verify"] === true,
 		quiet: v.quiet === true,
 	});
 	process.exitCode = reason === "completed" ? 0 : 1;

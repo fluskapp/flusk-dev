@@ -33,6 +33,10 @@ export interface CreateAgentOpts {
 	parentSession?: string;
 	/** Subagent nesting depth of THIS agent (0 = root); shared budget counts child spend. */
 	depth?: number;
+	/** Goal this run serves; flows into TurnContext.goalId (memory seeds). */
+	goalId?: string;
+	/** Run id override so callers (goal scheduler) can claim tasks up front. */
+	runId?: string;
 	/** Parent agent's abort signal: aborting the parent aborts this agent too. */
 	parentSignal?: AbortSignal;
 	budget?: BudgetTracker;
@@ -46,6 +50,9 @@ export interface CreateAgentOpts {
 
 export interface Agent {
 	run(): Promise<{ reason: RunEndReason; stats: RunStats }>;
+	/** Re-enter the loop on the SAME session (fresh run id) with a steering
+	 * user message — the verify gate's retry path, built on resume machinery. */
+	continueRun(steer: string): Promise<{ reason: RunEndReason; stats: RunStats }>;
 	steer(text: string): void;
 	abort(): void;
 	events: EventBus;

@@ -1,26 +1,20 @@
 import { randomUUID } from "node:crypto";
-import { readFile } from "node:fs/promises";
 import { createAgent } from "../agent/agent.js";
 import { buildSystemPrompt } from "../agent/system-prompt.js";
-import { loadConfig } from "../config/config.js";
-import type { HitConfig, TaskKind } from "../config/types.js";
+import { loadConfig, loadRepoConfig } from "../config/config.js";
+import type { TaskKind } from "../config/types.js";
 import { createEventBus } from "../core/events.js";
-import type { AssistantMsg, ModelRef, RunEndReason } from "../core/types.js";
-import { zeroUsage } from "../core/types.js";
-import { assistantText, assistantToolCalls, FakeProvider, type ScriptedTurn } from "../provider/fake.js";
+import { createMemory } from "../memory/bootstrap.js";
+import { FakeProvider } from "../provider/fake.js";
 import { classifyTask } from "../provider/intent.js";
-import { hasAuth, PiAiProvider, resolveModelRef } from "../provider/pi-ai.js";
-import { chooseModel } from "../provider/router.js";
-import { loadScores } from "../provider/scores.js";
+import { hasAuth, PiAiProvider } from "../provider/pi-ai.js";
 import { ensureCleanTree, isGitRepo, startRunBranch, summarizeRun } from "../safety/git-isolation.js";
 import { createHitPolicy } from "../safety/hit-policy.js";
-import { bashTool } from "../tools/bash.js";
-import { editTool } from "../tools/edit.js";
-import { globTool } from "../tools/glob.js";
-import { grepTool } from "../tools/grep.js";
-import { readTool } from "../tools/read.js";
-import { writeTool } from "../tools/write.js";
+import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import { attachRenderer } from "./render.js";
+import { DEFAULT_TOOLS, demoScript, envKeyVar, fakeModel, loadFakeScript, pickModel } from "./run-support.js";
+
+export { DEFAULT_TOOLS, envKeyVar, fakeModel, loadFakeScript } from "./run-support.js";
 
 export interface RunCmdOpts {
 	task: string;
@@ -38,55 +32,19 @@ export interface RunCmdOpts {
 	dry?: boolean;
 	noIsolation?: boolean;
 	allowDirty?: boolean;
+	/** Skip the verification gate (commands and claim check) entirely. */
+	noVerify?: boolean;
 	quiet?: boolean;
 	out?: NodeJS.WritableStream;
 }
 
-export const fakeModel: ModelRef = { provider: "fake", id: "fake-1", contextWindow: 200_000 };
-export const DEFAULT_TOOLS = [readTool, bashTool, writeTool, editTool, globTool, grepTool];
-
-/** Conventional API-key env var for a provider (anthropic → ANTHROPIC_API_KEY). */
-export const envKeyVar = (provider: string): string =>
-	`${provider.toUpperCase().replace(/-/g, "_")}_API_KEY`;
-
-/** Built-in script used when --fake is not given: one tool call, then a wrap-up. */
-function demoScript(): ScriptedTurn[] {
-	const finale = "Demo complete — the loop, tools, sessions and renderer all work.";
-	return [
-		{ message: assistantToolCalls([{ id: "demo-1", name: "bash", args: { command: "echo hello from hit" } }]) },
-		{ deltas: [{ channel: "text", text: finale }], message: assistantText(finale) },
-	];
-}
-
-/** Parses a --fake JSON array, filling missing deltas ([]) and usage (zeros). */
-export async function loadFakeScript(source: string): Promise<ScriptedTurn[]> {
-	const raw: unknown = JSON.parse(await readFile(source, "utf8"));
-	if (!Array.isArray(raw)) throw new Error(`fake script must be a JSON array: ${source}`);
-	return raw.map((entry, i) => {
-		const turn = entry as { deltas?: ScriptedTurn["deltas"]; message?: Partial<AssistantMsg> };
-		const msg = turn?.message;
-		if (msg?.role !== "assistant" || !Array.isArray(msg.content) || typeof msg.stopReason !== "string") {
-			throw new Error(`fake script entry ${i} lacks a valid assistant message: ${source}`);
-		}
-		const usage = typeof msg.usage === "object" && msg.usage !== null ? { ...zeroUsage(), ...msg.usage } : zeroUsage();
-		return { deltas: turn.deltas ?? [], message: { ...msg, usage } as AssistantMsg };
-	});
-}
-
-async function pickModel(cfg: HitConfig, kind: TaskKind, override?: string): Promise<ModelRef> {
-	if (override === undefined) return chooseModel(cfg, kind, await loadScores()).ref;
-	const slash = override.indexOf("/");
-	if (slash <= 0 || slash === override.length - 1) {
-		throw new Error(`--model must look like "provider/id", got "${override}"`);
-	}
-	return resolveModelRef({ provider: override.slice(0, slash), id: override.slice(slash + 1) });
-}
-
-/** Phase 2 run command: config → kind → routed model, hit policy, git isolation
- * with per-turn checkpoints. Never calls process.exit; returns the RunEndReason. */
-export async function runCmd(opts: RunCmdOpts): Promise<RunEndReason> {
+/** Phase 3 run command: config → routed model, hit policy, git isolation,
+ * memory bootstrap, then the run + verification gate. Never calls
+ * process.exit; returns the CLI outcome ("blocked" = gate failure, exit 1). */
+export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 	const out = opts.out ?? process.stdout;
 	const cfg = loadConfig(opts.repo);
+	const repoConfig = loadRepoConfig(opts.repo);
 	if (opts.maxCostUsd !== undefined) cfg.budgets.maxCostUsd = opts.maxCostUsd;
 	if (opts.deadlineMs !== undefined) cfg.budgets.deadlineMinutes = opts.deadlineMs / 60_000;
 	if (opts.maxTurns !== undefined) cfg.budgets.maxTurns = opts.maxTurns;
@@ -121,6 +79,8 @@ export async function runCmd(opts: RunCmdOpts): Promise<RunEndReason> {
 	const provider = isFake
 		? new FakeProvider(opts.fake !== undefined ? await loadFakeScript(opts.fake) : demoScript())
 		: new PiAiProvider();
+	// Quiet runs keep stderr clean; degradation still lands in noopMemory.
+	const mem = await createMemory(cfg, opts.repo, repoConfig, opts.quiet === true ? () => {} : undefined);
 	const events = createEventBus();
 	if (opts.quiet !== true) attachRenderer(events, out);
 	const agent = createAgent({
@@ -129,6 +89,7 @@ export async function runCmd(opts: RunCmdOpts): Promise<RunEndReason> {
 		tools: DEFAULT_TOOLS,
 		task: opts.task,
 		repoRoot: opts.repo,
+		memory: mem.port,
 		policy: createHitPolicy({ config: cfg, repoRoot: opts.repo }),
 		events,
 		config: cfg,
@@ -137,12 +98,20 @@ export async function runCmd(opts: RunCmdOpts): Promise<RunEndReason> {
 		...(isolation !== undefined ? { isolation: { repoRoot: opts.repo, branch: isolation.branch } } : {}),
 	});
 	try {
-		const { reason, stats } = await agent.run();
-		out.write(`${reason} · ${stats.turns} turns · $${stats.usage.costUsd.toFixed(4)} · ${agent.session.path}\n`);
+		const res = await runWithGate(agent, {
+			cfg,
+			repoRoot: opts.repo,
+			repoConfig,
+			client: mem.client,
+			ns: mem.ns,
+			out,
+			noVerify: opts.noVerify === true,
+		});
+		out.write(`${res.reason} · ${res.stats.turns} turns · $${res.stats.usage.costUsd.toFixed(4)} · ${agent.session.path}\n`);
 		if (isolation !== undefined) {
 			out.write(`${summarizeRun(opts.repo, isolation.branch, isolation.originalRef)}\n`);
 		}
-		return reason;
+		return res.outcome;
 	} finally {
 		agent.session.close();
 	}

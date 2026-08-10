@@ -24,6 +24,8 @@ export interface TurnDeps {
 	runId: string;
 	repoPath: string;
 	task: string;
+	/** Goal this run serves, if any; forwarded into MemoryPort.preTurn. */
+	goalId?: string;
 	isResume: boolean;
 	/** Enables context compaction; absent = never compact (bare test loops). */
 	compaction?: {
@@ -53,6 +55,7 @@ export async function runTurn(deps: TurnDeps, state: TurnState): Promise<RunEndR
 		runId: deps.runId,
 		repoPath: deps.repoPath,
 		task: deps.task,
+		goalId: deps.goalId,
 		isFirstTurn: state.turn === 1,
 		isResume: deps.isResume,
 	});

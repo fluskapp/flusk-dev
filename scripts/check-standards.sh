@@ -8,6 +8,8 @@
 #    files matching src/provider/pi-ai*.ts. Everything else uses hit's own
 #    types (src/core/types.ts, src/provider/provider.ts).
 # 3. The pi-ai "/compat" entrypoint must never be imported.
+# 4. Dependency boundary: `@abagraph/client` may only be imported under
+#    src/memory/. Everything else uses hit's own types (client-types.ts).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -38,6 +40,18 @@ compat_uses=$(grep -rln '@earendil-works/pi-ai/compat' src test --include='*.ts'
 if [ -n "$compat_uses" ]; then
 	echo "FAIL: the pi-ai \"/compat\" entrypoint must not be imported:"
 	printf '  %s\n' $compat_uses
+	fail=1
+fi
+
+# --- 4. abagraph client import boundary ---------------------------------------
+# The abagraph SDK stays behind the MemoryClient wrapper: only src/memory/
+# may import it. Everything else (tests included) uses the hit-owned types
+# in src/memory/client-types.ts.
+aba_leaks=$(grep -rln '@abagraph/client' src test --include='*.ts' 2>/dev/null |
+	grep -v '^src/memory/' || true)
+if [ -n "$aba_leaks" ]; then
+	echo "FAIL: @abagraph/client imported outside src/memory/:"
+	printf '  %s\n' $aba_leaks
 	fail=1
 fi
 
