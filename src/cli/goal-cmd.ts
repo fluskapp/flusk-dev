@@ -20,6 +20,7 @@ import type { Provider } from "../provider/provider.js";
 import { createHitPolicy } from "../safety/hit-policy.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import { allTasksDone, renderGoalList, taskDescription } from "./goal-list.js";
+import { runTask } from "./goal-task.js";
 import { attachRenderer } from "./render.js";
 import { DEFAULT_TOOLS, envKeyVar, fakeModel, loadFakeScript, pickModel } from "./run-support.js";
 
@@ -42,45 +43,6 @@ function renderPlan(plan: GoalPlan): string {
 	}
 	for (const note of plan.notes) lines.push(`  note: ${note}`);
 	return `${lines.join("\n")}\n`;
-}
-
-/** One frontier task = one gated agent session on a fresh memory snapshot. */
-async function runTask(
-	opts: GoalCmdOpts,
-	env: { mem: MemorySetup; provider: Provider; g: string; taskId: string; runId: string },
-): Promise<CliOutcome> {
-	const client = env.mem.client as NonNullable<MemorySetup["client"]>;
-	const cfg = loadConfig(opts.repo);
-	const repoConfig = loadRepoConfig(opts.repo);
-	const out = opts.out ?? process.stdout;
-	const desc = await taskDescription(client, env.mem.ns, env.taskId);
-	const brief = await goalBrief(client, env.mem.ns, env.g);
-	const events = createEventBus();
-	if (opts.quiet !== true) attachRenderer(events, out);
-	const agent = createAgent({
-		provider: env.provider,
-		model: opts.fake !== undefined ? fakeModel : await pickModel(cfg, "code"),
-		tools: DEFAULT_TOOLS,
-		task: `${desc}\n\nGoal context: ${brief}`,
-		repoRoot: opts.repo,
-		// Fresh port per task so each session gets a current <memory> snapshot.
-		memory: new AbagraphMemoryPort({ client, repoNs: env.mem.ns, budgets: cfg.memory.budgets }),
-		policy: createHitPolicy({ config: cfg, repoRoot: opts.repo }),
-		events,
-		config: cfg,
-		taskKind: "code",
-		goalId: env.g.replace(/^Goal:/, ""),
-		runId: env.runId,
-	});
-	try {
-		const res = await runWithGate(agent, {
-			cfg, repoRoot: opts.repo, repoConfig, client, ns: env.mem.ns, out,
-			noVerify: opts.noVerify === true,
-		});
-		return res.outcome;
-	} finally {
-		agent.session.close();
-	}
 }
 
 export async function goalCmd(opts: GoalCmdOpts): Promise<CliOutcome> {
@@ -122,9 +84,23 @@ export async function goalCmd(opts: GoalCmdOpts): Promise<CliOutcome> {
 			out.write("goal stalled: no runnable tasks remain\n");
 			return "blocked";
 		}
-		const taskId = front[0] as string;
-		const runId = randomUUID().slice(0, 8);
-		if ((await claimTask(mem.client, mem.ns, taskId, runId)) === null) continue;
+		// Try the whole frontier before giving up: a lost claim means another
+		// session took that task, not that the goal is stuck. Bounded, because
+		// an unbounded `continue` here is a hot loop against the server.
+		let taskId: string | undefined;
+		let runId = "";
+		for (const candidate of front) {
+			const id = randomUUID().slice(0, 8);
+			if ((await claimTask(mem.client, mem.ns, candidate, id)) !== null) {
+				taskId = candidate;
+				runId = id;
+				break;
+			}
+		}
+		if (taskId === undefined) {
+			out.write(`could not claim any of ${front.length} runnable task(s); stopping\n`);
+			return "blocked";
+		}
 		const outcome = await runTask(opts, { mem, provider, g, taskId, runId });
 		if (outcome !== "completed") {
 			await failTask(mem.client, mem.ns, taskId);

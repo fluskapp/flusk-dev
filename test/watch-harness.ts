@@ -12,7 +12,9 @@ import type { RunItemResult, WatchDeps } from "../src/watch/tick.js";
 import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
 
 export const REPO_NS = "repo:watch-test";
-export const T0 = Date.parse("2026-08-10T22:00:00.000Z");
+/** Anchored to real time: the mock stamps facts with the wall clock, so a
+ * fixed synthetic instant would put `as_of` reads before the facts exist. */
+export const T0 = Date.now();
 export const HOUR = 3_600_000;
 
 export const item = (key: string, updatedAt: string): WorkItem => ({
@@ -46,7 +48,9 @@ export function harness(client: MemoryClient, over: Partial<HitConfig["watch"]> 
 		ran: [],
 		published: [],
 		cleanups: 0,
-		now: T0,
+		// A minute ahead of import time: facts are written a few ms after T0,
+		// and an `as_of` read at exactly T0 would predate them.
+		now: T0 + 60_000,
 		result: { outcome: "completed", runId: "r1", verdict: "ALLOW" },
 		items: [],
 		deps: {} as WatchDeps,

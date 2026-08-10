@@ -90,8 +90,15 @@ export async function extendCooldown(
 	await client.transact(HIT_NS, [watchFact.cooldownUntil(key, untilIso)]);
 }
 
+/**
+ * The key a night's runs are counted under. Shifted back 12 hours and read in
+ * LOCAL time: a UTC date flips mid-session in most timezones, which would let
+ * an overnight run spend the nightly cap twice.
+ */
 export function nightKey(nowMs: number): string {
-	return new Date(nowMs).toISOString().slice(0, 10);
+	const d = new Date(nowMs - 12 * HOUR_MS);
+	const local = new Date(d.getTime() - d.getTimezoneOffset() * 60_000);
+	return local.toISOString().slice(0, 10);
 }
 
 export async function nightCount(client: MemoryClient, date: string): Promise<number> {

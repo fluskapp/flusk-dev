@@ -13,8 +13,14 @@ default reads), ignores `seeds` in `/api/context` (real: `context/collect.rs`
 only collects from seeds + a 1-hop walk), and implements `/api/search` as a
 substring scan (real: needs an embedding provider, else returns nothing).
 
-Nothing below is fixed unless it says FIXED. Items are ordered by expected
-damage, not by discovery order.
+Items are ordered by expected damage, not by discovery order. **FIXED** marks
+work completed; everything else is open.
+
+Known remaining mock divergences (deliberate, documented rather than hidden):
+the mock stores facts tenanted while an auth-free server stores them
+untenanted, so its compare evaluation ignores an absent compare tenant to
+reproduce the real outcome; `/api/context` still ignores `seeds`; and
+`/api/search` is a substring scan rather than a vector search.
 
 ## Corrections to earlier claims
 
@@ -115,3 +121,26 @@ damage, not by discovery order.
 When a behavior depends on abagraph semantics, the mock must be made faithful
 to the Rust source *first*, and the test written against that. A test that
 passes only because the mock is lenient is worse than no test.
+
+
+## Status after the follow-up pass (commit following 7070cc6)
+
+FIXED: 1 (untrusted config), 2 (cooldown visibility), 3 (throwaway namespace),
+4 (CAS compares carry no tenant), 5 (bounded claim attempts across the
+frontier), 6 (recall, context assembly and changes all read Candidates), 7
+(reads request 500 rows before the client-side namespace filter), 8 (semantic
+recall falls back to pattern when the server has no embeddings), 9
+(`openWorktree` inside the guarded region; worktree reclaimed in `finally`),
+10 (night key is local time shifted 12h), 11 (verdict compared
+case-insensitively), 13 (ledger keys are repo-qualified), 15 (explicit
+`failure_count`), 16 (per-tick catch in the loop; `try/finally` cleanup), 17
+(no empty pushes; PRs target the item's branch), 19 (client-side trim), 20
+(portable subjects route to the lessons namespace), plus malformed queue rows
+are dropped instead of sorting first forever.
+
+STILL OPEN: 12 (coexist claims degrade to WARN — needs membership checks
+instead of `/api/verify`), 14 (night counter has no CAS), 18 (`preTurn` has no
+catch), 21 (a failed task wedges its goal; no resume of an active goal), 22
+(`/api/verify` is admin-global), and the headline one: **the claim check is
+still circular** — it must be rebuilt from the agent's report rather than from
+harness state before the verification gate can be trusted.

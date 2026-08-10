@@ -56,12 +56,16 @@ export function createMemoryClient(opts: MemoryClientOptions): MemoryClient {
 
 		async transact(ns, asserts, compares) {
 			const body: TransactBody = {
-				// Compare tenants are honored for admin (dto/parse_transact.rs).
+				// No tenant on compares, for the same reason contextPack sends no
+				// scope tenant: the guard set is filtered by tenant equality
+				// (core/transact_guards.rs) while asserts land untenanted on an
+				// auth-free server, so a stamped compare matches nothing and every
+				// guarded transact would 409. Subjects are globally unique
+				// (`Task:t-<hex>`), so this does not weaken isolation.
 				compares: compares?.map((c) => ({
 					subject: c.subject,
 					predicate: c.predicate,
 					expect: c.object,
-					tenant: ns,
 				})),
 				// The SDK type spells valid_until as a string; the wire wants
 				// unix-ms — hence the cast through the wire shape.

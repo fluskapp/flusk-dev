@@ -10,7 +10,13 @@ import { createMemory } from "../memory/bootstrap.js";
 import { resolveNamespace } from "../memory/namespaces.js";
 import { repoSlug } from "../session/paths.js";
 import { watchLoop } from "../watch/loop.js";
-import { branchFor, createWorktree, currentBranch, removeWorktree } from "../watch/isolation.js";
+import {
+	branchFor,
+	commitCount,
+	createWorktree,
+	currentBranch,
+	removeWorktree,
+} from "../watch/isolation.js";
 import { observeRun } from "../watch/observe.js";
 import { publish } from "../watch/push.js";
 import { pollQueues } from "../watch/queue.js";
@@ -63,7 +69,7 @@ export async function watchCmd(opts: WatchCmdOpts): Promise<number> {
 			cfg,
 			now: () => Date.now(),
 			log,
-			poll: () => pollQueues(opts.repo, cfg.watch.queues),
+			poll: () => pollQueues(opts.repo, cfg.watch.queues, slug),
 			openWorktree: (item) => {
 				const wt = createWorktree(
 					opts.repo,
@@ -93,7 +99,9 @@ export async function watchCmd(opts: WatchCmdOpts): Promise<number> {
 			publish: (item, dir) => {
 				const branch = currentBranch(dir);
 				if (branch === "") return log("no branch to publish");
-				log(publish(opts.repo, item, branch).note);
+				const base = item.ref ?? "HEAD";
+				const hasCommits = commitCount(opts.repo, branch, base) > 0;
+				log(publish(opts.repo, item, branch, { hasCommits, ...(item.ref !== undefined ? { base: item.ref } : {}) }).note);
 			},
 		},
 		{

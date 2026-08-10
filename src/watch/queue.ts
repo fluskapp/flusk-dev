@@ -40,7 +40,7 @@ function parseRows(out: string): Record<string, unknown>[] {
 
 const str = (v: unknown): string => (typeof v === "string" ? v : "");
 
-export function pollGhPrs(repoRoot: string, limit = 50): PollResult {
+export function pollGhPrs(repoRoot: string, limit = 50, scope = ""): PollResult {
 	const r = gh(repoRoot, [
 		"pr",
 		"list",
@@ -56,7 +56,7 @@ export function pollGhPrs(repoRoot: string, limit = 50): PollResult {
 		const number = String(row.number ?? "");
 		const title = str(row.title);
 		return {
-			key: `gh-prs-${number}`,
+			key: `${scope}gh-prs-${number}`,
 			queue: "gh-prs",
 			title,
 			updatedAt: str(row.updatedAt),
@@ -70,7 +70,7 @@ export function pollGhPrs(repoRoot: string, limit = 50): PollResult {
 	return { items, notes: [] };
 }
 
-export function pollGhFailingCi(repoRoot: string, limit = 20): PollResult {
+export function pollGhFailingCi(repoRoot: string, limit = 20, scope = ""): PollResult {
 	const r = gh(repoRoot, [
 		"run",
 		"list",
@@ -88,7 +88,7 @@ export function pollGhFailingCi(repoRoot: string, limit = 20): PollResult {
 		const title = str(row.displayTitle);
 		const branch = str(row.headBranch);
 		return {
-			key: `gh-failing-ci-${id}`,
+			key: `${scope}gh-failing-ci-${id}`,
 			queue: "gh-failing-ci",
 			title,
 			updatedAt: str(row.updatedAt),
@@ -102,19 +102,26 @@ export function pollGhFailingCi(repoRoot: string, limit = 20): PollResult {
 }
 
 /** Poll every configured queue; oldest item first across all of them. */
-export function pollQueues(repoRoot: string, queues: string[]): PollResult {
+export function pollQueues(repoRoot: string, queues: string[], repoSlug = ""): PollResult {
+	// Ledger keys are global in the `hit` namespace, so they carry the repo:
+	// otherwise PR #7 in two repos would share one cooldown and failure count.
+	const scope = repoSlug === "" ? "" : `${repoSlug}/`;
 	const items: WorkItem[] = [];
 	const notes: string[] = [];
 	for (const q of queues) {
 		const r =
 			q === "gh-prs"
-				? pollGhPrs(repoRoot)
+				? pollGhPrs(repoRoot, 50, scope)
 				: q === "gh-failing-ci"
-					? pollGhFailingCi(repoRoot)
+					? pollGhFailingCi(repoRoot, 20, scope)
 					: { items: [], notes: [`unknown queue "${q}"`] };
 		items.push(...r.items);
 		notes.push(...r.notes);
 	}
-	items.sort((a, b) => a.updatedAt.localeCompare(b.updatedAt));
-	return { items, notes };
+	// A row with no id would collide with every other id-less row; a row with
+	// no timestamp would outrank every real item forever.
+	const usable = items.filter((i) => !i.key.endsWith("-") && i.updatedAt !== "");
+	if (usable.length !== items.length) notes.push(`skipped ${items.length - usable.length} malformed row(s)`);
+	usable.sort((a, b) => a.updatedAt.localeCompare(b.updatedAt));
+	return { items: usable, notes };
 }

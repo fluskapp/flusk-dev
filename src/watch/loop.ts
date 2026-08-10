@@ -28,7 +28,15 @@ export async function watchLoop(deps: WatchDeps, opts: LoopOpts): Promise<LoopSu
 	const aborted = (): boolean => opts.signal?.aborted === true;
 
 	while (summary.ticks < maxTicks && !aborted()) {
-		const result = await watchTick(deps);
+		// A tick that throws (an abagraph hiccup, a git surprise) logs and the
+		// night continues; only an abort or maxTicks stops the loop.
+		let result: TickResult;
+		try {
+			result = await watchTick(deps);
+		} catch (e) {
+			deps.log(`tick failed: ${e instanceof Error ? e.message : String(e)}`);
+			result = { status: "idle" };
+		}
 		summary.ticks++;
 		summary.results.push(result);
 		if (result.status === "ran") {

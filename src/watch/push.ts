@@ -27,7 +27,15 @@ const BODY_NOTE =
 	"Every commit is a per-turn checkpoint and the run passed its verification gate.";
 
 /** Push the branch and open a PR for it. Never throws; reports what happened. */
-export function publish(repoRoot: string, item: WorkItem, branch: string): PublishResult {
+export function publish(
+	repoRoot: string,
+	item: WorkItem,
+	branch: string,
+	opts: { hasCommits: boolean; base?: string } = { hasCommits: true },
+): PublishResult {
+	// A "completed" run that changed nothing would otherwise leave a stray
+	// remote branch and a PR creation that fails with "no commits".
+	if (!opts.hasCommits) return { pushed: false, note: "nothing to publish (no commits)" };
 	const pushed = run("git", ["push", "-u", "origin", branch], repoRoot);
 	if (!pushed.ok) return { pushed: false, note: `push failed: ${pushed.err.trim()}` };
 	const pr = run(
@@ -37,6 +45,9 @@ export function publish(repoRoot: string, item: WorkItem, branch: string): Publi
 			"create",
 			"--head",
 			branch,
+			// A PR-queue item is work ON that PR's branch: without a base the
+			// diff would be against the default branch and include the original.
+			...(opts.base !== undefined && opts.base !== "" ? ["--base", opts.base] : []),
 			"--title",
 			`hit: ${item.title}`.slice(0, 120),
 			"--body",

@@ -3,7 +3,8 @@
  * source file (/Users/ashb/projects/abagraph) whose semantics it mirrors.
  */
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { assertFact, evalCompares, type MockFact, type Store } from "./mock-abagraph-state.js";
+import { assertFact } from "./mock-abagraph-assert.js";
+import { evalCompares, type MockFact, type Store } from "./mock-abagraph-state.js";
 import { decide, type MockClaim } from "./mock-abagraph-verify.js";
 
 export type Body = Record<string, unknown>;

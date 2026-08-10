@@ -89,13 +89,19 @@ export async function watchTick(deps: WatchDeps): Promise<TickResult> {
 	await bumpNightCount(client, date, count);
 	deps.log(`working ${chosen.key}: ${chosen.title}`);
 
-	const wt = deps.openWorktree(chosen);
-	let result: RunItemResult;
+	// Opening the worktree is inside the guarded region: it throws when a
+	// branch from an earlier attempt still exists, and an unguarded throw here
+	// would end the entire night on one bad item.
+	let wt: { dir: string; cleanup(): void } | undefined;
+	let result: RunItemResult = { outcome: "error", runId: "", verdict: undefined };
 	try {
+		wt = deps.openWorktree(chosen);
 		result = await deps.runItem(chosen, wt.dir);
 	} catch (e) {
-		result = { outcome: "error", runId: "", verdict: undefined };
-		deps.log(`run threw: ${e instanceof Error ? e.message : String(e)}`);
+		deps.log(`run failed to start or threw: ${e instanceof Error ? e.message : String(e)}`);
+	} finally {
+		// Always reclaim the checkout, even if a post-run step throws below.
+		wt?.cleanup();
 	}
 	await recordOutcome(client, chosen.key, result.outcome, failures);
 
@@ -108,7 +114,7 @@ export async function watchTick(deps: WatchDeps): Promise<TickResult> {
 			result.verdict ?? "WARN",
 		);
 		if (promo.promoted > 0) deps.log(`promoted ${promo.promoted} lesson(s)`);
-		if (cfg.watch.push) deps.publish(chosen, wt.dir);
+		if (cfg.watch.push && wt !== undefined) deps.publish(chosen, wt.dir);
 	} else {
 		// Back off harder each time this item fails.
 		await extendCooldown(
@@ -117,7 +123,6 @@ export async function watchTick(deps: WatchDeps): Promise<TickResult> {
 			cooldownUntil(nowMs, cfg.watch.cooldownHours, cfg.watch.failCooldownHours, failures + 1),
 		);
 	}
-	wt.cleanup();
 	deps.log(`${chosen.key} → ${result.outcome}`);
 	return { status: "ran", item: chosen, outcome: result.outcome };
 }

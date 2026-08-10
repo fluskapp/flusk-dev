@@ -40,10 +40,39 @@ export async function buildMemoryBlock(
 		client.contextPack(LESSONS_NS, { goal: opts.task, tokenBudget: opts.budgets.lessons }),
 	]);
 	if (repo.status === "rejected" && lessons.status === "rejected") throw repo.reason;
-	const facts = [
+	// /api/context serves settled facts only. Everything the agent remembered
+	// and every extracted lesson is written at <= 0.7, which lands as a
+	// Candidate — invisible there — so those are fetched separately and
+	// appended, or the whole learning path would be write-only.
+	const candidates = await candidateFacts(client, opts);
+	const facts = dedupe([
 		...(repo.status === "fulfilled" ? repo.value : []),
 		...(lessons.status === "fulfilled" ? lessons.value : []),
-	];
+		...candidates,
+	]);
 	if (facts.length === 0) return null;
 	return `<memory>\n${facts.map(factLine).join("\n")}\n</memory>`;
+}
+
+function dedupe(facts: MemFact[]): MemFact[] {
+	const seen = new Set<string>();
+	return facts.filter((f) => (seen.has(f.id) ? false : (seen.add(f.id), true)));
+}
+
+/** Best-effort: a candidate read failing must not cost us the settled block. */
+async function candidateFacts(
+	client: MemoryClient,
+	opts: MemoryBlockOpts,
+): Promise<MemFact[]> {
+	const budget = Math.max(1, Math.round((opts.budgets.repo + opts.budgets.lessons) / 200));
+	const pull = async (ns: string): Promise<MemFact[]> => {
+		try {
+			const rows = await client.query(ns, { status: "candidate", limit: 500 });
+			return rows.slice(-budget); // newest candidates first-class
+		} catch {
+			return [];
+		}
+	};
+	const [a, b] = await Promise.all([pull(opts.repoNs), pull(LESSONS_NS)]);
+	return [...a, ...b];
 }

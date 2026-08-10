@@ -59,9 +59,9 @@ export function objectsEqual(a: unknown, b: unknown): boolean {
 	return a === b || (a == null && b == null);
 }
 
-type Body = Record<string, unknown>;
-const str = (v: unknown): string | undefined => (typeof v === "string" ? v : undefined);
-const num = (v: unknown): number | undefined => (typeof v === "number" ? v : undefined);
+export type Body = Record<string, unknown>;
+export const str = (v: unknown): string | undefined => (typeof v === "string" ? v : undefined);
+export const num = (v: unknown): number | undefined => (typeof v === "number" ? v : undefined);
 
 /**
  * Guard evaluation (core/transact_guards.rs): absent → no active fact;
@@ -72,7 +72,21 @@ export function evalCompares(store: Store, compares: unknown): unknown[] {
 	const failures: unknown[] = [];
 	for (const raw of Array.isArray(compares) ? compares : []) {
 		const c = raw as Body;
-		const active = store.active(String(c.subject), String(c.predicate), str(c.tenant));
+		// A compare with no tenant matches whatever tenant the fact carries.
+		// core/transact_guards.rs compares tenants strictly, but on the server
+		// hit targets (auth-free, so admin) BOTH the guard and the stored fact
+		// are untenanted, so they match. This mock stores facts tenanted, so
+		// ignoring an absent compare tenant reproduces the real outcome —
+		// see docs/review-findings.md on why hit sends no tenant on compares.
+		const active =
+			c.tenant === undefined
+				? store.facts.filter(
+						(f) =>
+							f.status === "active" &&
+							f.subject === String(c.subject) &&
+							f.predicate === String(c.predicate),
+					)
+				: store.active(String(c.subject), String(c.predicate), str(c.tenant));
 		const absent = c.absent === true;
 		const pass = absent
 			? active.length === 0
@@ -100,50 +114,3 @@ let idSeq = 0;
  * valid_until = now (supersede.rs close_fact). Tenant is read from the fact
  * body — admin passthrough (server/routes/transact.rs `scoped`).
  */
-export function assertFact(store: Store, a: Body, tx: number, now: number): MockFact {
-	const confidence = num(a.confidence) ?? 1;
-	const status = confidence < 0.75 ? "candidate" : "active"; // build_fact.rs:37 threshold 0.75
-	const fact: MockFact = {
-		id: `mockfact-${++idSeq}`,
-		subject: String(a.subject),
-		predicate: String(a.predicate),
-		object: a.object ?? null,
-		valid_from: num(a.valid_from) ?? now,
-		valid_until: num(a.valid_until) ?? null,
-		recorded_at: now,
-		confidence,
-		source: str(a.source),
-		properties: a.properties,
-		status,
-		tenant: store.dropTenantOnWrite ? undefined : str(a.tenant),
-		transient: a.transient === true,
-		tx,
-	};
-	const peers =
-		status === "active"
-			? store.active(fact.subject, fact.predicate, fact.tenant)
-			: store.facts.filter(
-					(f) =>
-						f.subject === fact.subject &&
-						f.predicate === fact.predicate &&
-						f.status === status &&
-						f.tenant === fact.tenant,
-				);
-	const dup = peers.find(
-		(f) =>
-			objectsEqual(f.object, fact.object) &&
-			f.source === fact.source &&
-			Math.abs(f.confidence - fact.confidence) < 0.001,
-	);
-	if (dup) return dup; // supersede.rs is_duplicate: idempotent, no new row
-	if (status === "active" && a.policy !== "coexist") {
-		// dto/parse.rs parse_policy: "coexist" keeps peers; default AutoSupersede
-		for (const f of peers.filter((f) => !objectsEqual(f.object, fact.object))) {
-			f.status = "superseded"; // supersede.rs close_fact
-			f.valid_until = now;
-			f.tx = tx;
-		}
-	}
-	store.facts.push(fact);
-	return fact;
-}

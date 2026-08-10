@@ -15,7 +15,8 @@ import {
 import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
 
 const HOUR = 3_600_000;
-const T0 = Date.parse("2026-08-10T22:00:00.000Z");
+/** Anchored to real time — see watch-harness.ts. */
+const T0 = Date.now();
 
 let mock: MockAbagraph;
 let client: MemoryClient;

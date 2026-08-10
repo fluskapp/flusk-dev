@@ -35,7 +35,8 @@ export async function observeRun(
 		await client.query(repoNs, { predicate: "verification", limit: 200 }),
 		sinceIso,
 	);
-	const object = newest(audits)?.object;
+	// abagraph writes the audit object lowercase (routes/verify.rs).
+	const object = newest(audits)?.object?.toUpperCase();
 	const verdict: MemVerdict =
 		object === "ALLOW" || object === "BLOCK" || object === "WARN" ? object : "WARN";
 	return { runId, verdict };

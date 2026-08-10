@@ -9,17 +9,12 @@
  * `fixed_by` supersedes the old one while keeping its history.
  */
 import type { MemFact, MemFactInput, MemoryClient, MemVerdict } from "../memory/client-types.js";
-import { lessonFact } from "../memory/facts.js";
+import { isPortableSubject, lessonFact } from "../memory/facts.js";
 import { LESSONS_NS } from "../memory/namespaces.js";
 
-/** Subjects whose knowledge is not specific to one repository. */
-const PORTABLE = ["ErrorClass:", "Tool:", "Approach:"];
+export { isPortableSubject };
 
 const PROMOTED_CONFIDENCE = 0.9;
-
-export function isPortableSubject(subject: string): boolean {
-	return PORTABLE.some((p) => subject.startsWith(p));
-}
 
 export interface PromotionResult {
 	promoted: number;

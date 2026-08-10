@@ -8,7 +8,7 @@ import type { Tool } from "../tools/tool.js";
 import { whatsChanged } from "./changes.js";
 import type { MemFact, MemoryClient } from "./client-types.js";
 import { factLine } from "./contextpack.js";
-import { isVocabularyPredicate, vocabularyFact, vocabularyRows } from "./facts.js";
+import { isPortableSubject, isVocabularyPredicate, vocabularyFact, vocabularyRows } from "./facts.js";
 import { LESSONS_NS } from "./namespaces.js";
 
 export interface MemoryToolsOpts {
@@ -18,6 +18,8 @@ export interface MemoryToolsOpts {
 }
 
 const RECALL_CAP = 15;
+/** Rows requested before hit's client-side namespace filter runs. */
+const FETCH_CAP = 500;
 const MAX_AGENT_CONFIDENCE = 0.7;
 
 const recallParams = Type.Object({
@@ -47,14 +49,25 @@ export function memoryTools(client: MemoryClient, opts: MemoryToolsOpts): Tool[]
 		parameters: recallParams,
 		mode: "parallel",
 		async execute(args) {
-			const fetch = (ns: string): Promise<MemFact[]> =>
-				args.mode === "semantic"
-					? client.search(ns, args.query, RECALL_CAP)
-					: client.query(ns, {
-							subject: args.subject,
-							predicate: args.predicate,
-							limit: RECALL_CAP,
-						});
+			const pattern = (ns: string): Promise<MemFact[]> =>
+				client.query(ns, {
+					subject: args.subject,
+					predicate: args.predicate,
+					// Candidates included: everything the agent remembers is capped
+					// at 0.7, which abagraph parks below its 0.75 threshold and
+					// hides from default reads — recall would never see it.
+					status: "active,candidate",
+					// Fetch generously: the server caps rows BEFORE hit filters by
+					// namespace, so a small limit can return none of ours.
+					limit: FETCH_CAP,
+				});
+			const fetch = async (ns: string): Promise<MemFact[]> => {
+				if (args.mode !== "semantic") return pattern(ns);
+				const hits = await client.search(ns, args.query, RECALL_CAP);
+				// Semantic search needs an embedding provider; without one the
+				// server answers empty. Fall back rather than claim amnesia.
+				return hits.length > 0 ? hits : pattern(ns);
+			};
 			const [repo, lessons] = await Promise.all([fetch(opts.repoNs), fetch(LESSONS_NS)]);
 			const facts = [...repo, ...lessons].slice(0, RECALL_CAP);
 			if (facts.length === 0) return { output: "No matching memory." };
@@ -85,7 +98,13 @@ export function memoryTools(client: MemoryClient, opts: MemoryToolsOpts): Tool[]
 				source: `agent:run:${opts.runId()}`,
 				...(args.why !== undefined ? { properties: { why: args.why } } : {}),
 			};
-			await client.transact(opts.repoNs, [input]);
+			// Cross-repo subjects belong in the lessons namespace, as digestion
+			// already writes them. Splitting one functional predicate across two
+			// namespaces is worse than a leak: with tenants dropped by an
+			// auth-free server the conflict set is shared, so the two copies
+			// silently supersede each other.
+			const ns = isPortableSubject(args.subject) ? LESSONS_NS : opts.repoNs;
+			await client.transact(ns, [input]);
 			return {
 				output: `Remembered: ${args.subject} ${args.predicate} ${args.object} (conf ${confidence})`,
 			};
