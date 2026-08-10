@@ -11,7 +11,7 @@ export interface SystemPromptOpts {
 export function buildSystemPrompt(opts: SystemPromptOpts): string {
 	const date = opts.now ? opts.now.toISOString().slice(0, 10) : "unset";
 	return [
-		"You are hit, an autonomous coding agent.",
+		"You are ah, an autonomous coding agent.",
 		"",
 		"Rules:",
 		"- Use the available tools to inspect the repository and act on the task.",

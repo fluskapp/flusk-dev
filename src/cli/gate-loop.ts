@@ -6,7 +6,7 @@
  * Empty command list → pass-through (scratch repos stay gate-free).
  */
 import type { Agent } from "../agent/options.js";
-import type { HitConfig, RepoConfig } from "../config/types.js";
+import type { AhConfig, RepoConfig } from "../config/types.js";
 import { collectRunRecord } from "../core/run-record.js";
 import { claimCheck, finalReport } from "./gate-report.js";
 import type { RunEndReason, RunStats } from "../core/types.js";
@@ -20,7 +20,7 @@ import { formatEvidence, runVerify, type VerifyCommandResult } from "../verify/g
 export type CliOutcome = RunEndReason | "blocked";
 
 export interface GateOpts {
-	cfg: HitConfig;
+	cfg: AhConfig;
 	repoRoot: string;
 	repoConfig?: RepoConfig;
 	client: MemoryClient | null;

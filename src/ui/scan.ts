@@ -2,7 +2,7 @@ import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import type { AssistantMsg, ModelRef, RunEndReason } from "../core/types.js";
 import type { StatsEntry } from "../session/entries.js";
-import { hitHome } from "../session/paths.js";
+import { ahHome } from "../session/paths.js";
 import { SessionStore } from "../session/store.js";
 
 export type SessionStatus = "completed" | "error" | "aborted" | "stopped" | "running";
@@ -39,7 +39,7 @@ export function statusFromReason(reason: RunEndReason): SessionStatus {
 }
 
 export function sessionsRoot(): string {
-	return join(hitHome(), "sessions");
+	return join(ahHome(), "sessions");
 }
 
 /** The session file doesn't persist RunEndReason; derive a display status. */

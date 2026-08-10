@@ -1,4 +1,4 @@
-import type { HitConfig, ModelChoice, TaskKind } from "../config/types.js";
+import type { AhConfig, ModelChoice, TaskKind } from "../config/types.js";
 import type { ModelRef } from "../core/types.js";
 import { resolveModelRef } from "./pi-ai.js";
 import { bestFor, type Scores } from "./scores.js";
@@ -9,7 +9,7 @@ import { bestFor, type Scores } from "./scores.js";
  * Resolution happens here (at use), never at config load.
  */
 export function chooseModel(
-	cfg: HitConfig,
+	cfg: AhConfig,
 	kind: TaskKind,
 	scores?: Scores,
 ): { ref: ModelRef; choice: ModelChoice } {

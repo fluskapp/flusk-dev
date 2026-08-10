@@ -10,14 +10,14 @@ import { repoSlug } from "../session/paths.js";
 export const LESSONS_NS = "lessons";
 
 /** Harness ops, mostly transient (docs/vocabulary.md). */
-export const HIT_NS = "hit";
+export const AH_NS = "ah";
 
 /** Per-repo namespace: "repo:" + the session-store repo slug. */
 export function repoNs(repoRoot: string): string {
 	return `repo:${repoSlug(repoRoot)}`;
 }
 
-/** The repo namespace, honoring a .hit.json "namespace" override. */
+/** The repo namespace, honoring a .ah.json "namespace" override. */
 export function resolveNamespace(
 	repoRoot: string,
 	repoConfig?: Pick<RepoConfig, "namespace">,

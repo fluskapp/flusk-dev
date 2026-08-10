@@ -1,6 +1,6 @@
 # Architecture
 
-hit owns its whole agent loop. Modules talk to each other only through a
+ah owns its whole agent loop. Modules talk to each other only through a
 handful of frozen contract files; everything else is replaceable. This page
 maps the modules, states the contracts, and is honest about what exists today
 versus what is roadmap.
@@ -30,14 +30,14 @@ versus what is roadmap.
   `classify-rules.ts` conservatively classify shell commands; `paths.ts` is
   the realpath write jail; `git-isolation.ts` puts each run on its own
   branch with per-turn checkpoint commits; `budget.ts` tracks spend and
-  deadlines; `hit-policy.ts` composes them behind the `Policy` port in
+  deadlines; `ah-policy.ts` composes them behind the `Policy` port in
   `policy.ts`.
 
 - **`src/session`** — durable state. Append-only JSONL files under
-  `~/.hit/sessions/<repo-slug>/`, fsynced per entry so a crash loses at most
+  `~/.ah/sessions/<repo-slug>/`, fsynced per entry so a crash loses at most
   the entry being written. `entries.ts` is the format, `store.ts` the file
   handle, `session.ts` the context rebuild, `repair.ts` fixes dangling tool
-  calls on resume, `paths.ts` maps repos to session directories (`HIT_HOME`
+  calls on resume, `paths.ts` maps repos to session directories (`AH_HOME`
   overrides the root for tests).
 
 - **`src/compaction`** — context management. Estimates tokens, and when the
@@ -54,11 +54,11 @@ versus what is roadmap.
   and ships `noopMemory`. The abagraph-backed implementation (Phase 3) is
   injected here; core never imports the abagraph SDK.
 
-- **`src/ui`** — `hit ui`, a loopback-only HTTP dashboard (IntelliJ-styled)
+- **`src/ui`** — `ah ui`, a loopback-only HTTP dashboard (IntelliJ-styled)
   over the session files: run list, transcript detail, reveal-in-Finder.
 
 - **`src/config`** — `types.ts` is the frozen contract; global config plus
-  per-repo `<repo>/.hit.json` sections deep-merged over it (`config.ts`,
+  per-repo `<repo>/.ah.json` sections deep-merged over it (`config.ts`,
   `defaults.ts`): models per task kind, budgets, unattended policy,
   isolation, compaction thresholds.
 
@@ -102,7 +102,7 @@ edits.
 2. **Path jail** — file writes must realpath-resolve inside the repo root
    (or explicitly granted extra roots); everything else is refused.
 3. **Git isolation** — runs refuse dirty trees (unless `--allow-dirty`),
-   happen on their own `hit/<runId>` branch, and checkpoint-commit after
+   happen on their own `ah/<runId>` branch, and checkpoint-commit after
    every mutating turn, so an autonomous session is always reviewable or
    discardable as one diff. Never pushes, never touches global git config.
 4. **Budgets** — max cost (USD), max turns, and an optional wall-clock
@@ -115,7 +115,7 @@ budget, so children cannot multiply spend.
 ## Roadmap
 
 - **Phase 1 — done.** The loop, tools, JSONL sessions, steering, CLI against
-  FakeProvider, and the IntelliJ-styled `hit ui` dashboard.
+  FakeProvider, and the IntelliJ-styled `ah ui` dashboard.
 - **Phase 2 — done.** The real provider adapter (pi-ai catalog) with model
   routing, the full safety stack (classification, path jail, git isolation,
   budgets), context compaction, subagents, config loading, and resume.
@@ -126,7 +126,7 @@ budget, so children cannot multiply spend.
   goal/task graphs worked across sessions. Server behavior this depends on
   is written down in `docs/abagraph-notes.md` — read it before changing the
   transport.
-- **Phase 4 — done.** `hit watch`: the unattended queue loop over open PRs
+- **Phase 4 — done.** `ah watch`: the unattended queue loop over open PRs
   and failing CI, worktree-per-item isolation, a fact-based attempt ledger
   with quadratic backoff, nightly caps, opt-in publishing, and lesson
   promotion gated on an `ALLOW` verdict (`src/watch/`).
@@ -138,5 +138,5 @@ budget, so children cannot multiply spend.
   the safety layer did.
 - Memory is exercised against a mock that mirrors the abagraph source. There
   is no test against a live abagraph binary.
-- `hit watch` queues are GitHub-only (`gh`); other sources mean writing a
+- `ah watch` queues are GitHub-only (`gh`); other sources mean writing a
   poller returning `WorkItem[]`.

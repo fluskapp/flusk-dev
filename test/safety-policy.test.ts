@@ -2,16 +2,16 @@ import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
-import type { HitConfig } from "../src/config/types.js";
+import type { AhConfig } from "../src/config/types.js";
 import type { Usage } from "../src/core/types.js";
 import { BudgetTracker } from "../src/safety/budget.js";
-import { createHitPolicy } from "../src/safety/hit-policy.js";
+import { createAhPolicy } from "../src/safety/ah-policy.js";
 
 let repo: string;
 let outside: string;
 
 beforeAll(() => {
-	const tmp = mkdtempSync(join(tmpdir(), "hit-policy-"));
+	const tmp = mkdtempSync(join(tmpdir(), "ah-policy-"));
 	repo = join(tmp, "repo");
 	outside = join(tmp, "outside");
 	mkdirSync(repo, { recursive: true });
@@ -20,13 +20,13 @@ beforeAll(() => {
 	symlinkSync(outside, join(repo, "sneaky-link"));
 });
 
-function config(onUnknownCommand: "deny" | "allow"): HitConfig {
+function config(onUnknownCommand: "deny" | "allow"): AhConfig {
 	const model = { provider: "fake", id: "fake-1" };
 	return {
 		models: { plan: model, code: model, review: model, summarize: model },
 		budgets: { maxTurns: 10, maxCostUsd: 5, deadlineMinutes: null },
 		unattended: { onUnknownCommand },
-		isolation: { requireGit: true, branchPrefix: "hit/" },
+		isolation: { requireGit: true, branchPrefix: "ah/" },
 		compaction: { reserveTokens: 4000, keepRecentTokens: 8000 },
 		memory: {
 			enabled: false,
@@ -82,9 +82,9 @@ describe("BudgetTracker", () => {
 	});
 });
 
-describe("createHitPolicy", () => {
+describe("createAhPolicy", () => {
 	it("denies denied bash commands with the classifier's reason", () => {
-		const d = createHitPolicy({ config: config("deny"), repoRoot: repo }).decide({
+		const d = createAhPolicy({ config: config("deny"), repoRoot: repo }).decide({
 			kind: "bash",
 			command: "sudo rm -rf /",
 		});
@@ -94,24 +94,24 @@ describe("createHitPolicy", () => {
 
 	it("routes unknown commands through unattended.onUnknownCommand", () => {
 		const cmd = { kind: "bash", command: "frobnicate --now" } as const;
-		const denyPolicy = createHitPolicy({ config: config("deny"), repoRoot: repo });
+		const denyPolicy = createAhPolicy({ config: config("deny"), repoRoot: repo });
 		expect(denyPolicy.decide(cmd).allow).toBe(false);
-		const allowPolicy = createHitPolicy({ config: config("allow"), repoRoot: repo });
+		const allowPolicy = createAhPolicy({ config: config("allow"), repoRoot: repo });
 		expect(allowPolicy.decide(cmd).allow).toBe(true);
 	});
 
 	it("allows read and write classed commands", () => {
-		const p = createHitPolicy({ config: config("deny"), repoRoot: repo });
+		const p = createAhPolicy({ config: config("deny"), repoRoot: repo });
 		expect(p.decide({ kind: "bash", command: "ls -la" }).allow).toBe(true);
 		expect(p.decide({ kind: "bash", command: "npm test" }).allow).toBe(true);
 	});
 
 	it("jails file writes to the repo and extra roots", () => {
-		const p = createHitPolicy({ config: config("deny"), repoRoot: repo });
+		const p = createAhPolicy({ config: config("deny"), repoRoot: repo });
 		expect(p.decide({ kind: "fileWrite", path: "src/index.ts" }).allow).toBe(true);
 		expect(p.decide({ kind: "fileWrite", path: "../outside/x.txt" }).allow).toBe(false);
 		expect(p.decide({ kind: "fileWrite", path: "sneaky-link/x.txt" }).allow).toBe(false);
-		const withExtra = createHitPolicy({
+		const withExtra = createAhPolicy({
 			config: config("deny"),
 			repoRoot: repo,
 			extraWriteRoots: [outside],
@@ -123,7 +123,7 @@ describe("createHitPolicy", () => {
 	});
 
 	it("caps subagent depth at 2", () => {
-		const p = createHitPolicy({ config: config("deny"), repoRoot: repo });
+		const p = createAhPolicy({ config: config("deny"), repoRoot: repo });
 		expect(p.decide({ kind: "subagent", depth: 0 }).allow).toBe(true);
 		expect(p.decide({ kind: "subagent", depth: 1 }).allow).toBe(true);
 		expect(p.decide({ kind: "subagent", depth: 2 }).allow).toBe(false);

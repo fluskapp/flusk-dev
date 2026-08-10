@@ -1,5 +1,5 @@
 /**
- * Message and run types owned by hit. Provider adapters map into these;
+ * Message and run types owned by ah. Provider adapters map into these;
  * nothing outside src/provider/pi-ai.ts may import provider-SDK types.
  */
 

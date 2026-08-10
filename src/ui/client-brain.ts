@@ -32,14 +32,14 @@ async function loadBrain() {
 		$("#brain").innerHTML =
 			'<div class="empty small"><b>Memory not connected</b><br/>' + esc(d.note || "") +
 			"<br/><br/>Goals, lessons and the unattended ledger live in abagraph." +
-			"<br/>Start it, or set <code>memory.baseUrl</code> in <code>~/.hit/config.json</code>.</div>";
+			"<br/>Start it, or set <code>memory.baseUrl</code> in <code>~/.ah/config.json</code>.</div>";
 		return;
 	}
 	$("#brain").innerHTML =
 		'<div class="brain-head">namespace <code>' + esc(d.namespace) + "</code></div>" +
 		section("Goals", d.goals.length ? d.goals.map(goalHtml).join("") : emptyRow("no goals yet")) +
 		section("Lessons", d.lessons.length ? d.lessons.map(lessonHtml).join("") : emptyRow("nothing learned yet")) +
-		section("Unattended ledger", d.ledger.length ? d.ledger.map(ledgerHtml).join("") : emptyRow("hit watch has not run"));
+		section("Unattended ledger", d.ledger.length ? d.ledger.map(ledgerHtml).join("") : emptyRow("ah watch has not run"));
 }
 
 function section(title, body) {

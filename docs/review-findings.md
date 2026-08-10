@@ -1,8 +1,8 @@
 # Adversarial review findings (2026-08-11)
 
 Two hostile reviews, one over the memory/verify/goals layer and one over
-unattended `hit watch`, both checked against the real abagraph source rather
-than hit's mock. They found a systemic problem worth stating up front:
+unattended `ah watch`, both checked against the real abagraph source rather
+than ah's mock. They found a systemic problem worth stating up front:
 
 > **The mock is more permissive than the real server, so a green suite is not
 > evidence that a memory-dependent feature works.**
@@ -39,7 +39,7 @@ reproduce the real outcome; `/api/context` still ignores `seeds`; and
 
 1. **Untrusted config from the worked checkout (security).**
    `watch-cmd.ts` → `runCmd({ repo: worktreeDir })` → `loadConfig(dir)` merges
-   `<worktree>/.hit.json` — content controlled by the PR branch being worked.
+   `<worktree>/.ah.json` — content controlled by the PR branch being worked.
    A hostile PR can set `unattended.onUnknownCommand: "allow"` (disabling the
    bash classifier), `verify: ["curl … | sh"]` (executed by the gate), or
    redirect `memory.baseUrl`. **FIXED**: watch resolves config from the
@@ -53,7 +53,7 @@ reproduce the real outcome; `/api/context` still ignores `seeds`; and
    mock honor validity.
 3. **Watch runs write memory into a throwaway namespace.** The run's namespace
    is derived from the temporary worktree path, so outcomes and lessons land
-   in `repo:hit-wt-<tmp>` — never read again — and `observeRun` (reading the
+   in `repo:ah-wt-<tmp>` — never read again — and `observeRun` (reading the
    real repo namespace) always sees nothing, so `runId` is `""`, the verdict
    is always `WARN`, and promotion can never fire.
 4. **CAS task claiming can never succeed on an auth-free server.** Compares are
@@ -94,12 +94,12 @@ reproduce the real outcome; `/api/context` still ignores `seeds`; and
 17. Empty branches are pushed; PRs for the `gh-prs` queue get no `--base`.
 18. `preTurn` has no catch: abagraph dying after bootstrap fails the whole run.
 19. Client-side budget trimming assumes a confidence-ordered response the
-    server only produces when it applied a budget itself (hit omits it).
+    server only produces when it applied a budget itself (ah omits it).
 20. Cross-namespace supersession: with tenants dropped, a functional predicate
     written to two namespaces silently supersedes across them —
     `memory_remember` writes lesson-typed subjects into the repo namespace
     while digestion writes them into `lessons`.
-21. A failed task wedges its goal permanently (no reset path), and `hit goal`
+21. A failed task wedges its goal permanently (no reset path), and `ah goal`
     always plans a new graph instead of resuming an active one.
 22. `/api/verify` is admin-global on a real server (the body tenant is
     ignored), so claims can be satisfied by another namespace's facts.

@@ -2,7 +2,7 @@ import { afterAll, beforeAll, expect, test } from "vitest";
 import type { Agent } from "../src/agent/agent.js";
 import { createAgent } from "../src/agent/agent.js";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { HitConfig } from "../src/config/types.js";
+import type { AhConfig } from "../src/config/types.js";
 import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
 import type { StatsEntry } from "../src/session/entries.js";
 import {
@@ -16,7 +16,7 @@ import {
 let repo: string;
 
 beforeAll(async () => {
-	repo = await setupTestHome("hit-loop-deadline-");
+	repo = await setupTestHome("ah-loop-deadline-");
 });
 
 afterAll(() => {
@@ -25,7 +25,7 @@ afterAll(() => {
 
 const WRAP_PREFIX = "Budget limit reached";
 
-function config(mutate: (cfg: HitConfig) => void): HitConfig {
+function config(mutate: (cfg: AhConfig) => void): AhConfig {
 	const cfg = structuredClone(DEFAULT_CONFIG);
 	mutate(cfg);
 	return cfg;

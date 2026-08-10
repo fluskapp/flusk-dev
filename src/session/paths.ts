@@ -2,9 +2,9 @@ import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { basename, join, resolve } from "node:path";
 
-/** Root of hit's on-disk state; overridable for tests via HIT_HOME. */
-export function hitHome(): string {
-	return process.env.HIT_HOME ?? join(homedir(), ".hit");
+/** Root of ah's on-disk state; overridable for tests via AH_HOME. */
+export function ahHome(): string {
+	return process.env.AH_HOME ?? join(homedir(), ".ah");
 }
 
 /**
@@ -23,7 +23,7 @@ export function repoSlug(repoRoot: string): string {
 }
 
 export function sessionsDir(repoRoot: string): string {
-	return join(hitHome(), "sessions", repoSlug(repoRoot));
+	return join(ahHome(), "sessions", repoSlug(repoRoot));
 }
 
 /** "<compact-iso>-<id>.jsonl" so files sort chronologically. */

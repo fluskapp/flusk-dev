@@ -6,7 +6,7 @@
  */
 import type { MemVerdict, MemoryClient } from "../memory/client-types.js";
 import type { CliOutcome } from "../cli/gate-loop.js";
-import type { HitConfig } from "../config/types.js";
+import type { AhConfig } from "../config/types.js";
 import {
 	bumpNightCount,
 	cooldownUntil,
@@ -32,7 +32,7 @@ export interface WatchDeps {
 	repoNs: string;
 	repoSlug: string;
 	client: MemoryClient;
-	cfg: HitConfig;
+	cfg: AhConfig;
 	now(): number;
 	log(line: string): void;
 	poll(): PollResult;

@@ -11,7 +11,7 @@ import { fakeModel, setupTestHome, teardownTestHome } from "./helpers.js";
 let repo: string;
 
 beforeEach(async () => {
-	repo = await setupTestHome("hit-cli-fb-");
+	repo = await setupTestHome("ah-cli-fb-");
 }, SLOW);
 afterEach(() => teardownTestHome(), SLOW);
 
@@ -73,7 +73,7 @@ test("runs renders a table and prefers the persisted stats reason for status", a
 	done.appendMessage(assistantText("bye"));
 	done.appendStats({ turns: 1, usage, startedAt: "2026-08-10T10:00:00.000Z" }, "completed");
 	done.close();
-	// Last assistant says stopReason "end", but the run actually hit its budget:
+	// Last assistant says stopReason "end", but the run actually ah its budget:
 	// the persisted reason must win over the old stopReason derivation.
 	const capped = Session.create({
 		task: "a very long task name that surely exceeds the table's truncation width",

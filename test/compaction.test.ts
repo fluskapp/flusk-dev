@@ -15,7 +15,7 @@ import { pingTool, setupTestHome, teardownTestHome } from "./helpers.js";
 let repo: string;
 
 beforeAll(async () => {
-	repo = await setupTestHome("hit-compaction-");
+	repo = await setupTestHome("ah-compaction-");
 });
 
 afterAll(() => {

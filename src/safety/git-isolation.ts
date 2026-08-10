@@ -65,12 +65,12 @@ export function startRunBranch(
 			? symbolic.stdout.trim()
 			: gitOrThrow(repoRoot, ["rev-parse", "HEAD"]).trim();
 	const branch = `${prefix}${runId}`;
-	// core.hooksPath=/dev/null: the target repo's hooks must never run under hit.
+	// core.hooksPath=/dev/null: the target repo's hooks must never run under ah.
 	gitOrThrow(repoRoot, ["-c", "core.hooksPath=/dev/null", "checkout", "-q", "-b", branch]);
 	return { branch, originalRef };
 }
 
-/** Commits everything as "hit: turn <turn>". Returns false when there is nothing to commit. */
+/** Commits everything as "ah: turn <turn>". Returns false when there is nothing to commit. */
 export function checkpoint(repoRoot: string, turn: number): boolean {
 	if (gitOrThrow(repoRoot, ["status", "--porcelain"]).trim() === "") return false;
 	gitOrThrow(repoRoot, ["add", "-A"]);
@@ -79,9 +79,9 @@ export function checkpoint(repoRoot: string, turn: number): boolean {
 	// merely failing hook would crash the run.
 	gitOrThrow(repoRoot, [
 		"-c",
-		"user.name=hit",
+		"user.name=ah",
 		"-c",
-		"user.email=hit@localhost",
+		"user.email=ah@localhost",
 		"-c",
 		"commit.gpgsign=false",
 		"-c",
@@ -90,7 +90,7 @@ export function checkpoint(repoRoot: string, turn: number): boolean {
 		"-q",
 		"--no-verify",
 		"-m",
-		`hit: turn ${turn}`,
+		`ah: turn ${turn}`,
 	]);
 	return true;
 }

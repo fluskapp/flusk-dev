@@ -17,7 +17,7 @@ export async function frontier(
 	ns: string,
 	goalId: string,
 ): Promise<string[]> {
-	// Generous limits: the server caps rows before hit filters by namespace,
+	// Generous limits: the server caps rows before ah filters by namespace,
 	// so a default page can contain none of this goal's tasks.
 	const [edges, statuses, deps] = await Promise.all([
 		client.query(ns, { subject: goalId, predicate: "has_task", limit: 500 }),

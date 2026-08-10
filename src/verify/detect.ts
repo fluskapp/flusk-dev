@@ -1,5 +1,5 @@
 /**
- * Verify-command detection. A .hit.json verify[] wins outright; otherwise
+ * Verify-command detection. A .ah.json verify[] wins outright; otherwise
  * package.json scripts, then Cargo.toml, then a Makefile test target.
  * Detected commands persist as coexisting Repo verify_cmd facts
  * (docs/vocabulary.md) so future runs recall them without re-detection.

@@ -1,5 +1,5 @@
 /**
- * The attempt ledger: facts in the `hit` namespace that stop an unattended
+ * The attempt ledger: facts in the `ah` namespace that stop an unattended
  * loop from retrying the same item forever. Attempts are recorded BEFORE the
  * run, so a crash mid-run still leaves a cooldown behind.
  *
@@ -9,7 +9,7 @@
  */
 import type { MemoryClient } from "../memory/client-types.js";
 import { watchFact } from "../memory/facts.js";
-import { HIT_NS } from "../memory/namespaces.js";
+import { AH_NS } from "../memory/namespaces.js";
 
 const HOUR_MS = 3_600_000;
 
@@ -34,7 +34,7 @@ export async function isCoolingDown(
 	// `valid_until`, and abagraph's DEFAULT read only returns facts with none
 	// (core/match.rs), so a plain query finds nothing and every item would
 	// look eligible on every tick — a retry storm.
-	const facts = await client.query(HIT_NS, {
+	const facts = await client.query(AH_NS, {
 		subject: `Item:${key}`,
 		predicate: "cooldown_until",
 		asOf: nowMs,
@@ -47,7 +47,7 @@ export async function isCoolingDown(
 
 /** Past attempts that did not finish cleanly — drives the backoff exponent. */
 export async function failureCount(client: MemoryClient, key: string): Promise<number> {
-	const facts = await client.query(HIT_NS, {
+	const facts = await client.query(AH_NS, {
 		subject: `Item:${key}`,
 		predicate: "failure_count",
 	});
@@ -62,7 +62,7 @@ export async function recordAttempt(
 	nowMs: number,
 	untilIso: string,
 ): Promise<void> {
-	await client.transact(HIT_NS, [
+	await client.transact(AH_NS, [
 		watchFact.attemptedAt(key, new Date(nowMs).toISOString()),
 		watchFact.cooldownUntil(key, untilIso),
 	]);
@@ -75,9 +75,9 @@ export async function recordOutcome(
 	outcome: string,
 	priorFailures = 0,
 ): Promise<void> {
-	await client.transact(HIT_NS, [watchFact.outcome(key, outcome)]);
+	await client.transact(AH_NS, [watchFact.outcome(key, outcome)]);
 	if (outcome !== "completed") {
-		await client.transact(HIT_NS, [watchFact.failureCount(key, priorFailures + 1)]);
+		await client.transact(AH_NS, [watchFact.failureCount(key, priorFailures + 1)]);
 	}
 }
 
@@ -87,7 +87,7 @@ export async function extendCooldown(
 	key: string,
 	untilIso: string,
 ): Promise<void> {
-	await client.transact(HIT_NS, [watchFact.cooldownUntil(key, untilIso)]);
+	await client.transact(AH_NS, [watchFact.cooldownUntil(key, untilIso)]);
 }
 
 /**
@@ -102,7 +102,7 @@ export function nightKey(nowMs: number): string {
 }
 
 export async function nightCount(client: MemoryClient, date: string): Promise<number> {
-	const facts = await client.query(HIT_NS, {
+	const facts = await client.query(AH_NS, {
 		subject: `Night:${date}`,
 		predicate: "runs_count",
 	});
@@ -124,5 +124,5 @@ export async function bumpNightCount(
 		current === 0
 			? undefined // no prior fact to guard against on the first run of a night
 			: [{ subject: `Night:${date}`, predicate: "runs_count", object: String(current) }];
-	await client.transact(HIT_NS, [watchFact.runsCount(date, current + 1)], compares);
+	await client.transact(AH_NS, [watchFact.runsCount(date, current + 1)], compares);
 }

@@ -6,7 +6,7 @@ import { createEventBus } from "../core/events.js";
 import { createMemory } from "../memory/bootstrap.js";
 import { FakeProvider } from "../provider/fake.js";
 import { hasAuth, PiAiProvider } from "../provider/pi-ai.js";
-import { createHitPolicy } from "../safety/hit-policy.js";
+import { createAhPolicy } from "../safety/ah-policy.js";
 import { SessionStore } from "../session/store.js";
 import { sessionsRoot } from "../ui/scan.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
@@ -58,7 +58,7 @@ function currentBranch(repoRoot: string): string | null {
 }
 
 /**
- * `hit resume <path-or-id>` — continue an interrupted session in place: same
+ * `ah resume <path-or-id>` — continue an interrupted session in place: same
  * file, same model, no new isolation branch (the run's branch, if any, is
  * whatever the tree is on; a mismatch only warns).
  */
@@ -92,7 +92,7 @@ export async function resumeCmd(opts: ResumeCmdOpts): Promise<CliOutcome> {
 		task: header.task,
 		repoRoot: header.repoRoot,
 		memory: mem.port,
-		policy: createHitPolicy({ config: cfg, repoRoot: header.repoRoot }),
+		policy: createAhPolicy({ config: cfg, repoRoot: header.repoRoot }),
 		events,
 		config: cfg,
 		sessionPath: path,

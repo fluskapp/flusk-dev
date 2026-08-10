@@ -53,7 +53,7 @@ export class AbagraphMemoryPort implements MemoryPort {
 		try {
 			await digestRun(this.opts.client, this.opts.repoNs, run, this.opts.extractor);
 		} catch (e) {
-			console.error(`hit memory: digestion failed for run ${run.runId}: ${String(e)}`);
+			console.error(`ah memory: digestion failed for run ${run.runId}: ${String(e)}`);
 		}
 	}
 

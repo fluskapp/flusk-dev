@@ -19,11 +19,11 @@ interface BinResult {
 	stderr: string;
 }
 
-/** Executes the built dist binary in a child process with an isolated HIT_HOME. */
+/** Executes the built dist binary in a child process with an isolated AH_HOME. */
 function runBin(args: string[]): Promise<BinResult> {
 	return new Promise((resolve, reject) => {
 		const child = spawn(process.execPath, [bin, ...args], {
-			env: { ...process.env, HIT_HOME: join(tmp, "home") },
+			env: { ...process.env, AH_HOME: join(tmp, "home") },
 		});
 		let stdout = "";
 		let stderr = "";
@@ -39,7 +39,7 @@ function runBin(args: string[]): Promise<BinResult> {
 }
 
 beforeAll(async () => {
-	tmp = await mkdtemp(join(tmpdir(), "hit-cli-bin-"));
+	tmp = await mkdtemp(join(tmpdir(), "ah-cli-bin-"));
 	repo = join(tmp, "repo");
 	await mkdir(repo, { recursive: true });
 	await promisify(execFile)("npm", ["run", "build"], { cwd: root });

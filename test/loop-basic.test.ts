@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, test } from "vitest";
 import { createAgent } from "../src/agent/agent.js";
-import type { HitEvent } from "../src/core/events.js";
+import type { AhEvent } from "../src/core/events.js";
 import type { ModelRef, ToolResultMsg } from "../src/core/types.js";
 import type { MemoryPort, RunRecord, TurnContext } from "../src/memory/port.js";
 import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
@@ -11,7 +11,7 @@ import { Session } from "../src/session/session.js";
 import { readTool } from "../src/tools/read.js";
 
 const model: ModelRef = { provider: "fake", id: "fake-1", contextWindow: 200_000 };
-const EVENT_TYPES: HitEvent["type"][] = [
+const EVENT_TYPES: AhEvent["type"][] = [
 	"run:start",
 	"turn:start",
 	"assistant:delta",
@@ -27,15 +27,15 @@ let tmp: string;
 let repo: string;
 
 beforeAll(async () => {
-	tmp = await mkdtemp(join(tmpdir(), "hit-loop-basic-"));
-	process.env.HIT_HOME = join(tmp, "home");
+	tmp = await mkdtemp(join(tmpdir(), "ah-loop-basic-"));
+	process.env.AH_HOME = join(tmp, "home");
 	repo = join(tmp, "repo");
 	await mkdir(repo, { recursive: true });
 	await writeFile(join(repo, "package.json"), '{\n\t"name": "demo-pkg"\n}\n');
 });
 
 afterAll(() => {
-	delete process.env.HIT_HOME;
+	delete process.env.AH_HOME;
 });
 
 test("full loop: read tool turn then completion", async () => {
@@ -115,7 +115,7 @@ test("full loop: read tool turn then completion", async () => {
 	expect(preTurns[0]?.isFirstTurn).toBe(true);
 	expect(preTurns[1]?.isFirstTurn).toBe(false);
 	expect(provider.requests).toHaveLength(2);
-	expect(provider.requests[0]?.system).toContain("You are hit, an autonomous coding agent.");
+	expect(provider.requests[0]?.system).toContain("You are ah, an autonomous coding agent.");
 	expect(provider.requests[0]?.system).toContain("<memory>this repo is called demo-pkg</memory>");
 	expect(provider.requests[1]?.system).not.toContain("<memory>");
 	agent.session.close();

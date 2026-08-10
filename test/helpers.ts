@@ -12,17 +12,17 @@ export const fakeModel: ModelRef = { provider: "fake", id: "fake-1", contextWind
 
 export const noParams = Type.Object({});
 
-/** Creates a tmpdir, points HIT_HOME inside it, and returns a repo dir path. */
+/** Creates a tmpdir, points AH_HOME inside it, and returns a repo dir path. */
 export async function setupTestHome(prefix: string): Promise<string> {
 	const tmp = await mkdtemp(join(tmpdir(), prefix));
-	process.env.HIT_HOME = join(tmp, "home");
+	process.env.AH_HOME = join(tmp, "home");
 	const repo = join(tmp, "repo");
 	await mkdir(repo, { recursive: true });
 	return repo;
 }
 
 export function teardownTestHome(): void {
-	delete process.env.HIT_HOME;
+	delete process.env.AH_HOME;
 }
 
 export function deferred(): { promise: Promise<void>; resolve: () => void } {

@@ -7,7 +7,7 @@ export interface ModelChoice {
 	id: string;
 }
 
-export interface HitConfig {
+export interface AhConfig {
 	models: Record<TaskKind, ModelChoice>;
 	budgets: {
 		maxTurns: number;
@@ -28,7 +28,7 @@ export interface HitConfig {
 		keepRecentTokens: number;
 	};
 	memory: {
-		/** When true and the server is unreachable, hit warns once and degrades to noopMemory. */
+		/** When true and the server is unreachable, ah warns once and degrades to noopMemory. */
 		enabled: boolean;
 		baseUrl: string;
 		apiKey: string | null;
@@ -62,12 +62,12 @@ export interface HitConfig {
 	};
 }
 
-/** Per-repo <repo>/.hit.json — sections deep-merge over the global config. */
+/** Per-repo <repo>/.ah.json — sections deep-merge over the global config. */
 export interface RepoConfig {
 	models?: Partial<Record<TaskKind, ModelChoice>>;
-	budgets?: Partial<HitConfig["budgets"]>;
-	unattended?: Partial<HitConfig["unattended"]>;
-	isolation?: Partial<HitConfig["isolation"]>;
+	budgets?: Partial<AhConfig["budgets"]>;
+	unattended?: Partial<AhConfig["unattended"]>;
+	isolation?: Partial<AhConfig["isolation"]>;
 	/** Verify commands; when set they win over auto-detection outright. */
 	verify?: string[];
 	/** Override the derived repo:<slug> memory namespace. */

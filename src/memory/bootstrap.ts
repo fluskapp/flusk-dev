@@ -6,8 +6,8 @@
 import { spawn } from "node:child_process";
 import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
-import type { HitConfig, RepoConfig } from "../config/types.js";
-import { hitHome } from "../session/paths.js";
+import type { AhConfig, RepoConfig } from "../config/types.js";
+import { ahHome } from "../session/paths.js";
 import { AbagraphMemoryPort } from "./abagraph-port.js";
 import type { MemoryClient } from "./client-types.js";
 import { createMemoryClient } from "./client.js";
@@ -26,10 +26,10 @@ const SPAWN_POLL_MS = 200;
 const SPAWN_WAIT_MS = 5_000;
 
 /** Detached abagraph server: --bind host:port from baseUrl, --data dir. */
-function spawnServer(mem: HitConfig["memory"]): void {
+function spawnServer(mem: AhConfig["memory"]): void {
 	const url = new URL(mem.baseUrl);
 	const bind = `${url.hostname}:${url.port === "" ? "80" : url.port}`;
-	const data = mem.dataDir ?? join(hitHome(), "memory");
+	const data = mem.dataDir ?? join(ahHome(), "memory");
 	const child = spawn(mem.serverBin as string, ["--bind", bind, "--data", data], {
 		detached: true,
 		stdio: "ignore",
@@ -57,7 +57,7 @@ const defaultWarn = (line: string): void => {
  * `warn` (default: stderr) receives the single degradation line.
  */
 export async function createMemory(
-	cfg: HitConfig,
+	cfg: AhConfig,
 	repoRoot: string,
 	repoConfig?: RepoConfig,
 	warn: (line: string) => void = defaultWarn,

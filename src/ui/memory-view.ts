@@ -1,5 +1,5 @@
 /**
- * What hit knows, assembled for the dashboard: the goal graphs it is working,
+ * What ah knows, assembled for the dashboard: the goal graphs it is working,
  * the lessons it has learned, and the unattended attempt ledger.
  *
  * This is the "what happened overnight" view. Memory is optional, so an
@@ -8,7 +8,7 @@
 import { loadConfig, loadRepoConfig } from "../config/config.js";
 import { createMemoryClient } from "../memory/client.js";
 import type { MemFact, MemoryClient } from "../memory/client-types.js";
-import { HIT_NS, LESSONS_NS, resolveNamespace } from "../memory/namespaces.js";
+import { AH_NS, LESSONS_NS, resolveNamespace } from "../memory/namespaces.js";
 
 export interface TaskView {
 	id: string;
@@ -127,7 +127,7 @@ export async function buildMemoryView(repoRoot: string): Promise<MemoryView> {
 			namespace: ns,
 			goals: buildGoals(await collect(client, ns)),
 			lessons: await collect(client, LESSONS_NS),
-			ledger: buildLedger(await collect(client, HIT_NS)),
+			ledger: buildLedger(await collect(client, AH_NS)),
 		};
 	} catch (e) {
 		return { ...empty, note: e instanceof Error ? e.message : String(e) };

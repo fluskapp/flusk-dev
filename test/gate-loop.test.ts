@@ -10,14 +10,14 @@ import { setupTestHome, teardownTestHome } from "./helpers.js";
 
 let repo: string;
 beforeEach(async () => {
-	repo = await setupTestHome("hit-gate-");
+	repo = await setupTestHome("ah-gate-");
 }, SLOW);
 afterEach(() => teardownTestHome(), SLOW);
 
 /** Scratch repos disable memory: the gate itself is under test here. */
 async function setupVerify(checkSh: string): Promise<void> {
 	await writeFile(
-		join(repo, ".hit.json"),
+		join(repo, ".ah.json"),
 		JSON.stringify({ verify: ["sh check.sh"], memory: { enabled: false } }),
 	);
 	await writeFile(join(repo, "check.sh"), checkSh);
@@ -30,7 +30,7 @@ async function writeScript(turns: unknown[]): Promise<string> {
 }
 
 async function onlySessionContext() {
-	const root = join(process.env.HIT_HOME as string, "sessions");
+	const root = join(process.env.AH_HOME as string, "sessions");
 	const names = (await readdir(root, { recursive: true })) as string[];
 	const files = names.filter((n) => n.endsWith(".jsonl"));
 	expect(files).toHaveLength(1);
@@ -62,9 +62,9 @@ test("gate failure steers the SAME session; the retry attempt fixes it and passe
 }, SLOW);
 
 test("retries exhausted → blocked outcome with the failing command and tail", async () => {
-	await mkdir(process.env.HIT_HOME as string, { recursive: true });
+	await mkdir(process.env.AH_HOME as string, { recursive: true });
 	await writeFile(
-		join(process.env.HIT_HOME as string, "config.json"),
+		join(process.env.AH_HOME as string, "config.json"),
 		JSON.stringify({ verify: { retries: 1 } }),
 	);
 	await setupVerify("echo still broken\nexit 1\n");
@@ -99,7 +99,7 @@ test("--no-verify skips the whole gate even with failing verify commands", async
 }, SLOW);
 
 test("no verify commands detected → the gate is a pass-through no-op", async () => {
-	await writeFile(join(repo, ".hit.json"), JSON.stringify({ memory: { enabled: false } }));
+	await writeFile(join(repo, ".ah.json"), JSON.stringify({ memory: { enabled: false } }));
 	const script = await writeScript([{ message: assistantText("done") }]);
 	const cap = capture();
 	const outcome = await runCmd({ task: "plain", repo, fake: script, quiet: true, out: cap.out });

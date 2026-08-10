@@ -10,17 +10,17 @@ import { uiCmd } from "./ui-cmd.js";
 import { watchCmd } from "./watch-cmd.js";
 
 const USAGE = `Usage:
-  hit run <task> [--model <provider/id>] [--kind <plan|code|review|summarize>]
+  ah run <task> [--model <provider/id>] [--kind <plan|code|review|summarize>]
                  [--max-cost <usd>] [--for <2h|30m>] [--max-turns <n>] [--repo <path>]
                  [--dry] [--no-isolation] [--allow-dirty] [--no-verify] [--quiet]
                  [--fake <script.json>]
-  hit resume <path-or-id> [--steer <msg>] [--fake <script.json>] [--no-verify] [--quiet]
-  hit goal <text> [--repo <path>] [--dry] [--fake <script.json>] [--no-verify] [--quiet]
-  hit goal --list [--repo <path>]
-  hit feedback <good|bad>
-  hit runs [-n <count>]
-  hit watch [--repo <path>] [--once]
-  hit ui [--port <n>] [--no-open]
+  ah resume <path-or-id> [--steer <msg>] [--fake <script.json>] [--no-verify] [--quiet]
+  ah goal <text> [--repo <path>] [--dry] [--fake <script.json>] [--no-verify] [--quiet]
+  ah goal --list [--repo <path>]
+  ah feedback <good|bad>
+  ah runs [-n <count>]
+  ah watch [--repo <path>] [--once]
+  ah ui [--port <n>] [--no-open]
 `;
 
 function fail(message: string): void {
@@ -56,7 +56,7 @@ async function main(): Promise<void> {
 			},
 		});
 	} catch (e) {
-		fail(`hit: ${e instanceof Error ? e.message : String(e)}\n${USAGE}`);
+		fail(`ah: ${e instanceof Error ? e.message : String(e)}\n${USAGE}`);
 		return;
 	}
 	const { values: v, positionals } = parsed;
@@ -65,7 +65,7 @@ async function main(): Promise<void> {
 	if (command === "ui") {
 		const port = v.port === undefined ? 4877 : Number(v.port);
 		if (!Number.isInteger(port) || port < 0 || port > 65535) {
-			return fail("hit: --port must be a valid port number\n");
+			return fail("ah: --port must be a valid port number\n");
 		}
 		await uiCmd({ port, open: v["no-open"] !== true });
 		return;
@@ -79,12 +79,12 @@ async function main(): Promise<void> {
 	}
 	if (command === "runs") {
 		const limit = v.n === undefined ? 20 : Number(v.n);
-		if (!Number.isInteger(limit) || limit <= 0) return fail("hit: -n must be a positive integer\n");
+		if (!Number.isInteger(limit) || limit <= 0) return fail("ah: -n must be a positive integer\n");
 		runsCmd({ limit });
 		return;
 	}
 	if (command === "feedback") {
-		if (arg !== "good" && arg !== "bad") return fail(`hit: feedback takes "good" or "bad"\n`);
+		if (arg !== "good" && arg !== "bad") return fail(`ah: feedback takes "good" or "bad"\n`);
 		await feedbackCmd({ good: arg === "good" });
 		return;
 	}
@@ -121,5 +121,5 @@ async function main(): Promise<void> {
 }
 
 main().catch((e) => {
-	fail(`hit: ${e instanceof Error ? e.message : String(e)}\n`);
+	fail(`ah: ${e instanceof Error ? e.message : String(e)}\n`);
 });

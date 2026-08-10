@@ -20,7 +20,7 @@ function ctx(): ToolContext {
 }
 
 beforeAll(async () => {
-	dir = await mkdtemp(join(tmpdir(), "hit-read-"));
+	dir = await mkdtemp(join(tmpdir(), "ah-read-"));
 	await writeFile(join(dir, "lines.txt"), "first\nsecond\nthird\nfourth\n");
 });
 

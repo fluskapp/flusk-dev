@@ -17,7 +17,7 @@ const git = (args: string[], cwd = repo): string =>
 	execFileSync("git", args, { cwd, encoding: "utf8" });
 
 beforeEach(() => {
-	repo = mkdtempSync(join(tmpdir(), "hit-wt-repo-"));
+	repo = mkdtempSync(join(tmpdir(), "ah-wt-repo-"));
 	git(["init", "-q", "-b", "main"]);
 	git(["config", "user.email", "t@t"]);
 	git(["config", "user.name", "t"]);
@@ -27,44 +27,44 @@ beforeEach(() => {
 });
 
 it("sanitizes item keys into legal branch names", () => {
-	expect(branchFor("hit/", "gh-prs-7")).toBe("hit/gh-prs-7");
-	expect(branchFor("hit/", "weird key/../..")).toBe("hit/weird-key");
-	expect(branchFor("hit/", "!!!")).toBe("hit/item");
+	expect(branchFor("ah/", "gh-prs-7")).toBe("ah/gh-prs-7");
+	expect(branchFor("ah/", "weird key/../..")).toBe("ah/weird-key");
+	expect(branchFor("ah/", "!!!")).toBe("ah/item");
 });
 
 it("gives each item its own checkout and branch, then cleans up", () => {
-	const wt = createWorktree(repo, "hit/item-a");
+	const wt = createWorktree(repo, "ah/item-a");
 	expect(existsSync(wt.dir)).toBe(true);
-	expect(currentBranch(wt.dir)).toBe("hit/item-a");
+	expect(currentBranch(wt.dir)).toBe("ah/item-a");
 	// The main tree is untouched by work in the worktree.
 	expect(currentBranch(repo)).toBe("main");
 
 	writeFileSync(join(wt.dir, "work.txt"), "done");
 	git(["add", "-A"], wt.dir);
 	git(["commit", "-qm", "work"], wt.dir);
-	expect(commitCount(repo, "hit/item-a", "main")).toBe(1);
+	expect(commitCount(repo, "ah/item-a", "main")).toBe(1);
 
 	removeWorktree(repo, wt);
 	expect(existsSync(wt.dir)).toBe(false);
 	// The branch survives removal, so the night's work stays reviewable.
-	expect(git(["branch", "--list", "hit/item-a"]).trim()).toContain("hit/item-a");
+	expect(git(["branch", "--list", "ah/item-a"]).trim()).toContain("ah/item-a");
 });
 
 it("two items get independent worktrees", () => {
-	const a = createWorktree(repo, "hit/item-a");
-	const b = createWorktree(repo, "hit/item-b");
+	const a = createWorktree(repo, "ah/item-a");
+	const b = createWorktree(repo, "ah/item-b");
 	expect(a.dir).not.toBe(b.dir);
 	writeFileSync(join(a.dir, "a.txt"), "a");
 	git(["add", "-A"], a.dir);
 	git(["commit", "-qm", "a"], a.dir);
-	expect(commitCount(repo, "hit/item-a", "main")).toBe(1);
-	expect(commitCount(repo, "hit/item-b", "main")).toBe(0);
+	expect(commitCount(repo, "ah/item-a", "main")).toBe(1);
+	expect(commitCount(repo, "ah/item-b", "main")).toBe(0);
 	removeWorktree(repo, a);
 	removeWorktree(repo, b);
 });
 
 it("reports a clear error when the branch already exists", () => {
-	const a = createWorktree(repo, "hit/dup");
-	expect(() => createWorktree(repo, "hit/dup")).toThrow(/worktree add failed for hit\/dup/);
+	const a = createWorktree(repo, "ah/dup");
+	expect(() => createWorktree(repo, "ah/dup")).toThrow(/worktree add failed for ah\/dup/);
 	removeWorktree(repo, a);
 });

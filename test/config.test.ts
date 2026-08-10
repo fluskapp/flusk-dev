@@ -3,26 +3,26 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { loadConfig } from "../src/config/config.js";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import { hitHome } from "../src/session/paths.js";
+import { ahHome } from "../src/session/paths.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 
 describe("loadConfig", () => {
 	let repo: string;
 
 	beforeEach(async () => {
-		repo = await setupTestHome("hit-config-");
+		repo = await setupTestHome("ah-config-");
 	});
 	afterEach(() => teardownTestHome());
 
 	async function writeGlobal(data: unknown): Promise<string> {
-		await mkdir(hitHome(), { recursive: true });
-		const path = join(hitHome(), "config.json");
+		await mkdir(ahHome(), { recursive: true });
+		const path = join(ahHome(), "config.json");
 		await writeFile(path, typeof data === "string" ? data : JSON.stringify(data));
 		return path;
 	}
 
 	async function writeRepo(data: unknown): Promise<string> {
-		const path = join(repo, ".hit.json");
+		const path = join(repo, ".ah.json");
 		await writeFile(path, typeof data === "string" ? data : JSON.stringify(data));
 		return path;
 	}
@@ -34,7 +34,7 @@ describe("loadConfig", () => {
 		expect(cfg.models.summarize).toEqual({ provider: "anthropic", id: "claude-haiku-4-5" });
 		expect(cfg.budgets).toEqual({ maxTurns: 100, maxCostUsd: 10, deadlineMinutes: null });
 		expect(cfg.unattended.onUnknownCommand).toBe("deny");
-		expect(cfg.isolation).toEqual({ requireGit: true, branchPrefix: "hit/" });
+		expect(cfg.isolation).toEqual({ requireGit: true, branchPrefix: "ah/" });
 		expect(cfg.compaction).toEqual({ reserveTokens: 16384, keepRecentTokens: 20000 });
 	});
 
@@ -51,7 +51,7 @@ describe("loadConfig", () => {
 		expect(cfg.isolation.requireGit).toBe(true);
 	});
 
-	it("gives repo .hit.json precedence over the global config", async () => {
+	it("gives repo .ah.json precedence over the global config", async () => {
 		await writeGlobal({
 			budgets: { maxTurns: 7, maxCostUsd: 3 },
 			unattended: { onUnknownCommand: "allow" },

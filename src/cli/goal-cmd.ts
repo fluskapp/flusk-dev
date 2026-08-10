@@ -1,7 +1,7 @@
 /**
- * `hit goal <text>`: plan a task graph with the plan-kind model, write it to
+ * `ah goal <text>`: plan a task graph with the plan-kind model, write it to
  * abagraph, then execute frontier tasks one by one — each as a full agent
- * session behind the same verification gate as `hit run`. Requires a live
+ * session behind the same verification gate as `ah run`. Requires a live
  * memory client; the goal graph IS memory. `--dry` plans and prints only.
  */
 import { randomUUID } from "node:crypto";
@@ -17,7 +17,7 @@ import { createMemory, type MemorySetup } from "../memory/bootstrap.js";
 import { FakeProvider } from "../provider/fake.js";
 import { hasAuth, PiAiProvider } from "../provider/pi-ai.js";
 import type { Provider } from "../provider/provider.js";
-import { createHitPolicy } from "../safety/hit-policy.js";
+import { createAhPolicy } from "../safety/ah-policy.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import { allTasksDone, renderGoalList, taskDescription } from "./goal-list.js";
 import { runTask } from "./goal-task.js";
@@ -51,14 +51,14 @@ export async function goalCmd(opts: GoalCmdOpts): Promise<CliOutcome> {
 	const mem = await createMemory(cfg, opts.repo, loadRepoConfig(opts.repo));
 	if (mem.client === null) {
 		throw new Error(
-			`hit goal needs a reachable abagraph memory server (memory.enabled + ${cfg.memory.baseUrl})`,
+			`ah goal needs a reachable abagraph memory server (memory.enabled + ${cfg.memory.baseUrl})`,
 		);
 	}
 	if (opts.list === true) {
 		out.write(await renderGoalList(mem.client, mem.ns));
 		return "completed";
 	}
-	if (opts.goal === undefined) throw new Error("hit goal needs <text> or --list");
+	if (opts.goal === undefined) throw new Error("ah goal needs <text> or --list");
 	const isFake = opts.fake !== undefined;
 	const planModel = isFake ? fakeModel : await pickModel(cfg, "plan");
 	if (!isFake && !(await hasAuth(planModel.provider))) {

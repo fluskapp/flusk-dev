@@ -43,7 +43,7 @@ function renderList(list) {
 	});
 	$("#list").innerHTML = html || (query
 		? '<div class="empty small">No matches for \\u201c' + esc(query) + '\\u201d</div>'
-		: '<div class="empty small">No sessions yet.<br/>Run: <code>hit run "task"</code></div>');
+		: '<div class="empty small">No sessions yet.<br/>Run: <code>ah run "task"</code></div>');
 	$("#count").textContent = shown.length + (query ? "/" + list.length : "") +
 		" session" + (list.length === 1 ? "" : "s");
 	Array.prototype.forEach.call(document.querySelectorAll("#list .row"), function (el) {
@@ -75,11 +75,11 @@ function toggleTheme() {
 	var osDark = matchMedia("(prefers-color-scheme: dark)").matches;
 	var next = cur === "dark" ? "light" : cur === "light" ? "dark" : osDark ? "light" : "dark";
 	document.documentElement.setAttribute("data-theme", next);
-	localStorage.setItem("hit-theme", next);
+	localStorage.setItem("ah-theme", next);
 }
 
 (function init() {
-	var saved = localStorage.getItem("hit-theme");
+	var saved = localStorage.getItem("ah-theme");
 	if (saved) document.documentElement.setAttribute("data-theme", saved);
 	$("#theme").addEventListener("click", toggleTheme);
 	var hash = location.hash.slice(1);
@@ -87,7 +87,7 @@ function toggleTheme() {
 	loadList(false);
 	setInterval(function () { loadList(false); }, 4000);
 	setInterval(function () {
-		if (current && window.__hitStatus === "running") loadDetail(false);
+		if (current && window.__ahStatus === "running") loadDetail(false);
 	}, 4000);
 })();
 `;

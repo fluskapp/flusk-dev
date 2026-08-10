@@ -14,9 +14,9 @@ let ui: UiServer;
 const model = { provider: "fake", id: "fake-1", contextWindow: 200_000 };
 
 beforeAll(async () => {
-	home = mkdtempSync(join(tmpdir(), "hit-ui-home-"));
-	repo = mkdtempSync(join(tmpdir(), "hit-ui-repo-"));
-	process.env.HIT_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "ah-ui-home-"));
+	repo = mkdtempSync(join(tmpdir(), "ah-ui-repo-"));
+	process.env.AH_HOME = home;
 	const s = Session.create({ task: "polish the dashboard", repoRoot: repo, model });
 	s.appendMessage({ role: "user", content: "polish the dashboard" });
 	s.appendMessage({
@@ -46,7 +46,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
 	await ui.close();
-	delete process.env.HIT_HOME;
+	delete process.env.AH_HOME;
 	rmSync(home, { recursive: true, force: true });
 	rmSync(repo, { recursive: true, force: true });
 });
@@ -64,7 +64,7 @@ it("scan finds the session with derived status and stats", () => {
 
 it("serves the IntelliJ-styled page and the sessions API", async () => {
 	const page = await (await fetch(`${ui.url}/`)).text();
-	expect(page).toContain("<title>hit</title>");
+	expect(page).toContain("<title>ah</title>");
 	expect(page).toContain("JetBrains Mono");
 	expect(page).toContain("data-theme");
 	const list = (await (await fetch(`${ui.url}/api/sessions`)).json()) as unknown[];

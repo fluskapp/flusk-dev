@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join, sep } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { AssistantMsg, ModelRef, Msg, ToolResultMsg, UserMsg } from "../src/core/types.js";
-import { hitHome, repoSlug, sessionsDir } from "../src/session/paths.js";
+import { ahHome, repoSlug, sessionsDir } from "../src/session/paths.js";
 import { Session } from "../src/session/session.js";
 import { SessionStore } from "../src/session/store.js";
 
@@ -15,15 +15,15 @@ let repoRoot: string;
 let prevHome: string | undefined;
 
 beforeEach(async () => {
-	prevHome = process.env.HIT_HOME;
-	home = await mkdtemp(join(tmpdir(), "hit-home-"));
-	repoRoot = await mkdtemp(join(tmpdir(), "hit-repo-"));
-	process.env.HIT_HOME = home;
+	prevHome = process.env.AH_HOME;
+	home = await mkdtemp(join(tmpdir(), "ah-home-"));
+	repoRoot = await mkdtemp(join(tmpdir(), "ah-repo-"));
+	process.env.AH_HOME = home;
 });
 
 afterEach(async () => {
-	if (prevHome === undefined) delete process.env.HIT_HOME;
-	else process.env.HIT_HOME = prevHome;
+	if (prevHome === undefined) delete process.env.AH_HOME;
+	else process.env.AH_HOME = prevHome;
 	await rm(home, { recursive: true, force: true });
 	await rm(repoRoot, { recursive: true, force: true });
 });
@@ -105,11 +105,11 @@ describe("Session", () => {
 		loaded.close();
 	});
 
-	it("stores files under HIT_HOME/sessions/<slug> with a stable slug", async () => {
+	it("stores files under AH_HOME/sessions/<slug> with a stable slug", async () => {
 		const s = Session.create({ task: "t", repoRoot, model });
 		s.close();
 		const dir = sessionsDir(repoRoot);
-		expect(hitHome()).toBe(home);
+		expect(ahHome()).toBe(home);
 		expect(dir.startsWith(join(home, "sessions") + sep)).toBe(true);
 		expect(s.path.startsWith(dir + sep)).toBe(true);
 		expect(s.path.endsWith(`-${s.id}.jsonl`)).toBe(true);
@@ -117,7 +117,7 @@ describe("Session", () => {
 
 		expect(repoSlug(repoRoot)).toBe(repoSlug(repoRoot));
 		expect(repoSlug(repoRoot)).toMatch(/^[a-z0-9-]+-[0-9a-f]{8}$/);
-		const otherRepo = await mkdtemp(join(tmpdir(), "hit-Other Repo!-"));
+		const otherRepo = await mkdtemp(join(tmpdir(), "ah-Other Repo!-"));
 		try {
 			expect(repoSlug(otherRepo)).not.toBe(repoSlug(repoRoot));
 			expect(repoSlug(otherRepo)).toMatch(/^[a-z0-9-]+-[0-9a-f]{8}$/);

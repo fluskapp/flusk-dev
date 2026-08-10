@@ -1,4 +1,4 @@
-import type { HitConfig } from "../config/types.js";
+import type { AhConfig } from "../config/types.js";
 import { classifyCommand } from "./classify.js";
 import { resolveWithin } from "./paths.js";
 import type { Policy, PolicyAction, PolicyDecision } from "./policy.js";
@@ -6,7 +6,7 @@ import type { Policy, PolicyAction, PolicyDecision } from "./policy.js";
 const MAX_SUBAGENT_DEPTH = 2;
 
 export interface HitPolicyOptions {
-	config: HitConfig;
+	config: AhConfig;
 	repoRoot: string;
 	extraWriteRoots?: string[];
 }
@@ -15,7 +15,7 @@ export interface HitPolicyOptions {
  * The real unattended-run policy: bash goes through command classification,
  * file writes through the realpath jail, and subagents through a depth cap.
  */
-export function createHitPolicy(opts: HitPolicyOptions): Policy {
+export function createAhPolicy(opts: HitPolicyOptions): Policy {
 	const writeRoots = [opts.repoRoot, ...(opts.extraWriteRoots ?? [])];
 	return {
 		decide: (action: PolicyAction): PolicyDecision => decide(opts, writeRoots, action),
@@ -48,7 +48,7 @@ function decide(
 	}
 }
 
-function decideBash(config: HitConfig, repoRoot: string, command: string): PolicyDecision {
+function decideBash(config: AhConfig, repoRoot: string, command: string): PolicyDecision {
 	const c = classifyCommand(command, repoRoot);
 	if (c.class === "deny") return { allow: false, reason: `denied: ${c.reason}` };
 	if (c.class === "unknown") {

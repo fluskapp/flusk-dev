@@ -74,10 +74,10 @@ export function evalCompares(store: Store, compares: unknown): unknown[] {
 		const c = raw as Body;
 		// A compare with no tenant matches whatever tenant the fact carries.
 		// core/transact_guards.rs compares tenants strictly, but on the server
-		// hit targets (auth-free, so admin) BOTH the guard and the stored fact
+		// ah targets (auth-free, so admin) BOTH the guard and the stored fact
 		// are untenanted, so they match. This mock stores facts tenanted, so
 		// ignoring an absent compare tenant reproduces the real outcome —
-		// see docs/review-findings.md on why hit sends no tenant on compares.
+		// see docs/review-findings.md on why ah sends no tenant on compares.
 		const active =
 			c.tenant === undefined
 				? store.facts.filter(

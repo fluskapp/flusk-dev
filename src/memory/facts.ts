@@ -1,5 +1,5 @@
 /**
- * Typed builders for every row of docs/vocabulary.md — the ONLY place hit
+ * Typed builders for every row of docs/vocabulary.md — the ONLY place ah
  * spells predicate strings. Coexist flags mirror the vocabulary cardinality
  * column (coexist rows map to abagraph's Coexist conflict policy; functional
  * rows use the default AutoSupersede). Confidence defaults to 1.0

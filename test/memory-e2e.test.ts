@@ -1,7 +1,7 @@
 /**
  * Memory end-to-end across two CLI runs: the first run digests facts into
  * abagraph (mock); the second run's FIRST provider request carries a
- * <memory> block built from them. Config flows through a temp HIT_HOME
+ * <memory> block built from them. Config flows through a temp AH_HOME
  * config.json whose memory.baseUrl points at the mock server.
  */
 import { mkdir, writeFile } from "node:fs/promises";
@@ -17,9 +17,9 @@ import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
 let repo: string;
 let mock: MockAbagraph;
 beforeEach(async () => {
-	repo = await setupTestHome("hit-mem-e2e-");
+	repo = await setupTestHome("ah-mem-e2e-");
 	mock = await startMockAbagraph();
-	const home = process.env.HIT_HOME as string;
+	const home = process.env.AH_HOME as string;
 	await mkdir(home, { recursive: true });
 	await writeFile(
 		join(home, "config.json"),

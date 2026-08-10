@@ -30,7 +30,7 @@ describe("fromPiMessage", () => {
 		expect(msg.usage).toEqual({ input: 100, output: 20, cacheRead: 30, costUsd: 0.33 });
 	});
 
-	it("maps every pi stopReason to a hit stopReason", () => {
+	it("maps every pi stopReason to a ah stopReason", () => {
 		const table: Array<[PiStopReason, StopReason]> = [
 			["stop", "end"],
 			["length", "maxTokens"],
@@ -40,10 +40,10 @@ describe("fromPiMessage", () => {
 			["pending", "error"],
 			["deferred", "error"],
 		];
-		for (const [pi, hit] of table) expect(fromPiStopReason(pi)).toBe(hit);
+		for (const [pi, ah] of table) expect(fromPiStopReason(pi)).toBe(ah);
 	});
 
-	it("maps pi usage to hit usage via cost.total", () => {
+	it("maps pi usage to ah usage via cost.total", () => {
 		expect(fromPiUsage(piUsage())).toEqual({
 			input: 100,
 			output: 20,

@@ -14,7 +14,7 @@ import {
 let repo: string;
 
 beforeAll(async () => {
-	repo = await setupTestHome("hit-loop-endings-");
+	repo = await setupTestHome("ah-loop-endings-");
 });
 
 afterAll(() => {

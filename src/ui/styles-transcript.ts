@@ -27,7 +27,7 @@ export const TRANSCRIPT_CSS = `
 .msg { display: flex; gap: 12px; margin: 14px 0; }
 .msg-tag {
 	flex: none; width: 42px; text-align: right; font-size: 11px; font-weight: 700;
-	padding-top: 2px; color: var(--tag-hit); text-transform: uppercase;
+	padding-top: 2px; color: var(--tag-ah); text-transform: uppercase;
 }
 .msg.user .msg-tag { color: var(--tag-user); }
 .msg-body { min-width: 0; flex: 1; }

@@ -18,7 +18,7 @@ export interface MemoryToolsOpts {
 }
 
 const RECALL_CAP = 15;
-/** Rows requested before hit's client-side namespace filter runs. */
+/** Rows requested before ah's client-side namespace filter runs. */
 const FETCH_CAP = 500;
 const MAX_AGENT_CONFIDENCE = 0.7;
 
@@ -57,7 +57,7 @@ export function memoryTools(client: MemoryClient, opts: MemoryToolsOpts): Tool[]
 					// at 0.7, which abagraph parks below its 0.75 threshold and
 					// hides from default reads — recall would never see it.
 					status: "active,candidate",
-					// Fetch generously: the server caps rows BEFORE hit filters by
+					// Fetch generously: the server caps rows BEFORE ah filters by
 					// namespace, so a small limit can return none of ours.
 					limit: FETCH_CAP,
 				});

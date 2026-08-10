@@ -1,6 +1,6 @@
-import type { HitConfig } from "./types.js";
+import type { AhConfig } from "./types.js";
 
-export const DEFAULT_CONFIG: HitConfig = {
+export const DEFAULT_CONFIG: AhConfig = {
 	models: {
 		plan: { provider: "anthropic", id: "claude-sonnet-5" },
 		code: { provider: "anthropic", id: "claude-sonnet-5" },
@@ -17,7 +17,7 @@ export const DEFAULT_CONFIG: HitConfig = {
 	},
 	isolation: {
 		requireGit: true,
-		branchPrefix: "hit/",
+		branchPrefix: "ah/",
 	},
 	compaction: {
 		reserveTokens: 16384,

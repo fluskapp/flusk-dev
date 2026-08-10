@@ -5,11 +5,11 @@
 #    The aspiration is <= ~100 lines (one concern per file); 150 is the
 #    hard cap this script enforces.
 # 2. Dependency boundary: `@earendil-works/pi-ai` may only be imported from
-#    files matching src/provider/pi-ai*.ts. Everything else uses hit's own
+#    files matching src/provider/pi-ai*.ts. Everything else uses ah's own
 #    types (src/core/types.ts, src/provider/provider.ts).
 # 3. The pi-ai "/compat" entrypoint must never be imported.
 # 4. Dependency boundary: `@abagraph/client` may only be imported under
-#    src/memory/. Everything else uses hit's own types (client-types.ts).
+#    src/memory/. Everything else uses ah's own types (client-types.ts).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -45,7 +45,7 @@ fi
 
 # --- 4. abagraph client import boundary ---------------------------------------
 # The abagraph SDK stays behind the MemoryClient wrapper: only src/memory/
-# may import it. Everything else (tests included) uses the hit-owned types
+# may import it. Everything else (tests included) uses the ah-owned types
 # in src/memory/client-types.ts.
 aba_leaks=$(grep -rln '@abagraph/client' src test --include='*.ts' 2>/dev/null |
 	grep -v '^src/memory/' || true)

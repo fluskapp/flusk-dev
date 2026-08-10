@@ -4,7 +4,7 @@
  * abagraph source they mirror. All requests run as admin (server/auth.rs:
  * no tokens configured → every request is admin), so reads return ALL
  * tenants and write bodies carry their own tenant — exactly the environment
- * hit's MemoryClient wrapper must handle.
+ * ah's MemoryClient wrapper must handle.
  */
 import { createServer } from "node:http";
 import {
@@ -32,7 +32,7 @@ export interface MockOptions {
 	 * documented intent: dto/parse.rs `parse_fact_input` hardcodes
 	 * `tenant: None` and routes/transact.rs `scoped` returns admin asserts
 	 * unchanged, so an auth-free abagraph stores every fact untenanted.
-	 * hit must stay namespace-correct under this — see wire.ts NS_PROP.
+	 * ah must stay namespace-correct under this — see wire.ts NS_PROP.
 	 */
 	dropTenantOnWrite?: boolean;
 }
@@ -78,7 +78,7 @@ export async function startMockAbagraph(opts: MockOptions = {}): Promise<MockAba
 					f.tenant === ns ||
 					(typeof f.properties === "object" &&
 						f.properties !== null &&
-						(f.properties as Record<string, unknown>).hit_ns === ns),
+						(f.properties as Record<string, unknown>).ah_ns === ns),
 			),
 	};
 }

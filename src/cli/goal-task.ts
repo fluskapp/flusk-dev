@@ -9,7 +9,7 @@ import { goalBrief } from "../goals/resume.js";
 import { AbagraphMemoryPort } from "../memory/abagraph-port.js";
 import type { MemorySetup } from "../memory/bootstrap.js";
 import type { Provider } from "../provider/provider.js";
-import { createHitPolicy } from "../safety/hit-policy.js";
+import { createAhPolicy } from "../safety/ah-policy.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import { taskDescription } from "./goal-list.js";
 import type { GoalCmdOpts } from "./goal-cmd.js";
@@ -36,7 +36,7 @@ export async function runTask(
 		repoRoot: opts.repo,
 		// Fresh port per task so each session gets a current <memory> snapshot.
 		memory: new AbagraphMemoryPort({ client, repoNs: env.mem.ns, budgets: cfg.memory.budgets }),
-		policy: createHitPolicy({ config: cfg, repoRoot: opts.repo }),
+		policy: createAhPolicy({ config: cfg, repoRoot: opts.repo }),
 		events,
 		config: cfg,
 		taskKind: "code",

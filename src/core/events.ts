@@ -6,7 +6,7 @@ import type {
 	ToolResultMsg,
 } from "./types.js";
 
-export type HitEvent =
+export type AhEvent =
 	| { type: "run:start"; runId: string; task: string; model: ModelRef }
 	| { type: "turn:start"; turn: number }
 	| { type: "assistant:delta"; text: string; channel: "text" | "thinking" }
@@ -17,8 +17,8 @@ export type HitEvent =
 	| { type: "compaction"; tokensBefore: number; tokensAfter: number }
 	| { type: "run:end"; reason: RunEndReason; stats: RunStats };
 
-type Listener<T extends HitEvent["type"]> = (
-	e: Extract<HitEvent, { type: T }>,
+type Listener<T extends AhEvent["type"]> = (
+	e: Extract<AhEvent, { type: T }>,
 ) => void | Promise<void>;
 
 /**
@@ -26,12 +26,12 @@ type Listener<T extends HitEvent["type"]> = (
  * memory layer, autonomy layer) observe each event before the loop proceeds.
  */
 export interface EventBus {
-	on<T extends HitEvent["type"]>(type: T, fn: Listener<T>): () => void;
-	emit(e: HitEvent): Promise<void>;
+	on<T extends AhEvent["type"]>(type: T, fn: Listener<T>): () => void;
+	emit(e: AhEvent): Promise<void>;
 }
 
 export function createEventBus(): EventBus {
-	const listeners = new Map<string, Set<(e: HitEvent) => void | Promise<void>>>();
+	const listeners = new Map<string, Set<(e: AhEvent) => void | Promise<void>>>();
 	return {
 		on(type, fn) {
 			let set = listeners.get(type);
@@ -39,7 +39,7 @@ export function createEventBus(): EventBus {
 				set = new Set();
 				listeners.set(type, set);
 			}
-			const untyped = fn as (e: HitEvent) => void | Promise<void>;
+			const untyped = fn as (e: AhEvent) => void | Promise<void>;
 			set.add(untyped);
 			return () => {
 				set.delete(untyped);

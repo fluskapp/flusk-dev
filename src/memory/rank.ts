@@ -1,10 +1,10 @@
 /**
  * Client-side budget trimming, mirroring abagraph core/rank.rs.
  *
- * hit cannot let the server apply the token budget: without a tenant scope
+ * ah cannot let the server apply the token budget: without a tenant scope
  * (see wire.ts NS_PROP) the server would spend the budget on other
- * namespaces' facts before hit filters them out. It still ranks by
- * confidence, so hit trims the ranked survivors with the same arithmetic.
+ * namespaces' facts before ah filters them out. It still ranks by
+ * confidence, so ah trims the ranked survivors with the same arithmetic.
  */
 import type { MemFact } from "./client-types.js";
 

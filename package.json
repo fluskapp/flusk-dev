@@ -1,5 +1,5 @@
 {
-	"name": "hit",
+	"name": "ah",
 	"version": "0.1.0",
 	"private": true,
 	"type": "module",
@@ -14,13 +14,13 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/adirbenyossef/hit.git"
+		"url": "git+https://github.com/adirbenyossef/ah.git"
 	},
 	"engines": {
 		"node": ">=22.8"
 	},
 	"bin": {
-		"hit": "./dist/cli/main.js"
+		"ah": "./dist/cli/main.js"
 	},
 	"scripts": {
 		"build": "tsc -p tsconfig.build.json",

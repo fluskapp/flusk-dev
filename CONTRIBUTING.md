@@ -1,6 +1,6 @@
-# Contributing to hit
+# Contributing to ah
 
-Thanks for wanting to help. hit is small on purpose — most of the value is in
+Thanks for wanting to help. ah is small on purpose — most of the value is in
 its contracts staying stable, so please read this page before opening a PR.
 
 ## Dev setup
@@ -8,7 +8,7 @@ its contracts staying stable, so please read this page before opening a PR.
 - Node >= 22 (ESM, `NodeNext` resolution — relative imports end in `.js`)
 - `npm i`
 - `npm test` — the whole suite is offline: FakeProvider scripts, temp dirs via
-  `fs.mkdtemp`, `HIT_HOME` pointed at scratch space. No network, no API keys.
+  `fs.mkdtemp`, `AH_HOME` pointed at scratch space. No network, no API keys.
 - `npm run check` — strict TypeScript, no emit
 - `npm run standards` — file-size cap and dependency-boundary lint
 - `npm run build` then `node dist/cli/main.js …` to try the CLI
@@ -20,7 +20,7 @@ architecture decision — open an issue and get agreement first; never change
 them as a drive-by inside a feature PR:
 
 - `src/core/types.ts` — messages, usage, stop/end reasons
-- `src/core/events.ts` — the event bus and `HitEvent` shapes
+- `src/core/events.ts` — the event bus and `AhEvent` shapes
 - `src/provider/provider.ts` — the Provider port
 - `src/tools/tool.ts` — the Tool interface and dispatch semantics
 - `src/safety/policy.ts` — the Policy port
@@ -35,7 +35,7 @@ them as a drive-by inside a feature PR:
   two files.
 - **Dependencies**: `node:` builtins, `typebox`, and `@earendil-works/pi-ai`
   only. pi-ai may be imported **only** from `src/provider/pi-ai*.ts`; the rest
-  of the codebase uses hit's own types. The pi-ai `/compat` entrypoint is
+  of the codebase uses ah's own types. The pi-ai `/compat` entrypoint is
   banned everywhere.
 - Tabs for indentation; Biome for formatting.
 
@@ -72,9 +72,9 @@ They point in opposite directions — keep them straight:
 - Everything lives in `test/`; reuse the fake-run helpers in
   `test/helpers.ts`.
 - Temp dirs come from `fs.mkdtemp`; session paths are redirected with the
-  `HIT_HOME` env var. `git init`/`add`/`commit` are fine **inside** those
+  `AH_HOME` env var. `git init`/`add`/`commit` are fine **inside** those
   scratch repos (set `user.email`/`user.name` locally); never run mutating
-  git against the hit checkout itself.
+  git against the ah checkout itself.
 - Do not weaken or delete existing tests to make a change pass.
 
 ## Running the dashboard
@@ -84,6 +84,6 @@ npm run build
 node dist/cli/main.js ui        # serves http://127.0.0.1:4877, opens browser on macOS
 ```
 
-`hit ui` reads sessions from `~/.hit/sessions/` (or `$HIT_HOME/sessions/`).
+`ah ui` reads sessions from `~/.ah/sessions/` (or `$AH_HOME/sessions/`).
 Run a task first — e.g. `node dist/cli/main.js run "demo"` — so there is
 something to look at.

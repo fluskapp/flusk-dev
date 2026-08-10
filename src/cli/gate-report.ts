@@ -58,7 +58,7 @@ export async function claimCheck(
 		}
 	}
 	if (check.verdict === "BLOCK") {
-		opts.out.write(`blocked: the completion report is not supported by what hit observed
+		opts.out.write(`blocked: the completion report is not supported by what ah observed
 `);
 		for (const r of check.reasons) opts.out.write(`  - ${r}
 `);

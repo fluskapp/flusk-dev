@@ -31,7 +31,7 @@ const denyWrites: Policy = {
 };
 
 beforeAll(async () => {
-	dir = await mkdtemp(join(tmpdir(), "hit-write-edit-"));
+	dir = await mkdtemp(join(tmpdir(), "ah-write-edit-"));
 });
 
 afterAll(async () => {

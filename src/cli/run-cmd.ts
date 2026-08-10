@@ -2,14 +2,14 @@ import { randomUUID } from "node:crypto";
 import { createAgent } from "../agent/agent.js";
 import { buildSystemPrompt } from "../agent/system-prompt.js";
 import { loadConfig, loadRepoConfig } from "../config/config.js";
-import type { HitConfig, RepoConfig, TaskKind } from "../config/types.js";
+import type { AhConfig, RepoConfig, TaskKind } from "../config/types.js";
 import { createEventBus } from "../core/events.js";
 import { createMemory } from "../memory/bootstrap.js";
 import { FakeProvider } from "../provider/fake.js";
 import { classifyTask } from "../provider/intent.js";
 import { hasAuth, PiAiProvider } from "../provider/pi-ai.js";
 import { ensureCleanTree, isGitRepo, startRunBranch, summarizeRun } from "../safety/git-isolation.js";
-import { createHitPolicy } from "../safety/hit-policy.js";
+import { createAhPolicy } from "../safety/ah-policy.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import { attachRenderer } from "./render.js";
 import { DEFAULT_TOOLS, demoScript, envKeyVar, fakeModel, loadFakeScript, pickModel } from "./run-support.js";
@@ -37,15 +37,15 @@ export interface RunCmdOpts {
 	quiet?: boolean;
 	out?: NodeJS.WritableStream;
 	/**
-	 * Config resolved by the caller, used INSTEAD of reading `<repo>/.hit.json`.
+	 * Config resolved by the caller, used INSTEAD of reading `<repo>/.ah.json`.
 	 * Unattended mode passes this because its `repo` is a worktree of a branch
-	 * under review: a hostile `.hit.json` there could otherwise disable the
+	 * under review: a hostile `.ah.json` there could otherwise disable the
 	 * command classifier, add a verify command to execute, or redirect memory.
 	 */
-	trustedConfig?: { cfg: HitConfig; repoConfig: RepoConfig | undefined; namespace?: string };
+	trustedConfig?: { cfg: AhConfig; repoConfig: RepoConfig | undefined; namespace?: string };
 }
 
-/** Phase 3 run command: config → routed model, hit policy, git isolation,
+/** Phase 3 run command: config → routed model, ah policy, git isolation,
  * memory bootstrap, then the run + verification gate. Never calls
  * process.exit; returns the CLI outcome ("blocked" = gate failure, exit 1). */
 export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
@@ -82,7 +82,7 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 	}
 	let isolation: { branch: string; originalRef: string } | undefined;
 	if (!inRepo && opts.noIsolation !== true && !isFake && cfg.isolation.requireGit) {
-		throw new Error(`${opts.repo} is not a git repository; hit isolates runs on a branch (pass --no-isolation to override)`);
+		throw new Error(`${opts.repo} is not a git repository; ah isolates runs on a branch (pass --no-isolation to override)`);
 	}
 	if (inRepo && opts.noIsolation !== true) {
 		if (opts.allowDirty !== true) ensureCleanTree(opts.repo);
@@ -102,7 +102,7 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 		task: opts.task,
 		repoRoot: opts.repo,
 		memory: mem.port,
-		policy: createHitPolicy({ config: cfg, repoRoot: opts.repo }),
+		policy: createAhPolicy({ config: cfg, repoRoot: opts.repo }),
 		events,
 		config: cfg,
 		taskKind: kind,

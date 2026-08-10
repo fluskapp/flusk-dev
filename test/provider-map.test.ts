@@ -28,7 +28,7 @@ const tools: ToolSchemaJson[] = [
 ];
 
 describe("toPiContext", () => {
-	it("maps hit messages to pi shapes with timestamps", () => {
+	it("maps ah messages to pi shapes with timestamps", () => {
 		const ctx = toPiContext("sys prompt", hitMsgs, tools);
 		expect(ctx.systemPrompt).toBe("sys prompt");
 		expect(ctx.messages).toHaveLength(3);
@@ -66,7 +66,7 @@ describe("toPiContext", () => {
 		expect(empty.tools).toBeUndefined();
 	});
 
-	it("round-trips assistant stopReasons hit → pi", () => {
+	it("round-trips assistant stopReasons ah → pi", () => {
 		const table: Array<[StopReason, PiStopReason]> = [
 			["end", "stop"],
 			["maxTokens", "length"],
@@ -74,11 +74,11 @@ describe("toPiContext", () => {
 			["error", "error"],
 			["aborted", "aborted"],
 		];
-		for (const [hit, pi] of table) {
+		for (const [ah, pi] of table) {
 			const msg: AssistantMsg = {
 				role: "assistant",
 				content: [],
-				stopReason: hit,
+				stopReason: ah,
 				usage: { input: 0, output: 0, cacheRead: 0, costUsd: 0 },
 			};
 			const ctx = toPiContext("s", [msg], []);

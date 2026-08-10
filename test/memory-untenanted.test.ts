@@ -1,5 +1,5 @@
 /**
- * Regression: hit must stay namespace-correct against an auth-free abagraph.
+ * Regression: ah must stay namespace-correct against an auth-free abagraph.
  *
  * Such a server (no ABAGRAPH_TOKENS → every request is admin) stores facts
  * UNTENANTED: dto/parse.rs `parse_fact_input` hardcodes `tenant: None` and
@@ -37,7 +37,7 @@ it("stores facts untenanted, exactly like the real admin write path", () => {
 	const stored = mock.dump(NS_A);
 	expect(stored).toHaveLength(1);
 	expect(stored[0]?.tenant).toBeUndefined();
-	expect((stored[0]?.properties as Record<string, unknown>).hit_ns).toBe(NS_A);
+	expect((stored[0]?.properties as Record<string, unknown>).ah_ns).toBe(NS_A);
 });
 
 it("query isolates namespaces despite the dropped tenant", async () => {

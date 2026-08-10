@@ -27,7 +27,7 @@ function sh(cwd: string, args: string[]): string {
 }
 
 async function scratchDir(): Promise<string> {
-	const dir = await mkdtemp(join(tmpdir(), "hit-git-"));
+	const dir = await mkdtemp(join(tmpdir(), "ah-git-"));
 	dirs.push(dir);
 	return dir;
 }
@@ -77,18 +77,18 @@ describe("git isolation", () => {
 	it("startRunBranch records the current branch and switches to the run branch", async () => {
 		const repo = await scratchRepo();
 		const before = sh(repo, ["symbolic-ref", "--short", "HEAD"]);
-		const { branch, originalRef } = startRunBranch(repo, "run1", "hit/");
-		expect(branch).toBe("hit/run1");
+		const { branch, originalRef } = startRunBranch(repo, "run1", "ah/");
+		expect(branch).toBe("ah/run1");
 		expect(originalRef).toBe(before);
-		expect(sh(repo, ["symbolic-ref", "--short", "HEAD"])).toBe("hit/run1");
+		expect(sh(repo, ["symbolic-ref", "--short", "HEAD"])).toBe("ah/run1");
 	});
 
 	it("startRunBranch from detached HEAD records the SHA", async () => {
 		const repo = await scratchRepo();
 		const sha = sh(repo, ["rev-parse", "HEAD"]);
 		sh(repo, ["checkout", "-q", "--detach"]);
-		const { branch, originalRef } = startRunBranch(repo, "run2", "hit/");
-		expect(branch).toBe("hit/run2");
+		const { branch, originalRef } = startRunBranch(repo, "run2", "ah/");
+		expect(branch).toBe("ah/run2");
 		expect(originalRef).toBe(sha);
 		expect(originalRef).toMatch(/^[0-9a-f]{40}$/);
 	});
@@ -99,12 +99,12 @@ describe("git isolation", () => {
 		expect(sh(repo, ["rev-list", "--count", "HEAD"])).toBe("1");
 	});
 
-	it("checkpoint commits with the hit identity and message format", async () => {
+	it("checkpoint commits with the ah identity and message format", async () => {
 		const repo = await scratchRepo();
 		await writeFile(join(repo, "work.txt"), "w\n");
 		expect(checkpoint(repo, 3)).toBe(true);
 		expect(sh(repo, ["log", "-1", "--format=%s|%an|%ae"])).toBe(
-			"hit: turn 3|hit|hit@localhost",
+			"ah: turn 3|ah|ah@localhost",
 		);
 		expect(sh(repo, ["status", "--porcelain"])).toBe("");
 	});
@@ -119,16 +119,16 @@ describe("git isolation", () => {
 				{ mode: 0o755 },
 			);
 		}
-		startRunBranch(repo, "hooked", "hit/");
+		startRunBranch(repo, "hooked", "ah/");
 		await writeFile(join(repo, "w.txt"), "w\n");
 		expect(checkpoint(repo, 1)).toBe(true); // a failing pre-commit hook must not crash it
 		expect(existsSync(marker)).toBe(false); // ...and no hook code ever executed
-		expect(sh(repo, ["log", "-1", "--format=%s"])).toBe("hit: turn 1");
+		expect(sh(repo, ["log", "-1", "--format=%s"])).toBe("ah: turn 1");
 	});
 
 	it("summarizeRun counts commits and points at the review diff", async () => {
 		const repo = await scratchRepo();
-		const { branch, originalRef } = startRunBranch(repo, "run3", "hit/");
+		const { branch, originalRef } = startRunBranch(repo, "run3", "ah/");
 		await writeFile(join(repo, "a.txt"), "a\n");
 		checkpoint(repo, 1);
 		await writeFile(join(repo, "b.txt"), "b\n");

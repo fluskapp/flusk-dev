@@ -1,5 +1,5 @@
 /**
- * Wire-shape mapping between hit's MemFact types and the abagraph REST JSON.
+ * Wire-shape mapping between ah's MemFact types and the abagraph REST JSON.
  * SDK types are extended via intersection/Omit — never mutated. Internal to
  * src/memory/; nothing outside imports it.
  */
@@ -26,9 +26,9 @@ export type WireFactInput = Omit<SdkFactInput, "valid_until"> & {
  * `tenant: None` ("server stamps from auth context"), and `scoped` returns
  * admin asserts unchanged — so on an auth-free (admin) server every fact
  * lands untenanted and tenant-filtered reads would match nothing. Tagging
- * our own namespace keeps hit correct on both admin and per-token servers.
+ * our own namespace keeps ah correct on both admin and per-token servers.
  */
-export const NS_PROP = "hit_ns";
+export const NS_PROP = "ah_ns";
 
 export function toWire(ns: string, f: MemFactInput): WireFactInput {
 	return {
@@ -47,7 +47,7 @@ export function toWire(ns: string, f: MemFactInput): WireFactInput {
 	};
 }
 
-/** Wire timestamps are unix-ms; hit's MemFact carries ISO strings. */
+/** Wire timestamps are unix-ms; ah's MemFact carries ISO strings. */
 function isoOf(v: unknown): string | undefined {
 	if (typeof v === "number") return new Date(v).toISOString();
 	return typeof v === "string" ? v : undefined;

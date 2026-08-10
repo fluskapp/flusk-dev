@@ -9,7 +9,7 @@ import { pingTool, setupTestHome, teardownTestHome } from "./helpers.js";
 let repo: string;
 
 beforeAll(async () => {
-	repo = await setupTestHome("hit-compaction-fail-");
+	repo = await setupTestHome("ah-compaction-fail-");
 });
 
 afterAll(() => {

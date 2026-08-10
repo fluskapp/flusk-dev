@@ -32,13 +32,13 @@ export function renderPage(home: string): string {
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>hit</title>
+<title>ah</title>
 <style>${THEME_CSS}${CHROME_CSS}${TRANSCRIPT_CSS}${WIDGETS_CSS}</style>
 </head>
 <body>
 <div id="app">
 	<header id="toolbar">
-		<div class="logo">hit</div>
+		<div class="logo">ah</div>
 		<div class="crumb">sessions</div>
 		<div class="spacer"></div>
 		<span id="count" class="dim small"></span>
@@ -63,7 +63,7 @@ export function renderPage(home: string): string {
 	<footer id="status">
 		<span class="dim">${escapeHtml(home)}</span>
 		<div class="spacer"></div>
-		<span class="dim">hit v0.1.0</span>
+		<span class="dim">ah v0.1.0</span>
 	</footer>
 </div>
 <div id="toast" hidden></div>

@@ -13,11 +13,11 @@ let mock: MockAbagraph;
 let ns: string;
 
 beforeEach(async () => {
-	repo = await setupTestHome("hit-goal-");
+	repo = await setupTestHome("ah-goal-");
 	mock = await startMockAbagraph();
 	ns = `repo:${repoSlug(repo)}`;
 	await writeFile(
-		join(repo, ".hit.json"),
+		join(repo, ".ah.json"),
 		JSON.stringify({ memory: { enabled: true, baseUrl: mock.url } }),
 	);
 }, SLOW);
@@ -110,7 +110,7 @@ test("a failing task marks it failed and stops the goal", async () => {
 }, SLOW);
 
 test("goal requires a live memory client", async () => {
-	await writeFile(join(repo, ".hit.json"), JSON.stringify({ memory: { enabled: false } }));
+	await writeFile(join(repo, ".ah.json"), JSON.stringify({ memory: { enabled: false } }));
 	await expect(
 		goalCmd({ goal: "anything", repo, quiet: true, out: capture().out }),
 	).rejects.toThrow(/abagraph memory server/);

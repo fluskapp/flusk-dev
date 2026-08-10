@@ -1,4 +1,4 @@
-import type { HitConfig } from "../config/types.js";
+import type { AhConfig } from "../config/types.js";
 import type { EventBus } from "../core/events.js";
 import type { Limits } from "../core/stop.js";
 import type { ModelRef, RunEndReason, RunStats } from "../core/types.js";
@@ -24,7 +24,7 @@ export interface CreateAgentOpts {
 	/** On resume: injected as a fresh user message after dangling-call repair. */
 	steer?: string;
 	/** Budgets + compaction thresholds; defaults to DEFAULT_CONFIG. */
-	config?: HitConfig;
+	config?: AhConfig;
 	/** Model for compaction summaries; defaults to the main model. */
 	summarizeModel?: ModelRef;
 	/** Routing kind recorded in the session header (plan|code|review|summarize). */

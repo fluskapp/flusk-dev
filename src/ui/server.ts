@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { createServer, type Server, type ServerResponse } from "node:http";
 import { join, resolve } from "node:path";
-import { hitHome } from "../session/paths.js";
+import { ahHome } from "../session/paths.js";
 import { loadSessionDetail } from "./detail.js";
 import { buildMemoryView } from "./memory-view.js";
 import { renderPage } from "./page.js";
@@ -37,7 +37,7 @@ function handle(
 ): void {
 	if (method === "GET" && pathname === "/") {
 		res.writeHead(200, { "content-type": "text/html; charset=utf-8" });
-		res.end(renderPage(hitHome()));
+		res.end(renderPage(ahHome()));
 		return;
 	}
 	if (method === "GET" && pathname === "/api/sessions") {
@@ -55,7 +55,7 @@ function handle(
 	}
 	if (method === "GET" && pathname === "/api/memory") {
 		// `repo` comes from a session the dashboard already listed, so it is a
-		// path hit itself recorded — but resolve it before use regardless.
+		// path ah itself recorded — but resolve it before use regardless.
 		if (repo === null || !repo.startsWith("/")) {
 			json(res, 400, { error: "repo must be an absolute path" });
 			return;

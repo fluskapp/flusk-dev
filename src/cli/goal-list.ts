@@ -29,7 +29,7 @@ async function loadGraph(client: MemoryClient, ns: string): Promise<GraphView> {
 	};
 }
 
-/** `hit goal --list`: goals with title/status plus per-task status lines. */
+/** `ah goal --list`: goals with title/status plus per-task status lines. */
 export async function renderGoalList(client: MemoryClient, ns: string): Promise<string> {
 	const g = await loadGraph(client, ns);
 	if (g.titles.length === 0) return "no goals\n";

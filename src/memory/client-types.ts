@@ -1,7 +1,7 @@
 /**
  * Frozen contract between the abagraph transport (client.ts) and everything
  * that consumes memory (contextpack, digestion, tools, verify, goals).
- * hit-owned shapes; @abagraph/client types stay inside src/memory/.
+ * ah-owned shapes; @abagraph/client types stay inside src/memory/.
  */
 
 export interface MemFact {

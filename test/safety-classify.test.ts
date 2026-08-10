@@ -8,7 +8,7 @@ import { classifyCommand } from "../src/safety/classify.js";
 let repo: string;
 
 beforeAll(async () => {
-	repo = await mkdtemp(join(tmpdir(), "hit-classify-"));
+	repo = await mkdtemp(join(tmpdir(), "ah-classify-"));
 });
 
 /** Attempted bypasses: every row must land on deny or unknown, never read/write. */

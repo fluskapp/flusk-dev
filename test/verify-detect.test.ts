@@ -8,7 +8,7 @@ import { detectVerifyCommands, persistVerifyCommands } from "../src/verify/detec
 import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
 
 async function fixture(files: Record<string, string>): Promise<string> {
-	const dir = await mkdtemp(join(tmpdir(), "hit-detect-"));
+	const dir = await mkdtemp(join(tmpdir(), "ah-detect-"));
 	for (const [name, content] of Object.entries(files)) {
 		await writeFile(join(dir, name), content);
 	}
@@ -18,7 +18,7 @@ async function fixture(files: Record<string, string>): Promise<string> {
 const pkg = (scripts: Record<string, string>) => JSON.stringify({ name: "x", scripts });
 
 describe("detectVerifyCommands", () => {
-	it(".hit.json verify[] wins outright over everything detectable", async () => {
+	it(".ah.json verify[] wins outright over everything detectable", async () => {
 		const dir = await fixture({ "package.json": pkg({ test: "vitest run" }) });
 		expect(detectVerifyCommands(dir, { verify: ["./ci.sh --fast"] })).toEqual(["./ci.sh --fast"]);
 		expect(detectVerifyCommands(dir, { verify: [] })).toEqual([]);

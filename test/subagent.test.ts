@@ -26,7 +26,7 @@ function firstToolResult(context: Msg[]): ToolResultMsg {
 }
 
 test("task tool: child text becomes the result; sessions link; depth caps at 2", async () => {
-	const repo = await setupTestHome("hit-subagent-");
+	const repo = await setupTestHome("ah-subagent-");
 	try {
 		const grandProvider = new FakeProvider([{ message: assistantText("grand done") }]);
 		const childProvider = new FakeProvider([
@@ -98,7 +98,7 @@ test("task tool: child text becomes the result; sessions link; depth caps at 2",
 });
 
 test("task tool: a failing child surfaces as an isError result; parent continues", async () => {
-	const repo = await setupTestHome("hit-subagent-fail-");
+	const repo = await setupTestHome("ah-subagent-fail-");
 	try {
 		const parentProvider = new FakeProvider([
 			{ message: assistantToolCalls([{ id: "t1", name: "task", args: { task: "doomed" } }]) },

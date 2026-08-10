@@ -8,7 +8,7 @@ let repo: string;
 let outside: string;
 
 beforeAll(() => {
-	const tmp = mkdtempSync(join(tmpdir(), "hit-paths-"));
+	const tmp = mkdtempSync(join(tmpdir(), "ah-paths-"));
 	repo = join(tmp, "repo");
 	outside = join(tmp, "outside");
 	mkdirSync(repo, { recursive: true });

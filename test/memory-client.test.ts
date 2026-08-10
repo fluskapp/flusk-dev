@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { MemoryClient } from "../src/memory/client-types.js";
 import { createMemoryClient } from "../src/memory/client.js";
 import { goalFact, isVocabularyPredicate, repoFact, runFact, taskFact, watchFact } from "../src/memory/facts.js";
-import { HIT_NS, LESSONS_NS, repoNs, resolveNamespace } from "../src/memory/namespaces.js";
+import { AH_NS, LESSONS_NS, repoNs, resolveNamespace } from "../src/memory/namespaces.js";
 import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
 
 let mock: MockAbagraph;
@@ -106,12 +106,12 @@ describe("memory client transport", () => {
 });
 
 describe("namespaces and vocabulary", () => {
-	it("derives repo:<slug>, honors the .hit.json override, exposes fixed namespaces", () => {
+	it("derives repo:<slug>, honors the .ah.json override, exposes fixed namespaces", () => {
 		expect(repoNs("/x/y/myrepo")).toMatch(/^repo:myrepo-[0-9a-f]{8}$/);
 		expect(resolveNamespace("/x/y/myrepo")).toBe(repoNs("/x/y/myrepo"));
 		expect(resolveNamespace("/x/y/myrepo", { namespace: "repo:custom" })).toBe("repo:custom");
 		expect(LESSONS_NS).toBe("lessons");
-		expect(HIT_NS).toBe("hit");
+		expect(AH_NS).toBe("ah");
 	});
 
 	it("builders carry vocabulary flags; TTL ephemera are transient", () => {

@@ -1,5 +1,5 @@
 /**
- * Flag validation for `hit run`, kept out of main.ts so the dispatcher stays
+ * Flag validation for `ah run`, kept out of main.ts so the dispatcher stays
  * a readable table of commands. Returns either the options runCmd wants or a
  * message to print.
  */
@@ -25,20 +25,20 @@ const str = (v: unknown): string | undefined => (typeof v === "string" ? v : und
 export function parseRunArgs(task: string, v: Values, cwd: string): ParsedRunArgs {
 	const maxTurns = v["max-turns"] === undefined ? undefined : Number(v["max-turns"]);
 	if (maxTurns !== undefined && (!Number.isInteger(maxTurns) || maxTurns <= 0)) {
-		return { ok: false, error: "hit: --max-turns must be a positive integer\n" };
+		return { ok: false, error: "ah: --max-turns must be a positive integer\n" };
 	}
 	const maxCost = v["max-cost"] === undefined ? undefined : Number(v["max-cost"]);
 	if (maxCost !== undefined && !(maxCost > 0)) {
-		return { ok: false, error: "hit: --max-cost must be a positive number of dollars\n" };
+		return { ok: false, error: "ah: --max-cost must be a positive number of dollars\n" };
 	}
 	const forFlag = str(v.for);
 	const deadlineMs = forFlag !== undefined ? parseDuration(forFlag) : undefined;
 	if (deadlineMs === null) {
-		return { ok: false, error: "hit: --for must look like 2h, 30m, 45s or 1h30m\n" };
+		return { ok: false, error: "ah: --for must look like 2h, 30m, 45s or 1h30m\n" };
 	}
 	const kind = str(v.kind);
 	if (kind !== undefined && !KINDS.has(kind)) {
-		return { ok: false, error: "hit: --kind must be plan, code, review or summarize\n" };
+		return { ok: false, error: "ah: --kind must be plan, code, review or summarize\n" };
 	}
 	const fake = str(v.fake);
 	const model = str(v.model);

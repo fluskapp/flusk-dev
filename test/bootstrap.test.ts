@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 import { runCmd } from "../src/cli/run-cmd.js";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { HitConfig } from "../src/config/types.js";
+import type { AhConfig } from "../src/config/types.js";
 import { AbagraphMemoryPort } from "../src/memory/abagraph-port.js";
 import { createMemory } from "../src/memory/bootstrap.js";
 import { noopMemory } from "../src/memory/port.js";
@@ -14,14 +14,14 @@ import { startMockAbagraph } from "./mock-abagraph.js";
 
 let repo: string;
 beforeEach(async () => {
-	repo = await setupTestHome("hit-bootstrap-");
+	repo = await setupTestHome("ah-bootstrap-");
 }, SLOW);
 afterEach(() => teardownTestHome(), SLOW);
 
 /** Nothing listens on the discard port; health fails fast. */
 const DEAD_URL = "http://127.0.0.1:9";
 
-function cfgWith(memory: Partial<HitConfig["memory"]>): HitConfig {
+function cfgWith(memory: Partial<AhConfig["memory"]>): AhConfig {
 	const cfg = structuredClone(DEFAULT_CONFIG);
 	cfg.memory = { ...cfg.memory, ...memory };
 	return cfg;
@@ -63,7 +63,7 @@ test("reachable server → AbagraphMemoryPort + client bound to the resolved nam
 		const cfg = cfgWith({ enabled: true, baseUrl: mock.url });
 		const mem = await createMemory(cfg, repo, { namespace: "repo:custom" }, (l) => warnings.push(l));
 		expect(mem.port).toBeInstanceOf(AbagraphMemoryPort);
-		expect(mem.ns).toBe("repo:custom"); // .hit.json namespace override wins
+		expect(mem.ns).toBe("repo:custom"); // .ah.json namespace override wins
 		expect(warnings).toEqual([]);
 		// namespace discipline: writes through the returned client are stamped
 		await mem.client?.transact(mem.ns, [
@@ -77,7 +77,7 @@ test("reachable server → AbagraphMemoryPort + client bound to the resolved nam
 
 test("run with memory enabled but unreachable warns on stderr and still completes", async () => {
 	await writeFile(
-		join(repo, ".hit.json"),
+		join(repo, ".ah.json"),
 		JSON.stringify({ memory: { enabled: true, baseUrl: DEAD_URL } }),
 	);
 	const err = spyStderr();
@@ -94,7 +94,7 @@ test("run with memory enabled but unreachable warns on stderr and still complete
 
 test("quiet run keeps stderr clean even while memory degrades", async () => {
 	await writeFile(
-		join(repo, ".hit.json"),
+		join(repo, ".ah.json"),
 		JSON.stringify({ memory: { enabled: true, baseUrl: DEAD_URL } }),
 	);
 	const err = spyStderr();

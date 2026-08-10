@@ -1,11 +1,11 @@
 /**
  * Per-task-kind model benchmarks (linof learn.js parity). Scores live in
- * <hitHome>/benchmarks.json as { [kind]: { "provider/id": score } }.
+ * <ahHome>/benchmarks.json as { [kind]: { "provider/id": score } }.
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import type { TaskKind } from "../config/types.js";
-import { hitHome } from "../session/paths.js";
+import { ahHome } from "../session/paths.js";
 
 export type Scores = Partial<Record<TaskKind, Record<string, number>>>;
 
@@ -16,7 +16,7 @@ const REWARD = 0.05;
 const PENALTY = 0.1;
 
 export function scoresPath(): string {
-	return join(hitHome(), "benchmarks.json");
+	return join(ahHome(), "benchmarks.json");
 }
 
 /** Missing or malformed benchmarks file reads as empty scores. */

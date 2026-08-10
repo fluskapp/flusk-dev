@@ -23,7 +23,7 @@ function run(
 }
 
 const BODY_NOTE =
-	"Opened by [hit](https://github.com/adirbenyossef/hit) running unattended. " +
+	"Opened by [ah](https://github.com/adirbenyossef/ah) running unattended. " +
 	"Every commit is a per-turn checkpoint and the run passed its verification gate.";
 
 /** Push the branch and open a PR for it. Never throws; reports what happened. */
@@ -49,7 +49,7 @@ export function publish(
 			// diff would be against the default branch and include the original.
 			...(opts.base !== undefined && opts.base !== "" ? ["--base", opts.base] : []),
 			"--title",
-			`hit: ${item.title}`.slice(0, 120),
+			`ah: ${item.title}`.slice(0, 120),
 			"--body",
 			`Working ${item.queue} item \`${item.key}\`.\n\n${BODY_NOTE}`,
 		],

@@ -14,14 +14,14 @@ let tmp: string;
 let repo: string;
 
 beforeAll(async () => {
-	tmp = await mkdtemp(join(tmpdir(), "hit-cli-"));
-	process.env.HIT_HOME = join(tmp, "home");
+	tmp = await mkdtemp(join(tmpdir(), "ah-cli-"));
+	process.env.AH_HOME = join(tmp, "home");
 	repo = join(tmp, "repo");
 	await mkdir(repo, { recursive: true });
 });
 
 afterAll(() => {
-	delete process.env.HIT_HOME;
+	delete process.env.AH_HOME;
 });
 
 function capture(): { out: PassThrough; text: () => string } {
@@ -34,7 +34,7 @@ function capture(): { out: PassThrough; text: () => string } {
 }
 
 async function sessionFiles(): Promise<string[]> {
-	const root = join(process.env.HIT_HOME as string, "sessions");
+	const root = join(process.env.AH_HOME as string, "sessions");
 	const names = (await readdir(root, { recursive: true })) as string[];
 	return names.filter((n) => n.endsWith(".jsonl")).map((n) => join(root, n));
 }
@@ -78,7 +78,7 @@ test("built-in demo script completes", async () => {
 	const cap = capture();
 	const reason = await runCmd({ task: "demo", repo, out: cap.out });
 	expect(reason).toBe("completed");
-	expect(cap.text()).toContain("→ bash: echo hello from hit");
+	expect(cap.text()).toContain("→ bash: echo hello from ah");
 	expect(cap.text()).toContain("Demo complete");
 	expect(cap.text()).toContain("done completed");
 });

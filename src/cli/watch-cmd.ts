@@ -1,5 +1,5 @@
 /**
- * `hit watch` — unattended mode. Wires the real dependencies (gh queues, git
+ * `ah watch` — unattended mode. Wires the real dependencies (gh queues, git
  * worktrees, runCmd, the abagraph ledger) into the injectable watch loop.
  *
  * Memory is REQUIRED here: the attempt ledger and cooldowns are facts, and
@@ -43,9 +43,9 @@ export async function watchCmd(opts: WatchCmdOpts): Promise<number> {
 	const { client } = await createMemory(cfg, opts.repo, repoConfig);
 	if (client === null) {
 		process.stderr.write(
-			"hit watch needs memory: the attempt ledger lives in abagraph, and without it " +
+			"ah watch needs memory: the attempt ledger lives in abagraph, and without it " +
 				"an unattended loop would retry the same item forever.\n" +
-				"Start abagraph (or set memory.baseUrl in ~/.hit/config.json) and try again.\n",
+				"Start abagraph (or set memory.baseUrl in ~/.ah/config.json) and try again.\n",
 		);
 		return 1;
 	}

@@ -103,7 +103,7 @@ export function pollGhFailingCi(repoRoot: string, limit = 20, scope = ""): PollR
 
 /** Poll every configured queue; oldest item first across all of them. */
 export function pollQueues(repoRoot: string, queues: string[], repoSlug = ""): PollResult {
-	// Ledger keys are global in the `hit` namespace, so they carry the repo:
+	// Ledger keys are global in the `ah` namespace, so they carry the repo:
 	// otherwise PR #7 in two repos would share one cooldown and failure count.
 	const scope = repoSlug === "" ? "" : `${repoSlug}/`;
 	const items: WorkItem[] = [];

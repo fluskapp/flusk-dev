@@ -91,12 +91,12 @@ export function createMemoryClient(opts: MemoryClientOptions): MemoryClient {
 			// No body tenant on purpose. routes/context.rs keeps it for admin and
 			// core/acl.rs ReadScope::allows then drops every fact whose tenant
 			// differs — including the untenanted ones an auth-free server writes
-			// (see wire.ts NS_PROP), which would hide all of hit's own memory.
+			// (see wire.ts NS_PROP), which would hide all of ah's own memory.
 			// Non-admin auth overwrites the body value anyway, so omitting it is
 			// correct on both server modes; isolation comes from inNs below.
 			// Nor a token_budget: the server would spend it on other namespaces'
 			// facts before inNs runs, starving this one. It still ranks by
-			// confidence, so hit trims the ranked survivors itself.
+			// confidence, so ah trims the ranked survivors itself.
 			const out = (await post("/api/context", {
 				goal: req.goal,
 				seeds: req.seeds,

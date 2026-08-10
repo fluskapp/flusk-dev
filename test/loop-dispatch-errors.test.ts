@@ -6,7 +6,7 @@ import { makeTool, runToolBatch, setupTestHome, teardownTestHome } from "./helpe
 let repo: string;
 
 beforeAll(async () => {
-	repo = await setupTestHome("hit-loop-dispatch-errors-");
+	repo = await setupTestHome("ah-loop-dispatch-errors-");
 });
 
 afterAll(() => {

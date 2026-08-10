@@ -23,8 +23,8 @@ function gitInit(repo: string): void {
 	sh(repo, ["commit", "-q", "--allow-empty", "-m", "seed"]);
 }
 
-test("isolation: a mutating turn is checkpointed as 'hit: turn N'", async () => {
-	const repo = await setupTestHome("hit-checkpoint-");
+test("isolation: a mutating turn is checkpointed as 'ah: turn N'", async () => {
+	const repo = await setupTestHome("ah-checkpoint-");
 	try {
 		gitInit(repo);
 		const provider = new FakeProvider([
@@ -44,13 +44,13 @@ test("isolation: a mutating turn is checkpointed as 'hit: turn N'", async () => 
 			task: "make a note",
 			repoRoot: repo,
 			memory,
-			isolation: { repoRoot: repo, branch: "hit/test" },
+			isolation: { repoRoot: repo, branch: "ah/test" },
 		});
 		const { reason } = await agent.run();
 		expect(reason).toBe("completed");
 
 		const subjects = sh(repo, ["log", "--format=%s"]).split("\n");
-		expect(subjects).toEqual(["hit: turn 1", "seed"]);
+		expect(subjects).toEqual(["ah: turn 1", "seed"]);
 		// The checkpoint captured the file the write tool produced.
 		expect(sh(repo, ["show", "--name-only", "--format=", "HEAD"])).toContain("note.txt");
 
@@ -65,7 +65,7 @@ test("isolation: a mutating turn is checkpointed as 'hit: turn N'", async () => 
 }, SLOW);
 
 test("isolation: non-mutating turns produce no checkpoint commit", async () => {
-	const repo = await setupTestHome("hit-checkpoint-clean-");
+	const repo = await setupTestHome("ah-checkpoint-clean-");
 	try {
 		gitInit(repo);
 		const provider = new FakeProvider([
@@ -81,7 +81,7 @@ test("isolation: non-mutating turns produce no checkpoint commit", async () => {
 			tools: [writeTool, bashTool],
 			task: "look around",
 			repoRoot: repo,
-			isolation: { repoRoot: repo, branch: "hit/test" },
+			isolation: { repoRoot: repo, branch: "ah/test" },
 		});
 		const { reason } = await agent.run();
 		expect(reason).toBe("completed");

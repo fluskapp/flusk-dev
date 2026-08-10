@@ -1,6 +1,6 @@
 # Predicate vocabulary
 
-The controlled vocabulary for facts hit writes to abagraph. `memory_remember`
+The controlled vocabulary for facts ah writes to abagraph. `memory_remember`
 and the digestion prompt validate against this table; unknown predicates are
 rejected with this list as the error message. Confidence conventions:
 1.0 harness-observed · 0.9 verification-confirmed · 0.7 LLM-extracted ·
@@ -29,11 +29,11 @@ rejected with this list as the error message. Confidence conventions:
 | lessons | `Tool:<name>` | `gotcha` | literal | coexist | promotion |
 | lessons | `Approach:<slug>` | `worked_for` | literal situation | coexist | promotion |
 | lessons | `Approach:<slug>` | `failed_for` | literal situation | coexist | promotion |
-| hit | `Item:<key>` | `attempted_at` | timestamp literal | functional | watch |
-| hit | `Item:<key>` | `outcome` | literal | functional | watch |
-| hit | `Item:<key>` | `cooldown_until` | timestamp literal (transient/TTL) | functional | watch |
-| hit | `Night:<date>` | `runs_count` | literal number | functional | watch |
+| ah | `Item:<key>` | `attempted_at` | timestamp literal | functional | watch |
+| ah | `Item:<key>` | `outcome` | literal | functional | watch |
+| ah | `Item:<key>` | `cooldown_until` | timestamp literal (transient/TTL) | functional | watch |
+| ah | `Night:<date>` | `runs_count` | literal number | functional | watch |
 
 Namespaces: `repo:<slug>` (slug = repo basename + short path hash), `lessons`
-(cross-repo, durable), `hit` (harness ops, mostly transient). The harness
+(cross-repo, durable), `ah` (harness ops, mostly transient). The harness
 stamps the namespace on every write; the agent never chooses one.

@@ -5,7 +5,7 @@ const DARK_VARS = `
 	--border: #393b40; --text: #dfe1e5; --dim: #9da0a8;
 	--accent: #3574f0; --accent-soft: #25324d; --sel: #2e436e;
 	--ok: #57965c; --err: #e35252; --warn: #d6ae58; --run: #9da0a8;
-	--code-bg: #26282b; --tag-user: #d6ae58; --tag-hit: #3574f0;
+	--code-bg: #26282b; --tag-user: #d6ae58; --tag-ah: #3574f0;
 `;
 
 export const THEME_CSS = `
@@ -14,7 +14,7 @@ export const THEME_CSS = `
 	--border: #ebecf0; --text: #1e1f22; --dim: #6c707e;
 	--accent: #3574f0; --accent-soft: #edf3ff; --sel: #d4e2ff;
 	--ok: #208a3c; --err: #db3b4b; --warn: #b07203; --run: #6c707e;
-	--code-bg: #f7f8fa; --tag-user: #b07203; --tag-hit: #3574f0;
+	--code-bg: #f7f8fa; --tag-user: #b07203; --tag-ah: #3574f0;
 	--font-ui: -apple-system, "Segoe UI", "Inter", "Helvetica Neue", sans-serif;
 	--font-code: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
 }

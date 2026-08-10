@@ -81,7 +81,7 @@ describe("memory tools", () => {
 		expect(fact).toMatchObject({ confidence: 0.7, source: "agent:run:tr1", status: "candidate" });
 		// The namespace tag rides in properties (wire.ts NS_PROP) so isolation
 		// survives servers that drop the tenant — see memory-untenanted.test.ts.
-		expect(fact?.properties).toEqual({ why: "seen in diff", hit_ns: NS });
+		expect(fact?.properties).toEqual({ why: "seen in diff", ah_ns: NS });
 	});
 
 	it("changes splits added vs superseded around the cutoff", async () => {

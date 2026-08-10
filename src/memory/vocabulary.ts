@@ -1,6 +1,6 @@
 /**
  * The predicate vocabulary (docs/vocabulary.md) and its validators — the
- * single source of truth for what hit is allowed to assert.
+ * single source of truth for what ah is allowed to assert.
  */
 import type { MemFactInput } from "./client-types.js";
 

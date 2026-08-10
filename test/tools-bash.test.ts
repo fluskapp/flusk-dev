@@ -23,7 +23,7 @@ function ctx(overrides: Partial<ToolContext> = {}): ToolContext {
 }
 
 beforeAll(async () => {
-	dir = await mkdtemp(join(tmpdir(), "hit-bash-"));
+	dir = await mkdtemp(join(tmpdir(), "ah-bash-"));
 });
 
 afterAll(async () => {

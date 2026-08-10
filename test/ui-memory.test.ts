@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { createMemoryClient } from "../src/memory/client.js";
 import type { MemoryClient } from "../src/memory/client-types.js";
-import { HIT_NS, LESSONS_NS, repoNs } from "../src/memory/namespaces.js";
+import { AH_NS, LESSONS_NS, repoNs } from "../src/memory/namespaces.js";
 import { goalFact, lessonFact, taskFact, watchFact } from "../src/memory/facts.js";
 import type { MemoryView } from "../src/ui/memory-view.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
@@ -22,9 +22,9 @@ let ui: UiServer;
 let client: MemoryClient;
 
 beforeAll(async () => {
-	home = mkdtempSync(join(tmpdir(), "hit-uimem-home-"));
-	repo = mkdtempSync(join(tmpdir(), "hit-uimem-repo-"));
-	process.env.HIT_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "ah-uimem-home-"));
+	repo = mkdtempSync(join(tmpdir(), "ah-uimem-repo-"));
+	process.env.AH_HOME = home;
 	mock = await startMockAbagraph();
 	writeFileSync(
 		join(home, "config.json"),
@@ -43,15 +43,15 @@ beforeAll(async () => {
 	await client.transact(ns, [taskFact.dependsOn("t2", "t1")]);
 	// An extracted lesson lands below the Candidate threshold on purpose.
 	await client.transact(LESSONS_NS, [lessonFact.gotcha("vitest", "worker starvation", 0.7)]);
-	await client.transact(HIT_NS, [watchFact.attemptedAt("gh-prs-9", "2026-08-10T22:00:00.000Z")]);
-	await client.transact(HIT_NS, [watchFact.outcome("gh-prs-9", "completed")]);
+	await client.transact(AH_NS, [watchFact.attemptedAt("gh-prs-9", "2026-08-10T22:00:00.000Z")]);
+	await client.transact(AH_NS, [watchFact.outcome("gh-prs-9", "completed")]);
 	ui = await startUiServer(0);
 });
 
 afterAll(async () => {
 	await ui.close();
 	await mock.close();
-	delete process.env.HIT_HOME;
+	delete process.env.AH_HOME;
 	rmSync(home, { recursive: true, force: true });
 	rmSync(repo, { recursive: true, force: true });
 });
@@ -91,12 +91,12 @@ it("rejects a non-absolute repo parameter", async () => {
 });
 
 it("reports not-connected instead of failing when abagraph is down", async () => {
-	const otherHome = mkdtempSync(join(tmpdir(), "hit-uimem-down-"));
+	const otherHome = mkdtempSync(join(tmpdir(), "ah-uimem-down-"));
 	writeFileSync(
 		join(otherHome, "config.json"),
 		JSON.stringify({ memory: { enabled: true, baseUrl: "http://127.0.0.1:9" } }),
 	);
-	process.env.HIT_HOME = otherHome;
+	process.env.AH_HOME = otherHome;
 	try {
 		const view = (await (
 			await fetch(`${ui.url}/api/memory?repo=${encodeURIComponent(repo)}`)
@@ -105,7 +105,7 @@ it("reports not-connected instead of failing when abagraph is down", async () =>
 		expect(view.note).toContain("unreachable");
 		expect(view.goals).toEqual([]);
 	} finally {
-		process.env.HIT_HOME = home;
+		process.env.AH_HOME = home;
 		rmSync(otherHome, { recursive: true, force: true });
 	}
 });

@@ -6,7 +6,7 @@
 import { createMemoryClient } from "../src/memory/client.js";
 import type { MemoryClient } from "../src/memory/client-types.js";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { HitConfig } from "../src/config/types.js";
+import type { AhConfig } from "../src/config/types.js";
 import type { WorkItem } from "../src/watch/queue.js";
 import type { RunItemResult, WatchDeps } from "../src/watch/tick.js";
 import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
@@ -41,8 +41,8 @@ export async function startMemory(): Promise<{ mock: MockAbagraph; client: Memor
 	return { mock, client: createMemoryClient({ baseUrl: mock.url, apiKey: null }) };
 }
 
-export function harness(client: MemoryClient, over: Partial<HitConfig["watch"]> = {}): Harness {
-	const cfg: HitConfig = { ...DEFAULT_CONFIG, watch: { ...DEFAULT_CONFIG.watch, ...over } };
+export function harness(client: MemoryClient, over: Partial<AhConfig["watch"]> = {}): Harness {
+	const cfg: AhConfig = { ...DEFAULT_CONFIG, watch: { ...DEFAULT_CONFIG.watch, ...over } };
 	const h: Harness = {
 		log: [],
 		ran: [],
