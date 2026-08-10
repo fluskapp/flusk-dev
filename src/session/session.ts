@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { ModelRef, Msg, RunStats } from "../core/types.js";
+import type { ModelRef, Msg, RunEndReason, RunStats } from "../core/types.js";
 import {
 	type CompactionEntry,
 	type HeaderEntry,
@@ -18,6 +18,7 @@ export interface CreateSessionOpts {
 	repoRoot: string;
 	model: ModelRef;
 	parentSession?: string;
+	taskKind?: string;
 	now?: Date;
 }
 
@@ -60,6 +61,7 @@ export class Session {
 			model: opts.model,
 			createdAt: now.toISOString(),
 			...(opts.parentSession !== undefined ? { parentSession: opts.parentSession } : {}),
+			...(opts.taskKind !== undefined ? { taskKind: opts.taskKind } : {}),
 		};
 		const store = SessionStore.open(newSessionPath(opts.repoRoot, id, now));
 		store.appendEntry(header);
@@ -98,8 +100,13 @@ export class Session {
 		return this.append<CompactionEntry>({ type: "compaction", id: this.nextId++, ...opts });
 	}
 
-	appendStats(stats: RunStats): StatsEntry {
-		return this.append<StatsEntry>({ type: "stats", id: this.nextId++, stats });
+	appendStats(stats: RunStats, reason?: RunEndReason): StatsEntry {
+		return this.append<StatsEntry>({
+			type: "stats",
+			id: this.nextId++,
+			stats,
+			...(reason !== undefined ? { reason } : {}),
+		});
 	}
 
 	/** Replay context; honors the most recent compaction entry if present. */
@@ -119,8 +126,16 @@ export class Session {
 
 	// biome-ignore format: trivial accessors kept compact
 	get id(): string { return this.headerEntry.id; }
-	get path(): string { return this.store.path; }
-	get header(): HeaderEntry { return { ...this.headerEntry }; }
-	get entries(): SessionEntry[] { return [...this.allEntries]; }
-	close(): void { this.store.close(); }
+	get path(): string {
+		return this.store.path;
+	}
+	get header(): HeaderEntry {
+		return { ...this.headerEntry };
+	}
+	get entries(): SessionEntry[] {
+		return [...this.allEntries];
+	}
+	close(): void {
+		this.store.close();
+	}
 }

@@ -1,3 +1,4 @@
+import { maybeCompact } from "../compaction/compact.js";
 import type { MemoryPort } from "../memory/port.js";
 import type { Provider } from "../provider/provider.js";
 import type { Session } from "../session/session.js";
@@ -24,6 +25,12 @@ export interface TurnDeps {
 	repoPath: string;
 	task: string;
 	isResume: boolean;
+	/** Enables context compaction; absent = never compact (bare test loops). */
+	compaction?: {
+		summarizeModel: ModelRef;
+		reserveTokens: number;
+		keepRecentTokens: number;
+	};
 }
 
 export interface TurnState {
@@ -51,6 +58,24 @@ export async function runTurn(deps: TurnDeps, state: TurnState): Promise<RunEndR
 	});
 	const system = preTurnText === null ? deps.baseSystem : `${deps.baseSystem}\n\n${preTurnText}`;
 	await deps.events.emit({ type: "turn:start", turn: state.turn });
+	if (deps.compaction) {
+		// Best-effort: a compaction failure must never take the run down.
+		try {
+			await maybeCompact(
+				{
+					provider: deps.provider,
+					contextWindow: deps.model.contextWindow,
+					session: deps.session,
+					events: deps.events,
+					signal: deps.signal,
+					...deps.compaction,
+				},
+				state,
+			);
+		} catch {
+			// skip compaction this turn and continue with the full context
+		}
+	}
 
 	let message: AssistantMsg | undefined;
 	const req = {

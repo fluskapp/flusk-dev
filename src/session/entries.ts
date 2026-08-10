@@ -1,4 +1,4 @@
-import type { ModelRef, Msg, RunStats } from "../core/types.js";
+import type { ModelRef, Msg, RunEndReason, RunStats } from "../core/types.js";
 
 export const SESSION_VERSION = 1;
 
@@ -14,6 +14,8 @@ export interface HeaderEntry {
 	createdAt: string;
 	/** Links a subagent session to its parent. */
 	parentSession?: string;
+	/** Routing kind chosen at run start (plan|code|review|summarize). */
+	taskKind?: string;
 }
 
 export interface MessageEntry {
@@ -35,6 +37,8 @@ export interface StatsEntry {
 	type: "stats";
 	id: number;
 	stats: RunStats;
+	/** Why the run ended; older files omit it (UI then derives from stopReason). */
+	reason?: RunEndReason;
 }
 
 export type SessionEntry = HeaderEntry | MessageEntry | CompactionEntry | StatsEntry;

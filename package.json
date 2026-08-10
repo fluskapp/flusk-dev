@@ -4,6 +4,18 @@
 	"private": true,
 	"type": "module",
 	"description": "Autonomous coding agent with abagraph as its brain",
+	"license": "Apache-2.0",
+	"keywords": [
+		"agent",
+		"autonomous",
+		"coding-agent",
+		"llm",
+		"cli"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/adirbenyossef/hit.git"
+	},
 	"engines": {
 		"node": ">=22.8"
 	},
@@ -13,9 +25,11 @@
 	"scripts": {
 		"build": "tsc -p tsconfig.build.json",
 		"check": "tsc --noEmit",
-		"test": "vitest run"
+		"test": "vitest run",
+		"standards": "bash scripts/check-standards.sh"
 	},
 	"dependencies": {
+		"@earendil-works/pi-ai": "^0.84.1",
 		"typebox": "^1.1.24"
 	},
 	"devDependencies": {

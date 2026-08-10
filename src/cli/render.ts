@@ -40,9 +40,16 @@ export function attachRenderer(events: EventBus, out: NodeJS.WritableStream): vo
 		out.write(`${text}\n`);
 	};
 
+	let modelShown = false;
+	let liveCostUsd = 0;
 	events.on("run:start", (e) => {
 		line(paint("bold", `hit · ${e.task}`));
+		if (modelShown) return; // the chosen model is announced exactly once
+		modelShown = true;
 		line(paint("dim", `model ${e.model.provider}/${e.model.id} · run ${e.runId}`));
+	});
+	events.on("turn:end", (e) => {
+		liveCostUsd += e.message.usage.costUsd;
 	});
 	events.on("assistant:delta", (e) => {
 		if (e.channel !== "text") return;
@@ -57,7 +64,8 @@ export function attachRenderer(events: EventBus, out: NodeJS.WritableStream): vo
 		line(paint("red", `  ✗ ${firstLine(e.output)}`));
 	});
 	events.on("run:end", (e) => {
-		const cost = `$${e.stats.usage.costUsd.toFixed(4)}`;
+		// Live per-turn accumulation backs the stats figure when it reads zero.
+		const cost = `$${(e.stats.usage.costUsd || liveCostUsd).toFixed(4)}`;
 		line(paint("bold", `done ${e.reason} · ${e.stats.turns} turns · ${cost}`));
 	});
 }

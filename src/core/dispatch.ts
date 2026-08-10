@@ -48,6 +48,15 @@ export async function dispatchToolCalls(
 	baseCtx: ToolContext,
 	events: EventBus,
 ): Promise<ToolResultMsg[]> {
+	const abortedStub = (call: ToolCall): ToolResultMsg => ({
+		role: "toolResult",
+		callId: call.id,
+		name: call.name,
+		output: "aborted before execution",
+		isError: true,
+	});
+	// A batch dispatched after abort runs nothing, on either execution path.
+	if (baseCtx.signal.aborted) return calls.map(abortedStub);
 	const runOne = async (call: ToolCall): Promise<ToolResultMsg> => {
 		const tool = registry.get(call.name);
 		if (!tool) {
@@ -78,13 +87,7 @@ export async function dispatchToolCalls(
 	for (const call of calls) {
 		if (baseCtx.signal.aborted) {
 			// Preserve the one-result-per-call invariant without running the tool.
-			results.push({
-				role: "toolResult",
-				callId: call.id,
-				name: call.name,
-				output: "aborted before execution",
-				isError: true,
-			});
+			results.push(abortedStub(call));
 			continue;
 		}
 		results.push(await runOne(call));

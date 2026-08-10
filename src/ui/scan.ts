@@ -1,6 +1,6 @@
 import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
-import type { AssistantMsg } from "../core/types.js";
+import type { AssistantMsg, ModelRef, RunEndReason } from "../core/types.js";
 import type { StatsEntry } from "../session/entries.js";
 import { hitHome } from "../session/paths.js";
 import { SessionStore } from "../session/store.js";
@@ -17,6 +17,25 @@ export interface SessionSummary {
 	status: SessionStatus;
 	turns: number;
 	costUsd: number;
+	model: ModelRef;
+	/** Routing kind from the header, when the run recorded one. */
+	taskKind?: string;
+	/** Present when this session belongs to a subagent (links to its parent). */
+	parentSession?: string;
+}
+
+/** Newer files persist the RunEndReason in the stats entry; map it directly. */
+export function statusFromReason(reason: RunEndReason): SessionStatus {
+	switch (reason) {
+		case "completed":
+			return "completed";
+		case "error":
+			return "error";
+		case "aborted":
+			return "aborted";
+		default:
+			return "stopped"; // budget/maxTurns/deadline
+	}
 }
 
 export function sessionsRoot(): string {
@@ -80,9 +99,15 @@ export function scanSessions(): SessionSummary[] {
 					sessionId: header.id,
 					createdAt: header.createdAt,
 					updatedAtMs: statSync(path).mtimeMs,
-					status: deriveStatus(stats !== undefined, lastAssistant),
+					status:
+						stats?.reason !== undefined
+							? statusFromReason(stats.reason)
+							: deriveStatus(stats !== undefined, lastAssistant),
 					turns: stats?.stats.turns ?? turns,
 					costUsd: stats?.stats.usage.costUsd ?? 0,
+					model: header.model,
+					...(header.taskKind !== undefined ? { taskKind: header.taskKind } : {}),
+					...(header.parentSession !== undefined ? { parentSession: header.parentSession } : {}),
 				});
 			} catch {
 				// unreadable/foreign file — not this dashboard's problem
