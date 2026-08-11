@@ -1,6 +1,7 @@
-import { mkdir, mkdtemp } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { ahHome } from "../src/session/paths.js";
 import { Type } from "typebox";
 import { createAgent } from "../src/agent/agent.js";
 import type { ModelRef, ToolResultMsg } from "../src/core/types.js";
@@ -23,6 +24,20 @@ export async function setupTestHome(prefix: string): Promise<string> {
 
 export function teardownTestHome(): void {
 	delete process.env.AH_HOME;
+}
+
+/**
+ * Writes ~/.ah/config.json for the current AH_HOME.
+ *
+ * Memory TRANSPORT (baseUrl, apiKey, autoSpawn, serverBin, dataDir) belongs
+ * here and nowhere else: loadConfig refuses those keys from a repo's own
+ * .ah.json, because a cloned repo authors that file and could otherwise point
+ * the client at a server of its choosing while inheriting the user's key.
+ */
+export async function writeHomeConfig(data: unknown): Promise<void> {
+	const home = ahHome();
+	await mkdir(home, { recursive: true });
+	await writeFile(join(home, "config.json"), JSON.stringify(data));
 }
 
 export function deferred(): { promise: Promise<void>; resolve: () => void } {

@@ -1,81 +1,62 @@
 /**
- * The "Runs" panel: harness run journals (linof-harness, ab, …) with their
- * pipeline stages, polled while a watch autopilot is mid-flight. This is the
- * live view aihub used to provide.
+ * The unified run feed: ah sessions and harness journals in one dense table,
+ * newest first, optionally narrowed to one project. Every row opens the run
+ * it stands for.
  */
 export const CLIENT_RUNS_JS = `
-var openJournal = null;
-
-function toggleRuns() { togglePanel("runs"); }
-
-var STAGE_CLASS = {
-	done: "completed", running: "running", failed: "error",
-	error: "error", skipped: "stopped", pending: "",
-};
-
-function stageHtml(s) {
-	var cls = STAGE_CLASS[s.status] === undefined ? "" : STAGE_CLASS[s.status];
-	var title = s.status + (s.duration ? " \\u00b7 " + s.duration : "") + (s.detail ? " \\u00b7 " + s.detail : "");
-	return '<span class="stage ' + cls + '" title="' + esc(title) + '">' + esc(s.name) + "</span>";
+function runHead(showProject) {
+	return "<tr><th>status</th><th>run</th>" + (showProject ? "<th>project</th>" : "") +
+		"<th>progress</th><th class=\\"num\\">cost</th><th class=\\"num\\">when</th></tr>";
 }
 
-function journalHtml(j) {
-	var done = j.stages.filter(function (s) { return s.status === "done"; }).length;
-	var active = j.stages.filter(function (s) { return s.status === "running"; })[0];
-	return '<div class="journal' + (j.path === openJournal ? " open" : "") +
-		'" data-p="' + esc(j.path) + '">' +
-		'<div class="journal-head"><span class="pill ' + statusClass(j.status) + '">' + esc(j.status) + "</span>" +
-		"<b>" + esc(j.title.replace(/^Run:\\s*/, "")) + "</b>" +
-		'<span class="dim small">' + done + "/" + j.stages.length +
-		(active ? " \\u00b7 " + esc(active.name) : "") + " \\u00b7 " + esc(fmtTime(j.date)) + "</span></div>" +
-		'<div class="stages">' + j.stages.map(stageHtml).join("") + "</div>" +
-		(j.pr ? '<div class="small"><a href="' + esc(j.pr) + '" target="_blank" rel="noopener">' + esc(j.pr) + "</a></div>" : "") +
-		(j.path === openJournal ? '<pre class="code out" id="journal-body">loading\\u2026</pre>' : "") +
-		"</div>";
+function runRow(r, showProject) {
+	var progress = r.progress || (r.kind === "session" ? "session" : "journal");
+	return '<tr data-open="ref:' + esc(r.ref) + '" title="' + esc(r.ref) + '">' +
+		"<td>" + pill(r.status) + "</td>" +
+		'<td class="grow">' + esc(r.title) + "</td>" +
+		(showProject ? "<td>" + projectLink(r.project) + "</td>" : "") +
+		'<td class="mono">' + esc(progress) + "</td>" +
+		'<td class="num">' + (r.costUsd == null ? "" : esc(fmtCost(r.costUsd))) + "</td>" +
+		'<td class="num">' + esc(fmtTime(r.at)) + "</td></tr>";
+}
+
+function runFilterBar() {
+	if (S.runSort === "cost") {
+		return '<div class="head-row"><h2>Runs by cost</h2>' +
+			'<span class="ev" data-open="runs:">show newest first</span></div>';
+	}
+	if (S.runFilter === null) {
+		return '<div class="head-row"><h2>All runs</h2>' +
+			'<span class="dim">every project \\u00b7 newest first</span></div>';
+	}
+	return '<div class="head-row"><h2>' + esc(S.runFilter) + " runs</h2>" +
+		'<span class="ev" data-open="runs:">show all projects</span></div>';
 }
 
 async function loadRuns() {
-	var list;
-	try {
-		list = await (await fetch("/api/journals")).json();
-	} catch (e) {
-		$("#runs").innerHTML = '<div class="empty small">could not read journals</div>';
+	var url = "/api/runs?limit=120" +
+		(S.runFilter ? "&project=" + encodeURIComponent(S.runFilter) : "");
+	var rows;
+	try { rows = await getJson(url); }
+	catch (e) {
+		$("#runs").innerHTML = '<div class="empty small">could not read the run feed</div>';
 		return;
 	}
-	if (!list.length) {
-		$("#runs").innerHTML =
-			'<div class="empty small">No harness journals found.<br/>' +
-			"Set <code>ui.harnessDirs</code> in <code>~/.ah/config.json</code> to the " +
-			"<code>docs/runs</code> directories you want followed.</div>";
+	if (S.runSort === "cost") {
+		rows = rows.slice().sort(function (a, b) { return (b.costUsd || 0) - (a.costUsd || 0); });
+	}
+	if (!rows.length) {
+		$("#runs").innerHTML = runFilterBar() +
+			'<div class="empty small">No runs yet.<br/>Run <code>ah run "task"</code>, or point ' +
+			"<code>ui.harnessDirs</code> at a harness's <code>docs/runs</code>.</div>";
 		return;
 	}
-	var byHarness = {};
-	list.forEach(function (j) { (byHarness[j.harness] = byHarness[j.harness] || []).push(j); });
-	var html = "";
-	Object.keys(byHarness).sort().forEach(function (h) {
-		var live = byHarness[h].filter(function (j) { return j.status === "running"; }).length;
-		html += '<section class="brain-sec"><h3>' + esc(h) +
-			(live ? ' <span class="pill running">' + live + " live</span>" : "") + "</h3>" +
-			byHarness[h].map(journalHtml).join("") + "</section>";
-	});
-	$("#runs").innerHTML = html;
-	Array.prototype.forEach.call(document.querySelectorAll("#runs .journal"), function (el) {
-		el.querySelector(".journal-head").addEventListener("click", function () {
-			var p = el.getAttribute("data-p");
-			openJournal = openJournal === p ? null : p;
-			loadRuns();
-		});
-	});
-	if (openJournal) {
-		try {
-			var text = await (await fetch("/api/journal?repo=" + encodeURIComponent(openJournal))).text();
-			var body = $("#journal-body");
-			if (body) body.textContent = text;
-		} catch (e) { /* leave the loading note in place */ }
-	}
+	var live = rows.filter(function (r) { return r.status === "running"; });
+	var rest = rows.filter(function (r) { return r.status !== "running"; });
+	$("#runs").innerHTML = runFilterBar() +
+		(live.length
+			? sec("Live", tbl(runHead(true), live.map(function (r) { return runRow(r, true); }).join("")), live.length)
+			: "") +
+		sec("Runs", tbl(runHead(true), rest.map(function (r) { return runRow(r, true); }).join("")), rest.length);
 }
-
-$("#runs-btn").addEventListener("click", toggleRuns);
-// Journals change while a watch autopilot is mid-run; keep the panel live.
-setInterval(function () { if (runsOpen) loadRuns(); }, 5000);
 `;

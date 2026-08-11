@@ -5,7 +5,7 @@ import { goalCmd } from "../src/cli/goal-cmd.js";
 import { assistantText } from "../src/provider/fake.js";
 import { repoSlug } from "../src/session/paths.js";
 import { capture, SLOW } from "./cli2-helpers.js";
-import { setupTestHome, teardownTestHome } from "./helpers.js";
+import { setupTestHome, teardownTestHome, writeHomeConfig } from "./helpers.js";
 import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
 
 let repo: string;
@@ -16,10 +16,9 @@ beforeEach(async () => {
 	repo = await setupTestHome("ah-goal-");
 	mock = await startMockAbagraph();
 	ns = `repo:${repoSlug(repo)}`;
-	await writeFile(
-		join(repo, ".ah.json"),
-		JSON.stringify({ memory: { enabled: true, baseUrl: mock.url } }),
-	);
+	// Transport goes in ~/.ah/config.json: a repo's .ah.json may not choose
+	// which abagraph server ah talks to (src/config/config.ts).
+	await writeHomeConfig({ memory: { enabled: true, baseUrl: mock.url } });
 }, SLOW);
 afterEach(async () => {
 	teardownTestHome();

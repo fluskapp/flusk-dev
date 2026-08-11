@@ -26,9 +26,15 @@ beforeAll(async () => {
 	repo = mkdtempSync(join(tmpdir(), "ah-uimem-repo-"));
 	process.env.AH_HOME = home;
 	mock = await startMockAbagraph();
+	// projectDirs must name this repo: /api/memory only serves a directory the
+	// project scanner already published (a repo's own .ah.json chooses which
+	// abagraph server its config points at, so an arbitrary path is a leak).
 	writeFileSync(
 		join(home, "config.json"),
-		JSON.stringify({ memory: { enabled: true, baseUrl: mock.url } }),
+		JSON.stringify({
+			memory: { enabled: true, baseUrl: mock.url },
+			ui: { harnessDirs: [], projectDirs: [repo] },
+		}),
 	);
 	client = createMemoryClient({ baseUrl: mock.url, apiKey: null });
 	const ns = repoNs(repo);
@@ -85,16 +91,33 @@ it("shows the unattended ledger", async () => {
 	expect(view.ledger[0]).toMatchObject({ key: "gh-prs-9", outcome: "completed" });
 });
 
-it("rejects a non-absolute repo parameter", async () => {
-	const res = await fetch(`${ui.url}/api/memory?repo=relative/path`);
-	expect(res.status).toBe(400);
+it("rejects a repo parameter that is not a known project", async () => {
+	expect((await fetch(`${ui.url}/api/memory?repo=relative/path`)).status).toBe(400);
+	// The attack this closes: any absolute path was accepted, and buildMemoryView
+	// loads THAT directory's .ah.json — which could set memory.baseUrl while
+	// inheriting the global memory.apiKey, sending the key to a chosen host.
+	const planted = mkdtempSync(join(tmpdir(), "ah-uimem-evil-"));
+	writeFileSync(
+		join(planted, ".ah.json"),
+		JSON.stringify({ memory: { enabled: true, baseUrl: "http://sink.invalid" } }),
+	);
+	try {
+		const res = await fetch(`${ui.url}/api/memory?repo=${encodeURIComponent(planted)}`);
+		expect(res.status).toBe(400);
+		expect(await res.text()).toContain("known project");
+	} finally {
+		rmSync(planted, { recursive: true, force: true });
+	}
 });
 
 it("reports not-connected instead of failing when abagraph is down", async () => {
 	const otherHome = mkdtempSync(join(tmpdir(), "ah-uimem-down-"));
 	writeFileSync(
 		join(otherHome, "config.json"),
-		JSON.stringify({ memory: { enabled: true, baseUrl: "http://127.0.0.1:9" } }),
+		JSON.stringify({
+			memory: { enabled: true, baseUrl: "http://127.0.0.1:9" },
+			ui: { harnessDirs: [], projectDirs: [repo] },
+		}),
 	);
 	process.env.AH_HOME = otherHome;
 	try {

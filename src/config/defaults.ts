@@ -40,6 +40,9 @@ export const DEFAULT_CONFIG: AhConfig = {
 		harnessDirs: ["~/projects/*/docs/runs", "~/projects/playground/*/docs/runs"],
 		projectDirs: ["~/projects/*", "~/projects/playground/*"],
 	},
+	chat: {
+		backends: [],
+	},
 	watch: {
 		queues: ["gh-prs", "gh-failing-ci"],
 		maxRunsPerNight: 10,

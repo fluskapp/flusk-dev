@@ -1,5 +1,19 @@
 /** Frozen config contract. Loading/merging lives in config.ts. */
 
+export interface ChatBackendConfig {
+	id: string;
+	label?: string;
+	kind: "cli" | "openai-compatible" | "pi-ai";
+	/** cli: binary name; the conversation is passed as one prompt argument. */
+	command?: string;
+	args?: string[];
+	/** openai-compatible: endpoint base, model id, and the env var holding
+	 * its key (omitted for keyless local servers like Ollama). */
+	baseUrl?: string;
+	model?: string;
+	apiKeyEnv?: string;
+}
+
 export type TaskKind = "plan" | "code" | "review" | "summarize";
 
 export interface ModelChoice {
@@ -48,6 +62,10 @@ export interface AhConfig {
 		harnessDirs: string[];
 		/** Globs (one `*` level) of project roots whose markdown is indexed. */
 		projectDirs: string[];
+	};
+	chat: {
+		/** Backends offered in the dashboard's chat. Empty = auto-detect CLIs. */
+		backends: ChatBackendConfig[];
 	};
 	watch: {
 		/** Queues to poll: "gh-prs" (open PRs) and/or "gh-failing-ci". */

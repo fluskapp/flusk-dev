@@ -6,6 +6,9 @@ const DARK_VARS = `
 	--accent: #3574f0; --accent-soft: #25324d; --sel: #2e436e;
 	--ok: #57965c; --err: #e35252; --warn: #d6ae58; --run: #9da0a8;
 	--code-bg: #26282b; --tag-user: #d6ae58; --tag-ah: #3574f0;
+	/* Dark's accents are LIGHT, so white text on them fails contrast — white
+	   on --warn #d6ae58 is ~2.1:1 at 10.5px bold, which is the status pill. */
+	--on-accent: #1e1f22;
 `;
 
 export const THEME_CSS = `
@@ -15,6 +18,8 @@ export const THEME_CSS = `
 	--accent: #3574f0; --accent-soft: #edf3ff; --sel: #d4e2ff;
 	--ok: #208a3c; --err: #db3b4b; --warn: #b07203; --run: #6c707e;
 	--code-bg: #f7f8fa; --tag-user: #b07203; --tag-ah: #3574f0;
+	/* Text drawn ON a filled accent (pills, badges, the running stage). */
+	--on-accent: #ffffff;
 	--font-ui: -apple-system, "Segoe UI", "Inter", "Helvetica Neue", sans-serif;
 	--font-code: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
 }

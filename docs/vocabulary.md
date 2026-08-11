@@ -23,6 +23,11 @@ rejected with this list as the error message. Confidence conventions:
 | repo | `Run:<id>` | `touched` | `File:<path>` | coexist | harness |
 | repo | `Run:<id>` | `verified_by` | literal command | coexist | harness |
 | repo | `Run:<id>` | `failed_because` | literal | coexist | harness |
+| repo | `Run:<id>` | `stage` | `<name>:<status>` | coexist | journal ingest |
+| repo | `Run:<id>` | `pr` | PR url | functional | journal ingest |
+| repo | `Harness:<name>` | `uses` | `Model:<id>` | coexist | journal ingest |
+| repo | `Harness:<name>` | `ran` | `Run:<id>` | coexist | journal ingest |
+| repo | `Harness:<name>` | `prompt_source` | path literal | functional | project detail |
 | repo | `Session:<id>` | `ended_at` | timestamp literal | functional | harness |
 | lessons | `ErrorClass:<slug>` | `fixed_by` | literal approach | functional | promotion |
 | lessons | `ErrorClass:<slug>` | `seen_in` | `Repo:<slug>` | coexist | promotion |

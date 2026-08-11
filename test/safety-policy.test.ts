@@ -39,6 +39,7 @@ function config(onUnknownCommand: "deny" | "allow"): AhConfig {
 		},
 		verify: { retries: 3, evidenceLines: 40 },
 		ui: { harnessDirs: [], projectDirs: [] },
+		chat: { backends: [] },
 		watch: {
 			queues: [],
 			maxRunsPerNight: 10,

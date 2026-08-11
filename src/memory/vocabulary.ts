@@ -25,7 +25,18 @@ const VOCABULARY: Record<string, Record<string, Cardinality>> = {
 		touched: "coexist",
 		verified_by: "coexist",
 		failed_because: "coexist",
+		/**
+		 * Ingested harness journals (src/memory/ingest.ts). Coexist, so a run's
+		 * stages accumulate under one subject and one query by that subject
+		 * fetches the whole run. A stage that advances therefore leaves its
+		 * older status live too — which is why every reader must collapse
+		 * stages by name, newest first (src/ui/graph-source.ts `progressOf`).
+		 */
+		stage: "coexist",
+		pr: "functional",
 	},
+	/** Another harness ah observes but does not run — ingested from journals. */
+	Harness: { uses: "coexist", ran: "coexist", prompt_source: "functional" },
 	Session: { ended_at: "functional" },
 	ErrorClass: { fixed_by: "functional", seen_in: "coexist" },
 	Tool: { gotcha: "coexist" },

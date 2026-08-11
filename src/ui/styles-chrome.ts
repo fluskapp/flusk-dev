@@ -1,69 +1,66 @@
-/** App chrome: toolbar, left tool window, status bar — IntelliJ window layout. */
+/**
+ * Window chrome: toolbar, the two tool windows, the editor area between them,
+ * and the status bar. IntelliJ's frame — fixed rails, one scrolling middle.
+ */
 export const CHROME_CSS = `
+:root { --tw-left: 288px; --tw-right: 360px; }
+
 #app {
 	display: grid; height: 100vh;
-	grid-template: "tb tb" 40px "side main" 1fr "st st" 25px / 300px 1fr;
+	grid-template:
+		"tb tb tb" 38px
+		"side main chat" 1fr
+		"st st st" 24px
+		/ var(--tw-left) minmax(0, 1fr) var(--tw-right);
 }
+body.chat-off #app { grid-template-columns: var(--tw-left) minmax(0, 1fr) 0; }
+body.chat-off #chat { display: none; }
 
 #toolbar {
-	grid-area: tb; display: flex; align-items: center; gap: 10px;
+	grid-area: tb; display: flex; align-items: center; gap: 8px;
 	padding: 0 10px; background: var(--panel); border-bottom: 1px solid var(--border);
 }
 .logo {
-	width: 24px; height: 24px; border-radius: 6px; background: var(--accent);
+	width: 22px; height: 22px; border-radius: 5px; background: var(--accent);
 	color: #fff; font-weight: 700; font-size: 11px;
 	display: flex; align-items: center; justify-content: center;
 }
-.crumb { font-weight: 600; }
-#theme { font-size: 15px; line-height: 1; padding: 3px 7px; }
+.crumb { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#toolbar button {
+	font-size: 12px; padding: 2px 10px;
+	border: 1px solid var(--border); border-radius: 5px;
+}
+#toolbar button.on { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+#theme, #help-btn { font-size: 14px; line-height: 1; padding: 3px 8px; }
 
 #side {
-	grid-area: side; overflow-y: auto;
+	grid-area: side; overflow-y: auto; min-width: 0; min-height: 0;
 	background: var(--panel); border-right: 1px solid var(--border);
 }
 .tw-head {
-	padding: 8px 12px 6px; font-size: 12px; font-weight: 600; color: var(--dim);
+	display: flex; align-items: center; gap: 8px;
+	padding: 7px 12px 5px; font-size: 11px; font-weight: 600;
+	text-transform: uppercase; letter-spacing: .5px; color: var(--dim);
 	position: sticky; top: 0; background: var(--panel); z-index: 1;
 }
-.group-h {
-	display: flex; align-items: center; gap: 6px;
-	padding: 5px 12px 3px; font-weight: 600; font-size: 12px;
-}
-.group-h .count {
-	margin-left: auto; color: var(--dim); font-weight: 400;
-	background: var(--hover); border-radius: 8px; padding: 0 7px; font-size: 11px;
-}
-.row {
-	display: flex; align-items: flex-start; gap: 8px;
-	padding: 5px 12px 5px 18px; cursor: pointer; border-left: 2px solid transparent;
-}
-.row:hover { background: var(--hover); }
-.row.active { background: var(--sel); border-left-color: var(--accent); }
-.row-main { min-width: 0; }
-.row-task {
-	white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 13px;
-}
-.row-sub { font-size: 11px; color: var(--dim); }
-.dot {
-	width: 8px; height: 8px; border-radius: 50%; flex: none; margin-top: 6px;
-	background: var(--run);
-}
-.dot.completed { background: var(--ok); }
-.dot.error { background: var(--err); }
-.dot.aborted, .dot.stopped { background: var(--warn); }
-.dot.running { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
 
-#main { grid-area: main; overflow-y: auto; }
+/* min-height:0 on the grid items: without it their content, not the row,
+   would set the height and the inner panes would never scroll. */
+#main { grid-area: main; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
+#views { flex: 1; overflow-y: auto; min-height: 0; }
+.view { min-height: 100%; }
+#overview, #runs, #brain, #project, #run { padding: 12px 18px 40px; max-width: 1080px; }
+#docs, #doc { padding: 0; }
 
 #status {
-	grid-area: st; display: flex; align-items: center; gap: 10px;
+	grid-area: st; display: flex; align-items: center; gap: 12px;
 	padding: 0 12px; font-size: 11px;
 	background: var(--panel); border-top: 1px solid var(--border);
 }
 
 .empty {
-	display: flex; height: 60%; align-items: center; justify-content: center;
+	display: flex; height: 55%; align-items: center; justify-content: center;
 	color: var(--dim); text-align: center;
 }
-.empty.small { display: block; height: auto; padding: 16px 12px; }
+.empty.small { display: block; height: auto; padding: 14px 12px; }
 `;

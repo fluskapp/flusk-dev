@@ -1,0 +1,96 @@
+/**
+ * Shared client vocabulary: the one state object, DOM helpers, escaping,
+ * formatting, and the small HTML builders every view is written in. Plain JS
+ * shipped as a string — no template literals inside.
+ */
+export const CLIENT_CORE_JS = `
+var S = {
+	projects: [], project: null, expanded: {}, query: "",
+	tabs: [], active: null, cursor: 0, zone: "tree",
+	runFilter: null, runSort: null, docFilter: "", docProject: null,
+	chat: { msgs: [], busy: false, abort: null },
+};
+
+function $(s) { return document.querySelector(s); }
+function $$(s) { return Array.prototype.slice.call(document.querySelectorAll(s)); }
+function esc(s) {
+	return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) {
+		return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+	});
+}
+function base(p) { var parts = String(p == null ? "" : p).split("/"); return parts[parts.length - 1] || String(p); }
+function fmtCost(n) { return "$" + (Math.round((n || 0) * 10000) / 10000); }
+function fmtTime(iso) {
+	if (!iso) return "";
+	var d = new Date(iso);
+	if (isNaN(d.getTime())) return String(iso);
+	return d.toLocaleString(undefined,
+		{ month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+/** "blocked" gets its own class: the attention rules rate it MEDIUM, so
+ * painting it the same red as a failure makes the two views contradict. */
+function statusClass(s) {
+	if (s === "done" || s === "completed" || s === "ok" || s === "passed") return "completed";
+	if (s === "failed" || s === "error") return "error";
+	if (s === "blocked") return "blocked";
+	if (s === "running" || s === "active") return "running";
+	return "stopped";
+}
+function pill(status) {
+	return '<span class="pill ' + statusClass(status) + '">' + esc(status || "unknown") + "</span>";
+}
+function sec(title, body, count) {
+	return '<section class="sec"><h3>' + esc(title) +
+		(count == null ? "" : '<span class="count">' + esc(count) + "</span>") +
+		"</h3>" + body + "</section>";
+}
+function line(text, calm) {
+	return '<div class="line' + (calm ? " calm" : "") + '">' + esc(text) + "</div>";
+}
+function emptyRow(text) { return line(text); }
+function tbl(head, rows) {
+	return '<table class="tbl">' + (head ? "<thead>" + head + "</thead>" : "") +
+		"<tbody>" + rows + "</tbody></table>";
+}
+/** An <a>-like handle onto evidence; the delegated click handler reads it. */
+function evidence(text, ref, cls) {
+	return '<span class="ev ' + (cls || "") + '" data-open="ref:' + esc(ref) + '">' + esc(text) + "</span>";
+}
+function projectLink(name) {
+	return '<span class="ev" data-open="project:' + esc(name) + '">' + esc(name) + "</span>";
+}
+
+async function getJson(url) {
+	var r = await fetch(url);
+	if (!r.ok) throw new Error("HTTP " + r.status);
+	return r.json();
+}
+
+function toast(msg) {
+	var t = $("#toast");
+	t.textContent = msg;
+	t.hidden = false;
+	clearTimeout(window.__toastT);
+	window.__toastT = setTimeout(function () { t.hidden = true; }, 1800);
+}
+async function copyText(text, label) {
+	try { await navigator.clipboard.writeText(text); toast(label || "Copied"); }
+	catch (e) { toast("Copy failed"); }
+}
+
+function toggleTheme() {
+	var cur = document.documentElement.getAttribute("data-theme");
+	var osDark = matchMedia("(prefers-color-scheme: dark)").matches;
+	var next = cur === "dark" ? "light" : cur === "light" ? "dark" : osDark ? "light" : "dark";
+	document.documentElement.setAttribute("data-theme", next);
+	localStorage.setItem("ah-theme", next);
+}
+
+/** Session key, harness journal, or indexed document — decided by shape. */
+function refKind(ref) {
+	if (/\\.jsonl$/.test(ref)) return "session";
+	if (ref.indexOf("/docs/runs/") !== -1) return "journal";
+	if (/\\.md$/.test(ref)) return "doc";
+	return "journal";
+}
+`;

@@ -11,7 +11,7 @@ import type { ServerResponse } from "node:http";
 import { resolve } from "node:path";
 import { loadConfig } from "../config/config.js";
 import { scanArtifacts } from "./artifact-scan.js";
-import { expandHome, resolveJournalDirs, scanJournals } from "./journal-scan.js";
+import { expandHome, type Journal, scanJournals } from "./journal-scan.js";
 import { renderMarkdown } from "./markdown.js";
 import { buildOverview } from "./overview.js";
 import { scanSessions } from "./scan.js";
@@ -23,11 +23,20 @@ function json(res: ServerResponse, status: number, body: unknown): void {
 
 const ui = () => loadConfig(process.cwd()).ui;
 
-/** Absolute path, but only if it sits inside one of `roots`. */
-function within(target: string | null, roots: string[]): string | null {
+/**
+ * The journal the request names, or null.
+ *
+ * Identity, not prefix. A lexical `startsWith(root)` test admits anything the
+ * filesystem will follow out of the directory — a symlink under `docs/runs`
+ * pointing at /etc/passwd resolves to a path that still *starts with* the
+ * root — and it admits every non-journal file sitting there too. Matching
+ * against the paths the scanner actually indexed is the same exact-membership
+ * rule /api/artifact uses below, and it cannot be walked out of.
+ */
+function indexedJournal(target: string | null): Journal | null {
 	if (target === null || target === "") return null;
 	const path = resolve(expandHome(target));
-	return roots.some((r) => path.startsWith(`${resolve(r)}/`)) ? path : null;
+	return scanJournals(ui().harnessDirs).find((j) => j.path === path) ?? null;
 }
 
 /** Returns true when it handled the route. */
@@ -44,9 +53,18 @@ export function handleContent(
 		return true;
 	}
 	if (pathname === "/api/journal") {
-		const path = within(repo, resolveJournalDirs(ui().harnessDirs));
-		if (path === null) json(res, 400, { error: "not a configured journal path" });
-		else sendText(path, res);
+		const found = indexedJournal(repo);
+		if (found === null) json(res, 400, { error: "not an indexed journal" });
+		else sendText(found.path, res);
+		return true;
+	}
+	// One journal's frontmatter. The run view needs the title, status, stages
+	// and PR link of the single journal it is rendering; without this it had to
+	// pull the whole index and filter it, every 5s while the run was live.
+	if (pathname === "/api/journal-meta") {
+		const found = indexedJournal(repo);
+		if (found === null) json(res, 400, { error: "not an indexed journal" });
+		else json(res, 200, found);
 		return true;
 	}
 	if (pathname === "/api/artifacts") {
@@ -80,7 +98,11 @@ export function handleContent(
 		json(
 			res,
 			200,
-			buildOverview(scanSessions(), scanJournals(cfg.harnessDirs), scanArtifacts(cfg.projectDirs).length),
+			buildOverview(
+				scanSessions(),
+				scanJournals(cfg.harnessDirs),
+				scanArtifacts(cfg.projectDirs).length,
+			),
 		);
 		return true;
 	}

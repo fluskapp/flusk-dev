@@ -1,32 +1,24 @@
-/** Editor area: tab strip, meta bar, transcript messages, tool call rows. */
+/** Run view: meta bar, transcript messages, tool call rows, stage pipeline. */
 export const TRANSCRIPT_CSS = `
-#tabs {
-	display: flex; position: sticky; top: 0; z-index: 2;
-	background: var(--bg); border-bottom: 1px solid var(--border);
-}
-.tab {
-	padding: 8px 16px; font-size: 12.5px; max-width: 60%;
-	white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-	border-bottom: 2px solid var(--accent); font-weight: 600;
-}
-
 #meta {
-	display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center;
-	padding: 10px 20px; border-bottom: 1px solid var(--border); font-size: 12px;
+	display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center;
+	padding: 0 0 10px; border-bottom: 1px solid var(--border); font-size: 12px;
 }
 .pill {
-	padding: 1px 9px; border-radius: 10px; font-size: 11px; font-weight: 600;
-	color: #fff; background: var(--run); text-transform: uppercase; letter-spacing: .4px;
+	padding: 1px 8px; border-radius: 10px; font-size: 10.5px; font-weight: 600;
+	color: var(--on-accent); background: var(--run);
+	text-transform: uppercase; letter-spacing: .4px;
 }
 .pill.completed { background: var(--ok); }
 .pill.error { background: var(--err); }
-.pill.aborted, .pill.stopped { background: var(--warn); }
+/* blocked is MEDIUM in the attention rules; red would contradict that. */
+.pill.blocked, .pill.stopped { background: var(--warn); }
 .pill.running { background: var(--accent); }
 
-#transcript { padding: 14px 20px 40px; max-width: 940px; }
-.msg { display: flex; gap: 12px; margin: 14px 0; }
+#transcript { padding: 12px 0 20px; }
+.msg { display: flex; gap: 12px; margin: 12px 0; }
 .msg-tag {
-	flex: none; width: 42px; text-align: right; font-size: 11px; font-weight: 700;
+	flex: none; width: 40px; text-align: right; font-size: 10.5px; font-weight: 700;
 	padding-top: 2px; color: var(--tag-ah); text-transform: uppercase;
 }
 .msg.user .msg-tag { color: var(--tag-user); }
@@ -34,17 +26,17 @@ export const TRANSCRIPT_CSS = `
 .pre { white-space: pre-wrap; overflow-wrap: break-word; }
 .msg.user .msg-body {
 	background: var(--panel); border: 1px solid var(--border);
-	border-left: 2px solid var(--tag-user); border-radius: 6px; padding: 8px 12px;
+	border-left: 2px solid var(--tag-user); border-radius: 6px; padding: 7px 10px;
 }
 
 .tool {
-	margin: 6px 0; border: 1px solid var(--border);
+	margin: 5px 0; border: 1px solid var(--border);
 	border-radius: 6px; background: var(--panel); overflow: hidden;
 }
 .tool[open] { background: var(--bg); }
 .tool.err { border-color: var(--err); }
 .tool summary {
-	display: flex; align-items: center; gap: 10px; padding: 5px 10px;
+	display: flex; align-items: center; gap: 10px; padding: 4px 9px;
 	cursor: pointer; list-style: none; user-select: none;
 }
 .tool summary::before { content: "▸"; color: var(--dim); font-size: 10px; }
@@ -64,16 +56,29 @@ export const TRANSCRIPT_CSS = `
 	border-top: 1px solid var(--border); overflow-x: auto; max-height: 340px;
 }
 .code.out { color: var(--text); }
-.pad { padding: 6px 12px; }
+.pad { padding: 5px 10px; }
 
 .error-line {
-	margin: 6px 0; padding: 6px 12px; color: var(--err); font-size: 12.5px;
+	margin: 6px 0; padding: 5px 10px; color: var(--err); font-size: 12.5px;
 	border: 1px solid var(--err); border-radius: 6px; background: var(--panel);
 }
 .compaction {
-	margin: 16px 0; padding: 6px 12px; text-align: center; font-size: 11.5px;
+	margin: 14px 0; padding: 5px 10px; text-align: center; font-size: 11.5px;
 	color: var(--dim); border-top: 1px dashed var(--border);
 }
-.stats { margin: 22px 0 0 54px; font-size: 12px; color: var(--dim); }
-.running-note { margin: 22px 0 0 54px; font-size: 12px; color: var(--accent); }
+.stats { margin: 18px 0 0 52px; font-size: 12px; color: var(--dim); }
+.running-note { margin: 18px 0 0 52px; font-size: 12px; color: var(--accent); }
+
+.stages { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; }
+.stage {
+	font: 10.5px var(--font-code); padding: 1px 6px; border-radius: 3px;
+	background: var(--hover); color: var(--dim); border: 1px solid transparent;
+}
+.stage.completed { background: transparent; border-color: var(--ok); color: var(--ok); }
+.stage.running { background: var(--accent); color: var(--on-accent); }
+.stage.error { background: transparent; border-color: var(--err); color: var(--err); }
+.stage.stopped { border-color: var(--warn); color: var(--warn); background: transparent; }
+.stage[data-stage], .error-line[data-stage] { cursor: pointer; }
+.error-line[data-stage]:hover { background: var(--hover); }
+#journal-body { margin-top: 8px; max-height: 60vh; }
 `;

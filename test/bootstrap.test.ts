@@ -9,7 +9,7 @@ import { createMemory } from "../src/memory/bootstrap.js";
 import { noopMemory } from "../src/memory/port.js";
 import { repoSlug } from "../src/session/paths.js";
 import { capture, SLOW } from "./cli2-helpers.js";
-import { setupTestHome, teardownTestHome } from "./helpers.js";
+import { setupTestHome, teardownTestHome, writeHomeConfig } from "./helpers.js";
 import { startMockAbagraph } from "./mock-abagraph.js";
 
 let repo: string;
@@ -76,10 +76,7 @@ test("reachable server → AbagraphMemoryPort + client bound to the resolved nam
 });
 
 test("run with memory enabled but unreachable warns on stderr and still completes", async () => {
-	await writeFile(
-		join(repo, ".ah.json"),
-		JSON.stringify({ memory: { enabled: true, baseUrl: DEAD_URL } }),
-	);
+	await writeHomeConfig({ memory: { enabled: true, baseUrl: DEAD_URL } });
 	const err = spyStderr();
 	try {
 		const cap = capture();
@@ -93,10 +90,7 @@ test("run with memory enabled but unreachable warns on stderr and still complete
 }, SLOW);
 
 test("quiet run keeps stderr clean even while memory degrades", async () => {
-	await writeFile(
-		join(repo, ".ah.json"),
-		JSON.stringify({ memory: { enabled: true, baseUrl: DEAD_URL } }),
-	);
+	await writeHomeConfig({ memory: { enabled: true, baseUrl: DEAD_URL } });
 	const err = spyStderr();
 	try {
 		const cap = capture();
