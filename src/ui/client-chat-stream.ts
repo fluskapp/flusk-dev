@@ -1,10 +1,39 @@
 /**
- * The chat transport: POST /api/chat and read its SSE frames, appending each
- * delta as it lands so the reply is visible while it is still being written.
- * Stop aborts the fetch, which the server turns into an aborted engine — a
- * closed stream must never leave a CLI running.
+ * Everything the chat panel says over the wire: the backend list, the SSE
+ * stream from POST /api/chat, and POST /api/render at the end of a turn.
+ *
+ * Deltas land as plain text so the reader sees the reply being written; the
+ * finished text goes to the server's one markdown renderer and comes back as
+ * HTML. If that call fails the plain text stays — a lost render must never
+ * cost the reply.
  */
 export const CLIENT_CHAT_STREAM_JS = `
+function backendOption(b, saved) {
+	var label = b.label + (b.available ? "" : " \\u2014 " + (b.note || "unavailable"));
+	return '<option value="' + esc(b.id) + '"' + (b.available ? "" : " disabled") +
+		(b.available && b.id === saved ? " selected" : "") + ">" + esc(label) + "</option>";
+}
+
+async function loadBackends() {
+	var list;
+	try { list = await getJson("/api/chat/backends"); }
+	catch (e) {
+		$("#chat-backend").innerHTML = '<option value="">backends unavailable</option>';
+		return;
+	}
+	var saved = localStorage.getItem(CHAT_KEY);
+	var known = list.filter(function (b) { return b.available && b.id === saved; }).length > 0;
+	if (!known) {
+		var first = list.filter(function (b) { return b.available; })[0];
+		saved = first ? first.id : "";
+	}
+	$("#chat-backend").innerHTML = list.length
+		? list.map(function (b) { return backendOption(b, saved); }).join("")
+		: '<option value="">no backends configured</option>';
+	var usable = list.filter(function (b) { return b.available; }).length;
+	if ($("#chat-note")) $("#chat-note").textContent = usable ? "" : "no backend available";
+}
+
 /** Split an SSE buffer into complete frames; returns the unparsed remainder. */
 function sseFrames(buf, onChunk) {
 	var i;
@@ -40,6 +69,35 @@ async function readChatStream(body) {
 	try { await reader.cancel(); } catch (e) { /* already closed */ }
 }
 
+/** The request body. Flagged turns are UI, never conversation (chatError). */
+function chatBody(backendId, msgs, cwd) {
+	var body = {
+		backendId: backendId,
+		messages: msgs.filter(function (m) { return !m.err; }).map(function (m) {
+			return { role: m.role, content: m.content };
+		}),
+	};
+	if (cwd) body.cwd = cwd;
+	return body;
+}
+
+/**
+ * End of turn: let the server render the reply as markdown, then swap it in.
+ * Any failure leaves m.html unset, so the turn keeps showing its plain text.
+ */
+async function finishTurn(m) {
+	if (!m || m.role !== "assistant" || m.err || !m.content) return;
+	try {
+		var r = await fetch("/api/render", {
+			method: "POST",
+			headers: { "content-type": "application/json" },
+			body: JSON.stringify({ text: m.content }),
+		});
+		if (r.ok) setTurnHtml(m, (await r.json()).html);
+	} catch (e) { /* keep the plain text */ }
+	renderChat();
+}
+
 async function sendChat() {
 	var input = $("#chat-input");
 	var text = input.value.trim();
@@ -48,7 +106,8 @@ async function sendChat() {
 	if (!backendId) { toast("No chat backend available"); return; }
 	localStorage.setItem(CHAT_KEY, backendId);
 	input.value = "";
-	S.chat.msgs.push({ role: "user", content: text });
+	autogrowChat(input);
+	S.chat.msgs.push({ role: "user", content: text, at: chatClock() });
 	S.chat.busy = true;
 	// Captured, so this call's teardown can tell whether it is still the one
 	// in flight: after Stop, a second send can start while the first is still
@@ -58,19 +117,11 @@ async function sendChat() {
 	S.chat.abort = ac;
 	renderChat();
 	chatBusyUi(true);
-	// Error bubbles are UI, not conversation: sending them back would replay
-	// "claude not found on PATH" to the model as its own last turn.
-	var body = { backendId: backendId, messages: S.chat.msgs.filter(function (m) {
-		return !m.err;
-	}).map(function (m) {
-		return { role: m.role, content: m.content };
-	}) };
-	if (S.project) body.cwd = S.project.path;
 	try {
 		var r = await fetch("/api/chat", {
 			method: "POST",
 			headers: { "content-type": "application/json" },
-			body: JSON.stringify(body),
+			body: JSON.stringify(chatBody(backendId, S.chat.msgs, S.project && S.project.path)),
 			signal: ac.signal,
 		});
 		if (!r.ok || !r.body) chatError("chat failed: HTTP " + r.status);
@@ -83,15 +134,16 @@ async function sendChat() {
 		S.chat.abort = null;
 		chatBusyUi(false);
 	}
-	renderChat();
+	// Stop lands here too, with a partial reply: render what did arrive.
+	await finishTurn(S.chat.msgs[S.chat.msgs.length - 1]);
 }
 
+/** Abort the fetch and keep whatever already arrived on screen. */
 function stopChat() {
 	if (S.chat.abort) S.chat.abort.abort();
 	S.chat.abort = null;
 	S.chat.busy = false;
 	chatBusyUi(false);
 	renderChat();
-	toast("Stopped");
 }
 `;

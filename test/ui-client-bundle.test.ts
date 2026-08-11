@@ -33,7 +33,6 @@ it("ships the handler the help overlay describes, not only the sheet", () => {
 	// stayed green with CLIENT_KEYS_JS deleted from the bundle entirely.
 	expect(served).toContain("PANEL_KEYS");
 	for (const binding of [
-		'"1": "attention"',
 		'"2": "runs"',
 		'"3": "docs"',
 		'"4": "brain"',
@@ -44,10 +43,30 @@ it("ships the handler the help overlay describes, not only the sheet", () => {
 	]) {
 		expect(served).toContain(binding);
 	}
+	// The tool windows are numbered the way IntelliJ numbers them: 1 Projects,
+	// 5 Find, 6 Chat are windows to fold, 2/3/4 are editor panels to open.
+	for (const binding of [
+		'if (n === "1") toggleSide()',
+		'else if (n === "5") toggleFind()',
+		'else if (n === "6") toggleChat()',
+	]) {
+		expect(served).toContain(binding);
+	}
 	// A panel key opens the WHOLE panel: no filter left over from a drill-in.
 	expect(served).toContain("openPanel(PANEL_KEYS[e.key])");
 	expect(served).toContain('if (kind === "runs") { S.runFilter = null; S.runSort = null; }');
-	for (const gesture of ["moveCursor(1)", "moveCursor(-1)", "openCursor()", "focusChat()"]) {
+	for (const gesture of [
+		"moveOrScroll(e, 1)",
+		"moveOrScroll(e, -1)",
+		"openCursor()",
+		"focusChat()",
+	]) {
 		expect(served).toContain(gesture);
 	}
+	// A zone with no rows scrolls the editor rather than swallowing the key:
+	// a rendered document has no cursor rows, and it must still scroll.
+	expect(served).toContain("function moveOrScroll(");
+	expect(served).toContain("pane.scrollBy(0, delta * 60)");
+	// ⌘W is the browser's; binding it closed the whole session.
+	expect(served).not.toContain('if (key === "w") { closeActiveTab(); return true; }');
 });

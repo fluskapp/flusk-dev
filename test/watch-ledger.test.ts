@@ -72,7 +72,16 @@ it("re-stamping a cooldown extends the rest period", async () => {
 
 it("tracks the nightly run count per date", async () => {
 	const date = nightKey(T0);
-	expect(date).toBe("2026-08-10");
+	// Date-INDEPENDENT: this used to assert a literal "2026-08-10", so it
+	// passed on exactly one day and failed the moment the clock rolled over.
+	// The property is that a night is stamped with the LOCAL calendar day it
+	// started on — twelve hours back — and that the next night is a new key.
+	expect(date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+	const started = new Date(T0 - 12 * HOUR);
+	expect(date).toBe(
+		new Date(started.getTime() - started.getTimezoneOffset() * 60_000).toISOString().slice(0, 10),
+	);
+	expect(nightKey(T0 + 24 * HOUR)).not.toBe(date);
 	expect(await nightCount(client, date)).toBe(0);
 	await bumpNightCount(client, date, 0);
 	expect(await nightCount(client, date)).toBe(1);

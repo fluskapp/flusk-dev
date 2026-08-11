@@ -61,28 +61,27 @@ async function loadDocs() {
 	renderDocs();
 }
 
+/**
+ * One document, RENDERED — with the frontmatter as a property table and the
+ * [Preview | Split | Raw] control in the tab's toolbar. /api/artifact serves
+ * markdown already rendered; when it also carries the source, Split and Raw
+ * light up, and until then they say why they are off rather than lying.
+ */
 async function loadDoc(path) {
+	setStatusPath(path);
 	var d;
 	try { d = await getJson("/api/artifact?repo=" + encodeURIComponent(path)); }
 	catch (e) {
 		$("#doc").innerHTML = '<div class="empty small">could not render this document</div>';
 		return;
 	}
-	var fm = Object.keys(d.frontmatter || {}).map(function (k) {
-		return '<div class="fm-row"><span class="fm-k">' + esc(k) + "</span><span>" +
-			esc(d.frontmatter[k]) + "</span></div>";
-	}).join("");
-	$("#doc").innerHTML =
-		'<div class="doc-head"><b>' + esc(d.title) + "</b>" +
-		'<span class="dim">' + esc(d.path) + "</span>" +
-		'<div class="meta-actions">' +
-		'<button class="act" id="doc-copy">Copy path</button>' +
-		'<button class="act" id="doc-nvim">Copy nvim command</button></div></div>' +
-		(fm ? '<div class="frontmatter">' + fm + "</div>" : "") +
-		'<div class="md">' + d.html + "</div>";
-	$("#doc-copy").addEventListener("click", function () { copyText(d.path, "Path copied"); });
-	$("#doc-nvim").addEventListener("click", function () {
-		copyText('nvim "' + d.path + '"', "Command copied");
+	setStatusPath(d.path);
+	mdSurface($("#doc"), {
+		id: "doc:" + path, title: d.title, path: d.path,
+		html: fmTable(d.frontmatter) + d.html,
+		text: typeof d.text === "string" ? d.text : "",
+		actions: pathActions(),
+		wire: function () { wirePathActions("#doc", d.path); },
 	});
 }
 `;

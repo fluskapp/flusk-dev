@@ -1,16 +1,19 @@
 /**
- * Static markup for the two pieces of chrome that are pure HTML: the chat
- * tool window and the shortcut sheet. Kept out of page.ts so the page file
- * stays a shell, and out of the client-*.js strings because nothing here is
- * generated — it never touches user data.
+ * Static markup for the chrome that is pure HTML: the chat tool window, the
+ * Find in Files tool window, and the shortcut sheet. Kept out of page.ts so
+ * the page file stays a shell, and out of the client-*.js strings because
+ * nothing here is generated — it never touches user data.
  */
 
-/** Right tool window: backend picker, transcript, composer. */
+/** The shortcut sheet lives beside its rows; re-exported so page.ts has one import. */
+export { HELP_HTML } from "./client-help.js";
+
+/** Right tool window (6): backend picker, transcript, composer. */
 export const CHAT_HTML = `<aside id="chat">
 	<div class="tw-head chat-head">
-		<span>Chat</span>
+		<span class="tw-num">6</span><span>Chat</span>
 		<select id="chat-backend" title="Backend"><option>loading…</option></select>
-		<button id="chat-hide" title="Hide chat (c)">&#10005;</button>
+		<button id="chat-hide" title="Hide chat (&#8984;6)">&#10005;</button>
 	</div>
 	<div id="chat-log"><div class="empty small">Ask the model about the selected project.</div></div>
 	<div id="chat-cwd" class="dim small">cwd: no project selected</div>
@@ -25,30 +28,26 @@ export const CHAT_HTML = `<aside id="chat">
 	</div>
 </aside>`;
 
-const HELP_ROWS: Array<[string, string]> = [
-	["/", "Search projects"],
-	["j", "Next row"],
-	["k", "Previous row"],
-	["Enter", "Open selected row"],
-	["Tab", "Cursor: tree ↔ table"],
-	["1", "Attention (what needs me)"],
-	["2", "Runs"],
-	["3", "Docs"],
-	["4", "Brain"],
-	["o", "Attention"],
-	["r", "Runs"],
-	["d", "Docs"],
-	["b", "Brain"],
-	["c", "Focus chat"],
-	["w", "Close current tab"],
-	["t", "Toggle theme"],
-	["Esc", "Clear / close"],
-	["?", "This panel"],
-];
-
-/** The shortcut sheet, pre-rendered: every row is a literal, never user data. */
-export const HELP_HTML = `<div id="help" class="overlay" hidden>
-	<div class="help-card"><h3>Shortcuts</h3><div class="keys">${HELP_ROWS.map(
-		([k, v]) => `<kbd>${k}</kbd><span>${v}</span>`,
-	).join("")}</div></div>
-</div>`;
+/**
+ * Bottom tool window (5): the query line, then a result tree. Every control
+ * is a real form field so the browser's own focus order is the tab order.
+ */
+export const FIND_HTML = `<section id="find">
+	<div class="tw-head">
+		<span class="tw-num">5</span><span class="glyph">find</span><span>Find in Files</span>
+		<span class="spacer"></span>
+		<button id="find-hide" title="Hide Find (&#8984;5)">&#10005;</button>
+	</div>
+	<div id="find-form">
+		<input id="find-q" spellcheck="false" placeholder="Search across your projects (ripgrep)"/>
+		<select id="find-scope" title="Where to search">
+			<option value="project">This project</option>
+			<option value="all">All projects</option>
+		</select>
+		<input id="find-mask" spellcheck="false" placeholder="File mask *.ts" title="ripgrep glob"/>
+		<label class="find-toggle" title="Match case"><input type="checkbox" id="find-case"/>Match case</label>
+		<label class="find-toggle" title="Regular expression"><input type="checkbox" id="find-regex"/>Regex</label>
+		<span id="find-note"></span>
+	</div>
+	<div id="find-results"><div class="fx-empty">Type to search every configured project.</div></div>
+</section>`;

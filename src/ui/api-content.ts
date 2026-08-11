@@ -82,10 +82,14 @@ export function handleContent(
 		const meta = scanArtifacts(ui().projectDirs).find((a) => a.path === path);
 		try {
 			const text = readFileSync(path, "utf8");
+			// `text` as well as `html`: without the source, mdSurface computes
+			// hasRaw === false and the Split and Raw segments are disabled on
+			// every document tab, while the help sheet still advertises s / R.
 			json(res, 200, {
 				path,
 				title: meta?.title ?? path,
 				frontmatter: meta?.frontmatter ?? {},
+				text,
 				html: renderMarkdown(text),
 			});
 		} catch (e) {

@@ -60,6 +60,8 @@ function wireToolbar() {
 	$("#help-btn").addEventListener("click", function () { $("#help").hidden = false; });
 	$("#help").addEventListener("click", function () { this.hidden = true; });
 	$("#overview-btn").addEventListener("click", function () { openPanel("attention"); });
+	$("#side-btn").addEventListener("click", toggleSide);
+	$("#find-btn").addEventListener("click", function () { toggleFind(); });
 	$("#runs-btn").addEventListener("click", function () { openPanel("runs"); });
 	$("#docs-btn").addEventListener("click", function () { openPanel("docs"); });
 	$("#brain-btn").addEventListener("click", toggleBrain);
@@ -107,10 +109,17 @@ function startPolls() {
 	var savedTheme = localStorage.getItem("ah-theme");
 	if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
 	setChatVisible(localStorage.getItem("ah-chat-open") !== "0");
+	setSideVisible(localStorage.getItem("ah-side-open") !== "0");
+	// Find starts CLOSED: it is a tool window you summon (⌘⇧F), not a rail
+	// that eats a third of the editor before you have searched for anything.
+	findVisible(localStorage.getItem(FIND_OPEN_KEY) === "1");
 	wireToolbar();
 	wireChat();
+	wireFind();
+	wireGrips();
 	initTabs();
 	updateChatCwd();
+	renderStatus();
 	loadProjects(true).then(function () { renderActive(true); });
 	loadBackends();
 	startPolls();

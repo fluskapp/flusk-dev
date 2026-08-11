@@ -63,6 +63,23 @@ it("serves only journals the scanner indexed — not symlinks, not stray files",
 	expect(JSON.parse(meta.body)).toMatchObject({ status: "done", path: indexedJournal });
 });
 
+it("serves an indexed document's SOURCE as well as its html", async () => {
+	// Without `text` the client computes hasRaw === false, so Split and Raw are
+	// disabled on every document tab while the help sheet still advertises
+	// s / R — the keys are swallowed and nothing happens.
+	const doc = write(project, "README.md", "# Title\n\nbody text\n");
+	const reply = await call(ui.url, `/api/artifact?repo=${encodeURIComponent(doc)}`);
+	expect(reply.status).toBe(200);
+	const payload = JSON.parse(reply.body) as Record<string, unknown>;
+	expect(payload.text).toBe("# Title\n\nbody text\n");
+	expect(String(payload.html)).toContain("<h1>Title</h1>");
+	// the containment rule is unchanged: only what the scanner indexed
+	const stray = join(t.work, "secret.txt");
+	const denied = await call(ui.url, `/api/artifact?repo=${encodeURIComponent(stray)}`);
+	expect(denied.status).toBe(400);
+	expect(denied.body).not.toContain("PRIVATE KEY");
+});
+
 it("answers an over-size chat body instead of resetting the connection", async () => {
 	const huge = JSON.stringify({
 		backendId: "claude",

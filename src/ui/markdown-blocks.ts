@@ -2,58 +2,64 @@
  * Multi-line block builders. Each takes the escaped line array plus the index
  * of its opening line and returns the HTML with the index to continue from.
  */
+import { highlightCode } from "./highlight.js";
 import { renderInline } from "./markdown-inline.js";
 
 export type Block = [html: string, next: number];
 
-const SEP_CELL = /^:?-+:?$/;
-
-function cells(line: string): string[] {
-	return line
-		.trim()
-		.replace(/^\|/, "")
-		.replace(/\|$/, "")
-		.split("|")
-		.map((c) => c.trim());
+/**
+ * CommonMark's closing rule, stated exactly: a fence is closed by a BARE run
+ * of backticks at least as long as the one that opened it. A line carrying an
+ * info string — ```bash — never closes, it opens.
+ *
+ * What this does NOT do is nest. A run journal that quotes an agent's
+ * transcript inside a plain ``` block, where the transcript has its own
+ * ```bash fence, is closed by that inner block's own bare ``` — because in
+ * CommonMark it is. The way to quote a transcript containing bare fences is
+ * an outer fence that is LONGER than any fence inside it (````), which this
+ * honours; there is no rule by which a three-backtick fence can hold another.
+ */
+function closesFence(line: string, width: number): boolean {
+	const m = /^\s*(`{3,})\s*$/.exec(line);
+	return m !== null && (m[1] ?? "").length >= width;
 }
 
-/** A GFM separator row: `|---|:--:|`. Decides whether the line above is a table. */
-export function isTableSeparator(line: string): boolean {
-	if (!line.includes("-") || !line.includes("|")) return false;
-	const parts = cells(line);
-	return parts.length > 0 && parts.every((c) => SEP_CELL.test(c));
+/**
+ * A bare fence whose body is obviously a patch.
+ *
+ * Measured across 301 real journals: 309 bare ``` fences, 300 ```mermaid, one
+ * ```bash and ZERO ```diff — so gating diff colour on an explicit info string
+ * meant every patch a journal ever wrote rendered unhighlighted.
+ */
+const DIFF_SNIFF = /^(?:diff --git |@@ .*@@|index [0-9a-f]{4,}\.\.)|^--- .*\n\+\+\+ /m;
+
+function looksLikeDiff(text: string): boolean {
+	return DIFF_SNIFF.test(text.split("\n").slice(0, 6).join("\n"));
 }
 
-export function takeTable(lines: string[], start: number): Block {
-	const head = cells(lines[start] ?? "").map((c) => `<th>${renderInline(c)}</th>`);
-	let i = start + 2;
-	const rows: string[] = [];
-	for (; i < lines.length; i++) {
-		const line = lines[i] ?? "";
-		if (!line.includes("|") || line.trim() === "") break;
-		rows.push(
-			`<tr>${cells(line)
-				.map((c) => `<td>${renderInline(c)}</td>`)
-				.join("")}</tr>`,
-		);
-	}
-	const body = rows.length > 0 ? `<tbody>${rows.join("")}</tbody>` : "";
-	return [`<table><thead><tr>${head.join("")}</tr></thead>${body}</table>`, i];
-}
-
-/** Fenced code: contents stay verbatim, so no inline formatting is applied. */
-export function takeCode(lines: string[], start: number, lang: string): Block {
+/**
+ * Fenced code: no inline formatting, and the language gets highlighted.
+ *
+ * `raw` is the *unescaped* line array — the same lines, before renderMarkdown
+ * escaped the document — because the highlighter tokenizes source and escapes
+ * every slice itself. Without it the block falls back to the escaped text.
+ */
+export function takeCode(lines: string[], start: number, lang: string, raw?: string[]): Block {
+	const width = (/^\s*(`{3,})/.exec(lines[start] ?? "")?.[1] ?? "```").length;
 	const body: string[] = [];
 	let i = start + 1;
 	for (; i < lines.length; i++) {
-		if (/^\s*```/.test(lines[i] ?? "")) {
+		if (closesFence(lines[i] ?? "", width)) {
 			i++;
 			break;
 		}
-		body.push(lines[i] ?? "");
+		body.push((raw ?? lines)[i] ?? "");
 	}
-	const cls = lang === "" ? "" : ` class="lang-${lang}"`;
-	return [`<pre class="code"><code${cls}>${body.join("\n")}</code></pre>`, i];
+	const text = body.join("\n");
+	const name = lang === "" && looksLikeDiff(text) ? "diff" : lang;
+	const inner = raw === undefined ? text : highlightCode(text, name);
+	const cls = name === "" ? "" : ` class="lang-${name}"`;
+	return [`<pre class="code"><code${cls}>${inner}</code></pre>`, i];
 }
 
 /** `>` survives escaping as `&gt;`, which is what the caller matched on. */

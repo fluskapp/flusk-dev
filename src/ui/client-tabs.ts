@@ -1,13 +1,14 @@
 /**
  * The editor tab strip. Four pinned tabs are the panels (Attention, Runs,
- * Docs, Brain); project, run and doc tabs open on top of them and close
- * again. One tab is active, one view container is visible, and every open
- * lands here — nothing in this dashboard is a dead end.
+ * Docs, Brain); project, run, doc and file tabs open on top of them and close
+ * again. Each carries a kind glyph — md / run / session / doc / find — one is
+ * active with a 2px accent underline, and a breadcrumb under the strip says
+ * where the active one lives: project › area › file.
  */
 export const CLIENT_TABS_JS = `
 var VIEW_OF = {
 	attention: "#overview", runs: "#runs", docs: "#docs", brain: "#brain",
-	project: "#project", run: "#run", doc: "#doc",
+	project: "#project", run: "#run", doc: "#doc", file: "#file",
 };
 var PINNED = [
 	{ id: "attention", kind: "attention", label: "Attention" },
@@ -18,6 +19,24 @@ var PINNED = [
 var PANEL_BTN = {
 	attention: "#overview-btn", runs: "#runs-btn", docs: "#docs-btn", brain: "#brain-btn",
 };
+/** The glyph vocabulary; the Find tool window's header uses "find" too. */
+var TAB_GLYPH = {
+	attention: "att", runs: "run", docs: "doc", brain: "mem",
+	project: "prj", find: "find",
+};
+/** Which area of the workbench a tab belongs to — the middle breadcrumb. */
+var TAB_AREA = {
+	attention: "Attention", runs: "Runs", docs: "Docs", brain: "Brain",
+	project: "Projects", run: "Runs", doc: "Docs", file: "Files",
+};
+
+function fileGlyph(path) { return isMd(path) ? "md" : ext(path) || "file"; }
+function tabGlyph(t) {
+	if (t.kind === "run") return refKind(t.ref) === "session" ? "session" : "run";
+	if (t.kind === "doc") return "md";
+	if (t.kind === "file") return fileGlyph(t.ref);
+	return TAB_GLYPH[t.kind] || "tab";
+}
 
 function tabById(id) {
 	return S.tabs.filter(function (t) { return t.id === id; })[0] || null;
@@ -45,8 +64,10 @@ function renderTabs() {
 	$("#tabs").innerHTML = S.tabs.map(function (t) {
 		return '<div class="tab' + (t.id === S.active ? " on" : "") +
 			'" data-open="tab:' + esc(t.id) + '" title="' + esc(t.title || t.label) + '">' +
+			'<span class="glyph">' + esc(tabGlyph(t)) + "</span>" +
 			'<span class="label">' + esc(t.label) + "</span>" +
-			(t.pinned ? "" : '<span class="x" data-close="' + esc(t.id) + '">&#10005;</span>') +
+			(t.pinned ? "" : '<span class="x" data-close="' + esc(t.id) +
+				'" title="Close (w)">&#10005;</span>') +
 			"</div>";
 	}).join("");
 	Object.keys(PANEL_BTN).forEach(function (k) {
@@ -55,11 +76,35 @@ function renderTabs() {
 	});
 }
 
+/**
+ * project › area › file, with the leaf in full colour.
+ *
+ * The tab's OWN project wins over the one selected in the tree: an
+ * all-projects search opens a hit from another repo, and prefixing it with
+ * whatever the tree happened to be showing made the breadcrumb and the status
+ * bar's path openly disagree.
+ */
+function renderCrumbs(t) {
+	var parts = [];
+	var owner = t.project || (S.project && S.project.name);
+	if (owner) parts.push(owner);
+	parts.push(TAB_AREA[t.kind] || t.kind);
+	var leaf = t.ref ? base(t.ref) : "";
+	if (leaf && leaf !== parts[parts.length - 1]) parts.push(leaf);
+	$("#crumbs").innerHTML = parts.map(function (p, i) {
+		return (i ? '<span class="sep">\\u203a</span>' : "") +
+			'<span class="' + (i === parts.length - 1 ? "leaf" : "") + '">' + esc(p) + "</span>";
+	}).join("");
+}
+
 /** Show the active tab's container and (re)load it. */
 function renderActive(reload) {
 	var t = activeTab() || PINNED[0];
 	Object.keys(VIEW_OF).forEach(function (k) { $(VIEW_OF[k]).hidden = k !== t.kind; });
-	$("#crumb").textContent = (S.project ? S.project.name + " \\u203a " : "") + t.label;
+	renderCrumbs(t);
+	// A panel is not a file; only a tab that stands for a path claims the
+	// status bar's path field, and the views refine it once they have loaded.
+	setStatusPath(t.ref && t.kind !== "project" ? t.ref : "");
 	if (reload !== false) loadView(t);
 }
 
@@ -71,6 +116,7 @@ function loadView(t) {
 	else if (t.kind === "project") loadProject(t.ref);
 	else if (t.kind === "run") loadRun(t.ref);
 	else if (t.kind === "doc") loadDoc(t.ref);
+	else if (t.kind === "file") loadFile(t);
 }
 
 function togglePanel(kind) {
@@ -79,9 +125,11 @@ function togglePanel(kind) {
 }
 
 /** Open whatever a piece of evidence points at: session, journal, or doc. */
-function openRef(ref, label) {
+function openRef(ref, label, project) {
 	var kind = refKind(ref) === "doc" ? "doc" : "run";
-	openTab({ id: kind + ":" + ref, kind: kind, label: label || base(ref), title: ref, ref: ref });
+	var t = { id: kind + ":" + ref, kind: kind, label: label || base(ref), title: ref, ref: ref };
+	if (project) t.project = project;
+	openTab(t);
 }
 function openProject(name) {
 	selectProject(name);

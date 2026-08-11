@@ -1,0 +1,130 @@
+/**
+ * A harness journal, rendered. The stage pipeline, its failing-stage evidence
+ * and the PR link stay above the body; the body itself is the markdown the
+ * harness wrote, RENDERED by default — frontmatter as a property table, not
+ * as the YAML that used to be the first thing anyone saw.
+ */
+export const CLIENT_JOURNAL_JS = `
+var STAGE_CLASS = {
+	done: "completed", ok: "completed", pass: "completed", passed: "completed",
+	running: "running", failed: "error", error: "error",
+	skipped: "stopped", skip: "stopped", pending: "",
+};
+
+function stageClass(status) {
+	var key = String(status).toLowerCase();
+	return Object.prototype.hasOwnProperty.call(STAGE_CLASS, key) ? STAGE_CLASS[key] : "";
+}
+
+/** Journals are files a harness wrote; only ever link out to http(s). */
+function safeUrl(u) { return /^https?:\\/\\//.test(String(u)) ? String(u) : null; }
+
+function stageHtml(s) {
+	var cls = stageClass(s.status);
+	var title = s.status + (s.duration ? " \\u00b7 " + s.duration : "") +
+		(s.detail ? " \\u00b7 " + s.detail : "");
+	// A failed stage is a handle onto the place in the journal that explains it.
+	var jump = cls === "error" ? ' data-stage="' + esc(s.name) + '"' : "";
+	return '<span class="stage ' + cls + '"' + jump + ' title="' + esc(title) + '">' +
+		esc(s.name) + "</span>";
+}
+
+/**
+ * The failing stage's detail, rendered where it can be read. It is the whole
+ * evidence behind a "stage gate failed" attention item, and hiding it in a
+ * title= tooltip stopped the symptom-to-evidence path one click short.
+ */
+function stageErrors(stages) {
+	return (stages || []).filter(function (s) {
+		var k = String(s.status).toLowerCase();
+		return k === "failed" || k === "error";
+	}).map(function (s) {
+		return '<div class="error-line" data-stage="' + esc(s.name) + '">' +
+			"<b>" + esc(s.name) + "</b> " + esc(s.status) +
+			(s.duration ? " \\u00b7 " + esc(s.duration) : "") +
+			(s.detail ? " \\u2014 " + esc(s.detail) : "") +
+			' <span class="dim">(open in journal)</span></div>';
+	}).join("");
+}
+
+/**
+ * Scroll the rendered journal to the first block that names this stage.
+ *
+ * Scoped to \`.md\`: the unscoped selector's \`pre\` matched the single
+ * \`<pre class="raw code">\` that Raw and Split render, so the "jump" marked
+ * and scrolled to the WHOLE document — and .hit-line is only styled under
+ * .md, so nothing was visibly marked either. In Raw mode there are no blocks
+ * to land on, so the raw pane is scrolled by the line's proportion instead.
+ */
+function jumpToStage(name) {
+	var needle = String(name).toLowerCase();
+	$$("#run .hit-line").forEach(function (el) { el.classList.remove("hit-line"); });
+	var els = $$("#run .md h1, #run .md h2, #run .md h3, #run .md p," +
+		" #run .md li, #run .md td, #run .md pre");
+	for (var i = 0; i < els.length; i++) {
+		if (String(els[i].textContent).toLowerCase().indexOf(needle) === -1) continue;
+		els[i].classList.add("hit-line");
+		els[i].scrollIntoView({ block: "center" });
+		return;
+	}
+	if (jumpRawToStage(needle)) return;
+	toast("\\u201c" + name + "\\u201d is not named in this journal");
+}
+
+/** Raw mode has one <pre>: scroll it to where the stage is named in the text. */
+function jumpRawToStage(needle) {
+	var raw = $("#run .ed-body pre.raw");
+	if (!raw) return false;
+	var text = String(raw.textContent);
+	var at = text.toLowerCase().indexOf(needle);
+	if (at === -1) return false;
+	var before = text.slice(0, at).split("\\n").length - 1;
+	var total = Math.max(1, text.split("\\n").length);
+	raw.scrollTop = Math.max(0, (before / total) * raw.scrollHeight - raw.clientHeight / 2);
+	return true;
+}
+
+function journalHead(meta, path) {
+	if (!meta) return '<div class="head-row"><h2>' + esc(base(path)) + "</h2></div>";
+	return '<div class="head-row"><h2>' + esc(meta.title.replace(/^Run:\\s*/, "")) + "</h2>" +
+		pill(meta.status) + '<span class="dim">' + esc(meta.harness) + " \\u00b7 " +
+		esc(fmtTime(meta.date)) + "</span></div>" +
+		'<div class="stages">' + meta.stages.map(stageHtml).join("") + "</div>" +
+		stageErrors(meta.stages) +
+		(safeUrl(meta.pr) ? '<div class="small"><a class="ev" href="' + esc(meta.pr) +
+			'" target="_blank" rel="noopener">' + esc(meta.pr) + "</a></div>" : "");
+}
+
+async function loadJournalRun(path) {
+	var meta = null;
+	// One journal's frontmatter, not the whole index: this repeats every 5s
+	// while the run is live, and the index is a rescan of every journal on disk.
+	try { meta = await getJson("/api/journal-meta?repo=" + encodeURIComponent(path)); }
+	catch (e) { meta = null; }
+	if (meta) window.__ahRunStatus = meta.status;
+	var host = $("#run");
+	var head = journalHead(meta, path);
+	var text = "";
+	try {
+		var r = await fetch("/api/journal?repo=" + encodeURIComponent(path));
+		if (r.ok) text = await r.text();
+	} catch (e) { text = ""; }
+	var html = "";
+	if (text !== "") {
+		try { html = await postRender(text, "md"); }
+		catch (e) { html = '<div class="empty small">could not render this journal</div>'; }
+	} else {
+		html = '<div class="empty small">could not read this journal</div>';
+	}
+	mdSurface(host, {
+		id: "run:" + path, path: path, head: head, html: html, text: text,
+		actions: pathActions(),
+		wire: function () {
+			wirePathActions("#run", path);
+			$$("#run [data-stage]").forEach(function (el) {
+				el.addEventListener("click", function () { jumpToStage(el.getAttribute("data-stage")); });
+			});
+		},
+	});
+}
+`;

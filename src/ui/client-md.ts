@@ -1,0 +1,96 @@
+/**
+ * The markdown surface every .md tab is built from: a toolbar carrying the
+ * IntelliJ segmented control [Preview | Split | Raw], and a body in whichever
+ * of those three the tab was last left in (remembered in localStorage, per
+ * tab, so a journal you read raw stays raw and a doc stays rendered).
+ *
+ * Preview is the DEFAULT — the whole point of the exercise: a .md file opens
+ * as a document, never as YAML frontmatter followed by asterisks.
+ */
+export const CLIENT_MD_JS = `
+var MD_MODES = ["preview", "split", "raw"];
+var MD_LABEL = { preview: "Preview", split: "Split", raw: "Raw" };
+var MD_KEY = "ah-md-mode";
+
+function mdModes() {
+	try { return JSON.parse(localStorage.getItem(MD_KEY) || "{}") || {}; } catch (e) { return {}; }
+}
+function mdMode(id) {
+	var m = mdModes()[id];
+	return MD_MODES.indexOf(m) === -1 ? "preview" : m;
+}
+function setMdMode(id, mode) {
+	var all = mdModes();
+	all[id] = mode;
+	try { localStorage.setItem(MD_KEY, JSON.stringify(all)); } catch (e) { /* private mode */ }
+}
+
+/** One control, three segments. Raw needs a source; without one it is off. */
+function mdSeg(mode, hasRaw) {
+	return '<div class="seg" role="group" aria-label="Preview mode">' + MD_MODES.map(function (m) {
+		var off = m !== "preview" && !hasRaw;
+		return '<button data-md="' + m + '"' + (m === mode ? ' class="on"' : "") +
+			(off ? ' disabled title="the server serves this document already rendered"' : "") +
+			">" + MD_LABEL[m] + "</button>";
+	}).join("") + "</div>";
+}
+
+function mdBody(mode, html, text) {
+	var raw = '<pre class="raw code">' + esc(text) + "</pre>";
+	var pre = '<div class="md">' + html + "</div>";
+	if (mode === "raw") return '<div class="ed-body">' + raw + "</div>";
+	if (mode === "split") return '<div class="ed-body split">' + raw + pre + "</div>";
+	return '<div class="ed-body">' + pre + "</div>";
+}
+
+/**
+ * Render one markdown tab into \`host\`. \`o.head\` is HTML that belongs above
+ * the body in every mode — the run view's stage pipeline and PR link.
+ * \`o.html\` is server-rendered (see postRender): never built here.
+ */
+function mdSurface(host, o) {
+	var hasRaw = typeof o.text === "string" && o.text !== "";
+	var mode = hasRaw ? mdMode(o.id) : "preview";
+	host.innerHTML =
+		'<div class="ed-bar">' + (o.title ? "<b>" + esc(o.title) + "</b>" : "") +
+		'<span class="path">' + esc(o.path || "") + "</span>" + mdSeg(mode, hasRaw) +
+		'<div class="meta-actions">' + (o.actions || "") + "</div></div>" +
+		(o.head || "") + mdBody(mode, o.html || "", o.text || "");
+	$$("#" + host.id + " [data-md]").forEach(function (b) {
+		b.addEventListener("click", function () {
+			if (b.disabled) return;
+			setMdMode(o.id, b.getAttribute("data-md"));
+			mdSurface(host, o);
+		});
+	});
+	if (o.wire) o.wire(host);
+}
+
+/** The localStorage key for a tab's mode, or "" when the tab is not markdown. */
+function mdId(t) {
+	if (!t) return "";
+	if (t.kind === "doc") return "doc:" + t.ref;
+	if (t.kind === "run" && refKind(t.ref) !== "session") return "run:" + t.ref;
+	if (t.kind === "file" && isMd(t.ref)) return "file:" + t.ref;
+	return "";
+}
+
+/** p / s / R from the keyboard. Returns false when this tab is not markdown. */
+function setActiveMdMode(mode) {
+	var id = mdId(activeTab());
+	if (!id) return false;
+	setMdMode(id, mode);
+	renderActive(true);
+	return true;
+}
+
+/** The frontmatter of an already-rendered document, as a property table. */
+function fmTable(fm) {
+	var keys = Object.keys(fm || {});
+	if (!keys.length) return "";
+	return '<table class="fm"><tbody>' + keys.map(function (k) {
+		return '<tr><th class="fm-k">' + esc(k) + '</th><td class="fm-v">' +
+			esc(fm[k]) + "</td></tr>";
+	}).join("") + "</tbody></table>";
+}
+`;

@@ -80,5 +80,6 @@ export const TRANSCRIPT_CSS = `
 .stage.stopped { border-color: var(--warn); color: var(--warn); background: transparent; }
 .stage[data-stage], .error-line[data-stage] { cursor: pointer; }
 .error-line[data-stage]:hover { background: var(--hover); }
-#journal-body { margin-top: 8px; max-height: 60vh; }
+/* The journal body is markdown now (client-journal.ts + styles-md.ts); the
+   pipeline above it keeps these rules. */
 `;

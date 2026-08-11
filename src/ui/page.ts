@@ -1,16 +1,19 @@
 /**
- * The workbench shell: an IntelliJ window — toolbar, project tool window on
- * the left, tabbed editor area in the middle, chat tool window on the right,
- * status bar underneath.
+ * The workbench shell: an IntelliJ window — toolbar of numbered tool windows,
+ * Projects on the left, the tabbed editor area with its breadcrumb in the
+ * middle, Find in Files along the bottom, Chat on the right, status bar
+ * underneath.
  *
  * The only value interpolated into this document is `home`, and it goes
  * through escapeHtml. Everything else is a literal or a bundled asset, which
  * is what test/ui-page.test.ts pins.
  */
 import { CLIENT_JS } from "./client-bundle.js";
+import { PALETTE_FILES_JS } from "./client-goto.js";
 import { CLIENT_PALETTE_JS, PALETTE_HTML } from "./client-palette.js";
 import { PALETTE_PROMPT_JS } from "./client-palette-prompt.js";
-import { CHAT_HTML, HELP_HTML } from "./client-shell.js";
+import { PALETTE_ROWS_JS } from "./client-palette-rows.js";
+import { CHAT_HTML, FIND_HTML, HELP_HTML } from "./client-shell.js";
 import { ALL_CSS } from "./styles-bundle.js";
 import { PALETTE_CSS } from "./styles-palette.js";
 
@@ -20,17 +23,24 @@ function escapeHtml(s: string): string {
 	});
 }
 
-/** Toolbar buttons: id, label, tooltip. The panel keys mirror client-keys. */
-const PANELS: Array<[string, string, string]> = [
-	["overview-btn", "Attention", "What needs me (1 / o)"],
-	["runs-btn", "Runs", "Sessions and harness journals (2 / r)"],
-	["docs-btn", "Docs", "Indexed markdown (3 / d)"],
-	["brain-btn", "Brain", "What ah knows (4 / b)"],
+/**
+ * Toolbar buttons: id, tool-window number, label, tooltip. The numbers are
+ * IntelliJ's — 1 Projects … 6 Chat — and they are the same numbers the plain
+ * digit keys and ⌘1…⌘6 bind to in client-keys.ts.
+ */
+const PANELS: Array<[string, string, string, string]> = [
+	["side-btn", "1", "Projects", "Project tool window (1 / ⌘1)"],
+	["runs-btn", "2", "Runs", "Sessions and harness journals (2 / ⌘2)"],
+	["docs-btn", "3", "Docs", "Indexed markdown (3 / ⌘3)"],
+	["brain-btn", "4", "Brain", "What ah knows (4 / ⌘4)"],
+	["find-btn", "5", "Find", "Find in Files (5 / ⌘5 / ⌘⇧F)"],
+	["chat-btn", "6", "Chat", "Chat tool window (6 / ⌘6 / c)"],
 ];
 
 export function renderPage(home: string): string {
 	const panels = PANELS.map(
-		([id, label, title]) => `<button id="${id}" title="${title}">${label}</button>`,
+		([id, n, label, title]) =>
+			`<button id="${id}" title="${title}"><span class="n">${n}</span>${label}</button>`,
 	).join("");
 	return `<!doctype html>
 <html lang="en">
@@ -44,21 +54,21 @@ export function renderPage(home: string): string {
 <div id="app">
 	<header id="toolbar">
 		<div class="logo">ah</div>
-		<div class="crumb" id="crumb">workbench</div>
+		<button id="overview-btn" title="What needs me (o)">Attention</button>
+		${panels}
 		<div class="spacer"></div>
 		<span id="count" class="dim small"></span>
-		${panels}
-		<button id="chat-btn" title="Chat tool window (c)">Chat</button>
 		<button id="help-btn" title="Shortcuts (?)">?</button>
 		<button id="theme" title="Toggle light/dark (t)">&#9681;</button>
 	</header>
 	<aside id="side">
-		<div class="tw-head">Projects</div>
+		<div class="tw-head"><span class="tw-num">1</span><span>Projects</span></div>
 		<input id="search" placeholder="Search (/)  project, path, kind" spellcheck="false"/>
 		<div id="tree"></div>
 	</aside>
 	<main id="main">
 		<div id="tabs"></div>
+		<div id="crumbs"></div>
 		<div id="views">
 			<div id="overview" class="view"></div>
 			<div id="runs" class="view" hidden></div>
@@ -67,20 +77,25 @@ export function renderPage(home: string): string {
 			<div id="project" class="view" hidden></div>
 			<div id="run" class="view" hidden></div>
 			<div id="doc" class="view" hidden></div>
+			<div id="file" class="view" hidden></div>
 		</div>
 	</main>
 	${CHAT_HTML}
+	${FIND_HTML}
 	<footer id="status">
-		<span class="dim">${escapeHtml(home)}</span>
+		<span id="status-cards" title="Runs, sessions and documents ah has indexed"></span>
+		<span id="status-live" title="Runs in flight"></span>
+		<span id="status-path" class="st-path" title="Current file"></span>
 		<div class="spacer"></div>
-		<span id="status-live" class="dim"></span>
-		<span class="dim">ah v0.1.0</span>
+		<span id="status-activity"></span>
+		<span class="st-path">${escapeHtml(home)}</span>
+		<span>ah v0.1.0</span>
 	</footer>
 </div>
 <div id="toast" hidden></div>
 ${HELP_HTML}
 ${PALETTE_HTML}
-<script>${CLIENT_JS}${PALETTE_PROMPT_JS}${CLIENT_PALETTE_JS}</script>
+<script>${CLIENT_JS}${PALETTE_PROMPT_JS}${PALETTE_ROWS_JS}${PALETTE_FILES_JS}${CLIENT_PALETTE_JS}</script>
 </body>
 </html>`;
 }

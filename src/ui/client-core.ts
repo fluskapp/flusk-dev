@@ -9,6 +9,14 @@ var S = {
 	tabs: [], active: null, cursor: 0, zone: "tree",
 	runFilter: null, runSort: null, docFilter: "", docProject: null,
 	chat: { msgs: [], busy: false, abort: null },
+	/** The path the status bar is showing — the active tab's file. */
+	path: "",
+};
+
+/** Find in Files state. One object, so a late response can check its seq. */
+var F = {
+	q: "", scope: "project", mask: "", cs: false, re: false,
+	result: null, open: {}, rows: [], cursor: -1, seq: 0, timer: 0, slow: 0, ac: null,
 };
 
 function $(s) { return document.querySelector(s); }
@@ -19,6 +27,12 @@ function esc(s) {
 	});
 }
 function base(p) { var parts = String(p == null ? "" : p).split("/"); return parts[parts.length - 1] || String(p); }
+function dirOf(p) {
+	var s = String(p == null ? "" : p), i = s.lastIndexOf("/");
+	return i === -1 ? "" : s.slice(0, i + 1);
+}
+function ext(p) { var m = /\\.([\\w+#-]+)$/.exec(String(p == null ? "" : p)); return m ? m[1].toLowerCase() : ""; }
+function isMd(p) { return ext(p) === "md" || ext(p) === "markdown"; }
 function fmtCost(n) { return "$" + (Math.round((n || 0) * 10000) / 10000); }
 function fmtTime(iso) {
 	if (!iso) return "";
@@ -60,10 +74,26 @@ function projectLink(name) {
 	return '<span class="ev" data-open="project:' + esc(name) + '">' + esc(name) + "</span>";
 }
 
-async function getJson(url) {
-	var r = await fetch(url);
+/** \`opts\` carries an AbortSignal, so a superseded search can be cancelled. */
+async function getJson(url, opts) {
+	var r = await fetch(url, opts || undefined);
 	if (!r.ok) throw new Error("HTTP " + r.status);
 	return r.json();
+}
+
+/**
+ * Markdown and syntax highlighting live on the SERVER (escaping is their
+ * security invariant, and a second implementation here would be a second
+ * place to get it wrong). Anything holding text posts it to /api/render.
+ */
+async function postRender(text, lang) {
+	var r = await fetch("/api/render", {
+		method: "POST",
+		headers: { "content-type": "application/json" },
+		body: JSON.stringify({ text: String(text == null ? "" : text), lang: lang || "" }),
+	});
+	if (!r.ok) throw new Error("HTTP " + r.status);
+	return (await r.json()).html;
 }
 
 function toast(msg) {

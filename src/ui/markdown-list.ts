@@ -5,6 +5,14 @@
 import { renderInline } from "./markdown-inline.js";
 
 export const LIST_RE = /^(\s*)(?:([-*])|(\d+)\.)\s+(.*)$/;
+/** GFM task item. The text is already escaped, so the brackets survive. */
+const TASK_RE = /^\[([ xX])\]\s+(.*)$/;
+
+/** A checkbox is rendered disabled: a preview shows state, it does not edit. */
+function taskHtml(m: RegExpExecArray): string {
+	const done = (m[1] ?? " ").toLowerCase() === "x";
+	return `<input type="checkbox" disabled${done ? " checked" : ""}> ${renderInline(m[2] ?? "")}`;
+}
 
 interface Item {
 	depth: number;
@@ -30,14 +38,15 @@ function renderLevel(items: Item[], start: number, depth: number): [string, numb
 		const it = items[i];
 		if (!it || it.depth < depth || (it.depth === depth && it.ordered !== ordered)) break;
 		i++;
-		let inner = renderInline(it.text);
+		const task = TASK_RE.exec(it.text);
+		let inner = task === null ? renderInline(it.text) : taskHtml(task);
 		const next = items[i];
 		if (next && next.depth > depth) {
 			const [sub, after] = renderLevel(items, i, depth + 1);
 			inner += sub;
 			i = after;
 		}
-		html += `<li>${inner}</li>`;
+		html += `<li${task === null ? "" : ' class="task"'}>${inner}</li>`;
 	}
 	return [html + (ordered ? "</ol>" : "</ul>"), i];
 }

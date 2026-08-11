@@ -48,9 +48,21 @@ function renderTree() {
 	var live = S.projects.reduce(function (n, p) { return n + p.liveRuns; }, 0);
 	var attn = S.projects.reduce(function (n, p) { return n + p.attention.length; }, 0);
 	$("#count").textContent = shown.length + " project" + (shown.length === 1 ? "" : "s") +
-		(attn ? " \\u00b7 " + attn + " need attention" : "");
-	$("#status-live").textContent = live ? live + " live" : "idle";
+		(attn ? " \\u00b7 " + attn + " need attention" : "") + (live ? " \\u00b7 " + live + " live" : "");
+	renderStatus();
 	syncCursor();
+}
+
+/** Tool window 1: the Projects rail folds away like any other. */
+function toggleSide() {
+	var off = document.body.classList.toggle("side-off");
+	localStorage.setItem("ah-side-open", off ? "0" : "1");
+	$("#side-btn").classList.toggle("on", !off);
+}
+function setSideVisible(on) {
+	document.body.classList.toggle("side-off", !on);
+	localStorage.setItem("ah-side-open", on ? "1" : "0");
+	$("#side-btn").classList.toggle("on", on);
 }
 
 function toggleExpand(name) {
