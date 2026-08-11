@@ -14,6 +14,20 @@ export interface ChatBackendConfig {
 	apiKeyEnv?: string;
 }
 
+/**
+ * One language server the doc view may spawn. Only the user's own
+ * ~/.ah/config.json may set these (see config.ts): a cloned repo must not
+ * choose what opening a file in the workbench executes.
+ */
+export interface DocServerConfig {
+	id: string;
+	/** Binary name or path; it must also be on PATH to be used. */
+	command: string;
+	args?: string[];
+	/** Lower-case, dot-led: [".rs"]. */
+	extensions: string[];
+}
+
 export type TaskKind = "plan" | "code" | "review" | "summarize";
 
 export interface ModelChoice {
@@ -66,6 +80,14 @@ export interface AhConfig {
 	chat: {
 		/** Backends offered in the dashboard's chat. Empty = auto-detect CLIs. */
 		backends: ChatBackendConfig[];
+	};
+	doc: {
+		/** Documentation lookup in the workbench. */
+		enabled: boolean;
+		/** Language servers to spawn. Empty = the bundled TypeScript engine only. */
+		servers: DocServerConfig[];
+		/** Documents held open per language server before the oldest is closed. */
+		maxFiles: number;
 	};
 	watch: {
 		/** Queues to poll: "gh-prs" (open PRs) and/or "gh-failing-ci". */

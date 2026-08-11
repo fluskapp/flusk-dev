@@ -15,6 +15,9 @@
  *  - `chat.backends`. `ah ui` loads config from its own cwd and spawns what
  *    that list names, so a repo could otherwise choose the binary a click on
  *    Send executes.
+ *  - `doc.servers`. Same threat, same answer: these name language-server
+ *    binaries the doc view spawns, so a cloned repo must not choose what
+ *    opening a file in the workbench executes.
  *  - `ui.projectDirs` / `ui.harnessDirs`. These are the directories the
  *    history indexer reads, serves over /api/history/search and embeds into
  *    composed prompts, so a repo could otherwise choose whose files leave the
@@ -40,6 +43,7 @@ interface ConfigLayer {
 	verify?: Partial<AhConfig["verify"]>;
 	ui?: Partial<AhConfig["ui"]>;
 	chat?: Partial<AhConfig["chat"]>;
+	doc?: Partial<AhConfig["doc"]>;
 	watch?: Partial<AhConfig["watch"]>;
 }
 
@@ -101,6 +105,13 @@ function chatOf(layer: ConfigLayer, trusted: boolean): Partial<AhConfig["chat"]>
 	return rest;
 }
 
+/** The `doc` section a layer is allowed to contribute — never `servers`. */
+function docOf(layer: ConfigLayer, trusted: boolean): Partial<AhConfig["doc"]> {
+	if (layer.doc === undefined || trusted) return layer.doc ?? {};
+	const { servers: _dropped, ...rest } = layer.doc;
+	return rest;
+}
+
 function mergeLayer(base: AhConfig, layer: ConfigLayer | null, trusted: boolean): AhConfig {
 	if (!layer) return base;
 	return {
@@ -117,6 +128,7 @@ function mergeLayer(base: AhConfig, layer: ConfigLayer | null, trusted: boolean)
 		verify: { ...base.verify, ...layer.verify },
 		ui: { ...base.ui, ...uiOf(layer, trusted) },
 		chat: { ...base.chat, ...chatOf(layer, trusted) },
+		doc: { ...base.doc, ...docOf(layer, trusted) },
 		watch: { ...base.watch, ...layer.watch },
 	};
 }

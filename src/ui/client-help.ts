@@ -32,6 +32,7 @@ export const HELP_GROUPS: HelpGroup[] = [
 			["4", "Brain (&#8984;4)"],
 			["5", "Find in Files (&#8984;5)"],
 			["6", "Chat (&#8984;6)"],
+			["7", "Documentation (&#8984;7)"],
 			["o", "Attention"],
 			["r", "Runs"],
 			["d", "Docs"],
@@ -55,6 +56,25 @@ export const HELP_GROUPS: HelpGroup[] = [
 			["&#8595; &#8593;", "Find: next / previous hit"],
 			["&#9166;", "Find: open the hit (or select the first)"],
 			["Esc", "Find: close the panel"],
+		],
+	},
+	{
+		id: "help-doc",
+		title: "Documentation",
+		rows: [
+			// Checked against browser defaults: ⌘B/Ctrl+B is unbound in Chrome
+			// and Safari (Firefox's bookmark sidebar is ⌘⇧B, which the shift
+			// guard in client-keys.ts now leaves alone); ⌥F7 is bound by no
+			// browser; and DevTools is bare F12 or ⌘⌥I — never ⌘F12.
+			//
+			// 7 leads and F1 follows: macOS maps F1 to brightness-down unless
+			// the "standard function keys" setting is on, so advertising it
+			// first pointed most readers here at a key that never arrives.
+			["7 / &#8984;7", "Documentation tool window &mdash; look up, or show"],
+			["F1", "The same, where the keyboard sends F1 at all"],
+			["&#8984;B", "Go to the definition of the selected symbol"],
+			["&#8997;F7", "Find usages &mdash; hands the symbol to Find in Files"],
+			["&#8984;F12", "File structure &mdash; focus the outline"],
 		],
 	},
 	{

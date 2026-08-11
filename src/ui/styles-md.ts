@@ -25,12 +25,10 @@ export const MD_CSS = `
 .ed-body { display: flex; align-items: flex-start; min-height: 0; }
 .ed-body > .md, .ed-body > .raw { flex: 1; min-width: 0; padding: 10px 18px 32px; }
 .ed-body.split > .raw { border-right: 1px solid var(--border); }
-/* .code caps a transcript's tool output at 340px; a document is not that. */
 .ed-body > .raw {
 	margin: 0; white-space: pre-wrap; overflow-wrap: anywhere;
-	background: var(--code-bg); max-height: none; border-top: none;
+	background: var(--code-bg); border-top: none;
 }
-.md pre.code { max-height: none; }
 /* The run view is already padded, and its toolbar bleeds to the tab strip. */
 #run .ed-bar { margin: -10px -16px 10px; }
 #run .ed-body > .md, #run .ed-body > .raw { padding: 0; }

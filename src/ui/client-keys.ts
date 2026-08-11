@@ -1,8 +1,8 @@
 /**
  * Keyboard first. The cursor lives in one of two zones — the project tree or
  * the active view's table — and Tab moves between them; the tool windows are
- * numbered the way IntelliJ numbers them, so ⌘1…⌘6 (and the bare digits when
- * nothing is focused) open 1 Projects … 6 Chat.
+ * numbered the way IntelliJ numbers them, so ⌘1…⌘7 (and the bare digits when
+ * nothing is focused) open 1 Projects … 7 Documentation.
  *
  * Every binding here has a row in the help sheet (client-help.ts).
  */
@@ -11,11 +11,12 @@ var PANEL_KEYS = { "2": "runs", "3": "docs", "4": "brain",
 	o: "attention", r: "runs", d: "docs", b: "brain" };
 var MD_KEYS = { p: "preview", s: "split", R: "raw" };
 
-/** 1 Projects, 2 Runs, 3 Docs, 4 Brain, 5 Find, 6 Chat. */
+/** 1 Projects, 2 Runs, 3 Docs, 4 Brain, 5 Find, 6 Chat, 7 Documentation. */
 function toolWindow(n) {
 	if (n === "1") toggleSide();
 	else if (n === "5") toggleFind();
 	else if (n === "6") toggleChat();
+	else if (n === "7") docQuick();
 	else openPanel(PANEL_KEYS[n]);
 }
 
@@ -46,7 +47,22 @@ function modKey(e) {
 		focusFind();
 		return true;
 	}
-	if (!e.shiftKey && /^[1-6]$/.test(e.key)) { toolWindow(e.key); return true; }
+	// IntelliJ's Go to Declaration and File Structure. Neither is a browser
+	// default that would be missed: ⌘B/Ctrl+B is unbound in Chrome and Safari
+	// (Firefox's bookmarks sidebar is ⌘⇧B), and DevTools opens on bare F12 or
+	// ⌘⌥I, never on ⌘F12 — so preventDefault is honoured. ⌘B is left alone
+	// while a field has focus, where it may still mean "bold".
+	//
+	// The SHIFT GUARDS keep the sentence above true. e.key is lower-cased, so
+	// ⌘⇧B arrived here as "b" and ⌘⇧F12 as "f12", and both were swallowed with
+	// preventDefault — including the bookmarks shortcut this comment claims is
+	// left free in every browser that has one.
+	if (key === "b" && !e.shiftKey && !isTyping(document.activeElement)) {
+		docGoToDefinition();
+		return true;
+	}
+	if (key === "f12" && !e.shiftKey) { focusOutline(); return true; }
+	if (!e.shiftKey && /^[1-7]$/.test(e.key)) { toolWindow(e.key); return true; }
 	return false;
 }
 
@@ -59,6 +75,19 @@ function findsInDocument() {
 
 document.addEventListener("keydown", function (e) {
 	if ((e.metaKey || e.ctrlKey) && !e.altKey && modKey(e)) { e.preventDefault(); return; }
+	// ⌥F7 is IntelliJ's Find Usages and no browser binds it; it has to be read
+	// before the bail-out below, which drops everything holding a modifier.
+	if (e.altKey && e.key === "F7") { e.preventDefault(); docFindUsages(); return; }
+	// F1 is IntelliJ's Quick Documentation and it DOES a lookup here rather than
+	// toggling a rail: on the identifier last clicked it documents that symbol,
+	// and only falls back to showing the panel when there is nothing to look up.
+	// Pressing it on a symbol used to CLOSE the panel, which is the opposite verb.
+	//
+	// It is a SECONDARY binding, not the advertised one: macOS maps F1 to
+	// brightness-down unless "Use F1, F2, etc. keys as standard function keys"
+	// is on, so on this platform the keycode usually never reaches the browser.
+	// The help sheet and the toolbar tooltip lead with 7 / ⌘7 for that reason.
+	if (e.key === "F1") { e.preventDefault(); docQuick(); return; }
 	if (e.metaKey || e.ctrlKey || e.altKey) return;
 	var search = $("#search");
 	var typing = isTyping(document.activeElement);
@@ -81,7 +110,7 @@ document.addEventListener("keydown", function (e) {
 	if (e.key === "/") { e.preventDefault(); search.focus(); search.select(); return; }
 	if (e.key === "?") { $("#help").hidden = false; return; }
 	if (e.key === "Tab") { e.preventDefault(); setZone(S.zone === "tree" ? "view" : "tree"); return; }
-	if (/^[1-6]$/.test(e.key)) { toolWindow(e.key); return; }
+	if (/^[1-7]$/.test(e.key)) { toolWindow(e.key); return; }
 	if (Object.prototype.hasOwnProperty.call(PANEL_KEYS, e.key)) {
 		// openPanel, not togglePanel: a panel key means the whole panel, with
 		// no filter left over from a drill-in.

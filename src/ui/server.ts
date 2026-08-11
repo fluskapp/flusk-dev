@@ -6,6 +6,7 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import { ahHome } from "../session/paths.js";
 import { handleChat, liveChats } from "./api-chat.js";
 import { handleContent } from "./api-content.js";
+import { disposeDocRegistries, handleDoc } from "./api-doc.js";
 import { handleFileBody } from "./api-file.js";
 import { handleFind } from "./api-find.js";
 import { denyReason, PAGE_HEADERS } from "./api-guard.js";
@@ -47,6 +48,7 @@ function handle(req: IncomingMessage, res: ServerResponse, port: number): void {
 	if (handleFileBody(method, path, repo, res)) return;
 	if (handleHistory(method, path, url.searchParams, res)) return;
 	if (handleContent(method, path, repo, res)) return;
+	if (handleDoc(method, path, url.searchParams, res)) return;
 	if (handleProjects(method, path, url.searchParams, res)) return;
 	if (handleRender(method, path, req, res)) return;
 	if (handleChat(method, path, req, res)) return;
@@ -80,6 +82,9 @@ export function startUiServer(port: number): Promise<UiServer> {
 						// nothing else will ever end them (see api-chat.ts liveChats).
 						for (const chat of [...liveChats]) chat.abort();
 						liveChats.clear();
+						// Then the doc engines: a language server ah spawned is detached
+						// too, and its ref'd stdio pipes outlived the dashboard entirely.
+						disposeDocRegistries();
 						server.close(() => r());
 						// keep-alive sockets would hold close() open forever
 						server.closeAllConnections();

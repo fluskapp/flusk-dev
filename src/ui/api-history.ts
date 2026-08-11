@@ -36,8 +36,15 @@ const MAX_QUERY = 512;
 
 let served: { at: number; key: string; index: Bm25Index } | null = null;
 
-/** Process-lifetime BM25 index; the stamps decide what is re-read under it. */
-function servedIndex(): Bm25Index {
+/**
+ * Process-lifetime BM25 index; the stamps decide what is re-read under it.
+ *
+ * Exported because the documentation panel folds history into every lookup and
+ * must share THIS index: a second one on its own 30s timer rebuilt the corpus
+ * on whichever click happened to land after the window rolled, which is how a
+ * warm 0.2s lookup turned into 2s at random.
+ */
+export function servedIndex(): Bm25Index {
 	const now = Date.now();
 	if (served !== null && now - served.at < STALE_MS) return served.index;
 	const cards = historyCards();
@@ -101,6 +108,21 @@ export function handleHistory(
 			return true;
 		}
 		json(res, 200, hits(query));
+		return true;
+	}
+	if (pathname === "/api/history/card") {
+		// BY REF, not by search. A commit row in the doc panel carries a 40-char
+		// sha, and the sha is not in the card's text — so BM25 returned zero hits
+		// and every commit row in RELATED was a dead click that copied a string.
+		// An opaque identifier is looked up, never ranked.
+		const ref = text(query, "ref");
+		if (ref === "") {
+			json(res, 400, { error: "ref is required" });
+			return true;
+		}
+		const card = historyCards().find((c) => c.ref === ref);
+		if (card === undefined) json(res, 404, { error: "no card with that ref" });
+		else json(res, 200, { card, score: 0, why: null, terms: [] });
 		return true;
 	}
 	const task = text(query, "task");

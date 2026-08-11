@@ -40,6 +40,7 @@ function config(onUnknownCommand: "deny" | "allow"): AhConfig {
 		verify: { retries: 3, evidenceLines: 40 },
 		ui: { harnessDirs: [], projectDirs: [] },
 		chat: { backends: [] },
+		doc: { enabled: true, servers: [], maxFiles: 50 },
 		watch: {
 			queues: [],
 			maxRunsPerNight: 10,

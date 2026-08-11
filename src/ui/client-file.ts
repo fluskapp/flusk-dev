@@ -61,6 +61,11 @@ async function loadFile(t) {
 	var host = $("#file");
 	host.innerHTML = '<div class="empty small">opening \\u2026</div>';
 	if (isMd(t.ref) && await fileAsDoc(host, t)) return;
+	// Source goes to the SYMBOL-AWARE viewer first. Without this line the code
+	// viewer, /api/source, the outline strip and the whole Documentation window
+	// are unreachable by any user gesture — every tab fell through to a
+	// markdown surface, which emits no identifier spans to click.
+	if (!isMd(t.ref) && await openCodeInto(host, t.ref, t.line || 0)) return;
 	if (await fileAsText(host, t)) return;
 	if (await fileAsSource(host, t)) return;
 	filePeek(host, t);
