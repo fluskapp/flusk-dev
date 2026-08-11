@@ -98,10 +98,15 @@ body.side-off #side-grip, body.find-off #find-grip { display: none; }
 #main { grid-area: main; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
 #views { flex: 1; overflow-y: auto; min-height: 0; }
 .view { min-height: 100%; }
-/* The editor's own inset, shared with the document reader in styles-md.ts. */
+/* The editor's own inset, shared with the document reader in styles-md.ts.
+   NO width cap on the container. A reading measure belongs to PROSE, and
+   applying it here capped everything: a run view is a stage strip, a property
+   grid, a pipeline diagram and a stage table, none of which are prose, and on
+   a wide window the cap left roughly a third of the editor empty while the
+   detail column beside it was still eliding text. The measure moved down to
+   the paragraphs that want it, below. */
 #overview, #runs, #project, #run {
 	padding: var(--ij-space-2) var(--ij-space-4) calc(var(--ij-space-4) * 2);
-	max-width: 1080px; /* design-exempt: the editor's reading measure */
 }
 #docs, #doc, #file { padding: 0; }
 

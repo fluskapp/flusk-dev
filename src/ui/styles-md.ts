@@ -117,6 +117,17 @@ table.fm td.fm-v {
 }
 .peek-gap .text { color: var(--dim); }
 
+/* The reading measure, applied to the things that are actually read as prose.
+   A line of body text past about 90 characters is hard to track back to the
+   next line; a TABLE has the opposite problem, and capping one because the
+   other sits above it is what left a third of the editor blank. Tables, the
+   pipeline diagram, the property grid and code blocks are deliberately absent
+   from this list — they take the width they are given. */
+.md > p, .md > ul, .md > ol, .md > blockquote,
+.md > h1, .md > h2, .md > h3, .md > h4 {
+	max-width: 90ch; /* design-exempt: prose measure */
+}
+
 /* A drawn flowchart. It scrolls sideways inside its own box rather than
    widening the document: a wide pipeline must never make the prose beside it
    scroll. The SVG keeps its intrinsic size so text stays at its designed

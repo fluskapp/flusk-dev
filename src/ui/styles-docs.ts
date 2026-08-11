@@ -38,7 +38,11 @@ export const DOCS_CSS = `
 
 #doc, #file { display: flex; flex-direction: column; min-height: 0; }
 
-.md { line-height: var(--ij-lh-loose); max-width: 900px; } /* design-exempt: prose measure */
+/* No cap on the container: the measure lives on the prose elements themselves
+   (styles-md.ts), so a paragraph still reads at a comfortable width while the
+   tables, diagrams and property grids beside it use the editor they were
+   given. Capping here capped all of them together. */
+.md { line-height: var(--ij-lh-loose); }
 .md h1, .md h2, .md h3, .md h4 {
 	margin: var(--ij-space-4) 0 var(--ij-space); line-height: var(--ij-lh-tight);
 }
@@ -56,9 +60,21 @@ export const DOCS_CSS = `
 	border-left: var(--ij-space-1) solid var(--border);
 	padding-left: var(--ij-space-2); color: var(--dim); margin-left: 0;
 }
+/* Real table layout at full width. It used to be display:block, which made a
+   too-wide table scroll instead of pushing the page sideways — but block also
+   makes the table shrink to its CONTENT, so a stage table sat at half the
+   editor's width while its detail column elided text it had room for.
+   Giving thead and tbody their own display:table is NOT the fix: they then
+   size as two independent tables and the header stops lining up with the body.
+   So the table lays out as a table, and the overflow case is handled by
+   WRAPPING the long cell rather than by scrolling the whole grid. */
 .md table {
-	border-collapse: collapse; font-size: var(--ij-fs-6); display: block; overflow-x: auto;
+	border-collapse: collapse; font-size: var(--ij-fs-6);
+	width: 100%; table-layout: auto;
 }
+/* Auto layout already gives the widest column the slack; this only stops a
+   single unbroken token (a path, a URL) from forcing the grid wider. */
+.md td { overflow-wrap: anywhere; }
 .md th, .md td {
 	border: 1px solid var(--border);
 	padding: var(--ij-space-1) var(--ij-space-2); text-align: left;
