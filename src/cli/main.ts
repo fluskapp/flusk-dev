@@ -12,6 +12,7 @@ import { searchCmd } from "./search-cmd.js";
 import { uiCmd } from "./ui-cmd.js";
 import { USAGE } from "./usage.js";
 import { watchCmd } from "./watch-cmd.js";
+import { workspaceCmd } from "./workspace-cmd.js";
 
 function fail(message: string): void {
 	process.stderr.write(message);
@@ -19,6 +20,10 @@ function fail(message: string): void {
 }
 
 async function main(): Promise<void> {
+	if (process.argv[2] === "workspace") {
+		process.exitCode = workspaceCmd(process.argv.slice(3));
+		return;
+	}
 	let parsed: ReturnType<typeof parseArgs>;
 	try {
 		parsed = parseArgs({

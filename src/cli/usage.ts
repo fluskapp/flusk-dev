@@ -16,6 +16,7 @@ export const USAGE = `Usage:
   ah find <query> [--project <name>] [--glob <g>] [--regex] [--case] [--limit <n>]
   ah prompt <task> [--repo <path> | --all] [--budget <n>] [--json] [--copy] [--refresh]
   ah feedback <good|bad>
+  ah workspace <init|show|path> [--project]
   ah runs [-n <count>]
   ah watch [--repo <path>] [--once]
   ah ui [--port <n>] [--no-open]

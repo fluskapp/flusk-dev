@@ -56,6 +56,7 @@ ah goal <text> [--repo <path>] [--dry] [--no-verify]
 ah goal --list [--repo <path>]
 ah watch [--repo <path>] [--once]
 ah feedback <good|bad>
+ah workspace <init|show|path> [--project]
 ah runs [-n <count>]
 ah ui [--port <n>] [--no-open]
 ```
@@ -92,6 +93,44 @@ ah ui [--port <n>] [--no-open]
 - **`ah feedback good|bad`** — score the last run's model for its task kind;
   routing learns from it.
 - **`ah runs`** — recent sessions with status, turns, and cost.
+- **`ah workspace`** — scaffold (`init`), inspect (`show`) or locate (`path`)
+  the prompt workspace (see below).
+
+## Workspace
+
+ah's prompt is not only ah's. Three markdown files you own are injected into
+every system prompt, so behaviour is tuned by editing files rather than
+TypeScript:
+
+| file | section | what it is for |
+| --- | --- | --- |
+| `IDENTITY.md` | `## Identity` | who the agent is and how it should sound |
+| `SOUL.md` | `## Hard constraints` | the lines it may never cross |
+| `TOOLS.md` | `## Tool guidance` | how to use the toolbelt in your world |
+
+They are read from `~/.ah/workspace/` (global), then `<repo>/.ah/workspace/`
+which **replaces** the global file of the same name, then the repository's own
+`AGENTS.md` — or `CLAUDE.md`, or both when both exist — as
+`## House rules for this repository`. The rules your team already wrote are
+therefore in front of the agent that edits your code, with no extra step.
+
+**`SOUL.md` wins over the task.** Its section says so in the prompt: if a task
+needs a constraint crossed, the agent does the rest and names the line that
+stopped it. Every section is preceded by a comment naming the file it came
+from, so any rule in a transcript can be traced back to the file to edit.
+
+Files are capped at 6000 characters each and 16000 in total, cut at a line
+boundary and marked `(truncated)`. Every file is run through the same secret
+scrubber as indexed history, so a token pasted into your notes does not ride
+along into a request. Missing files are normal; with none present the prompt
+is exactly what it was before.
+
+```bash
+ah workspace init            # ~/.ah/workspace/{IDENTITY,SOUL,TOOLS}.md, never overwriting
+ah workspace init --project  # <repo>/.ah/workspace/… instead
+ah workspace show            # what is loaded, from where, and what is absent
+ah run "…" --dry             # see the assembled prompt
+```
 
 ## Verification
 
