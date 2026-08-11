@@ -10,6 +10,9 @@
 # 3. The pi-ai "/compat" entrypoint must never be imported.
 # 4. Dependency boundary: `@abagraph/client` may only be imported under
 #    src/memory/. Everything else uses ah's own types (client-types.ts).
+# 5. Dependency boundary: the LangChain packages (optional dependencies) may
+#    only be named under src/lang/. Everything else — including tests — uses
+#    ah's own flow types (src/lang/types.ts) and the loader in src/lang/deps.ts.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -52,6 +55,19 @@ aba_leaks=$(grep -rln '@abagraph/client' src test --include='*.ts' 2>/dev/null |
 if [ -n "$aba_leaks" ]; then
 	echo "FAIL: @abagraph/client imported outside src/memory/:"
 	printf '  %s\n' $aba_leaks
+	fail=1
+fi
+
+# --- 5. LangChain import boundary ---------------------------------------------
+# LangChain/LangGraph are OPTIONAL dependencies: ah must build, test and run
+# with them absent. That only stays true while every mention of them lives
+# behind src/lang/deps.ts, so the package names are banned everywhere else —
+# a test that asserts on the install line should call langMissing() instead.
+lang_leaks=$(grep -rlnE "@langchain/|['\"]langchain(/[a-zA-Z0-9_./-]+)?['\"]" src test --include='*.ts' 2>/dev/null |
+	grep -v '^src/lang/' || true)
+if [ -n "$lang_leaks" ]; then
+	echo "FAIL: LangChain packages named outside src/lang/:"
+	printf '  %s\n' $lang_leaks
 	fail=1
 fi
 

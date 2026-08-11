@@ -17,6 +17,14 @@ import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
 const HOUR = 3_600_000;
 /** Anchored to real time — see watch-harness.ts. */
 const T0 = Date.now();
+/**
+ * A FIXED instant for the one assertion about the KEY's shape. `nightKey`
+ * shifts back 12 hours and reads in local time, so anchoring that assertion to
+ * `Date.now()` made it hold only before local noon on the day it was written.
+ * Local midnight puts the shifted instant at local noon the day before, in
+ * every timezone.
+ */
+const NIGHT = new Date(2026, 7, 11, 0, 0, 0).getTime();
 
 let mock: MockAbagraph;
 let client: MemoryClient;
@@ -71,8 +79,8 @@ it("re-stamping a cooldown extends the rest period", async () => {
 });
 
 it("tracks the nightly run count per date", async () => {
+	expect(nightKey(NIGHT)).toBe("2026-08-10");
 	const date = nightKey(T0);
-	expect(date).toBe("2026-08-10");
 	expect(await nightCount(client, date)).toBe(0);
 	await bumpNightCount(client, date, 0);
 	expect(await nightCount(client, date)).toBe(1);

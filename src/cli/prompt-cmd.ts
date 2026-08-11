@@ -16,6 +16,7 @@ import { basename, resolve } from "node:path";
 import { buildIndex } from "../history/bm25.js";
 import { composePrompt } from "../history/compose.js";
 import { historyCards } from "../history/corpus.js";
+import { renderBlocks } from "../history/render-blocks.js";
 import type { ComposedPrompt } from "../history/types.js";
 import { buildWalkthrough } from "../history/walkthrough.js";
 import { DEFAULT_BUDGET } from "../ui/api-history.js";
@@ -44,14 +45,10 @@ function elide(source: string, width = SOURCE_W): string {
 	return `${source.slice(0, head)}…${source.slice(source.length - (width - head - 1))}`;
 }
 
-/** The prompt itself — what `--copy` copies and what a model would receive. */
-export function renderPrompt(prompt: ComposedPrompt): string {
-	const parts = prompt.blocks.map((b) => `## ${b.source}\n${b.text.trim()}\n`);
-	if (prompt.constraints.length > 0) {
-		parts.push(`## Constraints\n${prompt.constraints.map((c) => `- ${c}`).join("\n")}\n`);
-	}
-	return parts.join("\n");
-}
+/** The prompt itself — what `--copy` copies and what a model would receive.
+ * The format lives in src/history/render-blocks.ts; the header below is what
+ * this command adds on top of it. */
+export const renderPrompt = (prompt: ComposedPrompt): string => renderBlocks(prompt);
 
 function plural(n: number, one: string): string {
 	return `${n} ${one}${n === 1 ? "" : "s"}`;

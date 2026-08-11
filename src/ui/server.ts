@@ -6,6 +6,7 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import { ahHome } from "../session/paths.js";
 import { handleChat, liveChats } from "./api-chat.js";
 import { handleContent } from "./api-content.js";
+import { handleFlows } from "./api-flow.js";
 import { denyReason, PAGE_HEADERS } from "./api-guard.js";
 import { handleHistory } from "./api-history.js";
 import { handleProjects } from "./api-projects.js";
@@ -43,6 +44,7 @@ function handle(req: IncomingMessage, res: ServerResponse, port: number): void {
 	if (handleHistory(method, path, url.searchParams, res)) return;
 	if (handleContent(method, path, repo, res)) return;
 	if (handleProjects(method, path, url.searchParams, res)) return;
+	if (handleFlows(method, path, url.searchParams, req, res)) return;
 	if (handleChat(method, path, req, res)) return;
 	if (handleSessions(method, path, url.searchParams.get("k"), repo, res)) return;
 	json(res, 404, { error: "not found" });

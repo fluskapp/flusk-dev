@@ -33,6 +33,12 @@
 		"@earendil-works/pi-ai": "^0.84.1",
 		"typebox": "^1.1.24"
 	},
+	"optionalDependencies": {
+		"@langchain/anthropic": "^1.5.4",
+		"@langchain/core": "^1.2.5",
+		"@langchain/langgraph": "^1.4.9",
+		"langchain": "^1.5.5"
+	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.0",
 		"@types/node": "^24.0.0",

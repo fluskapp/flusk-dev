@@ -8,10 +8,12 @@
  * is what test/ui-page.test.ts pins.
  */
 import { CLIENT_JS } from "./client-bundle.js";
+import { CLIENT_FLOW_JS } from "./client-flow.js";
 import { CLIENT_PALETTE_JS, PALETTE_HTML } from "./client-palette.js";
 import { PALETTE_PROMPT_JS } from "./client-palette-prompt.js";
 import { CHAT_HTML, HELP_HTML } from "./client-shell.js";
 import { ALL_CSS } from "./styles-bundle.js";
+import { FLOW_CSS } from "./styles-flow.js";
 import { PALETTE_CSS } from "./styles-palette.js";
 
 function escapeHtml(s: string): string {
@@ -26,6 +28,7 @@ const PANELS: Array<[string, string, string]> = [
 	["runs-btn", "Runs", "Sessions and harness journals (2 / r)"],
 	["docs-btn", "Docs", "Indexed markdown (3 / d)"],
 	["brain-btn", "Brain", "What ah knows (4 / b)"],
+	["flows-btn", "Flows", "Flow runs and the prompts composed for them"],
 ];
 
 export function renderPage(home: string): string {
@@ -38,7 +41,7 @@ export function renderPage(home: string): string {
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>ah</title>
-<style>${ALL_CSS}${PALETTE_CSS}</style>
+<style>${ALL_CSS}${FLOW_CSS}${PALETTE_CSS}</style>
 </head>
 <body>
 <div id="app">
@@ -64,6 +67,7 @@ export function renderPage(home: string): string {
 			<div id="runs" class="view" hidden></div>
 			<div id="docs" class="view" hidden></div>
 			<div id="brain" class="view" hidden></div>
+			<div id="flows" class="view" hidden></div>
 			<div id="project" class="view" hidden></div>
 			<div id="run" class="view" hidden></div>
 			<div id="doc" class="view" hidden></div>
@@ -80,7 +84,7 @@ export function renderPage(home: string): string {
 <div id="toast" hidden></div>
 ${HELP_HTML}
 ${PALETTE_HTML}
-<script>${CLIENT_JS}${PALETTE_PROMPT_JS}${CLIENT_PALETTE_JS}</script>
+<script>${CLIENT_JS}${CLIENT_FLOW_JS}${PALETTE_PROMPT_JS}${CLIENT_PALETTE_JS}</script>
 </body>
 </html>`;
 }
