@@ -31,6 +31,10 @@ function projectRow(p) {
 		'<span class="twisty" data-expand="' + esc(p.name) + '">' + (open ? "\\u25be" : "\\u25b8") + "</span>" +
 		'<span class="node-name">' + esc(p.name) + "</span>" +
 		'<span class="kind-chip ' + esc(p.kind) + '">' + esc(p.kind) + "</span>" +
+		(p.worktreeOf
+			? '<span class="wt-chip" title="a git worktree of ' + esc(p.worktreeOf) +
+				'">\u2937 ' + esc(p.worktreeOf) + "</span>"
+			: "") +
 		live + attn + "</div>";
 	if (!open) return head;
 	return head +
@@ -40,8 +44,25 @@ function projectRow(p) {
 }
 
 function renderTree() {
-	var shown = S.projects.filter(projMatches);
-	$("#tree").innerHTML = shown.map(projectRow).join("") || (S.query
+	var shown = orderProjects(S.projects.filter(projMatches));
+	// Read off the ORDERED list, not from a count: a busy repo's worktrees sort
+	// directly beneath it, so counting busy projects put the divider in the
+	// middle of them. A worktree belongs with its parent whatever its own
+	// activity, so it is never the row the divider lands on.
+	var busyNames = {};
+	shown.forEach(function (p) { if (isBusy(p)) busyNames[p.name] = 1; });
+	var firstQuiet = -1;
+	shown.forEach(function (p, i) {
+		if (firstQuiet !== -1) return;
+		if (isBusy(p)) return;
+		if (p.worktreeOf && busyNames[p.worktreeOf]) return;
+		firstQuiet = i;
+	});
+	$("#tree").innerHTML = shown.map(function (p, i) {
+		return (i === firstQuiet && i > 0
+			? '<div class="tree-sep">' + (shown.length - firstQuiet) + " quiet</div>"
+			: "") + projectRow(p);
+	}).join("") || (S.query
 		? '<div class="empty small">No project matches \\u201c' + esc(S.query) + '\\u201d</div>'
 		: '<div class="empty small">No projects indexed.<br/>Set <code>ui.projectDirs</code> in ' +
 			"<code>~/.ah/config.json</code>.</div>");

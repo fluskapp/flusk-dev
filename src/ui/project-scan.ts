@@ -7,6 +7,8 @@
  * what needs a human instead of listing everything.
  */
 import { existsSync, statSync } from "node:fs";
+import { summarize } from "./project-summary.js";
+export { summarize } from "./project-summary.js";
 import { basename, join, resolve } from "node:path";
 import type { AhConfig } from "../config/types.js";
 import type { ProjectKind, ProjectSummary } from "./api-types.js";
@@ -110,34 +112,6 @@ export function lastActivity(p: ProjectParts): string | undefined {
 		.filter((s) => s !== "")
 		.sort()
 		.at(-1);
-}
-
-export function summarize(p: ProjectParts, nowMs: number, median?: number): ProjectSummary {
-	const at = lastActivity(p);
-	const live = liveRuns(p);
-	const costUsd = Number(projectSpend(p).toFixed(6));
-	const input = {
-		journals: p.journals,
-		sessions: p.sessions,
-		liveRuns: live,
-		costUsd,
-		...(at !== undefined ? { lastActivity: at } : {}),
-	};
-	return {
-		name: p.name,
-		path: p.path,
-		kind: p.kind,
-		runs: p.journals.length + p.sessions.length,
-		liveRuns: live,
-		sessions: p.sessions.length,
-		docs: p.docs.length,
-		costUsd,
-		...(at !== undefined ? { lastActivity: at } : {}),
-		attention: computeAttention(input, {
-			nowMs,
-			...(median !== undefined ? { medianCostUsd: median } : {}),
-		}),
-	};
 }
 
 export function scanProjects(cfg: AhConfig, now: Date = new Date()): ProjectSummary[] {

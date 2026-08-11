@@ -28,6 +28,7 @@ import { CLIENT_STAGES_JS } from "./client-stages.js";
 import { CLIENT_STATUS_JS } from "./client-status.js";
 import { CLIENT_TABS_JS } from "./client-tabs.js";
 import { CLIENT_TREE_JS } from "./client-tree.js";
+import { CLIENT_TREE_ORDER_JS } from "./client-tree-order.js";
 
 export const CLIENT_JS =
 	CLIENT_CORE_JS +
@@ -35,6 +36,7 @@ export const CLIENT_JS =
 	CLIENT_STATUS_JS +
 	CLIENT_TABS_JS +
 	CLIENT_ROUTER_JS +
+	CLIENT_TREE_ORDER_JS +
 	CLIENT_TREE_JS +
 	CLIENT_ATTENTION_JS +
 	CLIENT_RUNS_JS +

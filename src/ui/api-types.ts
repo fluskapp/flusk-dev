@@ -19,6 +19,11 @@ export interface ProjectSummary {
 	docs: number;
 	costUsd: number;
 	lastActivity?: string;
+	/**
+	 * Set when this root is a git WORKTREE: the name of the repo it belongs to.
+	 * The tree groups by it, so three worktrees stop reading as three projects.
+	 */
+	worktreeOf?: string;
 	/** Anything that wants a human: failed runs, blocked gates, stalled goals. */
 	attention: Attention[];
 }

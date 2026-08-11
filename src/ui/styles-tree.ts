@@ -45,6 +45,22 @@ body:not(.zone-view) .tree-row.active, body:not(.zone-view) .tree-row.active:hov
 }
 .kind-chip.harness { color: var(--accent); border-color: var(--accent); }
 
+/* "a worktree of X" — no border, because it names a RELATIONSHIP rather than
+   classifying the row, and a second bordered chip beside the kind reads as a
+   second kind. */
+.wt-chip {
+	font: var(--ij-fs-2) var(--font-code); color: var(--dim);
+	white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+/* Where the projects that have never run anything begin. A label rather than
+   a bare rule: an unexplained divider is one more thing to work out. */
+.tree-sep {
+	margin: var(--ij-space-2) 0 var(--ij-space-1);
+	padding: 0 var(--ij-space-2); border-top: 1px solid var(--border);
+	font: var(--ij-fs-1) var(--font-code); color: var(--ij-text-disabled);
+	text-transform: uppercase; letter-spacing: .4px; line-height: var(--ij-row-h);
+}
+
 .tree-row .count {
 	margin-left: auto; color: var(--dim); font: var(--ij-fs-3) var(--font-code);
 }
