@@ -23,8 +23,10 @@ function stageHtml(s) {
 	var cls = stageClass(s.status);
 	var title = s.status + (s.duration ? " \\u00b7 " + s.duration : "") +
 		(s.detail ? " \\u00b7 " + s.detail : "");
-	// A failed stage is a handle onto the place in the journal that explains it.
-	var jump = cls === "error" ? ' data-stage="' + esc(s.name) + '"' : "";
+	// A failed stage is a handle onto the place in the journal that explains it,
+	// so it is a real control: focusable, and openable from the keyboard.
+	var jump = cls === "error"
+		? ' data-stage="' + esc(s.name) + '" tabindex="0" role="button"' : "";
 	return '<span class="stage ' + cls + '"' + jump + ' title="' + esc(title) + '">' +
 		esc(s.name) + "</span>";
 }
@@ -39,7 +41,8 @@ function stageErrors(stages) {
 		var k = String(s.status).toLowerCase();
 		return k === "failed" || k === "error";
 	}).map(function (s) {
-		return '<div class="error-line" data-stage="' + esc(s.name) + '">' +
+		return '<div class="error-line" data-stage="' + esc(s.name) +
+			'" tabindex="0" role="button">' +
 			"<b>" + esc(s.name) + "</b> " + esc(s.status) +
 			(s.duration ? " \\u00b7 " + esc(s.duration) : "") +
 			(s.detail ? " \\u2014 " + esc(s.detail) : "") +
@@ -69,6 +72,17 @@ function jumpToStage(name) {
 	}
 	if (jumpRawToStage(needle)) return;
 	toast("\\u201c" + name + "\\u201d is not named in this journal");
+}
+
+/**
+ * One stage is selected at a time. The class outlives :focus on purpose: the
+ * click moves focus into the document, and IntelliJ keeps showing the row it
+ * came from in the INACTIVE selection colour rather than dropping the mark.
+ */
+function pickStage(el) {
+	$$("#run [data-stage]").forEach(function (o) { o.classList.remove("on"); });
+	el.classList.add("on");
+	jumpToStage(el.getAttribute("data-stage"));
 }
 
 /** Raw mode has one <pre>: scroll it to where the stage is named in the text. */
@@ -122,7 +136,12 @@ async function loadJournalRun(path) {
 		wire: function () {
 			wirePathActions("#run", path);
 			$$("#run [data-stage]").forEach(function (el) {
-				el.addEventListener("click", function () { jumpToStage(el.getAttribute("data-stage")); });
+				el.addEventListener("click", function () { pickStage(el); });
+				el.addEventListener("keydown", function (e) {
+					if (e.key !== "Enter" && e.key !== " ") return;
+					e.preventDefault();
+					pickStage(el);
+				});
 			});
 		},
 	});

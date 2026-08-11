@@ -1,85 +1,149 @@
-/** Run view: meta bar, transcript messages, tool call rows, stage pipeline. */
+/**
+ * The run transcript: IntelliJ's Run/Debug tool window console.
+ *
+ * That surface is an editor, not a feed of cards — a header strip under one
+ * hairline, console lines on the editor background, and tool calls as
+ * collapsible tree nodes one Tree.rowHeight tall. Status is a Badge.*, the
+ * stage strip is the Counter/Badge row above it; the journal body below it is
+ * markdown (styles-md.ts). Every colour, space, radius and size is a token;
+ * the only literal is the `1px` of a separator.
+ *
+ * Two facts about expUI shape the rules below: *.selectionForeground equals
+ * the default foreground in BOTH themes, so a filled selection needs no
+ * colour override; and the inactive selection is its own colour
+ * (*.selectionInactiveBackground, Gray11/Gray4), not the focused fill faded.
+ */
 export const TRANSCRIPT_CSS = `
 #meta {
-	display: flex; flex-wrap: wrap; gap: 6px 16px; align-items: center;
-	padding: 0 0 10px; border-bottom: 1px solid var(--border); font-size: 12px;
+	display: flex; flex-wrap: wrap; align-items: center;
+	gap: var(--ij-space-1) var(--ij-space-3); min-height: var(--ij-tw-header-h);
+	padding: 0 0 var(--ij-space-2); border-bottom: 1px solid var(--border);
+	font-size: var(--ij-fs-4);
 }
+#meta .meta-item { display: inline-flex; align-items: center; gap: var(--ij-space); }
+
+/* Badge.*: a filled plate in the status colour with the theme's own on-badge
+   foreground. An outline badge means something else in expUI. */
 .pill {
-	padding: 1px 8px; border-radius: 10px; font-size: 10.5px; font-weight: 600;
-	color: var(--on-accent); background: var(--run);
-	text-transform: uppercase; letter-spacing: .4px;
+	display: inline-block; padding: 0 var(--ij-space-2);
+	border-radius: var(--ij-radius-sm); letter-spacing: .04em;
+	font-size: var(--ij-fs-1); font-weight: 600; line-height: var(--ij-lh-loose);
+	color: var(--on-accent); background: var(--run); text-transform: uppercase;
 }
 .pill.completed { background: var(--ok); }
 .pill.error { background: var(--err); }
 /* blocked is MEDIUM in the attention rules; red would contradict that. */
 .pill.blocked, .pill.stopped { background: var(--warn); }
-.pill.running { background: var(--accent); }
+/* Filled with the default button's Blue, so it takes that key's white fg. */
+.pill.running { background: var(--accent); color: var(--ij-button-default-fg); }
 
-#transcript { padding: 12px 0 20px; }
-.msg { display: flex; gap: 12px; margin: 12px 0; }
-.msg-tag {
-	flex: none; width: 40px; text-align: right; font-size: 10.5px; font-weight: 700;
-	padding-top: 2px; color: var(--tag-ah); text-transform: uppercase;
+/* The gutter the speaker tag sits in, and the indent every summary line below
+   the transcript aligns to. Derived from the spacing step, not measured. */
+#transcript {
+	--tx-gutter: calc(var(--ij-space-4) * 3);
+	padding: var(--ij-space-3) 0 var(--ij-space-4);
 }
-.msg.user .msg-tag { color: var(--tag-user); }
+/* No align-items at all: a turn that is only tool calls has no first line box,
+   and baseline alignment would synthesise one from the bottom of the whole
+   node list. The tag is given the body's own line-height instead (.msg-tag
+   below), so the two line up without a hand-tuned padding. */
+.msg { display: flex; gap: var(--ij-space-3); padding: var(--ij-space) 0; }
+.msg-tag {
+	flex: none; width: var(--tx-gutter); text-align: right; letter-spacing: .04em;
+	font-size: var(--ij-fs-1); font-weight: 700; text-transform: uppercase;
+	line-height: calc(var(--ij-fs-6) * var(--ij-lh)); color: var(--tag-ah);
+}
+.msg.user .msg-tag { color: var(--tag-user); padding-top: var(--ij-space); }
 .msg-body { min-width: 0; flex: 1; }
 .pre { white-space: pre-wrap; overflow-wrap: break-word; }
+/* Table.stripeColor and a two-pixel rule — the console's way of banding a run
+   of lines. No card: no border, no radius, no shadow. */
 .msg.user .msg-body {
-	background: var(--panel); border: 1px solid var(--border);
-	border-left: 2px solid var(--tag-user); border-radius: 6px; padding: 7px 10px;
+	background: var(--code-bg); padding: var(--ij-space) var(--ij-space-2);
+	box-shadow: inset var(--ij-space-1) 0 0 var(--tag-user);
 }
 
-.tool {
-	margin: 5px 0; border: 1px solid var(--border);
-	border-radius: 6px; background: var(--panel); overflow: hidden;
-}
-.tool[open] { background: var(--bg); }
-.tool.err { border-color: var(--err); }
-.tool summary {
-	display: flex; align-items: center; gap: 10px; padding: 4px 9px;
+/* A collapsible node row: Tree.rowHeight tall, on one hairline, no frame. The
+   status rule is a border and not an inset shadow because the summary's own
+   selection fill would paint over a shadow the parent drew. */
+.tool { border-bottom: 1px solid var(--border); border-left: var(--ij-space-1) solid transparent; }
+.tool.err { border-left-color: var(--err); }
+.tool > summary {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	min-height: var(--ij-row-h); padding: 0 var(--ij-space-2);
 	cursor: pointer; list-style: none; user-select: none;
 }
-.tool summary::before { content: "▸"; color: var(--dim); font-size: 10px; }
-.tool[open] summary::before { content: "▾"; }
-.tool summary:hover { background: var(--hover); }
-.tool-chip {
-	font: 600 11px var(--font-code); color: var(--accent);
-	background: var(--accent-soft); border-radius: 4px; padding: 1px 7px;
+.tool > summary::-webkit-details-marker { display: none; }
+.tool > summary::before { content: "▸"; color: var(--dim); font-size: var(--ij-fs-1); }
+.tool[open] > summary::before { content: "▾"; }
+.tool > summary:hover { background: var(--hover); }
+/* Expanded is NOT selected: disclosure and selection are independent in an
+   IntelliJ tree, and filling every open node made several rows read as
+   selected at once. Only the row the keyboard is on is filled. */
+.tool > summary:focus { background: var(--ij-selection); outline: none; }
+.tool > summary:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(var(--ij-focus-ring-w) * -1);
 }
+/* A tool NAME is not a status, so it carries no colour and no plate. */
+.tool-chip { flex: none; font: 600 var(--ij-fs-3) var(--font-code); color: var(--text); }
 .tool-preview {
-	font: 11.5px var(--font-code); color: var(--dim); min-width: 0;
+	font: var(--ij-fs-4) var(--font-code); color: var(--dim); min-width: 0;
 	white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.tool-flag { margin-left: auto; color: var(--err); font-size: 11px; font-weight: 600; }
+.tool-flag { margin-left: auto; color: var(--err); font-size: var(--ij-fs-3); font-weight: 600; }
+/* Console output, capped at fourteen rows so one node cannot own the view. */
 .code {
-	margin: 0; padding: 8px 12px; background: var(--code-bg);
-	border-top: 1px solid var(--border); overflow-x: auto; max-height: 340px;
+	margin: 0; padding: var(--ij-space) var(--ij-space-3); background: var(--code-bg);
+	border-top: 1px solid var(--border); overflow-x: auto;
+	max-height: calc(var(--ij-row-h) * 14);
 }
 .code.out { color: var(--text); }
-.pad { padding: 5px 10px; }
+.pad { padding: var(--ij-space-1) var(--ij-space-3); }
 
+/* Label.errorForeground behind a marker. The token layer has no error FILL
+   (Editor.ToolTip.errorBackground is not in SEMANTIC), so none is invented. */
 .error-line {
-	margin: 6px 0; padding: 5px 10px; color: var(--err); font-size: 12.5px;
-	border: 1px solid var(--err); border-radius: 6px; background: var(--panel);
+	margin: var(--ij-space-1) 0; padding: var(--ij-space-1) var(--ij-space-2);
+	color: var(--err); font-size: var(--ij-fs-5);
+	box-shadow: inset var(--ij-space-1) 0 0 var(--err);
 }
 .compaction {
-	margin: 14px 0; padding: 5px 10px; text-align: center; font-size: 11.5px;
-	color: var(--dim); border-top: 1px dashed var(--border);
+	margin: var(--ij-space-3) 0 0; padding: var(--ij-space-1) 0; text-align: center;
+	font-size: var(--ij-fs-3); color: var(--dim); border-top: 1px solid var(--border);
 }
-.stats { margin: 18px 0 0 52px; font-size: 12px; color: var(--dim); }
-.running-note { margin: 18px 0 0 52px; font-size: 12px; color: var(--accent); }
+.stats, .running-note {
+	margin: var(--ij-space-4) 0 0 calc(var(--tx-gutter) + var(--ij-space-3));
+	font-size: var(--ij-fs-5);
+}
+.stats { color: var(--dim); }
+.running-note { color: var(--accent); }
 
-.stages { display: flex; flex-wrap: wrap; gap: 4px; margin: 10px 0; }
+/* The stage pipeline as a Badge row. A pending stage is not a disabled
+   control — its name is content — so it is the secondary text on a real border. */
+.stages { display: flex; flex-wrap: wrap; gap: var(--ij-space-1); margin: var(--ij-space-2) 0; }
 .stage {
-	font: 10.5px var(--font-code); padding: 1px 6px; border-radius: 3px;
-	background: var(--hover); color: var(--dim); border: 1px solid transparent;
+	font: var(--ij-fs-2) var(--font-code);
+	line-height: calc(var(--ij-row-h) - var(--ij-space-2));
+	padding: 0 var(--ij-space-2); border-radius: var(--ij-radius-sm);
+	background: transparent; color: var(--ij-text-secondary); border: 1px solid var(--ij-border-control);
 }
-.stage.completed { background: transparent; border-color: var(--ok); color: var(--ok); }
-.stage.running { background: var(--accent); color: var(--on-accent); }
-.stage.error { background: transparent; border-color: var(--err); color: var(--err); }
-.stage.stopped { border-color: var(--warn); color: var(--warn); background: transparent; }
+.stage.completed { color: var(--ok); border-color: var(--ok); }
+.stage.running { background: var(--accent); color: var(--ij-button-default-fg); border-color: var(--accent); }
+.stage.error { color: var(--err); border-color: var(--err); }
+.stage.stopped { color: var(--warn); border-color: var(--warn); }
+
+/* Only a failing stage is a handle onto the journal, so only it is a row you
+   can select. The selection outlives :focus (client-journal.ts sets .on),
+   which is the whole point of having an inactive selection colour. */
 .stage[data-stage], .error-line[data-stage] { cursor: pointer; }
-.error-line[data-stage]:hover { background: var(--hover); }
-/* The journal body is markdown now (client-journal.ts + styles-md.ts); the
-   pipeline above it keeps these rules. */
+.stage[data-stage]:hover, .error-line[data-stage]:hover { background: var(--hover); }
+.stage.on, .error-line.on { background: var(--ij-selection-inactive); }
+.stage[data-stage]:focus, .error-line[data-stage]:focus {
+	background: var(--ij-selection); outline: none;
+}
+.stage[data-stage]:focus-visible, .error-line[data-stage]:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(var(--ij-focus-ring-w) * -1);
+}
 `;

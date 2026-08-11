@@ -7,6 +7,8 @@ export const CLIENT_CORE_JS = `
 var S = {
 	projects: [], project: null, expanded: {}, query: "",
 	tabs: [], active: null, cursor: 0, zone: "tree",
+	/** Where the cursor was left in each zone, so Tab returns to it. */
+	cursorOf: { tree: 0, view: 0 },
 	runFilter: null, runSort: null, docFilter: "", docProject: null,
 	chat: { msgs: [], busy: false, abort: null },
 	/** The path the status bar is showing — the active tab's file. */

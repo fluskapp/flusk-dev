@@ -91,11 +91,15 @@ function setTurnHtml(m, html) {
 	if (m && typeof html === "string" && html !== "") m.html = html;
 	return m;
 }
-/** Grows to about six lines, then scrolls. */
+/**
+ * Grows with the text, up to the max-height the stylesheet sets — the cap is
+ * a token (five control heights) and the stylesheet stays its only owner.
+ */
 function autogrowChat(el) {
 	if (!el) return;
+	var cap = parseFloat(getComputedStyle(el).maxHeight);
 	el.style.height = "auto";
-	el.style.height = Math.min(el.scrollHeight, 132) + "px";
+	el.style.height = (cap > 0 ? Math.min(el.scrollHeight, cap) : el.scrollHeight) + "px";
 }
 function setChatVisible(on) {
 	document.body.classList.toggle("chat-off", !on);
@@ -115,19 +119,15 @@ function setChatWidth(px) {
 }
 
 /**
- * Geometry and composer layout, once. The shell ships the parts; this pulls
- * the picker and the cwd into the single row under the textarea, so the
- * composer is picker + cwd + Send and nothing else.
+ * Geometry, once. The shell ships the composer already assembled — the picker
+ * is a header action, the cwd is the first cell of the button row — so this
+ * no longer reshuffles the DOM at boot; it only restores the rail width, wires
+ * autogrow and hangs the splitter.
  */
 (function chatShell() {
 	var panel = typeof document === "undefined" ? null : document.getElementById("chat");
 	if (!panel) return;
 	twRestore("--tw-right", CHAT_W_KEY, CHAT_MIN_W, 760);
-	var row = panel.querySelector(".chat-actions");
-	var pick = $("#chat-backend");
-	var cwd = $("#chat-cwd");
-	if (row && pick) row.insertBefore(pick, row.firstChild);
-	if (row && cwd) row.insertBefore(cwd, $("#chat-send") || null);
 	var input = $("#chat-input");
 	if (input) input.addEventListener("input", function () { autogrowChat(this); });
 	twGrip(panel, "chat-grip", function (ev) { setChatWidth(window.innerWidth - ev.clientX); });

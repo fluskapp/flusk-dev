@@ -1,38 +1,73 @@
-/** Document list chips and the rendered-markdown reader. */
+/**
+ * Document list chips and the rendered-markdown reader.
+ *
+ * Every value is a token. The filter is the same TextField the sidebar search
+ * is (Editor.SearchField.background inside Component.borderColor, Component.arc,
+ * the focus ring drawn OUTSIDE the border in *.focusColor), because two search
+ * fields in one workbench that do not match read as two different controls.
+ * The type steps are the shared scale, so a heading here is the size a heading
+ * is anywhere else.
+ */
 export const DOCS_CSS = `
-#docs { padding: 8px 16px 36px; max-width: 1080px; }
-#doc-search {
-	display: block; width: 100%; max-width: 340px; margin: 0 0 8px;
-	padding: 2px 6px; font: 12.5px var(--font-ui); color: var(--text);
-	background: var(--bg); border: 1px solid var(--border); outline: none;
+#docs {
+	padding: var(--ij-space-2) var(--ij-space-4) calc(var(--ij-space-4) * 2);
+	max-width: 1080px; /* design-exempt: the editor's reading measure */
 }
-#doc-search:focus { border-color: var(--accent); }
+#doc-search {
+	display: block; width: 100%; max-width: 340px; /* design-exempt: filter field measure */
+	margin: 0 0 var(--ij-space-2);
+	height: var(--ij-control-h); padding: 0 var(--ij-space-2);
+	font: var(--ij-fs-6)/var(--ij-lh) var(--font-ui); color: var(--text);
+	background: var(--ij-bg-editor); border: 1px solid var(--ij-border-control);
+	border-radius: var(--ij-radius); outline: none;
+}
+#doc-search:focus {
+	border-color: var(--ij-focus-ring);
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+}
+#doc-search::placeholder { color: var(--ij-text-disabled); }
 .kind {
-	font: 10px var(--font-code); text-transform: uppercase; padding: 0 5px;
-	background: var(--hover); color: var(--dim);
+	font: var(--ij-fs-1) var(--font-code); text-transform: uppercase;
+	padding: 0 var(--ij-space); background: var(--hover); color: var(--dim);
 }
 /* Only "context" is tinted, and with the accent — a document KIND is not a
-   status, so plan must not read as a warning nor skill as a success. */
-.k-context { color: var(--accent); background: var(--accent-soft); }
+   status, so plan must not read as a warning nor skill as a success. The text
+   on it is Link.activeForeground: --accent-soft inverts with the theme while
+   --accent does not, so the accent on it reads at 3:1 in light and less in dark. */
+.k-context { color: var(--ij-link); background: var(--accent-soft); }
 
 #doc, #file { display: flex; flex-direction: column; min-height: 0; }
 
-.md { line-height: 1.6; max-width: 900px; }
-.md h1, .md h2, .md h3, .md h4 { margin: 16px 0 6px; line-height: 1.3; }
-.md h1 { font-size: 18px; } .md h2 { font-size: 15px; } .md h3 { font-size: 13.5px; }
-.md p, .md ul, .md ol, .md blockquote { margin: 7px 0; }
-.md ul, .md ol { padding-left: 20px; }
-.md code { background: var(--code-bg); padding: 0 3px; font-size: 12px; }
-.md pre.code { padding: 8px 10px; border: 1px solid var(--border); }
+.md { line-height: var(--ij-lh-loose); max-width: 900px; } /* design-exempt: prose measure */
+.md h1, .md h2, .md h3, .md h4 {
+	margin: var(--ij-space-4) 0 var(--ij-space); line-height: var(--ij-lh-tight);
+}
+.md h1 { font-size: var(--ij-fs-9); }
+.md h2 { font-size: var(--ij-fs-8); }
+.md h3 { font-size: var(--ij-fs-7); }
+.md p, .md ul, .md ol, .md blockquote { margin: var(--ij-space-2) 0; }
+.md ul, .md ol { padding-left: var(--ij-space-4); }
+.md code {
+	background: var(--code-bg); padding: 0 var(--ij-space-1); font-size: var(--ij-fs-5);
+}
+.md pre.code { padding: var(--ij-space-2); border: 1px solid var(--border); }
 .md pre.code code { background: none; padding: 0; }
 .md blockquote {
-	border-left: 2px solid var(--border); padding-left: 10px; color: var(--dim); margin-left: 0;
+	border-left: var(--ij-space-1) solid var(--border);
+	padding-left: var(--ij-space-2); color: var(--dim); margin-left: 0;
 }
-.md table { border-collapse: collapse; font-size: 12.5px; display: block; overflow-x: auto; }
-.md th, .md td { border: 1px solid var(--border); padding: 2px 8px; text-align: left; }
+.md table {
+	border-collapse: collapse; font-size: var(--ij-fs-6); display: block; overflow-x: auto;
+}
+.md th, .md td {
+	border: 1px solid var(--border);
+	padding: var(--ij-space-1) var(--ij-space-2); text-align: left;
+}
 .md th { background: var(--panel); }
-.md a { color: var(--accent); }
-.md hr { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+/* Link.activeForeground, the key for link TEXT — Button.default's Blue is a
+   fill colour and fails against the editor, the chat panel and white alike. */
+.md a { color: var(--ij-link); }
+.md hr { border: none; border-top: 1px solid var(--border); margin: var(--ij-space-3) 0; }
 /* Syntax colour (highlight.ts emits these): meaning only, never decoration. */
 .hl-kw { color: var(--accent); }
 .hl-str { color: var(--ok); }

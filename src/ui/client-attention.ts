@@ -19,7 +19,9 @@ function attentionRow(r) {
 		'<td><span class="sev ' + esc(a.severity) + '"></span></td>' +
 		'<td class="grow">' + esc(a.label) + "</td>" +
 		"<td>" + projectLink(r.project) + "</td>" +
-		'<td class="mono">' + (a.ref ? evidence(base(a.ref), a.ref) : "\\u2014") + "</td></tr>";
+		'<td class="mono">' +
+		(a.ref ? evidence(base(a.ref), a.ref) : '<span class="off">\\u2014</span>') +
+		"</td></tr>";
 }
 
 function calmLine() {

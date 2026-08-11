@@ -1,58 +1,91 @@
-/** IntelliJ "New UI" palette: light + dark, dark via toggle or OS preference. */
+/**
+ * Theming, in three states that must all keep working: bare :root is light,
+ * an explicit data-theme="dark" is dark, and the OS preference decides only
+ * when the user has not chosen (so an explicit light choice still wins).
+ *
+ * No value is written here any more — everything comes from styles-tokens.ts.
+ */
+import {
+	METRIC_VARS,
+	rampVars,
+	semanticVars,
+	type ThemeName,
+	TYPE_VARS,
+} from "./styles-tokens.js";
 
-const DARK_VARS = `
-	--bg: #1e1f22; --panel: #2b2d30; --hover: #313438;
-	--border: #393b40; --text: #dfe1e5; --dim: #9da0a8;
-	--accent: #3574f0; --accent-soft: #25324d; --sel: #2e436e;
-	--ok: #57965c; --err: #e35252; --warn: #d6ae58; --run: #9da0a8;
-	--code-bg: #26282b; --tag-user: #d6ae58; --tag-ah: #3574f0;
-	/* Search hits and the editor gutter: the only other places colour is
-	   allowed to mean something. Both themes define both. */
-	--match-bg: #4d3d17; --match-fg: #f2c55c; --gutter-bg: #26282b;
-	/* Dark's accents are LIGHT, so white text on them fails contrast — white
-	   on --warn #d6ae58 is ~2.1:1 at 10.5px bold, which is the status pill. */
-	--on-accent: #1e1f22;
+/** One theme owns the raw ramps plus the semantic layer built on top. */
+const vars = (t: ThemeName): string => `${rampVars(t)}\n\t${semanticVars(t)}`;
+
+/**
+ * The names the rest of the CSS already uses. They are aliases, not a second
+ * palette: each one points at a single semantic token, so this slice could
+ * change every value without touching another file.
+ */
+const ALIASES = `
+	--bg: var(--ij-bg-surface);
+	--panel: var(--ij-bg-panel);
+	--hover: var(--ij-hover);
+	/* The workbench draws one hairline everywhere, and IntelliJ's hairline is
+	   the separator; --ij-border (Borders.color) is the darker frame line. */
+	--border: var(--ij-separator);
+	--text: var(--ij-text);
+	--dim: var(--ij-text-secondary);
+	--accent: var(--ij-accent);
+	--accent-soft: var(--ij-accent-soft);
+	--sel: var(--ij-selection);
+	--ok: var(--ij-status-success);
+	--err: var(--ij-status-error);
+	--warn: var(--ij-status-warning);
+	--run: var(--ij-text-secondary);
+	--code-bg: var(--ij-bg-inset);
+	--gutter-bg: var(--ij-bg-inset);
+	--tag-user: var(--ij-status-warning);
+	--tag-ah: var(--ij-accent);
+	--match-bg: var(--ij-match-bg);
+	--match-fg: var(--ij-match-fg);
+	/* Text drawn ON a filled BADGE (Badge.blueForeground's pair, which the pill
+	   colours share). A filled default button is not a badge: it takes
+	   --ij-button-default-fg, which is white in both themes. */
+	--on-accent: var(--ij-text-on-accent);
+	/* One row height for every list in the workbench. Tree.rowHeight is 24px,
+	   two more than the 22 ah used to draw: fidelity, not densification. */
+	--row: var(--ij-row-h);
+	--font-ui: var(--ij-font-ui);
+	--font-code: var(--ij-font-mono);
 `;
 
 export const THEME_CSS = `
 :root {
-	--bg: #ffffff; --panel: #f7f8fa; --hover: #eef0f2;
-	--border: #ebecf0; --text: #1e1f22; --dim: #6c707e;
-	--accent: #3574f0; --accent-soft: #edf3ff; --sel: #d4e2ff;
-	--ok: #208a3c; --err: #db3b4b; --warn: #b07203; --run: #6c707e;
-	--code-bg: #f7f8fa; --tag-user: #b07203; --tag-ah: #3574f0;
-	--match-bg: #ffeeb0; --match-fg: #6b4e00; --gutter-bg: #f7f8fa;
-	/* Text drawn ON a filled accent (pills, badges, the running stage). */
-	--on-accent: #ffffff;
-	/* One row height for every list in the workbench. */
-	--row: 22px;
-	--font-ui: -apple-system, "Segoe UI", "Inter", "Helvetica Neue", sans-serif;
-	--font-code: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+	${vars("light")}
+	${METRIC_VARS}
+	${TYPE_VARS}
+	${ALIASES}
 }
-:root[data-theme="dark"] { ${DARK_VARS} }
+:root[data-theme="dark"] { ${vars("dark")} }
 @media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]) { ${DARK_VARS} }
+	:root:not([data-theme="light"]) { ${vars("dark")} }
 }
 
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
 	margin: 0; background: var(--bg); color: var(--text);
-	font: 12.5px/1.5 var(--font-ui);
+	font: var(--ij-fs-6)/var(--ij-lh) var(--font-ui);
 	-webkit-font-smoothing: antialiased;
 }
-pre, code, .code { font: 12px/1.55 var(--font-code); }
+pre, code, .code { font: var(--ij-fs-5)/var(--ij-lh-code) var(--font-code); }
 button {
 	font: inherit; color: inherit; background: none;
-	border: none; cursor: pointer; border-radius: 3px; padding: 1px 8px;
+	border: none; cursor: pointer;
+	border-radius: var(--ij-radius-sm); padding: var(--ij-space-1) var(--ij-space-2);
 }
 button:hover { background: var(--hover); }
-::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar { width: 10px; height: 10px; } /* design-exempt: scrollbar furniture */
 ::-webkit-scrollbar-thumb { background: var(--border); }
 ::-webkit-scrollbar-thumb:hover { background: var(--dim); }
 [hidden] { display: none !important; }
 .dim { color: var(--dim); }
-.small { font-size: 11.5px; }
+.small { font-size: var(--ij-fs-4); }
 .spacer { flex: 1; }
 mark, .hit { background: var(--match-bg); color: var(--match-fg); }
 `;

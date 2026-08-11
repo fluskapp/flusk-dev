@@ -19,7 +19,7 @@ function projectCounts(d) {
 
 function modelRow(m) {
 	return "<tr><td class=\\"mono\\">" + esc(m.id) + "</td>" +
-		"<td>" + (m.role ? esc(m.role) : '<span class="dim">\\u2014</span>') + "</td>" +
+		"<td>" + (m.role ? esc(m.role) : '<span class="off">\\u2014</span>') + "</td>" +
 		'<td class="num">' + (m.score == null ? "" : '<span class="score">' + esc(m.score) + "</span>") +
 		"</td></tr>";
 }

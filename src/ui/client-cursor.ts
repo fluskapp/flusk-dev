@@ -16,7 +16,17 @@ function cursorRows() {
 	return $$("#tree .tree-row[data-row]");
 }
 
+/**
+ * IntelliJ paints a selection in two colours: the focused one where the
+ * keyboard is, the inactive one where it is not. \`zone-view\` on <body> is
+ * which of the two the view's table draws.
+ */
+function markZone() {
+	document.body.classList.toggle("zone-view", S.zone === "view");
+}
+
 function syncCursor() {
+	markZone();
 	var rows = cursorRows();
 	if (S.cursor >= rows.length) S.cursor = Math.max(0, rows.length - 1);
 	rows.forEach(function (el, i) { el.classList.toggle("cursor", i === S.cursor); });
@@ -36,10 +46,21 @@ function openCursor() {
 	if (el) handleOpen(el.getAttribute("data-open"));
 }
 
+/**
+ * Leaving the view no longer erases its selected row: the row stays marked and
+ * the stylesheet repaints it in the inactive colour, which is what tells you
+ * where Tab will put you back — so the index has to be kept per zone, or the
+ * mark would point at a row Tab does not return to. The tree's own mark IS
+ * cleared on the way into the view, because the tree paints its cursor as a
+ * focus ring and two focus rings at once would be a lie.
+ */
 function setZone(zone) {
+	S.cursorOf[S.zone] = S.cursor;
 	S.zone = zone;
-	S.cursor = 0;
-	$$(".cursor").forEach(function (el) { el.classList.remove("cursor"); });
+	S.cursor = S.cursorOf[zone] || 0;
+	if (zone === "view") {
+		$$("#tree .cursor").forEach(function (el) { el.classList.remove("cursor"); });
+	}
 	syncCursor();
 }
 

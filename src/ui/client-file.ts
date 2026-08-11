@@ -30,11 +30,17 @@ function matchesFor(path) {
 	})[0] || null;
 }
 
-/** The matching lines, in the editor's gutter, the opened one marked. */
+/**
+ * The matching lines, in the editor's gutter, the opened one marked. An elided
+ * range carries the same empty gutter cell as a real line, so the gutter is
+ * one unbroken column down the peek instead of stopping at every gap.
+ */
 function peekRows(file, line) {
 	var prev = 0;
+	var gapRow = '<div class="peek-gap"><span class="gutter"></span>' +
+		'<span class="text">\\u22ee</span></div>';
 	return file.matches.map(function (m) {
-		var gap = prev && m.line > prev + 1 ? '<div class="peek-gap">\\u22ee</div>' : "";
+		var gap = prev && m.line > prev + 1 ? gapRow : "";
 		prev = m.line;
 		return gap + '<div class="peek-row' + (m.line === line ? " hit-line" : "") +
 			'" data-line="' + esc(m.line) + '"><span class="gutter">' + esc(m.line) +

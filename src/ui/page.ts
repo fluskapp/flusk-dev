@@ -92,7 +92,7 @@ export function renderPage(home: string): string {
 		<span>ah v0.1.0</span>
 	</footer>
 </div>
-<div id="toast" hidden></div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
 ${HELP_HTML}
 ${PALETTE_HTML}
 <script>${CLIENT_JS}${PALETTE_PROMPT_JS}${PALETTE_ROWS_JS}${PALETTE_FILES_JS}${CLIENT_PALETTE_JS}</script>

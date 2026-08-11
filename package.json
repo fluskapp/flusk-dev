@@ -26,7 +26,8 @@
 		"build": "tsc -p tsconfig.build.json",
 		"check": "tsc --noEmit",
 		"test": "vitest run",
-		"standards": "bash scripts/check-standards.sh"
+		"standards": "bash scripts/check-standards.sh",
+		"design": "bash scripts/check-design.sh"
 	},
 	"dependencies": {
 		"@abagraph/client": "^0.1.0",

@@ -25,11 +25,16 @@ function setMdMode(id, mode) {
 	try { localStorage.setItem(MD_KEY, JSON.stringify(all)); } catch (e) { /* private mode */ }
 }
 
-/** One control, three segments. Raw needs a source; without one it is off. */
+/**
+ * One control, three segments — IntelliJ's SegmentedButton. Raw needs a
+ * source; without one it is off. \`aria-pressed\` carries the selection to a
+ * screen reader, which the \`.on\` class alone never did.
+ */
 function mdSeg(mode, hasRaw) {
 	return '<div class="seg" role="group" aria-label="Preview mode">' + MD_MODES.map(function (m) {
 		var off = m !== "preview" && !hasRaw;
-		return '<button data-md="' + m + '"' + (m === mode ? ' class="on"' : "") +
+		return '<button data-md="' + m + '" aria-pressed="' + (m === mode) + '"' +
+			(m === mode ? ' class="on"' : "") +
 			(off ? ' disabled title="the server serves this document already rendered"' : "") +
 			">" + MD_LABEL[m] + "</button>";
 	}).join("") + "</div>";
@@ -59,8 +64,14 @@ function mdSurface(host, o) {
 	$$("#" + host.id + " [data-md]").forEach(function (b) {
 		b.addEventListener("click", function () {
 			if (b.disabled) return;
-			setMdMode(o.id, b.getAttribute("data-md"));
+			var m = b.getAttribute("data-md");
+			setMdMode(o.id, m);
 			mdSurface(host, o);
+			// Re-rendering replaces the button that was clicked, so without this
+			// the focus falls to the body: the control could be reached from the
+			// keyboard exactly once, and never showed its focused selection.
+			var again = $("#" + host.id + ' [data-md="' + m + '"]');
+			if (again) again.focus({ preventScroll: true });
 		});
 	});
 	if (o.wire) o.wire(host);
