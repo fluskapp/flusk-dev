@@ -1,15 +1,18 @@
 /**
  * `ah watch` — unattended mode. Wires the real dependencies (gh queues, git
- * worktrees, runCmd, the abagraph ledger) into the injectable watch loop.
+ * worktrees, runCmd, the attempt ledger) into the injectable watch loop.
  *
- * Memory is REQUIRED here: the attempt ledger and cooldowns are facts, and
- * without them an overnight loop would retry the same item forever.
+ * The ledger is REQUIRED here: attempts and cooldowns are facts, and without
+ * them an overnight loop would retry the same item forever. `memory.enabled:
+ * false` asks ah to leave no trace, which for an unattended loop is not a
+ * degraded mode but an unbounded one — so this command refuses to start
+ * instead of running without a record.
  */
 import { loadConfig, loadRepoConfig } from "../config/config.js";
-import { createMemory } from "../memory/bootstrap.js";
-import { resolveNamespace } from "../memory/namespaces.js";
 import { repoSlug } from "../session/paths.js";
-import { watchLoop } from "../watch/loop.js";
+import { AH_NS, resolveNamespace } from "../store/namespaces.js";
+import { createFactStore } from "../store/store.js";
+import { sweepTransient } from "../store/sweep.js";
 import {
 	branchFor,
 	commitCount,
@@ -17,10 +20,9 @@ import {
 	currentBranch,
 	removeWorktree,
 } from "../watch/isolation.js";
-import { observeRun } from "../watch/observe.js";
+import { watchLoop } from "../watch/loop.js";
 import { publish } from "../watch/push.js";
 import { pollQueues } from "../watch/queue.js";
-import type { RunItemResult } from "../watch/tick.js";
 import { runCmd } from "./run-cmd.js";
 
 export interface WatchCmdOpts {
@@ -40,20 +42,21 @@ export async function watchCmd(opts: WatchCmdOpts): Promise<number> {
 	const out = opts.out ?? process.stdout;
 	const cfg = loadConfig(opts.repo);
 	const repoConfig = loadRepoConfig(opts.repo);
-	const { client } = await createMemory(cfg, opts.repo, repoConfig);
-	if (client === null) {
-		process.stderr.write(
-			"ah watch needs memory: the attempt ledger lives in abagraph, and without it " +
-				"an unattended loop would retry the same item forever.\n" +
-				"Start abagraph (or set memory.baseUrl in ~/.ah/config.json) and try again.\n",
-		);
+	if (!cfg.memory.enabled) {
+		out.write("ah watch needs the fact store: it is the only bound on retries.\n");
+		out.write("Set memory.enabled to true, or run `ah run` for a single unrecorded run.\n");
 		return 1;
 	}
+	const store = createFactStore();
 	const repoNs = resolveNamespace(opts.repo, repoConfig);
 	const slug = repoSlug(opts.repo);
 	const log = (line: string): void => {
 		out.write(`watch · ${line}\n`);
 	};
+	// Cooldowns are the ledger's ephemera: expired ones answer no question and
+	// the log they sit in is read whole on every tick. Once per session, at the
+	// one moment no tick is in flight.
+	await sweepTransient(AH_NS).catch(() => undefined);
 
 	log(
 		`queues ${cfg.watch.queues.join(", ")} · max ${cfg.watch.maxRunsPerNight}/night · ` +
@@ -63,9 +66,7 @@ export async function watchCmd(opts: WatchCmdOpts): Promise<number> {
 	const summary = await watchLoop(
 		{
 			repoRoot: opts.repo,
-			repoNs,
-			repoSlug: slug,
-			client,
+			client: store,
 			cfg,
 			now: () => Date.now(),
 			log,
@@ -78,9 +79,8 @@ export async function watchCmd(opts: WatchCmdOpts): Promise<number> {
 				);
 				return { dir: wt.dir, cleanup: () => removeWorktree(opts.repo, wt) };
 			},
-			runItem: async (item, dir): Promise<RunItemResult> => {
-				const startedAt = new Date().toISOString();
-				const outcome = await runCmd({
+			runItem: async (item, dir) =>
+				runCmd({
 					task: item.task,
 					repo: dir,
 					real: true,
@@ -89,13 +89,10 @@ export async function watchCmd(opts: WatchCmdOpts): Promise<number> {
 					quiet: true,
 					out,
 					// The worktree holds a branch under review: never read config
-					// from it, and keep memory in the main repo's namespace so
-					// what the run learns is still there tomorrow.
+					// from it, and keep the run's facts in the main repo's
+					// namespace so what it learns is still there tomorrow.
 					trustedConfig: { cfg, repoConfig, namespace: repoNs },
-				});
-				const seen = await observeRun(client, repoNs, startedAt);
-				return { outcome, runId: seen.runId, verdict: seen.verdict };
-			},
+				}),
 			publish: (item, dir) => {
 				const branch = currentBranch(dir);
 				if (branch === "") return log("no branch to publish");

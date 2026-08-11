@@ -1,14 +1,15 @@
 /**
  * Verify-command detection. A .ah.json verify[] wins outright; otherwise
  * package.json scripts, then Cargo.toml, then a Makefile test target.
- * Detected commands persist as coexisting Repo verify_cmd facts
- * (docs/vocabulary.md) so future runs recall them without re-detection.
+ *
+ * The answer is derived from the repository on every run rather than
+ * remembered: the files it reads are the authority, so a remembered list could
+ * only ever be a staler copy of them — and it would keep proposing the test
+ * command of a project that has since dropped it.
  */
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { RepoConfig } from "../config/types.js";
-import type { MemoryClient } from "../memory/client-types.js";
-import { repoFact } from "../memory/facts.js";
 
 /** package.json scripts checked in this order; "test" maps to `npm test`. */
 const NPM_SCRIPT_ORDER = ["typecheck", "lint", "test", "build"];
@@ -47,22 +48,5 @@ function readText(path: string): string | null {
 		return readFileSync(path, "utf8");
 	} catch {
 		return null;
-	}
-}
-
-/**
- * Best-effort persistence — callers catch. One transact per command: a
- * single transact may not assert the same (subject, predicate) twice
- * (abagraph transact_guards), even for coexist predicates. All writes go
- * via transact — never /api/digest, which nulls the tenant for admin.
- */
-export async function persistVerifyCommands(
-	client: MemoryClient,
-	ns: string,
-	commands: string[],
-): Promise<void> {
-	const slug = ns.startsWith("repo:") ? ns.slice("repo:".length) : ns;
-	for (const cmd of commands) {
-		await client.transact(ns, [repoFact.verifyCmd(slug, cmd)]);
 	}
 }

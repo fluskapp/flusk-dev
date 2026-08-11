@@ -2,7 +2,6 @@ import type { AhConfig } from "../config/types.js";
 import type { EventBus } from "../core/events.js";
 import type { Limits } from "../core/stop.js";
 import type { ModelRef, RunEndReason, RunStats } from "../core/types.js";
-import type { MemoryPort } from "../memory/port.js";
 import type { Provider } from "../provider/provider.js";
 import type { BudgetTracker } from "../safety/budget.js";
 import type { Policy } from "../safety/policy.js";
@@ -15,7 +14,6 @@ export interface CreateAgentOpts {
 	tools: Tool[];
 	task: string;
 	repoRoot: string;
-	memory?: MemoryPort;
 	policy?: Policy;
 	events?: EventBus;
 	limits?: Partial<Limits>;
@@ -33,7 +31,8 @@ export interface CreateAgentOpts {
 	parentSession?: string;
 	/** Subagent nesting depth of THIS agent (0 = root); shared budget counts child spend. */
 	depth?: number;
-	/** Goal this run serves; flows into TurnContext.goalId (memory seeds). */
+	/** Goal this run serves; recorded on the turn so a run can be traced back
+	 * to the task that spawned it. */
 	goalId?: string;
 	/** Run id override so callers (goal scheduler) can claim tasks up front. */
 	runId?: string;

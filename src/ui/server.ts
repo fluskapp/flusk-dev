@@ -52,7 +52,7 @@ function handle(req: IncomingMessage, res: ServerResponse, port: number): void {
 	if (handleProjects(method, path, url.searchParams, res)) return;
 	if (handleRender(method, path, req, res)) return;
 	if (handleChat(method, path, req, res)) return;
-	if (handleSessions(method, path, url.searchParams.get("k"), repo, res)) return;
+	if (handleSessions(method, path, url.searchParams.get("k"), res)) return;
 	json(res, 404, { error: "not found" });
 }
 

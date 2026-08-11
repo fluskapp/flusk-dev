@@ -31,9 +31,10 @@ function escapeHtml(s: string): string {
 }
 
 /**
- * Toolbar buttons: id, tool-window number, label, tooltip. The numbers are
- * IntelliJ's — 1 Projects … 6 Chat — and they are the same numbers the plain
- * digit keys and ⌘1…⌘6 bind to in client-keys.ts.
+ * Toolbar buttons: id, tool-window number, label, tooltip. The number belongs
+ * to the window, not to its position in this list: it is the key client-keys.ts
+ * binds (the plain digit, and ⌘ plus the digit), so a window that leaves the
+ * toolbar takes its number with it rather than renumbering its neighbours.
  *
  * 7's tooltip leads with the digits rather than F1: macOS maps F1 to
  * brightness-down unless the "standard function keys" setting is on, so on
@@ -43,10 +44,9 @@ const PANELS: Array<[string, string, string, string]> = [
 	["side-btn", "1", "Projects", "Project tool window (1 / ⌘1)"],
 	["runs-btn", "2", "Runs", "Sessions and harness journals (2 / ⌘2)"],
 	["docs-btn", "3", "Docs", "Indexed markdown (3 / ⌘3)"],
-	["brain-btn", "4", "Brain", "What ah knows (4 / ⌘4)"],
-	["find-btn", "5", "Find", "Find in Files (5 / ⌘5 / ⌘⇧F)"],
-	["chat-btn", "6", "Chat", "Chat tool window (6 / ⌘6 / c)"],
-	["doc-btn", "7", "Documentation", "Documentation tool window (7 / ⌘7)"],
+	["find-btn", "4", "Find", "Find in Files (4 / ⌘4 / ⌘⇧F)"],
+	["chat-btn", "5", "Chat", "Chat tool window (5 / ⌘5 / c)"],
+	["doc-btn", "6", "Documentation", "Documentation tool window (6 / ⌘6)"],
 ];
 
 /**
@@ -97,7 +97,6 @@ export function renderPage(home: string): string {
             <div id="overview" class="view"></div>
             <div id="runs" class="view" hidden></div>
             <div id="docs" class="view" hidden></div>
-            <div id="brain" class="view" hidden></div>
             <div id="project" class="view" hidden></div>
             <div id="run" class="view" hidden></div>
             <div id="doc" class="view" hidden></div>

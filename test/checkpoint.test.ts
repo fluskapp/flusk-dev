@@ -2,11 +2,12 @@ import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { expect, test } from "vitest";
 import { createAgent } from "../src/agent/agent.js";
+import { collectRunRecord } from "../src/core/run-record.js";
 import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
 import { bashTool } from "../src/tools/bash.js";
 import { writeTool } from "../src/tools/write.js";
 import { SLOW } from "./cli2-helpers.js";
-import { fakeModel, setupTestHome, spyMemory, teardownTestHome } from "./helpers.js";
+import { fakeModel, setupTestHome, teardownTestHome } from "./helpers.js";
 
 function sh(cwd: string, args: string[]): string {
 	const res = spawnSync("git", args, { cwd, encoding: "utf8" });
@@ -36,18 +37,18 @@ test("isolation: a mutating turn is checkpointed as 'ah: turn N'", async () => {
 			},
 			{ message: assistantText("done") },
 		]);
-		const { memory, postRuns } = spyMemory();
 		const agent = createAgent({
 			provider,
 			model: fakeModel,
 			tools: [writeTool, bashTool],
 			task: "make a note",
 			repoRoot: repo,
-			memory,
 			isolation: { repoRoot: repo, branch: "ah/test" },
 		});
+		const rec = collectRunRecord(agent.events, repo);
 		const { reason } = await agent.run();
 		expect(reason).toBe("completed");
+		rec.stop();
 
 		const subjects = sh(repo, ["log", "--format=%s"]).split("\n");
 		expect(subjects).toEqual(["ah: turn 1", "seed"]);
@@ -55,9 +56,8 @@ test("isolation: a mutating turn is checkpointed as 'ah: turn N'", async () => {
 		expect(sh(repo, ["show", "--name-only", "--format=", "HEAD"])).toContain("note.txt");
 
 		// The run record collected the evidence trail off the event bus.
-		expect(postRuns).toHaveLength(1);
-		expect(postRuns[0]?.filesTouched).toEqual([join(repo, "note.txt")]);
-		expect(postRuns[0]?.commandsRun).toEqual([{ cmd: "printf hi; exit 3", exit: 3 }]);
+		expect(rec.filesTouched).toEqual([join(repo, "note.txt")]);
+		expect(rec.commandsRun).toEqual([{ cmd: "printf hi; exit 3", exit: 3 }]);
 		agent.session.close();
 	} finally {
 		teardownTestHome();

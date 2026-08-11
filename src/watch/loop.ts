@@ -28,7 +28,7 @@ export async function watchLoop(deps: WatchDeps, opts: LoopOpts): Promise<LoopSu
 	const aborted = (): boolean => opts.signal?.aborted === true;
 
 	while (summary.ticks < maxTicks && !aborted()) {
-		// A tick that throws (an abagraph hiccup, a git surprise) logs and the
+		// A tick that throws (a store write, a git surprise) logs and the
 		// night continues; only an abort or maxTicks stops the loop.
 		let result: TickResult;
 		try {

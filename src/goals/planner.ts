@@ -1,12 +1,10 @@
 /**
  * LLM goal planning: one stream call producing a strict-JSON plan, parsed
  * defensively, dependency-validated (index deps, cycles dropped with a note).
- * Writing goes through /api/transact only (never /api/digest — it nulls the
- * tenant for admin requests, abagraph routes/digest_facts.rs).
  */
 import type { ModelRef } from "../core/types.js";
-import type { MemFactInput, MemoryClient } from "../memory/client-types.js";
 import type { Provider } from "../provider/provider.js";
+import type { FactInput, FactStore } from "../store/types.js";
 import { parsePlanJson } from "./planner-parse.js";
 import { goal, goalId, task, taskId } from "./schema.js";
 
@@ -107,20 +105,19 @@ export async function planGoal(
 }
 
 /**
- * Write the whole graph via /api/transact. abagraph rejects two asserts on
- * one (subject, predicate) per transact (transact_guards.rs
- * check_distinct_asserts), so multi-edge predicates (has_task, depends_on)
- * are chunked into the minimal number of waves — wave 1 carries the goal,
- * every task, and each subject's first edge; wave k the k-th edges.
+ * Write the whole graph. One transact may not carry two asserts on the same
+ * (subject, predicate), so multi-edge predicates (has_task, depends_on) are
+ * chunked into the minimal number of waves — wave 1 carries the goal, every
+ * task, and each subject's first edge; wave k the k-th edges.
  */
 export async function writeGoalGraph(
-	client: MemoryClient,
+	store: FactStore,
 	ns: string,
 	plan: GoalPlan,
 ): Promise<string> {
 	const g = goalId();
-	const waves: MemFactInput[][] = [];
-	const put = (f: MemFactInput): void => {
+	const waves: FactInput[][] = [];
+	const put = (f: FactInput): void => {
 		let i = 0;
 		while ((waves[i] ?? []).some((w) => w.subject === f.subject && w.predicate === f.predicate))
 			i++;
@@ -136,6 +133,6 @@ export async function writeGoalGraph(
 		put(task.status(t.id, "pending"));
 		for (const dep of t.dependsOn) put(task.dependsOn(t.id, dep));
 	}
-	for (const wave of waves) await client.transact(ns, wave);
+	for (const wave of waves) await store.transact(ns, wave);
 	return g;
 }

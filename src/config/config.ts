@@ -5,13 +5,9 @@
  *
  * The two layers are NOT equally trusted. `~/.ah/config.json` is the user's
  * own file; `<repo>/.ah.json` ships inside whatever repository happens to be
- * on disk, so a cloned repo authors it. Two sections are therefore refused
+ * on disk, so a cloned repo authors it. Three sections are therefore refused
  * from the repo layer entirely:
  *
- *  - `memory` transport (baseUrl/apiKey/autoSpawn/serverBin/dataDir). A repo
- *    that could set `baseUrl` while inheriting the global `apiKey` would make
- *    the dashboard send that key as `Authorization: Bearer` to a host of the
- *    repo's choosing.
  *  - `chat.backends`. `ah ui` loads config from its own cwd and spawns what
  *    that list names, so a repo could otherwise choose the binary a click on
  *    Send executes.
@@ -67,9 +63,6 @@ function readLayer(path: string): ConfigLayer | null {
 	return parsed as ConfigLayer;
 }
 
-/** Memory keys only the user's own ~/.ah/config.json may set. */
-const HOME_ONLY_MEMORY = ["baseUrl", "apiKey", "autoSpawn", "serverBin", "dataDir"] as const;
-
 /**
  * Scan roots only the user's own ~/.ah/config.json may set. These name the
  * directories the history indexer READS and then serves over the loopback API
@@ -84,16 +77,6 @@ function uiOf(layer: ConfigLayer, trusted: boolean): Partial<AhConfig["ui"]> {
 	if (trusted) return layer.ui;
 	const out: Partial<AhConfig["ui"]> = { ...layer.ui };
 	for (const key of HOME_ONLY_UI) delete out[key];
-	return out;
-}
-
-/** The `memory` section a layer is allowed to contribute. */
-function memoryOf(layer: ConfigLayer, trusted: boolean): Partial<AhConfig["memory"]> {
-	const mem = layer.memory;
-	if (mem === undefined) return {};
-	if (trusted) return mem;
-	const out: Partial<AhConfig["memory"]> = { ...mem };
-	for (const key of HOME_ONLY_MEMORY) delete out[key];
 	return out;
 }
 
@@ -120,11 +103,7 @@ function mergeLayer(base: AhConfig, layer: ConfigLayer | null, trusted: boolean)
 		unattended: { ...base.unattended, ...layer.unattended },
 		isolation: { ...base.isolation, ...layer.isolation },
 		compaction: { ...base.compaction, ...layer.compaction },
-		memory: {
-			...base.memory,
-			...memoryOf(layer, trusted),
-			budgets: { ...base.memory.budgets, ...layer.memory?.budgets },
-		},
+		memory: { ...base.memory, ...layer.memory },
 		verify: { ...base.verify, ...layer.verify },
 		ui: { ...base.ui, ...uiOf(layer, trusted) },
 		chat: { ...base.chat, ...chatOf(layer, trusted) },

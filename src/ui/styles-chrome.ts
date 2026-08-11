@@ -75,7 +75,7 @@ body.side-off #side-grip, body.find-off #find-grip { display: none; }
 #main { grid-area: main; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
 #views { flex: 1; overflow-y: auto; min-height: 0; }
 .view { min-height: 100%; }
-#overview, #runs, #brain, #project, #run { padding: 10px 16px 36px; max-width: 1080px; }
+#overview, #runs, #project, #run { padding: 10px 16px 36px; max-width: 1080px; }
 #docs, #doc, #file { padding: 0; }
 
 #crumbs {

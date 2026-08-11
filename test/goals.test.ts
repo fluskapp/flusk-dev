@@ -4,19 +4,18 @@ import { writeGoalGraph } from "../src/goals/planner.js";
 import { goalBrief } from "../src/goals/resume.js";
 import { claimTask, completeTask, failTask, frontier } from "../src/goals/scheduler.js";
 import { goalId, taskId, writeTaskStatus } from "../src/goals/schema.js";
-import { createMemoryClient } from "../src/memory/client.js";
-import type { MemoryClient } from "../src/memory/client-types.js";
-import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
+import type { FactStore } from "../src/store/types.js";
+import { type Harness, HOUR, harness, T0 } from "./store-harness.js";
 
-let mock: MockAbagraph;
-let mem: MemoryClient;
+let h: Harness;
+let mem: FactStore;
 
 beforeAll(async () => {
-	mock = await startMockAbagraph();
-	mem = createMemoryClient({ baseUrl: mock.url });
+	h = await harness();
+	mem = h.store;
 });
 afterAll(async () => {
-	await mock.close();
+	await h.cleanup();
 });
 
 /** A; B,C depend on A; D depends on B and C. */
@@ -34,7 +33,7 @@ function diamond(): GoalPlan {
 	};
 }
 
-describe("goal graphs in abagraph", () => {
+describe("goal graphs in the fact store", () => {
 	it("writeGoalGraph survives the distinct-assert guard and reads back whole", async () => {
 		const ns = "repo:graph";
 		const plan = diamond();
@@ -53,8 +52,8 @@ describe("goal graphs in abagraph", () => {
 		);
 		for (const t of taskIds)
 			expect(await obj({ subject: t, predicate: "status" })).toEqual(["pending"]);
-		expect(mock.dump(ns).length).toBeGreaterThanOrEqual(18);
-		expect(mock.dump(ns).every((f) => f.tenant === ns)).toBe(true);
+		// Namespace isolation: none of it is visible from a neighbouring repo.
+		expect(await mem.query("repo:elsewhere", { limit: 500 })).toEqual([]);
 	});
 
 	it("frontier walks the diamond as dependencies complete", async () => {
@@ -93,14 +92,19 @@ describe("goal graphs in abagraph", () => {
 	it("status transitions leave the history as superseded facts", async () => {
 		const ns = "repo:history";
 		const t = taskId();
+		// Each transition needs its own instant, or the closed row would carry
+		// the same validFrom as its replacement and no snapshot could separate them.
 		await writeTaskStatus(mem, ns, t, "pending");
+		h.at(T0 + HOUR);
 		await writeTaskStatus(mem, ns, t, "running");
+		h.at(T0 + 2 * HOUR);
 		await writeTaskStatus(mem, ns, t, "done");
+		h.at(T0);
 		const active = await mem.query(ns, { subject: t, predicate: "status" });
 		expect(active.map((f) => f.object)).toEqual(["done"]);
-		// History is reached with as_of, NOT by asking for status "superseded":
-		// closing a fact sets valid_until, and a default read returns only facts
-		// with none (core/match.rs valid_at_time).
+		// History is reached with asOf, NOT by asking for status "superseded":
+		// closing a fact stamps validUntil, and a default read returns only facts
+		// with none.
 		const closed = await mem.query(ns, {
 			subject: t,
 			predicate: "status",
@@ -125,6 +129,9 @@ describe("goal graphs in abagraph", () => {
 		const since = new Date(
 			Math.max(...all.map((f) => Date.parse(f.validFrom ?? "0"))),
 		).toISOString();
+		// The diff is between two snapshots, so the second completion needs an
+		// instant of its own: written at `since` it would be in both of them.
+		h.at(T0 + HOUR);
 		await completeTask(mem, ns, plan.tasks[1]?.id as string);
 		const diff = await goalBrief(mem, ns, g, since);
 		expect(diff).toContain("task B done");

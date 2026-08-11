@@ -4,11 +4,10 @@
  * an injected dependency so the whole policy is testable without gh, git, or
  * a model.
  */
-import type { MemVerdict, MemoryClient } from "../memory/client-types.js";
 import type { CliOutcome } from "../cli/gate-loop.js";
 import type { AhConfig } from "../config/types.js";
+import type { FactStore } from "../store/types.js";
 import {
-	bumpNightCount,
 	cooldownUntil,
 	extendCooldown,
 	failureCount,
@@ -16,28 +15,20 @@ import {
 	nightCount,
 	nightKey,
 	recordAttempt,
+	recordNightRun,
 	recordOutcome,
 } from "./ledger.js";
-import { promoteLessons } from "./promote.js";
 import type { PollResult, WorkItem } from "./queue.js";
-
-export interface RunItemResult {
-	outcome: CliOutcome;
-	runId: string;
-	verdict?: MemVerdict;
-}
 
 export interface WatchDeps {
 	repoRoot: string;
-	repoNs: string;
-	repoSlug: string;
-	client: MemoryClient;
+	client: FactStore;
 	cfg: AhConfig;
 	now(): number;
 	log(line: string): void;
 	poll(): PollResult;
 	/** Work the item inside `dir`; resolves with the CLI outcome. */
-	runItem(item: WorkItem, dir: string): Promise<RunItemResult>;
+	runItem(item: WorkItem, dir: string): Promise<CliOutcome>;
 	openWorktree(item: WorkItem): { dir: string; cleanup(): void };
 	/** Called only when the run completed and `watch.push` is on. */
 	publish(item: WorkItem, dir: string): void;
@@ -80,40 +71,32 @@ export async function watchTick(deps: WatchDeps): Promise<TickResult> {
 
 	const failures = await failureCount(client, chosen.key);
 	// Ledger first: a crash mid-run must still leave a cooldown behind.
+	await recordNightRun(client, date, chosen.key, nowMs);
 	await recordAttempt(
 		client,
 		chosen.key,
 		nowMs,
 		cooldownUntil(nowMs, cfg.watch.cooldownHours, cfg.watch.failCooldownHours, failures),
 	);
-	await bumpNightCount(client, date, count);
 	deps.log(`working ${chosen.key}: ${chosen.title}`);
 
 	// Opening the worktree is inside the guarded region: it throws when a
 	// branch from an earlier attempt still exists, and an unguarded throw here
 	// would end the entire night on one bad item.
 	let wt: { dir: string; cleanup(): void } | undefined;
-	let result: RunItemResult = { outcome: "error", runId: "", verdict: undefined };
+	let outcome: CliOutcome = "error";
 	try {
 		wt = deps.openWorktree(chosen);
-		result = await deps.runItem(chosen, wt.dir);
+		outcome = await deps.runItem(chosen, wt.dir);
 	} catch (e) {
 		deps.log(`run failed to start or threw: ${e instanceof Error ? e.message : String(e)}`);
 	} finally {
 		// Always reclaim the checkout, even if a post-run step throws below.
 		wt?.cleanup();
 	}
-	await recordOutcome(client, chosen.key, result.outcome, failures);
+	await recordOutcome(client, chosen.key, outcome, failures);
 
-	if (result.outcome === "completed") {
-		const promo = await promoteLessons(
-			client,
-			deps.repoNs,
-			deps.repoSlug,
-			result.runId,
-			result.verdict ?? "WARN",
-		);
-		if (promo.promoted > 0) deps.log(`promoted ${promo.promoted} lesson(s)`);
+	if (outcome === "completed") {
 		if (cfg.watch.push && wt !== undefined) deps.publish(chosen, wt.dir);
 	} else {
 		// Back off harder each time this item fails.
@@ -123,6 +106,6 @@ export async function watchTick(deps: WatchDeps): Promise<TickResult> {
 			cooldownUntil(nowMs, cfg.watch.cooldownHours, cfg.watch.failCooldownHours, failures + 1),
 		);
 	}
-	deps.log(`${chosen.key} → ${result.outcome}`);
-	return { status: "ran", item: chosen, outcome: result.outcome };
+	deps.log(`${chosen.key} → ${outcome}`);
+	return { status: "ran", item: chosen, outcome };
 }

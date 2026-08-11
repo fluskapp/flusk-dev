@@ -1,7 +1,8 @@
 /**
  * The property the gate exists for: a report that claims more than the
- * harness saw must not pass. The previous check could never block, because it
- * verified harness state against itself (docs/review-findings.md).
+ * harness saw must not pass. The comparison is between the report and
+ * observations the model cannot forge — a check of harness state against
+ * harness state is self-fulfilling and could never block anything.
  */
 import { expect, it } from "vitest";
 import { checkReportText, type Observations } from "../src/verify/report-check.js";

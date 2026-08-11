@@ -7,7 +7,7 @@ import {
 	fakeModel as model,
 	pingTool,
 	setupTestHome,
-	spyMemory,
+	spyRunEnds,
 	teardownTestHome,
 } from "./helpers.js";
 
@@ -21,7 +21,7 @@ afterAll(() => {
 	teardownTestHome();
 });
 
-test("abort mid-stream ends turn 1 with reason aborted and one postRun", async () => {
+test("abort mid-stream ends turn 1 with reason aborted and one run:end", async () => {
 	const provider = new FakeProvider([
 		{
 			deltas: [
@@ -31,22 +31,21 @@ test("abort mid-stream ends turn 1 with reason aborted and one postRun", async (
 			message: assistantText("never delivered"),
 		},
 	]);
-	const { memory, postRuns } = spyMemory();
 	const agent = createAgent({
 		provider,
 		model,
 		tools: [pingTool],
-		memory,
 		task: "t",
 		repoRoot: repo,
 	});
+	const ends = spyRunEnds(agent.events);
 	agent.events.on("assistant:delta", () => agent.abort());
 	const { reason, stats } = await agent.run();
 	expect(reason).toBe("aborted");
 	expect(stats.turns).toBe(1);
 	expect(provider.requests).toHaveLength(1);
-	expect(postRuns).toHaveLength(1);
-	expect(postRuns[0]?.outcome).toBe("aborted");
+	expect(ends).toHaveLength(1);
+	expect(ends[0]).toBe("aborted");
 	agent.session.close();
 });
 
@@ -58,21 +57,20 @@ test("stopReason maxTokens ends the run as error, not completed", async () => {
 		usage: zeroUsage(),
 	};
 	const provider = new FakeProvider([{ message: truncated }]);
-	const { memory, postRuns } = spyMemory();
 	const agent = createAgent({
 		provider,
 		model,
 		tools: [pingTool],
-		memory,
 		task: "t",
 		repoRoot: repo,
 	});
+	const ends = spyRunEnds(agent.events);
 	const { reason, stats } = await agent.run();
 	expect(reason).toBe("error");
 	expect(reason).not.toBe("completed");
 	expect(stats.turns).toBe(1);
-	expect(postRuns).toHaveLength(1);
-	expect(postRuns[0]?.outcome).toBe("error");
+	expect(ends).toHaveLength(1);
+	expect(ends[0]).toBe("error");
 	agent.session.close();
 });
 
@@ -89,8 +87,10 @@ test("steering during a final no-tool turn keeps the loop going", async () => {
 			agent.steer("wait, also do X");
 		}
 	});
+	const ends = spyRunEnds(agent.events);
 	const { reason, stats } = await agent.run();
 	expect(reason).toBe("completed");
+	expect(ends).toEqual(["completed"]);
 	expect(stats.turns).toBe(2);
 	const steerMsg = { role: "user", content: "wait, also do X" };
 	expect(provider.requests).toHaveLength(2);

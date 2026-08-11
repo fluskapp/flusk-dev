@@ -4,12 +4,13 @@ import { buildSystemPrompt } from "../agent/system-prompt.js";
 import { loadConfig, loadRepoConfig } from "../config/config.js";
 import type { AhConfig, RepoConfig, TaskKind } from "../config/types.js";
 import { createEventBus } from "../core/events.js";
-import { createMemory } from "../memory/bootstrap.js";
+import { resolveNamespace } from "../store/namespaces.js";
 import { FakeProvider } from "../provider/fake.js";
 import { classifyTask } from "../provider/intent.js";
 import { hasAuth, PiAiProvider } from "../provider/pi-ai.js";
-import { ensureCleanTree, isGitRepo, startRunBranch, summarizeRun } from "../safety/git-isolation.js";
 import { createAhPolicy } from "../safety/ah-policy.js";
+import { ensureCleanTree, isGitRepo, startRunBranch, summarizeRun } from "../safety/git-isolation.js";
+import { createFactStore } from "../store/store.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import { attachRenderer } from "./render.js";
 import { DEFAULT_TOOLS, demoScript, envKeyVar, fakeModel, loadFakeScript, pickModel } from "./run-support.js";
@@ -46,8 +47,8 @@ export interface RunCmdOpts {
 }
 
 /** Phase 3 run command: config → routed model, ah policy, git isolation,
- * memory bootstrap, then the run + verification gate. Never calls
- * process.exit; returns the CLI outcome ("blocked" = gate failure, exit 1). */
+ * then the run + verification gate. Never calls process.exit; returns the CLI
+ * outcome ("blocked" = gate failure, exit 1). */
 export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 	const out = opts.out ?? process.stdout;
 	const cfg = opts.trustedConfig?.cfg ?? loadConfig(opts.repo);
@@ -91,8 +92,10 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 	const provider = isFake
 		? new FakeProvider(opts.fake !== undefined ? await loadFakeScript(opts.fake) : demoScript())
 		: new PiAiProvider();
-	// Quiet runs keep stderr clean; degradation still lands in noopMemory.
-	const mem = await createMemory(cfg, opts.repo, repoConfig, opts.quiet === true ? () => {} : undefined);
+	// `memory.enabled: false` is a request to leave no trace: the gate still
+	// runs, it just has nowhere to write the run's facts of record.
+	const ns = resolveNamespace(opts.repo, repoConfig);
+	const store = cfg.memory.enabled ? createFactStore() : null;
 	const events = createEventBus();
 	if (opts.quiet !== true) attachRenderer(events, out);
 	const agent = createAgent({
@@ -101,7 +104,6 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 		tools: DEFAULT_TOOLS,
 		task: opts.task,
 		repoRoot: opts.repo,
-		memory: mem.port,
 		policy: createAhPolicy({ config: cfg, repoRoot: opts.repo }),
 		events,
 		config: cfg,
@@ -114,8 +116,8 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 			cfg,
 			repoRoot: opts.repo,
 			repoConfig,
-			client: mem.client,
-			ns: mem.ns,
+			store,
+			ns,
 			out,
 			noVerify: opts.noVerify === true,
 		});

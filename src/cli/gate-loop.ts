@@ -2,19 +2,17 @@
  * The post-run verification gate shared by run, resume and goal: when a run
  * completes, run the detected verify commands; on failure steer the SAME
  * session with the evidence (agent.continueRun) up to cfg.verify.retries;
- * then, with a live memory client, claim-check the completion report.
+ * then claim-check the completion report and record the verdict.
  * Empty command list → pass-through (scratch repos stay gate-free).
  */
 import type { Agent } from "../agent/options.js";
 import type { AhConfig, RepoConfig } from "../config/types.js";
 import { collectRunRecord } from "../core/run-record.js";
-import { claimCheck, finalReport } from "./gate-report.js";
 import type { RunEndReason, RunStats } from "../core/types.js";
-import type { MemoryClient } from "../memory/client-types.js";
-import { runFact } from "../memory/facts.js";
-import type { RunRecord } from "../memory/port.js";
-import { detectVerifyCommands, persistVerifyCommands } from "../verify/detect.js";
+import type { FactStore } from "../store/types.js";
+import { detectVerifyCommands } from "../verify/detect.js";
 import { formatEvidence, runVerify, type VerifyCommandResult } from "../verify/gate.js";
+import { claimCheck, finalReport } from "./gate-report.js";
 
 /** What the CLI exits on: a run end reason, or gate-blocked (exit 1). */
 export type CliOutcome = RunEndReason | "blocked";
@@ -23,7 +21,9 @@ export interface GateOpts {
 	cfg: AhConfig;
 	repoRoot: string;
 	repoConfig?: RepoConfig;
-	client: MemoryClient | null;
+	/** null when the caller keeps no record (memory disabled): the gate still
+	 * runs, it just writes nothing down. */
+	store: FactStore | null;
 	ns: string;
 	out: NodeJS.WritableStream;
 	/** --no-verify: skip the whole gate (commands AND claim check). */
@@ -65,9 +65,6 @@ export async function runWithGate(
 		const commands = detectVerifyCommands(opts.repoRoot, opts.repoConfig);
 		let results: VerifyCommandResult[] = [];
 		if (commands.length > 0) {
-			if (opts.client !== null) {
-				await persistVerifyCommands(opts.client, opts.ns, commands).catch(() => {});
-			}
 			let verdict = runVerify(commands, opts.repoRoot, opts.cfg.verify.evidenceLines);
 			for (let retry = 0; !verdict.passed; retry++) {
 				if (retry >= opts.cfg.verify.retries) {
@@ -84,7 +81,7 @@ export async function runWithGate(
 		}
 		const rec = track.snapshot();
 		const report = finalReport(agent);
-		const outcome = await claimCheck(opts.client, opts, {
+		const outcome = await claimCheck(opts.store, opts, {
 			runId: rec.runId,
 			sessionId: agent.session.id,
 			repoPath: opts.repoRoot,

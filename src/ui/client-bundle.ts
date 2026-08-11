@@ -5,7 +5,6 @@
  */
 import { CLIENT_ATTENTION_JS } from "./client-attention.js";
 import { CLIENT_BOOT_JS } from "./client-boot.js";
-import { CLIENT_BRAIN_JS } from "./client-brain.js";
 import { CLIENT_CHAT_JS } from "./client-chat.js";
 import { CLIENT_CHAT_STREAM_JS } from "./client-chat-stream.js";
 import { CLIENT_CORE_JS } from "./client-core.js";
@@ -45,7 +44,6 @@ export const CLIENT_JS =
 	CLIENT_FIND_JS +
 	CLIENT_FIND_ROWS_JS +
 	CLIENT_PROJECT_JS +
-	CLIENT_BRAIN_JS +
 	CLIENT_CHAT_JS +
 	CLIENT_CHAT_STREAM_JS +
 	CLIENT_CURSOR_JS +

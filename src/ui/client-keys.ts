@@ -1,22 +1,25 @@
 /**
  * Keyboard first. The cursor lives in one of two zones — the project tree or
  * the active view's table — and Tab moves between them; the tool windows are
- * numbered the way IntelliJ numbers them, so ⌘1…⌘7 (and the bare digits when
+ * numbered the way IntelliJ numbers them, so ⌘1…⌘6 (and the bare digits when
  * nothing is focused) open 1 Projects … 7 Documentation.
  *
- * Every binding here has a row in the help sheet (client-help.ts).
+ * Every binding here has a row in the help sheet (client-help.ts), and the
+ * digit patterns admit exactly the numbers that open something: a key with no
+ * tool window behind it must keep its browser meaning rather than be swallowed
+ * by a preventDefault that then does nothing.
  */
 export const CLIENT_KEYS_JS = `
-var PANEL_KEYS = { "2": "runs", "3": "docs", "4": "brain",
-	o: "attention", r: "runs", d: "docs", b: "brain" };
+var PANEL_KEYS = { "2": "runs", "3": "docs",
+	o: "attention", r: "runs", d: "docs" };
 var MD_KEYS = { p: "preview", s: "split", R: "raw" };
 
-/** 1 Projects, 2 Runs, 3 Docs, 4 Brain, 5 Find, 6 Chat, 7 Documentation. */
+/** 1 Projects, 2 Runs, 3 Docs, 4 Find, 5 Chat, 6 Documentation. */
 function toolWindow(n) {
 	if (n === "1") toggleSide();
-	else if (n === "5") toggleFind();
-	else if (n === "6") toggleChat();
-	else if (n === "7") docQuick();
+	else if (n === "4") toggleFind();
+	else if (n === "5") toggleChat();
+	else if (n === "6") docQuick();
 	else openPanel(PANEL_KEYS[n]);
 }
 
@@ -62,7 +65,7 @@ function modKey(e) {
 		return true;
 	}
 	if (key === "f12" && !e.shiftKey) { focusOutline(); return true; }
-	if (!e.shiftKey && /^[1-7]$/.test(e.key)) { toolWindow(e.key); return true; }
+	if (!e.shiftKey && /^[1-6]$/.test(e.key)) { toolWindow(e.key); return true; }
 	return false;
 }
 
@@ -86,7 +89,7 @@ document.addEventListener("keydown", function (e) {
 	// It is a SECONDARY binding, not the advertised one: macOS maps F1 to
 	// brightness-down unless "Use F1, F2, etc. keys as standard function keys"
 	// is on, so on this platform the keycode usually never reaches the browser.
-	// The help sheet and the toolbar tooltip lead with 7 / ⌘7 for that reason.
+	// The help sheet and the toolbar tooltip lead with 6 / ⌘6 for that reason.
 	if (e.key === "F1") { e.preventDefault(); docQuick(); return; }
 	if (e.metaKey || e.ctrlKey || e.altKey) return;
 	var search = $("#search");
@@ -110,7 +113,7 @@ document.addEventListener("keydown", function (e) {
 	if (e.key === "/") { e.preventDefault(); search.focus(); search.select(); return; }
 	if (e.key === "?") { $("#help").hidden = false; return; }
 	if (e.key === "Tab") { e.preventDefault(); setZone(S.zone === "tree" ? "view" : "tree"); return; }
-	if (/^[1-7]$/.test(e.key)) { toolWindow(e.key); return; }
+	if (/^[1-6]$/.test(e.key)) { toolWindow(e.key); return; }
 	if (Object.prototype.hasOwnProperty.call(PANEL_KEYS, e.key)) {
 		// openPanel, not togglePanel: a panel key means the whole panel, with
 		// no filter left over from a drill-in.

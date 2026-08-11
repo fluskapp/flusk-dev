@@ -1,8 +1,5 @@
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { createMemoryClient } from "../src/memory/client.js";
-import type { MemoryClient } from "../src/memory/client-types.js";
 import {
-	bumpNightCount,
 	cooldownUntil,
 	extendCooldown,
 	failureCount,
@@ -10,24 +7,25 @@ import {
 	nightCount,
 	nightKey,
 	recordAttempt,
+	recordNightRun,
 	recordOutcome,
 } from "../src/watch/ledger.js";
-import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
+import type { FactStore } from "../src/store/types.js";
+import { startMemory } from "./watch-harness.js";
 
 const HOUR = 3_600_000;
 /** Anchored to real time — see watch-harness.ts. */
 const T0 = Date.now();
 
-let mock: MockAbagraph;
-let client: MemoryClient;
+let cleanup: () => Promise<void>;
+let client: FactStore;
 
 beforeAll(async () => {
-	mock = await startMockAbagraph();
-	client = createMemoryClient({ baseUrl: mock.url, apiKey: null });
+	({ store: client, cleanup } = await startMemory());
 });
 
 afterAll(async () => {
-	await mock.close();
+	await cleanup();
 });
 
 it("backs off quadratically after repeated failures", () => {
@@ -50,8 +48,8 @@ it("an attempt cools the item down, and expiry is by timestamp not presence", as
 });
 
 it("advances the backoff counter on failures only", async () => {
-	// The counter is explicit because supersession sets valid_until, which
-	// hides the old outcome facts from a default read (core/match.rs).
+	// The counter is explicit because supersession stamps validUntil, which
+	// hides the old outcome facts from a default read.
 	const key = "gh-prs-2";
 	expect(await failureCount(client, key)).toBe(0);
 	await recordOutcome(client, key, "error", 0);
@@ -83,9 +81,9 @@ it("tracks the nightly run count per date", async () => {
 	);
 	expect(nightKey(T0 + 24 * HOUR)).not.toBe(date);
 	expect(await nightCount(client, date)).toBe(0);
-	await bumpNightCount(client, date, 0);
+	await recordNightRun(client, date, "gh-prs-9", T0);
 	expect(await nightCount(client, date)).toBe(1);
-	await bumpNightCount(client, date, 1);
+	await recordNightRun(client, date, "gh-prs-10", T0 + 1000);
 	expect(await nightCount(client, date)).toBe(2);
 	// A different night starts fresh.
 	expect(await nightCount(client, nightKey(T0 + 24 * HOUR))).toBe(0);

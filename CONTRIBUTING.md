@@ -24,7 +24,7 @@ them as a drive-by inside a feature PR:
 - `src/provider/provider.ts` — the Provider port
 - `src/tools/tool.ts` — the Tool interface and dispatch semantics
 - `src/safety/policy.ts` — the Policy port
-- `src/memory/port.ts` — the MemoryPort seam (abagraph plugs in here)
+- `src/store/types.ts` — the FactStore contract
 - `src/session/entries.ts` — the on-disk JSONL session format
 - `src/config/types.ts` — the config contract
 
@@ -64,8 +64,7 @@ They point in opposite directions — keep them straight:
 3. Ask the `Policy` (via `ctx.policy.decide`) before dangerous acts and throw
    on denial — the dispatcher turns that into the model-visible error.
 4. Register it where agents are assembled (the `tools` array passed to
-   `createAgent`, or `MemoryPort.tools()` for memory tools) and add an
-   offline test under `test/`.
+   `createAgent`) and add an offline test under `test/`.
 
 ## Tests
 

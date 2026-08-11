@@ -18,7 +18,7 @@
 /** Right rail (7). The header carries the engine that answered the lookup. */
 export const DOC_HTML = `<aside id="docwin">
 	<div class="tw-head">
-		<span class="tw-num">7</span><span>Documentation</span>
+		<span class="tw-num">6</span><span>Documentation</span>
 		<span class="spacer"></span>
 		<span id="doc-provider" class="dw-badge" title="Which engine answered">none</span>
 		<button id="doc-hide" title="Hide Documentation (F1 / &#8984;7)">&#10005;</button>
@@ -46,7 +46,7 @@ function docVisible(on) {
 function toggleDoc() { docVisible(!document.body.classList.contains("doc-on")); }
 
 /**
- * 7 / ⌘7 / F1 — IntelliJ's Quick Documentation verb. It LOOKS UP the symbol
+ * 6 / ⌘6 / F1 — IntelliJ's Quick Documentation verb. It LOOKS UP the symbol
  * last clicked in the code viewer and shows the answer; only with nothing to
  * look up does it fall back to toggling the rail. A key that closed the panel
  * while you were reading a symbol was the opposite of what it is named for.

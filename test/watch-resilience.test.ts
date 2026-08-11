@@ -5,22 +5,21 @@
  * and nothing empty may be published.
  */
 import { afterEach, beforeEach, expect, it } from "vitest";
-import type { MemoryClient } from "../src/memory/client-types.js";
 import { nightKey } from "../src/watch/ledger.js";
 import { watchLoop } from "../src/watch/loop.js";
+import type { FactStore } from "../src/store/types.js";
 import { watchTick } from "../src/watch/tick.js";
 import { harness, HOUR, item, startMemory, T0 } from "./watch-harness.js";
-import type { MockAbagraph } from "./mock-abagraph.js";
 
-let mock: MockAbagraph;
-let client: MemoryClient;
+let cleanup: () => Promise<void>;
+let client: FactStore;
 
 beforeEach(async () => {
-	({ mock, client } = await startMemory());
+	({ store: client, cleanup } = await startMemory());
 });
 
 afterEach(async () => {
-	await mock.close();
+	await cleanup();
 });
 
 it("a worktree that cannot be opened costs one item, not the night", async () => {

@@ -34,11 +34,11 @@ afterAll(async () => {
 	rmSync(home, { recursive: true, force: true });
 });
 
-it("docks a Documentation tool window numbered 7, pinned rather than a popup", () => {
+it("docks a Documentation tool window numbered 6, pinned rather than a popup", () => {
 	has(['id="docwin"', 'id="doc-body"', 'id="doc-sym"', 'id="doc-btn"', 'id="doc-hide"']);
 	// The header badge, the toolbar button and the key binding must agree.
-	has(['<span class="tw-num">7</span>', '<span class="n">7</span>', "Documentation"]);
-	has(['if (n === "7") docQuick()', "function toggleDoc()", 'classList.toggle("doc-on"']);
+	has(['<span class="tw-num">6</span>', '<span class="n">6</span>', "Documentation"]);
+	has(['if (n === "6") docQuick()', "function toggleDoc()", 'classList.toggle("doc-on"']);
 	// 7 LOOKS UP the symbol under the caret rather than only toggling a rail.
 	has(["function docQuick()", "codeLookupCaret()"]);
 	// Draggable, like every other tool window.
@@ -91,17 +91,17 @@ it("never renders a blank box: every empty state is a sentence", () => {
 	has(["no declaration for this symbol in the indexed sources"]);
 });
 
-it("binds F1, 7, ⌘B, ⌥F7 and ⌘F12, and documents every one of them", () => {
+it("binds F1, 6, ⌘B, ⌥F7 and ⌘F12, and documents every one of them", () => {
 	has(['if (e.key === "F1") { e.preventDefault(); docQuick(); return; }']);
 	has(['if (e.altKey && e.key === "F7")', "docFindUsages(); return;"]);
 	// The shift guards: ⌘⇧B is the browsers' bookmarks shortcut and must survive.
 	has(['if (key === "b" && !e.shiftKey && !isTyping(document.activeElement))']);
 	has(["docGoToDefinition()", 'if (key === "f12" && !e.shiftKey)', "function focusOutline()"]);
-	has(["/^[1-7]$/.test(e.key)"]);
+	has(["/^[1-6]$/.test(e.key)"]);
 	// Every gesture has a row in the help sheet, grouped.
 	has(['id="help-doc"', "Documentation tool window &mdash; look up, or show"]);
 	has(["Go to the definition of the selected symbol", "Find usages &mdash;"]);
-	has(["File structure &mdash; focus the outline", "Documentation (&#8984;7)"]);
+	has(["File structure &mdash; focus the outline", "Documentation (&#8984;6)"]);
 	// 7 leads and F1 follows: on macOS F1 is brightness-down by default.
 	const seven = served.indexOf("Documentation tool window &mdash; look up, or show");
 	expect(seven).toBeGreaterThan(-1);

@@ -25,12 +25,6 @@ export const DEFAULT_CONFIG: AhConfig = {
 	},
 	memory: {
 		enabled: true,
-		baseUrl: "http://127.0.0.1:7777",
-		apiKey: null,
-		autoSpawn: false,
-		serverBin: null,
-		dataDir: null,
-		budgets: { repo: 2000, lessons: 1000 },
 	},
 	verify: {
 		retries: 3,

@@ -2,23 +2,22 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import type { ModelRef } from "../src/core/types.js";
 import { planGoal, writeGoalGraph } from "../src/goals/planner.js";
 import { frontier } from "../src/goals/scheduler.js";
-import { createMemoryClient } from "../src/memory/client.js";
-import type { MemoryClient } from "../src/memory/client-types.js";
 import { assistantText, FakeProvider } from "../src/provider/fake.js";
-import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
+import type { FactStore } from "../src/store/types.js";
+import { type Harness, harness } from "./store-harness.js";
 
 const model: ModelRef = { provider: "fake", id: "fake-planner", contextWindow: 200_000 };
 const planOf = (v: unknown) => new FakeProvider([{ message: assistantText(JSON.stringify(v)) }]);
 
-let mock: MockAbagraph;
-let mem: MemoryClient;
+let h: Harness;
+let mem: FactStore;
 
 beforeAll(async () => {
-	mock = await startMockAbagraph();
-	mem = createMemoryClient({ baseUrl: mock.url });
+	h = await harness();
+	mem = h.store;
 });
 afterAll(async () => {
-	await mock.close();
+	await h.cleanup();
 });
 
 describe("planGoal", () => {
@@ -90,7 +89,7 @@ describe("planGoal", () => {
 		expect(plan.tasks.every((t) => t.dependsOn.length === 0)).toBe(true);
 	});
 
-	it("planned graph lands in abagraph and schedules from the first task", async () => {
+	it("planned graph lands in the store and schedules from the first task", async () => {
 		const ns = "repo:planned";
 		const provider = planOf({
 			title: "Ship",
@@ -102,6 +101,7 @@ describe("planGoal", () => {
 		const plan = await planGoal(provider, model, "ship it");
 		const g = await writeGoalGraph(mem, ns, plan);
 		expect(await frontier(mem, ns, g)).toEqual([plan.tasks[0]?.id]);
-		expect(mock.dump(ns).every((f) => f.tenant === ns)).toBe(true);
+		// Namespace isolation: the graph is invisible from another repo's namespace.
+		expect(await frontier(mem, "repo:elsewhere", g)).toEqual([]);
 	});
 });

@@ -1,5 +1,4 @@
 import type { BudgetTracker } from "../safety/budget.js";
-import { collectRunRecord } from "./run-record.js";
 import { checkStop, type Limits } from "./stop.js";
 import { runTurn, type TurnDeps, type TurnState } from "./turn.js";
 import type { Msg, RunEndReason, RunStats } from "./types.js";
@@ -18,8 +17,10 @@ const WRAP_UP_MSG =
 	"Budget limit reached — stop after this message: summarize what was done and what remains; do not call more tools.";
 
 /**
- * The run loop: run:start, turns until a stop/end reason, then run:end and
- * exactly one memory.postRun for every outcome.
+ * The run loop: run:start, turns until a stop/end reason, then the stats
+ * append and exactly one run:end for every outcome — including the outcomes
+ * nobody wants, which is why the ending is in a finally-shaped tail rather
+ * than on the success path.
  */
 export async function runLoop(deps: LoopDeps): Promise<{ reason: RunEndReason; stats: RunStats }> {
 	const now = deps.now ?? Date.now;
@@ -30,7 +31,6 @@ export async function runLoop(deps: LoopDeps): Promise<{ reason: RunEndReason; s
 		task: deps.task,
 		model: deps.model,
 	});
-	const record = collectRunRecord(deps.events, deps.toolCtx.cwd);
 	const state: TurnState = { context: [...deps.initialContext], turn: 1, usage: zeroUsage() };
 	let turnsCompleted = 0;
 	let reason: RunEndReason;
@@ -73,8 +73,8 @@ export async function runLoop(deps: LoopDeps): Promise<{ reason: RunEndReason; s
 		}
 		reason = next;
 	} catch (e) {
-		// An escaped exception (session write, memory.preTurn, event listener)
-		// must not skip the stats append, run:end, and the single postRun below.
+		// An escaped exception (session write, event listener) must not skip the
+		// stats append and run:end below.
 		reason = "error";
 		const errorMessage = e instanceof Error ? e.message : String(e);
 		try {
@@ -106,24 +106,12 @@ export async function runLoop(deps: LoopDeps): Promise<{ reason: RunEndReason; s
 	try {
 		deps.session.appendStats(stats, reason);
 	} catch {
-		// a failed stats write must not skip the run:end emit or postRun
+		// a failed stats write must not skip the run:end emit
 	}
 	try {
 		await deps.events.emit({ type: "run:end", reason, stats });
 	} catch {
-		// never let a listener failure skip the single postRun
+		// a listener that throws is its own problem; the run still ended
 	}
-	record.stop();
-	await deps.memory.postRun({
-		runId: deps.runId,
-		sessionId: deps.session.id,
-		repoPath: deps.repoPath,
-		task: deps.task,
-		outcome: reason,
-		filesTouched: record.filesTouched,
-		commandsRun: record.commandsRun,
-		transcriptTail: state.context.slice(-10),
-		stats,
-	});
 	return { reason, stats };
 }

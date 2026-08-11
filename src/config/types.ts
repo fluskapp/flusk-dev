@@ -56,16 +56,14 @@ export interface AhConfig {
 		keepRecentTokens: number;
 	};
 	memory: {
-		/** When true and the server is unreachable, ah warns once and degrades to noopMemory. */
+		/**
+		 * Whether a run keeps a record of itself in the local fact store
+		 * (`~/.ah/store`). False is a request to leave no trace: `ah run` and
+		 * `ah resume` proceed and write nothing, while the commands whose whole
+		 * subject matter is stored state (`ah goal`, `ah watch`) refuse rather
+		 * than pretend.
+		 */
 		enabled: boolean;
-		baseUrl: string;
-		apiKey: string | null;
-		/** Spawn serverBin --data dataDir when health-check fails. */
-		autoSpawn: boolean;
-		serverBin: string | null;
-		dataDir: string | null;
-		/** Context token budgets for the <memory> block. */
-		budgets: { repo: number; lessons: number };
 	};
 	verify: {
 		retries: number;

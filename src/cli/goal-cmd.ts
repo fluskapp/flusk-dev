@@ -1,28 +1,25 @@
 /**
  * `ah goal <text>`: plan a task graph with the plan-kind model, write it to
- * abagraph, then execute frontier tasks one by one — each as a full agent
- * session behind the same verification gate as `ah run`. Requires a live
- * memory client; the goal graph IS memory. `--dry` plans and prints only.
+ * the fact store, then execute frontier tasks one by one — each as a full
+ * agent session behind the same verification gate as `ah run`. The graph IS
+ * the store: task status, claims and dependencies are facts, which is what
+ * lets a second session join a goal already in flight. `--dry` plans and
+ * prints only.
  */
 import { randomUUID } from "node:crypto";
-import { createAgent } from "../agent/agent.js";
 import { loadConfig, loadRepoConfig } from "../config/config.js";
-import { createEventBus } from "../core/events.js";
 import { type GoalPlan, planGoal, writeGoalGraph } from "../goals/planner.js";
-import { goalBrief } from "../goals/resume.js";
 import { claimTask, completeTask, failTask, frontier } from "../goals/scheduler.js";
 import { resetFailedTasks, writeGoalStatus } from "../goals/schema.js";
-import { AbagraphMemoryPort } from "../memory/abagraph-port.js";
-import { createMemory, type MemorySetup } from "../memory/bootstrap.js";
+import { resolveNamespace } from "../store/namespaces.js";
 import { FakeProvider } from "../provider/fake.js";
 import { hasAuth, PiAiProvider } from "../provider/pi-ai.js";
 import type { Provider } from "../provider/provider.js";
-import { createAhPolicy } from "../safety/ah-policy.js";
-import { type CliOutcome, runWithGate } from "./gate-loop.js";
-import { allTasksDone, renderGoalList, taskDescription } from "./goal-list.js";
+import { createFactStore } from "../store/store.js";
+import type { CliOutcome } from "./gate-loop.js";
+import { allTasksDone, renderGoalList } from "./goal-list.js";
 import { runTask } from "./goal-task.js";
-import { attachRenderer } from "./render.js";
-import { DEFAULT_TOOLS, envKeyVar, fakeModel, loadFakeScript, pickModel } from "./run-support.js";
+import { envKeyVar, fakeModel, loadFakeScript, pickModel } from "./run-support.js";
 
 export interface GoalCmdOpts {
 	goal?: string;
@@ -48,14 +45,16 @@ function renderPlan(plan: GoalPlan): string {
 export async function goalCmd(opts: GoalCmdOpts): Promise<CliOutcome> {
 	const out = opts.out ?? process.stdout;
 	const cfg = loadConfig(opts.repo);
-	const mem = await createMemory(cfg, opts.repo, loadRepoConfig(opts.repo));
-	if (mem.client === null) {
-		throw new Error(
-			`ah goal needs a reachable abagraph memory server (memory.enabled + ${cfg.memory.baseUrl})`,
-		);
+	const ns = resolveNamespace(opts.repo, loadRepoConfig(opts.repo));
+	// The graph IS the store: task status, claims and dependencies are facts,
+	// so there is no version of this command that records nothing.
+	if (!cfg.memory.enabled) {
+		out.write("ah goal needs the fact store: the goal graph has nowhere else to live.\n");
+		return "blocked";
 	}
+	const store = createFactStore();
 	if (opts.list === true) {
-		out.write(await renderGoalList(mem.client, mem.ns));
+		out.write(await renderGoalList(store, ns));
 		return "completed";
 	}
 	if (opts.goal === undefined) throw new Error("ah goal needs <text> or --list");
@@ -70,20 +69,20 @@ export async function goalCmd(opts: GoalCmdOpts): Promise<CliOutcome> {
 	const plan = await planGoal(provider, planModel, opts.goal);
 	out.write(renderPlan(plan));
 	if (opts.dry === true) return "completed";
-	const g = await writeGoalGraph(mem.client, mem.ns, plan);
-	await writeGoalStatus(mem.client, mem.ns, g, "active");
+	const g = await writeGoalGraph(store, ns, plan);
+	await writeGoalStatus(store, ns, g, "active");
 	out.write(`goal ${g} written (${plan.tasks.length} tasks)\n`);
 	for (;;) {
-		const front = await frontier(mem.client, mem.ns, g);
+		const front = await frontier(store, ns, g);
 		if (front.length === 0) {
-			if (await allTasksDone(mem.client, mem.ns, g)) {
-				await writeGoalStatus(mem.client, mem.ns, g, "done");
+			if (await allTasksDone(store, ns, g)) {
+				await writeGoalStatus(store, ns, g, "done");
 				out.write("goal done\n");
 				return "completed";
 			}
 			// A goal is only truly stuck if nothing can be retried: returning
 			// failed tasks to pending unwedges the graph for the next attempt.
-			const reset = await resetFailedTasks(mem.client, mem.ns, g);
+			const reset = await resetFailedTasks(store, ns, g);
 			if (reset.length > 0) {
 				out.write(`goal stalled: reset ${reset.length} failed task(s) — rerun to retry\n`);
 			} else {
@@ -93,12 +92,12 @@ export async function goalCmd(opts: GoalCmdOpts): Promise<CliOutcome> {
 		}
 		// Try the whole frontier before giving up: a lost claim means another
 		// session took that task, not that the goal is stuck. Bounded, because
-		// an unbounded `continue` here is a hot loop against the server.
+		// an unbounded `continue` here is a hot loop over the log.
 		let taskId: string | undefined;
 		let runId = "";
 		for (const candidate of front) {
 			const id = randomUUID().slice(0, 8);
-			if ((await claimTask(mem.client, mem.ns, candidate, id)) !== null) {
+			if ((await claimTask(store, ns, candidate, id)) !== null) {
 				taskId = candidate;
 				runId = id;
 				break;
@@ -108,13 +107,13 @@ export async function goalCmd(opts: GoalCmdOpts): Promise<CliOutcome> {
 			out.write(`could not claim any of ${front.length} runnable task(s); stopping\n`);
 			return "blocked";
 		}
-		const outcome = await runTask(opts, { mem, provider, g, taskId, runId });
+		const outcome = await runTask(opts, { store, ns, provider, g, taskId, runId });
 		if (outcome !== "completed") {
-			await failTask(mem.client, mem.ns, taskId);
+			await failTask(store, ns, taskId);
 			out.write(`task ${taskId} failed (${outcome}); stopping\n`);
 			return outcome;
 		}
-		await completeTask(mem.client, mem.ns, taskId);
+		await completeTask(store, ns, taskId);
 		out.write(`task ${taskId} done\n`);
 	}
 }
