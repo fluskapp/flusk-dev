@@ -5,51 +5,6 @@
  * as the YAML that used to be the first thing anyone saw.
  */
 export const CLIENT_JOURNAL_JS = `
-var STAGE_CLASS = {
-	done: "completed", ok: "completed", pass: "completed", passed: "completed",
-	running: "running", failed: "error", error: "error",
-	skipped: "stopped", skip: "stopped", pending: "",
-};
-
-function stageClass(status) {
-	var key = String(status).toLowerCase();
-	return Object.prototype.hasOwnProperty.call(STAGE_CLASS, key) ? STAGE_CLASS[key] : "";
-}
-
-/** Journals are files a harness wrote; only ever link out to http(s). */
-function safeUrl(u) { return /^https?:\\/\\//.test(String(u)) ? String(u) : null; }
-
-function stageHtml(s) {
-	var cls = stageClass(s.status);
-	var title = s.status + (s.duration ? " \\u00b7 " + s.duration : "") +
-		(s.detail ? " \\u00b7 " + s.detail : "");
-	// A failed stage is a handle onto the place in the journal that explains it,
-	// so it is a real control: focusable, and openable from the keyboard.
-	var jump = cls === "error"
-		? ' data-stage="' + esc(s.name) + '" tabindex="0" role="button"' : "";
-	return '<span class="stage ' + cls + '"' + jump + ' title="' + esc(title) + '">' +
-		esc(s.name) + "</span>";
-}
-
-/**
- * The failing stage's detail, rendered where it can be read. It is the whole
- * evidence behind a "stage gate failed" attention item, and hiding it in a
- * title= tooltip stopped the symptom-to-evidence path one click short.
- */
-function stageErrors(stages) {
-	return (stages || []).filter(function (s) {
-		var k = String(s.status).toLowerCase();
-		return k === "failed" || k === "error";
-	}).map(function (s) {
-		return '<div class="error-line" data-stage="' + esc(s.name) +
-			'" tabindex="0" role="button">' +
-			"<b>" + esc(s.name) + "</b> " + esc(s.status) +
-			(s.duration ? " \\u00b7 " + esc(s.duration) : "") +
-			(s.detail ? " \\u2014 " + esc(s.detail) : "") +
-			' <span class="dim">(open in journal)</span></div>';
-	}).join("");
-}
-
 /**
  * Scroll the rendered journal to the first block that names this stage.
  *
@@ -105,8 +60,11 @@ function journalHead(meta, path) {
 		esc(fmtTime(meta.date)) + "</span></div>" +
 		'<div class="stages">' + meta.stages.map(stageHtml).join("") + "</div>" +
 		stageErrors(meta.stages) +
-		(safeUrl(meta.pr) ? '<div class="small"><a class="ev" href="' + esc(meta.pr) +
-			'" target="_blank" rel="noopener">' + esc(meta.pr) + "</a></div>" : "");
+		// A button, not the URL. "Open PR #188" is the action; the href was only
+		// ever something to copy out and paste into a browser by hand.
+		(safeUrl(meta.pr) ? '<div class="meta-actions"><a class="act" href="' + esc(meta.pr) +
+			'" target="_blank" rel="noopener noreferrer">Open PR' + prNumber(meta.pr) +
+			"</a></div>" : "");
 }
 
 async function loadJournalRun(path) {

@@ -18,19 +18,40 @@ const JOURNAL = [
 
 it("renders frontmatter as a definition table and counts its keys", () => {
 	const { html, keys } = renderFrontmatter(JOURNAL);
-	expect(keys).toBe(5);
+	// title, date, status, and ONE row for the whole pipeline — not one row per
+	// stage, which is what made a twelve-stage journal unreadable.
+	expect(keys).toBe(4);
 	expect(html.startsWith('<table class="fm"><tbody>')).toBe(true);
 	expect(html).toContain(
 		'<tr><th class="fm-k">title</th><td class="fm-v">Run: review PR #7</td></tr>',
 	);
 	expect(html).toContain('<th class="fm-k">status</th><td class="fm-v">failed</td>');
-	// nested keys keep their parent, and a wrapped value is joined, not lost
-	expect(html).toContain('<th class="fm-k">stages.intent</th>');
+	// the container is not repeated per row
+	expect(html.match(/<table/g)?.length).toBe(1);
+});
+
+it("draws the stages as a pipeline rather than printing their encoding", () => {
+	const { html } = renderFrontmatter(JOURNAL);
+	expect(html).not.toContain("stages.intent");
+	expect(html).not.toContain("done|1.9s|");
+	expect(html).toContain('<th class="fm-k">stages</th>');
+	expect(html).toContain('class="stg-row"');
+	// status as a glyph, and the failing stage carries the failure colour class
+	expect(html).toContain('<span class="stage completed"');
+	expect(html).toContain('<span class="stage error"');
+	expect(html).toContain("✓");
+	expect(html).toContain("✗");
+	expect(html).toContain('<span class="stg-t">1.9s</span>');
+});
+
+it("keeps a wrapped stage detail whole, where it can still be read", () => {
+	const { html } = renderFrontmatter(JOURNAL);
+	// The value spans two source lines. Joining it was the point of the parser;
+	// it now lands in the chip's tooltip rather than in a cell, so this asserts
+	// the JOIN still happens and nothing was dropped on the way.
 	expect(html).toContain(
 		"merge commit failed: On branch main nothing to commit, working tree clean",
 	);
-	// the container is not repeated per row
-	expect(html.match(/<table/g)?.length).toBe(1);
 });
 
 it("escapes keys and values, so frontmatter cannot inject markup", () => {

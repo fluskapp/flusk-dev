@@ -10,6 +10,7 @@
  * plus one level of indented nesting, and values that wrap onto later lines.
  */
 import { escapeHtml } from "./markdown-inline.js";
+import { parseStage, stagePipeline, valueHtml } from "./stage-format.js";
 
 export interface FrontmatterHtml {
 	/** A `<table class="fm">`, or "" when the document has no frontmatter. */
@@ -42,7 +43,16 @@ function unquote(value: string): string {
 	return quoted && t.endsWith(t.charAt(0)) ? t.slice(1, -1) : t;
 }
 
-/** Scalar keys, one level of `parent.child` nesting, wrapped values joined. */
+/**
+ * Scalar keys, one level of `parent.child` nesting, wrapped values joined.
+ *
+ * Quotes are stripped only AFTER the continuation lines are joined. A value
+ * that wraps opens its quote on one line and closes it on another, so
+ * unquoting each line as it arrived saw an opening quote with no closing one,
+ * declined, and left BOTH quotes embedded in the joined result — which turned
+ * a stage status of `failed` into `"failed` and quietly rendered a failure as
+ * pending.
+ */
 export function frontmatterRows(block: string): Row[] {
 	const rows: Row[] = [];
 	let parent = "";
@@ -56,7 +66,9 @@ export function frontmatterRows(block: string): Row[] {
 		}
 		const nested = (m[1] ?? "").length > 0;
 		const name = m[2] ?? "";
-		const value = unquote(m[3] ?? "");
+		const value = (m[3] ?? "").trim();
+		// An empty value opens a nested block; test it before unquoting, since
+		// `key: ""` is a value and `key:` is a parent.
 		if (!nested && value === "") {
 			parent = name;
 			continue;
@@ -64,20 +76,39 @@ export function frontmatterRows(block: string): Row[] {
 		if (!nested) parent = "";
 		rows.push({ key: nested && parent !== "" ? `${parent}.${name}` : name, value });
 	}
+	for (const r of rows) r.value = unquote(r.value);
 	return rows;
 }
+
+const STAGE_PREFIX = "stages.";
 
 export function renderFrontmatter(src: string): FrontmatterHtml {
 	const block = frontmatterBlock(src);
 	if (block === null) return EMPTY;
 	const rows = frontmatterRows(block);
 	if (rows.length === 0) return EMPTY;
-	const body = rows
+
+	// The stage keys become ONE pipeline row. Left as ordinary properties they
+	// were the majority of the table — thirteen rows of the storage encoding,
+	// pushing the values a reader came for off the bottom of the screen.
+	const stages = rows
+		.filter((r) => r.key.startsWith(STAGE_PREFIX))
+		.map((r) => ({ name: r.key.slice(STAGE_PREFIX.length), stage: parseStage(r.value) }));
+	const plain = rows.filter((r) => !r.key.startsWith(STAGE_PREFIX));
+
+	const body = plain
 		.map(
 			(r) =>
 				`<tr><th class="fm-k">${escapeHtml(r.key)}</th>` +
-				`<td class="fm-v">${escapeHtml(r.value)}</td></tr>`,
+				`<td class="fm-v">${valueHtml(r.key, r.value)}</td></tr>`,
 		)
 		.join("");
-	return { html: `<table class="fm"><tbody>${body}</tbody></table>`, keys: rows.length };
+	const stageRow =
+		stages.length === 0
+			? ""
+			: `<tr><th class="fm-k">stages</th><td class="fm-v">${stagePipeline(stages)}</td></tr>`;
+	return {
+		html: `<table class="fm"><tbody>${body}${stageRow}</tbody></table>`,
+		keys: plain.length + (stages.length === 0 ? 0 : 1),
+	};
 }

@@ -9,6 +9,7 @@ import { DOCS_CSS } from "./styles-docs.js";
 import { FIND_CSS } from "./styles-find.js";
 import { MD_CSS } from "./styles-md.js";
 import { THEME_CSS } from "./styles-theme.js";
+import { STAGES_CSS } from "./styles-stages.js";
 import { TRANSCRIPT_CSS } from "./styles-transcript.js";
 import { TREE_CSS } from "./styles-tree.js";
 import { WIDGETS_CSS } from "./styles-widgets.js";
@@ -20,6 +21,7 @@ export const ALL_CSS =
 	TREE_CSS +
 	WORK_CSS +
 	TRANSCRIPT_CSS +
+	STAGES_CSS +
 	DOCS_CSS +
 	MD_CSS +
 	FIND_CSS +

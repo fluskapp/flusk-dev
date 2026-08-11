@@ -4,8 +4,26 @@
  */
 import { highlightCode } from "./highlight.js";
 import { renderInline } from "./markdown-inline.js";
+import { parseMermaid } from "./mermaid-parse.js";
+import { renderMermaid } from "./mermaid-svg.js";
 
 export type Block = [html: string, next: number];
+
+/**
+ * A drawn flowchart, or null when the source is outside the supported subset —
+ * in which case the caller shows the code, because a diagram silently missing
+ * half its edges is worse than the text that would have told you the truth.
+ *
+ * The marker id is seeded from the source rather than a running counter so the
+ * function stays pure: same diagram, same ids, no shared state between renders.
+ */
+function drawMermaid(src: string): string | null {
+	const graph = parseMermaid(src);
+	if (graph === null) return null;
+	let seed = 0;
+	for (let i = 0; i < src.length; i++) seed = (seed * 31 + src.charCodeAt(i)) >>> 8;
+	return renderMermaid(graph, seed % 100000);
+}
 
 /**
  * CommonMark's closing rule, stated exactly: a fence is closed by a BARE run
@@ -56,6 +74,13 @@ export function takeCode(lines: string[], start: number, lang: string, raw?: str
 		body.push((raw ?? lines)[i] ?? "");
 	}
 	const text = body.join("\n");
+	// Mermaid needs the UNESCAPED source: the parser matches on " and [ ], which
+	// the document-level escape has already turned into entities. Without `raw`
+	// there is nothing to parse, so the fence stays a code block.
+	if (lang === "mermaid" && raw !== undefined) {
+		const drawn = drawMermaid(text);
+		if (drawn !== null) return [drawn, i];
+	}
 	const name = lang === "" && looksLikeDiff(text) ? "diff" : lang;
 	const inner = raw === undefined ? text : highlightCode(text, name);
 	const cls = name === "" ? "" : ` class="lang-${name}"`;

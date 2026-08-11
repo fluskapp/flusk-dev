@@ -119,20 +119,6 @@ export const TRANSCRIPT_CSS = `
 .stats { color: var(--dim); }
 .running-note { color: var(--accent); }
 
-/* The stage pipeline as a Badge row. A pending stage is not a disabled
-   control — its name is content — so it is the secondary text on a real border. */
-.stages { display: flex; flex-wrap: wrap; gap: var(--ij-space-1); margin: var(--ij-space-2) 0; }
-.stage {
-	font: var(--ij-fs-2) var(--font-code);
-	line-height: calc(var(--ij-row-h) - var(--ij-space-2));
-	padding: 0 var(--ij-space-2); border-radius: var(--ij-radius-sm);
-	background: transparent; color: var(--ij-text-secondary); border: 1px solid var(--ij-border-control);
-}
-.stage.completed { color: var(--ok); border-color: var(--ok); }
-.stage.running { background: var(--accent); color: var(--ij-button-default-fg); border-color: var(--accent); }
-.stage.error { color: var(--err); border-color: var(--err); }
-.stage.stopped { color: var(--warn); border-color: var(--warn); }
-
 /* Only a failing stage is a handle onto the journal, so only it is a row you
    can select. The selection outlives :focus (client-journal.ts sets .on),
    which is the whole point of having an inactive selection colour. */

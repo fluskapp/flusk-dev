@@ -34,6 +34,7 @@ function firstTable(html: string): string {
 
 it.runIf(journals.length > 0)("renders every real harness journal without throwing", () => {
 	let tables = 0;
+	let drawn = 0;
 	for (const path of journals) {
 		const src = readFileSync(path, "utf8");
 		let html = "";
@@ -41,14 +42,19 @@ it.runIf(journals.length > 0)("renders every real harness journal without throwi
 			html = renderMarkdown(src);
 		}, path).not.toThrow();
 		expect(html.length, path).toBeGreaterThan(0);
-		// a journal always declares frontmatter and always fences its graph
+		// a journal always declares frontmatter, and always carries its pipeline
+		// graph — as a DRAWN diagram now, which is why this no longer demands a
+		// code fence: for most journals the mermaid graph was the only one.
 		expect(renderFrontmatter(src).keys, path).toBeGreaterThan(0);
-		expect(html, path).toContain('<pre class="code">');
+		expect(html, path).toMatch(/<pre class="code">|<div class="mmd">/);
+		if (html.includes('<div class="mmd">')) drawn++;
 		if (html.includes("<table>")) tables++;
 		// nothing a journal quotes may escape as markup
 		expect(html).not.toContain("<script");
 	}
 	expect(tables).toBeGreaterThan(journals.length - 5);
+	// The whole point of the renderer: these are diagrams, not fenced text.
+	expect(drawn).toBeGreaterThan(journals.length - 5);
 });
 
 it.runIf(journals.length > 0)("keeps a wrapped stage row inside the table", () => {

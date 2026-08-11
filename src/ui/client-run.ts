@@ -52,17 +52,35 @@ function wireRunActions(d) {
 	});
 }
 
-/** Copy path / copy nvim command, for any view holding a file path. */
+/**
+ * Copy path / copy nvim command / reveal, for any view holding a file path.
+ *
+ * Reveal is offered everywhere rather than only on run transcripts: a journal
+ * or a document is a file on disk, and "where IS this" was previously a
+ * question you answered by copying the path and pasting it into a terminal.
+ */
 function pathActions() {
 	return '<button class="act" data-act="copy-path">Copy path</button>' +
-		'<button class="act" data-act="copy-nvim">Copy nvim command</button>';
+		'<button class="act" data-act="copy-nvim">Copy nvim command</button>' +
+		'<button class="act" data-act="reveal-path">Reveal in Finder</button>';
 }
+
+/** The server takes the PATH here (a run transcript sends its session key). */
+function revealPath(path) {
+	fetch("/api/reveal?repo=" + encodeURIComponent(path), { method: "POST" })
+		.then(function (r) { return r.ok ? null : r.json().catch(function () { return {}; }); })
+		.then(function (bad) {
+			toast(bad === null ? "Revealed in Finder" : (bad.error || "Reveal failed"));
+		});
+}
+
 function wirePathActions(root, path) {
 	$$(root + " [data-act]").forEach(function (b) {
 		b.addEventListener("click", function () {
 			var act = b.getAttribute("data-act");
 			if (act === "copy-path") copyText(path, "Path copied");
 			else if (act === "copy-nvim") copyText(nvimCmd(path), "Command copied");
+			else if (act === "reveal-path") revealPath(path);
 		});
 	});
 }

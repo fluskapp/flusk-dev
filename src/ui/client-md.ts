@@ -95,13 +95,42 @@ function setActiveMdMode(mode) {
 	return true;
 }
 
-/** The frontmatter of an already-rendered document, as a property table. */
+/**
+ * One property value. A URL becomes something you can click rather than a
+ * string you have to select and paste, and a pull request becomes a labelled
+ * button, because "open PR #187" is the action and the href was never the
+ * information.
+ */
+function fmValue(k, v) {
+	var url = safeUrl(v);
+	if (!url) return esc(v);
+	if (k === "pr") {
+		var num = /\\/pull\\/(\\d+)/.exec(url);
+		return '<a class="act" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' +
+			"Open PR" + (num ? " #" + num[1] : "") + "</a>";
+	}
+	return '<a href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(url) + "</a>";
+}
+
+/**
+ * The frontmatter of an already-rendered document, as a property table.
+ *
+ * The packed stage keys are lifted out and drawn as one pipeline row: left as
+ * ordinary properties they filled the table with "stages.gate" / "running|0.0s|"
+ * pairs, which is the file format leaking through the UI.
+ */
 function fmTable(fm) {
-	var keys = Object.keys(fm || {});
-	if (!keys.length) return "";
-	return '<table class="fm"><tbody>' + keys.map(function (k) {
+	var keys = Object.keys(fm || {}).filter(function (k) { return k.indexOf("stages.") !== 0; });
+	var stages = stagesOfFm(fm);
+	if (!keys.length && !stages) return "";
+	var rows = keys.map(function (k) {
 		return '<tr><th class="fm-k">' + esc(k) + '</th><td class="fm-v">' +
-			esc(fm[k]) + "</td></tr>";
-	}).join("") + "</tbody></table>";
+			fmValue(k, fm[k]) + "</td></tr>";
+	});
+	if (stages) {
+		rows.push('<tr><th class="fm-k">stages</th><td class="fm-v">' +
+			stagePipeline(stages) + "</td></tr>");
+	}
+	return '<table class="fm"><tbody>' + rows.join("") + "</tbody></table>";
 }
 `;

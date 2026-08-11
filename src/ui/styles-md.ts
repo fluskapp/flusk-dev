@@ -118,4 +118,15 @@ table.fm td.fm-v {
 	padding-left: var(--ij-space-2); white-space: pre-wrap; overflow-wrap: anywhere;
 }
 .peek-gap .text { color: var(--dim); }
+
+/* A drawn flowchart. It scrolls sideways inside its own box rather than
+   widening the document: a wide pipeline must never make the prose beside it
+   scroll. The SVG keeps its intrinsic size so text stays at its designed
+   weight instead of being scaled into blur. */
+.mmd {
+	margin: var(--ij-space-3) 0; padding: var(--ij-space-2);
+	background: var(--code-bg); border: 1px solid var(--border);
+	border-radius: var(--ij-radius-sm); overflow-x: auto;
+}
+.mmd svg { display: block; }
 `;
