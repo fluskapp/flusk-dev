@@ -9,7 +9,7 @@ import {
 	fakeModel as model,
 	pingTool,
 	setupTestHome,
-	spyMemory,
+	spyRunEnds,
 	teardownTestHome,
 } from "./helpers.js";
 
@@ -54,11 +54,13 @@ test("deadline breach uses the injected clock and ends with reason deadline", as
 		config: cfg,
 		now: () => t,
 	});
+	const ends = spyRunEnds(agent.events);
 	agent.events.on("turn:end", (e) => {
 		if (e.turn === 1) t = 61_000; // clock jumps past the 60s deadline after turn 1
 	});
 	const { reason, stats } = await agent.run();
 	expect(reason).toBe("deadline");
+	expect(ends).toEqual(["deadline"]);
 	expect(stats.turns).toBe(2);
 	expect(
 		provider.requests[1]?.messages.some(
@@ -71,16 +73,15 @@ test("deadline breach uses the injected clock and ends with reason deadline", as
 
 test("the last allowed turn becomes a wrap-up turn ending with maxTurns", async () => {
 	const provider = new FakeProvider([toolTurn("c1"), toolTurn("c2")]);
-	const { memory, postRuns } = spyMemory();
 	const agent = createAgent({
 		provider,
 		model,
 		tools: [pingTool],
-		memory,
 		task: "t",
 		repoRoot: repo,
 		limits: { maxTurns: 2 },
 	});
+	const ends = spyRunEnds(agent.events);
 	const { reason, stats } = await agent.run();
 	expect(reason).toBe("maxTurns");
 	expect(stats.turns).toBe(2);
@@ -90,6 +91,6 @@ test("the last allowed turn becomes a wrap-up turn ending with maxTurns", async 
 		),
 	).toBe(true);
 	expect(statsReason(agent)).toBe("maxTurns");
-	expect(postRuns[0]?.outcome).toBe("maxTurns");
+	expect(ends[0]).toBe("maxTurns");
 	agent.session.close();
 });

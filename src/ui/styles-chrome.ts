@@ -99,7 +99,7 @@ body.side-off #side-grip, body.find-off #find-grip { display: none; }
 #views { flex: 1; overflow-y: auto; min-height: 0; }
 .view { min-height: 100%; }
 /* The editor's own inset, shared with the document reader in styles-md.ts. */
-#overview, #runs, #brain, #project, #run {
+#overview, #runs, #project, #run {
 	padding: var(--ij-space-2) var(--ij-space-4) calc(var(--ij-space-4) * 2);
 	max-width: 1080px; /* design-exempt: the editor's reading measure */
 }

@@ -36,22 +36,25 @@ afterAll(async () => {
 it("serves every tool window, the tab strip and every view container", () => {
 	has(['id="toolbar"', 'id="side"', 'id="tree"', 'id="main"', 'id="tabs"', 'id="views"']);
 	has(['id="chat"', 'id="find"', 'id="status"', 'id="crumbs"']);
-	for (const view of ["overview", "runs", "docs", "brain", "project", "run", "doc", "file"]) {
+	for (const view of ["overview", "runs", "docs", "project", "run", "doc", "file"]) {
 		expect(served).toContain(`<div id="${view}" class="view"`);
 	}
 });
 
-it("numbers the tool windows the way IntelliJ does: 1 Projects … 6 Chat", () => {
+it("numbers the tool windows the way IntelliJ does: 1 Projects … 6 Documentation", () => {
 	// The header badge, the toolbar button and the key binding must agree.
-	has(['<span class="tw-num">1</span>', '<span class="tw-num">5</span>']);
-	has(['<span class="tw-num">6</span>', 'id="side-btn"', 'id="find-btn"', 'id="chat-btn"']);
-	for (const n of ["1", "2", "3", "4", "5", "6"]) {
-		expect(served).toContain(`<span class="n">${n}</span>`);
-	}
+	has(['<span class="tw-num">1</span>', '<span class="tw-num">4</span>']);
+	has(['<span class="tw-num">5</span>', 'id="side-btn"', 'id="find-btn"', 'id="chat-btn"']);
+	// 1..N with no hole. Deleting a tool window is exactly when a gap appears,
+	// and the shortcut in the middle then opens nothing.
+	const shown = [...served.matchAll(/<span class="n">(\d)<\/span>/g)]
+		.map((m) => Number(m[1]))
+		.sort((a, b) => a - b);
+	expect(shown).toEqual([1, 2, 3, 4, 5, 6]);
 	has([
 		"function toolWindow(n)",
 		'if (n === "1") toggleSide()',
-		'else if (n === "5") toggleFind()',
+		'else if (n === "4") toggleFind()',
 	]);
 });
 

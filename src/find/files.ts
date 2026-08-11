@@ -1,6 +1,6 @@
 /**
- * The roots every search is allowed to touch, the files inside them, and the
- * fuzzy path match that turns "uicli" into `src/ui/client-list.ts`.
+ * The roots every search is allowed to touch and the files inside them. (The
+ * fuzzy path match lives beside it in path-score.ts, re-exported here.)
  *
  * Two things are load-bearing here:
  *
@@ -46,24 +46,53 @@ export function projectFor(roots: FindRoot[], path: string): string {
 	return found?.project ?? "";
 }
 
-const cache = new Map<string, { at: number; files: string[] }>();
+interface Listing {
+	at: number;
+	files: string[];
+	/** The same paths, resolved, for membership tests. Built once per walk. */
+	set: Set<string>;
+}
+
+const cache = new Map<string, Listing>();
 /** One walk per root at a time: a burst of keystrokes must not fan out into N. */
-const inflight = new Map<string, Promise<string[]>>();
+const inflight = new Map<string, Promise<Listing>>();
 
 /** One root's tracked files, cached briefly — the palette calls this per keystroke. */
-async function filesUnder(root: string): Promise<string[]> {
+async function listingUnder(root: string): Promise<Listing> {
 	const hit = cache.get(root);
-	if (hit !== undefined && Date.now() - hit.at < TTL_MS) return hit.files;
+	if (hit !== undefined && Date.now() - hit.at < TTL_MS) return hit;
 	const running = inflight.get(root);
 	if (running !== undefined) return running;
 	const walk = rgFiles(root)
 		.then((files) => {
-			cache.set(root, { at: Date.now(), files });
-			return files;
+			const listing = { at: Date.now(), files, set: new Set(files.map((f) => resolve(f))) };
+			cache.set(root, listing);
+			return listing;
 		})
 		.finally(() => inflight.delete(root));
 	inflight.set(root, walk);
 	return walk;
+}
+
+async function filesUnder(root: string): Promise<string[]> {
+	return (await listingUnder(root)).files;
+}
+
+/**
+ * Is `path` one of the files ah indexes? The membership test every endpoint
+ * that serves a file body runs before it opens anything.
+ *
+ * PER ROOT, deliberately. Testing against `listFiles(cfg)` meant testing
+ * against a list capped at MAX_FILES and filled root-first, so one large repo
+ * sorting first made every file in every LATER project "not an indexed file".
+ * Resolving the owning root first also turns an O(n) scan of 20,000 strings
+ * into a Set lookup, on a path the doc panel hits three times per click.
+ */
+export async function isIndexedFile(cfg: AhConfig, path: string): Promise<boolean> {
+	const target = resolve(path);
+	const root = searchRoots(cfg).find((r) => target === r.path || target.startsWith(`${r.path}/`));
+	if (root === undefined) return false;
+	return (await listingUnder(root.path)).set.has(target);
 }
 
 export interface ListOptions {
@@ -84,50 +113,4 @@ export async function listFiles(cfg: AhConfig, options: ListOptions = {}): Promi
 	return out;
 }
 
-/** A new segment starts here, which is where humans abbreviate. */
-const BOUNDARY = new Set(["/", "-", "_", ".", " "]);
-
-/** Greedy subsequence score over `text` from `from`, or null when it misses. */
-function score(text: string, q: string, from: number): number | null {
-	let cursor = from;
-	let total = 0;
-	let last = -2;
-	for (const ch of q) {
-		const at = text.indexOf(ch, cursor);
-		if (at === -1) return null;
-		total += 1;
-		if (at === 0 || BOUNDARY.has(text[at - 1] ?? "")) total += 4;
-		if (at === last + 1) total += 3;
-		last = at;
-		cursor = at + 1;
-	}
-	return total;
-}
-
-/**
- * Score for one path: the best of the whole-path match and a match confined to
- * the basename, with the basename preferred. "Go to file" is a question about
- * the FILE — the directories are context — so `client-list.ts` must beat a
- * long path that merely happens to spell the letters out across segments.
- */
-function scorePath(path: string, q: string): number | null {
-	const lower = path.toLowerCase();
-	const full = score(lower, q, 0);
-	if (full === null) return null;
-	const base = score(lower, q, lower.lastIndexOf("/") + 1);
-	const best = base === null ? full : Math.max(full, base) + 6;
-	return best - lower.length * 0.01; // shorter paths break ties
-}
-
-/** Best fuzzy matches for `query`, best first. An empty query is everything. */
-export function fuzzyPath(files: string[], query: string, limit = 40): string[] {
-	const q = query.replace(/\s+/g, "").toLowerCase();
-	if (q === "") return files.slice(0, limit);
-	const scored: { path: string; score: number }[] = [];
-	for (const path of files) {
-		const s = scorePath(path, q);
-		if (s !== null) scored.push({ path, score: s });
-	}
-	scored.sort((a, b) => b.score - a.score || a.path.localeCompare(b.path));
-	return scored.slice(0, Math.max(0, limit)).map((s) => s.path);
-}
+export { fuzzyPath } from "./path-score.js";

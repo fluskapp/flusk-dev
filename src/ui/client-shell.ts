@@ -19,7 +19,7 @@ export { HELP_HTML } from "./client-help.js";
  */
 export const CHAT_HTML = `<aside id="chat">
 	<div class="tw-head chat-head">
-		<span class="tw-num">6</span><span>Chat</span>
+		<span class="tw-num">5</span><span>Chat</span>
 		<select id="chat-backend" title="Backend"><option>loading…</option></select>
 		<button id="chat-hide" title="Hide chat (&#8984;6)">&#10005;</button>
 	</div>
@@ -50,9 +50,9 @@ export const CHAT_HTML = `<aside id="chat">
  */
 export const FIND_HTML = `<section id="find">
 	<div class="tw-head">
-		<span class="tw-num">5</span><span class="glyph">find</span><span>Find in Files</span>
+		<span class="tw-num">4</span><span class="glyph">find</span><span>Find in Files</span>
 		<span class="spacer"></span>
-		<button id="find-hide" title="Hide Find (&#8984;5)">&#10005;</button>
+		<button id="find-hide" title="Hide Find (&#8984;4)">&#10005;</button>
 	</div>
 	<div id="find-form">
 		<input id="find-q" spellcheck="false" placeholder="Search across your projects (ripgrep)"

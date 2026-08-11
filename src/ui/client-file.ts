@@ -67,6 +67,11 @@ async function loadFile(t) {
 	var host = $("#file");
 	host.innerHTML = '<div class="empty small">opening \\u2026</div>';
 	if (isMd(t.ref) && await fileAsDoc(host, t)) return;
+	// Source goes to the SYMBOL-AWARE viewer first. Without this line the code
+	// viewer, /api/source, the outline strip and the whole Documentation window
+	// are unreachable by any user gesture — every tab fell through to a
+	// markdown surface, which emits no identifier spans to click.
+	if (!isMd(t.ref) && await openCodeInto(host, t.ref, t.line || 0)) return;
 	if (await fileAsText(host, t)) return;
 	if (await fileAsSource(host, t)) return;
 	filePeek(host, t);
@@ -127,21 +132,5 @@ async function fileAsText(host, t) {
 		wire: function () { wirePathActions("#file", t.ref); markLine(); },
 	});
 	return true;
-}
-
-/** Everything else: the lines Find found, and an honest note about the rest. */
-function filePeek(host, t) {
-	var file = matchesFor(t.ref);
-	host.innerHTML =
-		'<div class="ed-bar"><b>' + esc(base(t.ref)) + "</b>" +
-		'<span class="path">' + esc(t.ref) + "</span>" +
-		'<div class="meta-actions">' + pathActions() + "</div></div>" +
-		(file
-			? '<div class="peek-wrap"><div class="peek">' + peekRows(file, t.line) + "</div></div>"
-			: '<div class="empty small">ah serves whole file bodies for the documents and ' +
-				"journals it indexes.<br/>Search this file (\\u2318\\u21e7F) to read its matching " +
-				"lines here, or copy the nvim command above.</div>");
-	wirePathActions("#file", t.ref);
-	markLine();
 }
 `;

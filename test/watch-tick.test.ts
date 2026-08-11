@@ -1,22 +1,21 @@
 import { afterEach, beforeEach, expect, it } from "vitest";
+import type { FactStore } from "../src/store/types.js";
 import { watchTick } from "../src/watch/tick.js";
-import type { MemoryClient } from "../src/memory/client-types.js";
 import { HOUR, T0, harness, item, startMemory } from "./watch-harness.js";
-import type { MockAbagraph } from "./mock-abagraph.js";
 
-let mock: MockAbagraph;
-let client: MemoryClient;
+let cleanup: () => Promise<void>;
+let client: FactStore;
 
 beforeEach(async () => {
-	({ mock, client } = await startMemory());
+	({ store: client, cleanup } = await startMemory());
 });
 
 afterEach(async () => {
-	await mock.close();
+	await cleanup();
 });
 
 it("works the oldest item and cleans up its worktree", async () => {
-	const h = harness(client, );
+	const h = harness(client);
 	h.items = [item("new", "2026-08-10T21:00:00Z"), item("old", "2026-08-01T09:00:00Z")];
 	const r = await watchTick(h.deps);
 	expect(r.status).toBe("ran");
@@ -25,7 +24,7 @@ it("works the oldest item and cleans up its worktree", async () => {
 });
 
 it("never works the same item twice in a night — the cooldown holds it", async () => {
-	const h = harness(client, );
+	const h = harness(client);
 	h.items = [item("pr-1", "2026-08-01T09:00:00Z")];
 	await watchTick(h.deps);
 	h.now = T0 + HOUR;
@@ -35,9 +34,9 @@ it("never works the same item twice in a night — the cooldown holds it", async
 });
 
 it("records the attempt before running, so a crash still leaves a cooldown", async () => {
-	const h = harness(client, );
+	const h = harness(client);
 	h.items = [item("pr-boom", "2026-08-01T09:00:00Z")];
-	h.result = { outcome: "error", runId: "throw" };
+	h.explodes = true;
 	const r = await watchTick(h.deps);
 	// The thrown run is caught and recorded, not propagated.
 	expect(r.outcome).toBe("error");

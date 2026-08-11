@@ -5,7 +5,6 @@
  */
 import { CLIENT_ATTENTION_JS } from "./client-attention.js";
 import { CLIENT_BOOT_JS } from "./client-boot.js";
-import { CLIENT_BRAIN_JS } from "./client-brain.js";
 import { CLIENT_CHAT_JS } from "./client-chat.js";
 import { CLIENT_CHAT_STREAM_JS } from "./client-chat-stream.js";
 import { CLIENT_CORE_JS } from "./client-core.js";
@@ -13,6 +12,7 @@ import { CLIENT_CURSOR_JS } from "./client-cursor.js";
 import { CLIENT_DETAIL_JS } from "./client-detail.js";
 import { CLIENT_DOCS_JS } from "./client-docs.js";
 import { CLIENT_FILE_JS } from "./client-file.js";
+import { CLIENT_FILE_PEEK_JS } from "./client-file-peek.js";
 import { CLIENT_FIND_JS } from "./client-find.js";
 import { CLIENT_FIND_ROWS_JS } from "./client-find-rows.js";
 import { CLIENT_FIND_STATE_JS } from "./client-find-state.js";
@@ -43,11 +43,11 @@ export const CLIENT_JS =
 	CLIENT_MD_JS +
 	CLIENT_DOCS_JS +
 	CLIENT_FILE_JS +
+	CLIENT_FILE_PEEK_JS +
 	CLIENT_FIND_STATE_JS +
 	CLIENT_FIND_JS +
 	CLIENT_FIND_ROWS_JS +
 	CLIENT_PROJECT_JS +
-	CLIENT_BRAIN_JS +
 	CLIENT_CHAT_JS +
 	CLIENT_CHAT_STREAM_JS +
 	CLIENT_CURSOR_JS +

@@ -4,26 +4,29 @@ import { afterEach, beforeEach, expect, test } from "vitest";
 import { goalCmd } from "../src/cli/goal-cmd.js";
 import { assistantText } from "../src/provider/fake.js";
 import { repoSlug } from "../src/session/paths.js";
+import { createFactStore } from "../src/store/store.js";
+import type { Fact } from "../src/store/types.js";
 import { capture, SLOW } from "./cli2-helpers.js";
-import { setupTestHome, teardownTestHome, writeHomeConfig } from "./helpers.js";
-import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
+import { setupTestHome, teardownTestHome } from "./helpers.js";
 
 let repo: string;
-let mock: MockAbagraph;
 let ns: string;
 
 beforeEach(async () => {
 	repo = await setupTestHome("ah-goal-");
-	mock = await startMockAbagraph();
 	ns = `repo:${repoSlug(repo)}`;
-	// Transport goes in ~/.ah/config.json: a repo's .ah.json may not choose
-	// which abagraph server ah talks to (src/config/config.ts).
-	await writeHomeConfig({ memory: { enabled: true, baseUrl: mock.url } });
 }, SLOW);
-afterEach(async () => {
+afterEach(() => {
 	teardownTestHome();
-	await mock.close();
 }, SLOW);
+
+/**
+ * The graph goalCmd actually wrote. It opens the store under the test's own
+ * AH_HOME, which is where the command's own default store lives.
+ */
+async function graph(): Promise<Fact[]> {
+	return createFactStore().query(ns, { limit: 500 });
+}
 
 /** Planner reply: two tasks, B depends on A. */
 const plan = {
@@ -55,7 +58,7 @@ test("plans, writes the graph, executes tasks in dependency order, ends done", a
 	expect(cap.text()).toContain("plan: Ship it");
 	expect(cap.text()).toContain("goal done");
 
-	const active = mock.dump(ns).filter((f) => f.status === "active");
+	const active = await graph();
 	const status = (subjPrefix: string) =>
 		active
 			.filter((f) => f.subject.startsWith(subjPrefix) && f.predicate === "status")
@@ -91,7 +94,7 @@ test("--dry plans and prints the graph but writes nothing", async () => {
 	expect(outcome).toBe("completed");
 	expect(cap.text()).toContain("plan: Ship it");
 	expect(cap.text()).toContain("task B");
-	expect(mock.dump(ns)).toHaveLength(0);
+	expect(await graph()).toEqual([]);
 }, SLOW);
 
 test("a failing task marks it failed and stops the goal", async () => {
@@ -102,15 +105,8 @@ test("a failing task marks it failed and stops the goal", async () => {
 	const cap = capture();
 	const outcome = await goalCmd({ goal: "ship it", repo, fake: script, quiet: true, out: cap.out });
 	expect(outcome).toBe("error");
-	const active = mock.dump(ns).filter((f) => f.status === "active" && f.predicate === "status");
+	const active = (await graph()).filter((f) => f.predicate === "status");
 	const tasks = active.filter((f) => f.subject.startsWith("Task:")).map((f) => f.object);
 	expect(tasks.sort()).toEqual(["failed", "pending"]); // B never ran
 	expect(cap.text()).toContain("failed");
-}, SLOW);
-
-test("goal requires a live memory client", async () => {
-	await writeFile(join(repo, ".ah.json"), JSON.stringify({ memory: { enabled: false } }));
-	await expect(
-		goalCmd({ goal: "anything", repo, quiet: true, out: capture().out }),
-	).rejects.toThrow(/abagraph memory server/);
 }, SLOW);

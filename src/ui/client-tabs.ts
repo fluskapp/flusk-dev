@@ -1,32 +1,31 @@
 /**
- * The editor tab strip. Four pinned tabs are the panels (Attention, Runs,
- * Docs, Brain); project, run, doc and file tabs open on top of them and close
+ * The editor tab strip. Three pinned tabs are the panels (Attention, Runs,
+ * Docs); project, run, doc and file tabs open on top of them and close
  * again. Each carries a kind glyph — md / run / session / doc / find — one is
  * active with a 2px accent underline, and a breadcrumb under the strip says
  * where the active one lives: project › area › file.
  */
 export const CLIENT_TABS_JS = `
 var VIEW_OF = {
-	attention: "#overview", runs: "#runs", docs: "#docs", brain: "#brain",
+	attention: "#overview", runs: "#runs", docs: "#docs",
 	project: "#project", run: "#run", doc: "#doc", file: "#file",
 };
 var PINNED = [
 	{ id: "attention", kind: "attention", label: "Attention" },
 	{ id: "runs", kind: "runs", label: "Runs" },
 	{ id: "docs", kind: "docs", label: "Docs" },
-	{ id: "brain", kind: "brain", label: "Brain" },
 ];
 var PANEL_BTN = {
-	attention: "#overview-btn", runs: "#runs-btn", docs: "#docs-btn", brain: "#brain-btn",
+	attention: "#overview-btn", runs: "#runs-btn", docs: "#docs-btn",
 };
 /** The glyph vocabulary; the Find tool window's header uses "find" too. */
 var TAB_GLYPH = {
-	attention: "att", runs: "run", docs: "doc", brain: "mem",
+	attention: "att", runs: "run", docs: "doc",
 	project: "prj", find: "find",
 };
 /** Which area of the workbench a tab belongs to — the middle breadcrumb. */
 var TAB_AREA = {
-	attention: "Attention", runs: "Runs", docs: "Docs", brain: "Brain",
+	attention: "Attention", runs: "Runs", docs: "Docs",
 	project: "Projects", run: "Runs", doc: "Docs", file: "Files",
 };
 
@@ -112,7 +111,6 @@ function loadView(t) {
 	if (t.kind === "attention") loadAttention();
 	else if (t.kind === "runs") loadRuns();
 	else if (t.kind === "docs") loadDocs();
-	else if (t.kind === "brain") loadBrain();
 	else if (t.kind === "project") loadProject(t.ref);
 	else if (t.kind === "run") loadRun(t.ref);
 	else if (t.kind === "doc") loadDoc(t.ref);

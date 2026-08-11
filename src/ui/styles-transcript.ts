@@ -96,8 +96,15 @@ export const TRANSCRIPT_CSS = `
 .code {
 	margin: 0; padding: var(--ij-space) var(--ij-space-3); background: var(--code-bg);
 	border-top: 1px solid var(--border); overflow-x: auto;
-	max-height: calc(var(--ij-row-h) * 14);
 }
+/* The height cap belongs to the TRANSCRIPT, not to the .code class. Tool
+   output there is an excerpt and a 400-line dump would bury the next turn --
+   but .code is also what the markdown renderer, the doc window's signature
+   and the file editor emit, and an editor that can only ever show 19 lines is
+   not an editor. Unscoped, this rule clipped every one of them; markdown had
+   already grown a max-height:none patch to escape it. Scope it instead, so
+   the next surface that renders code does not have to discover this. */
+#transcript .code { max-height: calc(var(--ij-row-h) * 14); }
 .code.out { color: var(--text); }
 .pad { padding: var(--ij-space-1) var(--ij-space-3); }
 

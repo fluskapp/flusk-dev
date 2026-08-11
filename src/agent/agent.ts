@@ -5,7 +5,6 @@ import { runLoop } from "../core/loop.js";
 import { SteeringQueue } from "../core/steering.js";
 import type { Limits } from "../core/stop.js";
 import type { Msg } from "../core/types.js";
-import { noopMemory } from "../memory/port.js";
 import { BudgetTracker } from "../safety/budget.js";
 import { checkpoint } from "../safety/git-isolation.js";
 import { allowAllPolicy } from "../safety/policy.js";
@@ -28,7 +27,6 @@ const MAX_SUBAGENT_DEPTH = 2;
 const MUTATING_TOOLS = new Set(["write", "edit", "bash", "task"]);
 
 export function createAgent(opts: CreateAgentOpts): Agent {
-	const memory = opts.memory ?? noopMemory;
 	const policy = opts.policy ?? allowAllPolicy;
 	const events = opts.events ?? createEventBus();
 	const config = opts.config ?? DEFAULT_CONFIG;
@@ -42,7 +40,7 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 		opts.budget ?? new BudgetTracker({ maxCostUsd: config.budgets.maxCostUsd, deadlineMs }, now());
 
 	const registry = new ToolRegistry();
-	for (const tool of [...opts.tools, ...memory.tools()]) registry.register(tool);
+	for (const tool of opts.tools) registry.register(tool);
 
 	const isResume = opts.sessionPath !== undefined;
 	const session =
@@ -108,7 +106,6 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 		registry,
 		session,
 		events,
-		memory,
 		steering,
 		baseSystem: buildSystemPrompt({
 			repoRoot: opts.repoRoot,

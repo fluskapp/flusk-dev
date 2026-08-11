@@ -25,12 +25,6 @@ export const DEFAULT_CONFIG: AhConfig = {
 	},
 	memory: {
 		enabled: true,
-		baseUrl: "http://127.0.0.1:7777",
-		apiKey: null,
-		autoSpawn: false,
-		serverBin: null,
-		dataDir: null,
-		budgets: { repo: 2000, lessons: 1000 },
 	},
 	verify: {
 		retries: 3,
@@ -42,6 +36,19 @@ export const DEFAULT_CONFIG: AhConfig = {
 	},
 	chat: {
 		backends: [],
+	},
+	doc: {
+		enabled: true,
+		// Ships EMPTY on purpose: TypeScript and JavaScript are answered by the
+		// bundled compiler-API engine with nothing installed, and no language
+		// server is ever spawned unless you name it here AND it is on PATH.
+		// The obvious additions, once you have the binaries:
+		//   { id: "rust-analyzer", command: "rust-analyzer", extensions: [".rs"] }
+		//   { id: "pyright", command: "pyright-langserver", args: ["--stdio"],
+		//     extensions: [".py"] }
+		//   { id: "gopls", command: "gopls", extensions: [".go"] }
+		servers: [],
+		maxFiles: 50,
 	},
 	watch: {
 		queues: ["gh-prs", "gh-failing-ci"],

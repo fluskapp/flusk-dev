@@ -9,7 +9,7 @@ import {
 	fakeModel as model,
 	pingTool,
 	setupTestHome,
-	spyMemory,
+	spyRunEnds,
 	teardownTestHome,
 } from "./helpers.js";
 
@@ -45,16 +45,15 @@ test("cost breach injects one wrap-up turn then ends with reason budget", async 
 		c.budgets.maxCostUsd = 0.0005;
 	});
 	const provider = new FakeProvider([toolTurn("c1"), { message: assistantText("wrapped up") }]);
-	const { memory, postRuns } = spyMemory();
 	const agent = createAgent({
 		provider,
 		model,
 		tools: [pingTool],
-		memory,
 		task: "t",
 		repoRoot: repo,
 		config: cfg,
 	});
+	const ends = spyRunEnds(agent.events);
 	const { reason, stats } = await agent.run();
 	expect(reason).toBe("budget");
 	expect(stats.turns).toBe(2);
@@ -69,7 +68,7 @@ test("cost breach injects one wrap-up turn then ends with reason budget", async 
 		),
 	).toBe(false);
 	expect(statsReason(agent)).toBe("budget");
-	expect(postRuns[0]?.outcome).toBe("budget");
+	expect(ends[0]).toBe("budget");
 	agent.session.close();
 });
 
@@ -86,8 +85,10 @@ test("the wrap-up turn ends the run even if the model still calls tools", async 
 		repoRoot: repo,
 		config: cfg,
 	});
+	const ends = spyRunEnds(agent.events);
 	const { reason, stats } = await agent.run();
 	expect(reason).toBe("budget");
+	expect(ends).toEqual(["budget"]);
 	expect(stats.turns).toBe(2);
 	expect(provider.requests).toHaveLength(2); // turn 3 never runs
 	agent.session.close();

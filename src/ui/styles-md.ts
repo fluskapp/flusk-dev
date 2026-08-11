@@ -61,12 +61,10 @@ export const MD_CSS = `
 /* EditorPane.splitBorder, which the dark theme names and the light one leaves
    to the separator both themes share. */
 .ed-body.split > .raw { border-right: 1px solid var(--border); }
-/* .code caps a transcript's tool output at 340px; a document is not that. */
 .ed-body > .raw {
 	margin: 0; white-space: pre-wrap; overflow-wrap: anywhere;
-	background: var(--code-bg); max-height: none; border-top: none;
+	background: var(--code-bg); border-top: none;
 }
-.md pre.code { max-height: none; }
 /* The run view is already padded, and its toolbar bleeds to the tab strip. */
 #run .ed-bar {
 	margin: calc(var(--ij-space-2) * -1) calc(var(--ij-space-4) * -1) var(--ij-space-2);

@@ -46,13 +46,15 @@ versus what is roadmap.
   tail). Best-effort: a summarize failure never takes the run down.
 
 - **`src/agent`** — assembly. `agent.ts` wires provider, tools, policy,
-  session, budget, compaction, and memory into a runnable `Agent`;
+  session, budget and compaction into a runnable `Agent`;
   `subagent.ts` spawns depth-capped child agents sharing the parent's
   budget; `system-prompt.ts` builds the base system prompt.
 
-- **`src/memory`** — today, only the seam. `port.ts` defines `MemoryPort`
-  and ships `noopMemory`. The abagraph-backed implementation (Phase 3) is
-  injected here; core never imports the abagraph SDK.
+- **`src/store`** — the local bitemporal fact store: one append-only JSONL
+  log per namespace, visibility computed on every read, compare-and-swap
+  guards on write. `types.ts` is the frozen `FactStore` contract; goals,
+  watch and verify are built above it and nothing below it grows a third
+  method.
 
 - **`src/ui`** — `ah ui`, a loopback-only HTTP dashboard (IntelliJ-styled)
   over the session files: run list, transcript detail, reveal-in-Finder.
@@ -69,7 +71,7 @@ versus what is roadmap.
 ## The contracts
 
 Frozen files: `core/types.ts`, `core/events.ts`, `provider/provider.ts`,
-`tools/tool.ts`, `safety/policy.ts`, `memory/port.ts`, `session/entries.ts`,
+`tools/tool.ts`, `safety/policy.ts`, `store/types.ts`, `session/entries.ts`,
 `config/types.ts`. Changes to these are architecture decisions, not drive-by
 edits.
 
@@ -82,15 +84,14 @@ edits.
   runs sequentially in call order; otherwise calls run concurrently. Results
   are always appended in the original call order, one result per call, even
   on abort.
-- **MemoryPort is the brain seam.** `preTurn` may inject a memory block on
-  the first turn and on resume (null otherwise); `postRun` is called exactly
-  once after `run:end` regardless of outcome, with the run's evidence trail
-  (files touched, commands run, transcript tail); `tools()` contributes
-  memory tools. Core ships `noopMemory` and never imports the abagraph SDK.
+- **`run:end` fires exactly once**, whatever the outcome. It is where the
+  run is closed out: the CLI collects the evidence trail off the same bus
+  (`src/core/run-record.ts` — files touched, commands run) and the gate turns
+  it into the run's facts of record.
 - **Sessions are append-only JSONL** — header, message, compaction, and
   stats entries, fsynced per append; a torn final line is dropped on read.
-  Format: `src/session/entries.ts`. Fact vocabulary for the Phase 3 memory:
-  `docs/vocabulary.md`.
+  Format: `src/session/entries.ts`. The predicates the harness may assert:
+  `src/store/facts.ts`.
 
 ## Safety model (4 layers)
 
@@ -119,24 +120,22 @@ budget, so children cannot multiply spend.
 - **Phase 2 — done.** The real provider adapter (pi-ai catalog) with model
   routing, the full safety stack (classification, path jail, git isolation,
   budgets), context compaction, subagents, config loading, and resume.
-- **Phase 3 — done.** The abagraph-backed `MemoryPort`: bitemporal facts
-  (repo conventions, verify commands, cross-repo lessons — see
-  `docs/vocabulary.md`), the verification gate (detected verify commands,
-  retry-with-evidence, then claim-checking the run's own report), and
-  goal/task graphs worked across sessions. Server behavior this depends on
-  is written down in `docs/abagraph-notes.md` — read it before changing the
-  transport.
+- **Phase 3 — done.** The local fact store: bitemporal facts (goal graphs,
+  the attempt ledger, a run's facts of record — the predicate table lives in
+  `src/store/facts.ts`), the verification gate (detected verify commands,
+  retry-with-evidence, then checking the run's own report against what the
+  harness observed), and goal/task graphs worked across sessions.
 - **Phase 4 — done.** `ah watch`: the unattended queue loop over open PRs
   and failing CI, worktree-per-item isolation, a fact-based attempt ledger
-  with quadratic backoff, nightly caps, opt-in publishing, and lesson
-  promotion gated on an `ALLOW` verdict (`src/watch/`).
+  with quadratic backoff, nightly caps, and opt-in publishing (`src/watch/`).
 
 ### Known gaps
 
+- Nothing generalizes a run's experience beyond its own repository. Every
+  fact ah writes belongs to one namespace, and no step reads a finished run
+  and proposes a lesson from it, so what one repo learns stays there.
 - The Phase 3 adversarial review was cut short; the goal scheduler's edge
   cases and the gate's retry semantics have had less hostile scrutiny than
   the safety layer did.
-- Memory is exercised against a mock that mirrors the abagraph source. There
-  is no test against a live abagraph binary.
 - `ah watch` queues are GitHub-only (`gh`); other sources mean writing a
   poller returning `WorkItem[]`.

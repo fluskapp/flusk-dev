@@ -3,13 +3,15 @@
  * loop from retrying the same item forever. Attempts are recorded BEFORE the
  * run, so a crash mid-run still leaves a cooldown behind.
  *
- * `cooldown_until` is transient with a TTL, so abagraph's sweeper eventually
- * deletes it — but expiry is decided by comparing the stored timestamp, never
- * by the fact's mere presence (the sweep is not instant).
+ * `cooldown_until` is transient with a TTL, so a sweeper may eventually delete
+ * the row — but expiry is decided by comparing the stored timestamp, never by
+ * the fact's mere presence (the sweep is not instant).
  */
-import type { MemoryClient } from "../memory/client-types.js";
-import { watchFact } from "../memory/facts.js";
-import { AH_NS } from "../memory/namespaces.js";
+
+import { watchFact } from "../store/facts.js";
+import { AH_NS } from "../store/namespaces.js";
+import type { FactStore } from "../store/types.js";
+import { NO_LIMIT } from "../store/visibility.js";
 
 const HOUR_MS = 3_600_000;
 
@@ -26,15 +28,15 @@ export function cooldownUntil(
 
 /** True while the item is resting. Unparseable timestamps count as expired. */
 export async function isCoolingDown(
-	client: MemoryClient,
+	store: FactStore,
 	key: string,
 	nowMs: number,
 ): Promise<boolean> {
-	// `as_of` is required, not an optimization: cooldown facts carry a
-	// `valid_until`, and abagraph's DEFAULT read only returns facts with none
-	// (core/match.rs), so a plain query finds nothing and every item would
-	// look eligible on every tick — a retry storm.
-	const facts = await client.query(AH_NS, {
+	// `asOf` is the tick's own clock, not an optimization: a cooldown fact
+	// carries a `validUntil`, and the store stops returning it the instant that
+	// passes. Reading at `nowMs` is what makes "still resting" and "still
+	// visible" the same question on a tick whose clock is not wall time.
+	const facts = await store.query(AH_NS, {
 		subject: `Item:${key}`,
 		predicate: "cooldown_until",
 		asOf: nowMs,
@@ -46,8 +48,8 @@ export async function isCoolingDown(
 }
 
 /** Past attempts that did not finish cleanly — drives the backoff exponent. */
-export async function failureCount(client: MemoryClient, key: string): Promise<number> {
-	const facts = await client.query(AH_NS, {
+export async function failureCount(store: FactStore, key: string): Promise<number> {
+	const facts = await store.query(AH_NS, {
 		subject: `Item:${key}`,
 		predicate: "failure_count",
 	});
@@ -57,12 +59,12 @@ export async function failureCount(client: MemoryClient, key: string): Promise<n
 
 /** Claim the item before working it: attempt + cooldown in one transact. */
 export async function recordAttempt(
-	client: MemoryClient,
+	store: FactStore,
 	key: string,
 	nowMs: number,
 	untilIso: string,
 ): Promise<void> {
-	await client.transact(AH_NS, [
+	await store.transact(AH_NS, [
 		watchFact.attemptedAt(key, new Date(nowMs).toISOString()),
 		watchFact.cooldownUntil(key, untilIso),
 	]);
@@ -70,24 +72,24 @@ export async function recordAttempt(
 
 /** Records the outcome and, on failure, advances the backoff counter. */
 export async function recordOutcome(
-	client: MemoryClient,
+	store: FactStore,
 	key: string,
 	outcome: string,
 	priorFailures = 0,
 ): Promise<void> {
-	await client.transact(AH_NS, [watchFact.outcome(key, outcome)]);
+	await store.transact(AH_NS, [watchFact.outcome(key, outcome)]);
 	if (outcome !== "completed") {
-		await client.transact(AH_NS, [watchFact.failureCount(key, priorFailures + 1)]);
+		await store.transact(AH_NS, [watchFact.failureCount(key, priorFailures + 1)]);
 	}
 }
 
 /** Re-stamp the cooldown after a failure so the backoff reflects the new count. */
 export async function extendCooldown(
-	client: MemoryClient,
+	store: FactStore,
 	key: string,
 	untilIso: string,
 ): Promise<void> {
-	await client.transact(AH_NS, [watchFact.cooldownUntil(key, untilIso)]);
+	await store.transact(AH_NS, [watchFact.cooldownUntil(key, untilIso)]);
 }
 
 /**
@@ -101,28 +103,33 @@ export function nightKey(nowMs: number): string {
 	return local.toISOString().slice(0, 10);
 }
 
-export async function nightCount(client: MemoryClient, date: string): Promise<number> {
-	const facts = await client.query(AH_NS, {
+/**
+ * How many runs the night has spent: one coexisting row per run, counted.
+ * Uncapped, because a night whose rows fell off the end of a page would read
+ * as a fresh night and spend the cap again.
+ */
+export async function nightCount(store: FactStore, date: string): Promise<number> {
+	const facts = await store.query(AH_NS, {
 		subject: `Night:${date}`,
-		predicate: "runs_count",
+		predicate: "run",
+		limit: NO_LIMIT,
 	});
-	const n = Number(facts[0]?.object ?? "0");
-	return Number.isFinite(n) ? n : 0;
+	return facts.length;
 }
 
 /**
- * Guarded increment: two watchers reading the same count would otherwise both
- * write n+1 and quietly double the night's cap. A lost race throws
- * (CompareFailed), which the caller treats as "someone else took this slot".
+ * Take a slot in the night's budget. Two watchers racing here both write their
+ * own row and both are counted; an increment of a shared counter would have
+ * lost one of them, and no compare could have guarded the first write of a
+ * night because there is no prior value to compare against.
  */
-export async function bumpNightCount(
-	client: MemoryClient,
+export async function recordNightRun(
+	store: FactStore,
 	date: string,
-	current: number,
+	itemKey: string,
+	nowMs: number,
 ): Promise<void> {
-	const compares =
-		current === 0
-			? undefined // no prior fact to guard against on the first run of a night
-			: [{ subject: `Night:${date}`, predicate: "runs_count", object: String(current) }];
-	await client.transact(AH_NS, [watchFact.runsCount(date, current + 1)], compares);
+	await store.transact(AH_NS, [
+		watchFact.nightRun(date, `${itemKey}@${new Date(nowMs).toISOString()}`),
+	]);
 }

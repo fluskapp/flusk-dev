@@ -1,5 +1,4 @@
 import { maybeCompact } from "../compaction/compact.js";
-import type { MemoryPort } from "../memory/port.js";
 import type { Provider } from "../provider/provider.js";
 import type { Session } from "../session/session.js";
 import type { ToolRegistry } from "../tools/registry.js";
@@ -16,7 +15,6 @@ export interface TurnDeps {
 	registry: ToolRegistry;
 	session: Session;
 	events: EventBus;
-	memory: MemoryPort;
 	steering: SteeringQueue;
 	baseSystem: string;
 	toolCtx: ToolContext;
@@ -24,7 +22,7 @@ export interface TurnDeps {
 	runId: string;
 	repoPath: string;
 	task: string;
-	/** Goal this run serves, if any; forwarded into MemoryPort.preTurn. */
+	/** Goal this run serves, if any. */
 	goalId?: string;
 	isResume: boolean;
 	/** Enables context compaction; absent = never compact (bare test loops). */
@@ -51,15 +49,6 @@ export async function runTurn(deps: TurnDeps, state: TurnState): Promise<RunEndR
 	for (const msg of deps.steering.drain()) {
 		record(deps, state, msg);
 	}
-	const preTurnText = await deps.memory.preTurn({
-		runId: deps.runId,
-		repoPath: deps.repoPath,
-		task: deps.task,
-		goalId: deps.goalId,
-		isFirstTurn: state.turn === 1,
-		isResume: deps.isResume,
-	});
-	const system = preTurnText === null ? deps.baseSystem : `${deps.baseSystem}\n\n${preTurnText}`;
 	await deps.events.emit({ type: "turn:start", turn: state.turn });
 	if (deps.compaction) {
 		// Best-effort: a compaction failure must never take the run down.
@@ -83,7 +72,7 @@ export async function runTurn(deps: TurnDeps, state: TurnState): Promise<RunEndR
 	let message: AssistantMsg | undefined;
 	const req = {
 		model: deps.model,
-		system,
+		system: deps.baseSystem,
 		messages: [...state.context],
 		tools: deps.registry.schemas(),
 	};

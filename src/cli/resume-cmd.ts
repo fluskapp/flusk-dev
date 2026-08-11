@@ -3,11 +3,12 @@ import { join } from "node:path";
 import { createAgent } from "../agent/agent.js";
 import { loadConfig, loadRepoConfig } from "../config/config.js";
 import { createEventBus } from "../core/events.js";
-import { createMemory } from "../memory/bootstrap.js";
+import { resolveNamespace } from "../store/namespaces.js";
 import { FakeProvider } from "../provider/fake.js";
 import { hasAuth, PiAiProvider } from "../provider/pi-ai.js";
 import { createAhPolicy } from "../safety/ah-policy.js";
 import { SessionStore } from "../session/store.js";
+import { createFactStore } from "../store/store.js";
 import { sessionsRoot } from "../ui/scan.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import { attachRenderer } from "./render.js";
@@ -82,7 +83,10 @@ export async function resumeCmd(opts: ResumeCmdOpts): Promise<CliOutcome> {
 			`warning: ${header.repoRoot} is on ${branch ?? "a detached HEAD"} but the session ran on ${header.gitBranch}\n`,
 		);
 	}
-	const mem = await createMemory(cfg, header.repoRoot, repoConfig, opts.quiet === true ? () => {} : undefined);
+	// `memory.enabled: false` is a request to leave no trace: the gate still
+	// runs, it just has nowhere to write the run's facts of record.
+	const ns = resolveNamespace(header.repoRoot, repoConfig);
+	const store = cfg.memory.enabled ? createFactStore() : null;
 	const events = createEventBus();
 	if (opts.quiet !== true) attachRenderer(events, out);
 	const agent = createAgent({
@@ -91,7 +95,6 @@ export async function resumeCmd(opts: ResumeCmdOpts): Promise<CliOutcome> {
 		tools: DEFAULT_TOOLS,
 		task: header.task,
 		repoRoot: header.repoRoot,
-		memory: mem.port,
 		policy: createAhPolicy({ config: cfg, repoRoot: header.repoRoot }),
 		events,
 		config: cfg,
@@ -103,8 +106,8 @@ export async function resumeCmd(opts: ResumeCmdOpts): Promise<CliOutcome> {
 			cfg,
 			repoRoot: header.repoRoot,
 			repoConfig,
-			client: mem.client,
-			ns: mem.ns,
+			store,
+			ns,
 			out,
 			noVerify: opts.noVerify === true,
 		});

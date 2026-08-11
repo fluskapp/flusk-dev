@@ -60,7 +60,6 @@ export async function runSubagent(ctx: SpawnCtx, task: string, kind?: string): P
 		tools: ctx.parent.tools,
 		task,
 		repoRoot: ctx.parent.repoRoot,
-		memory: ctx.parent.memory,
 		policy: ctx.parent.policy,
 		limits: ctx.parent.limits,
 		config: ctx.parent.config,

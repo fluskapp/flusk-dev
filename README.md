@@ -4,11 +4,9 @@ An autonomous coding agent that owns its whole loop.
 
 ah is not a wrapper around another agent CLI. It runs its own
 turn/tool/session engine, keeps every run on an isolated git branch with
-per-turn checkpoints, and is built around a memory seam that will bind it to
-[abagraph](https://github.com/adirbenyossef/abagraph) — so what it learns
-about your repos (conventions, verify commands, cross-repo lessons, goal
-graphs) persists as bitemporal facts instead of evaporating with the context
-window.
+per-turn checkpoints, and writes what it learns about your repos (verify
+commands, cross-repo lessons, goal graphs, the unattended ledger) to a local
+bitemporal fact store, so that knowledge outlives the context window.
 
 Design goals:
 
@@ -41,8 +39,10 @@ instead, which is how the demo and the whole test suite run without a key or a
 network. `--dry` composes and prints the prompt, model, and isolation plan
 without calling anything.
 
-Memory is optional: with no abagraph reachable, `ah run` prints one warning
-and proceeds without it. `ah watch` is the exception and requires it.
+The fact store is local files under `~/.ah/store` — no server, nothing to
+reach. Setting `memory.enabled: false` is a request to leave no trace: `ah run`
+and `ah resume` proceed and record nothing, while `ah goal` and `ah watch`,
+whose subject matter IS the stored state, refuse to start.
 
 ## Commands
 
@@ -74,10 +74,7 @@ ah ui [--port <n>] [--no-open]
   harnesses' run journals, read from the `docs/runs/*.md` files they already
   write, so a watch autopilot can be followed here; **Docs** (`d`) — every
   markdown file across your projects (context files, plans, skills, docs)
-  with a rendered preview; and **Brain** (`b`) — what ah knows about a repo:
-  goal graphs, lessons and the unattended ledger from abagraph when it is
-  reachable, plus knowledge derived from ah's own sessions (files it edits,
-  commands it runs, recent failures) which is always available.
+  with a rendered preview.
 
   Configure what is indexed with `ui.harnessDirs` and `ui.projectDirs` in
   `~/.ah/config.json`; both default to `~/projects/*` and
@@ -87,8 +84,8 @@ ah ui [--port <n>] [--no-open]
 - **`ah resume <path-or-id>`** — continue a stopped or crashed session,
   repairing any tool call left dangling by the interruption. `--steer` adds
   a new instruction on the way back in.
-- **`ah goal <text>`** — decompose a goal into a task graph stored in
-  abagraph, then work the frontier task by task across sessions.
+- **`ah goal <text>`** — decompose a goal into a task graph stored in the
+  fact store, then work the frontier task by task across sessions.
 - **`ah watch`** — unattended queue mode (see below).
 - **`ah feedback good|bad`** — score the last run's model for its task kind;
   routing learns from it.
@@ -170,8 +167,8 @@ See [`docs/architecture.md`](docs/architecture.md) for the module map,
 contracts, and roadmap. The short version: `core` (loop/turns/dispatch),
 `provider` (model port; only `provider/pi-ai*.ts` may import the pi-ai SDK),
 `tools`, `safety`, `session` (JSONL), `compaction`, `agent` (assembly),
-`memory` (the abagraph seam), `verify`, `goals`, `watch`, `ui`, `config`,
-`cli`. Two contracts
+`store` (the bitemporal fact store), `verify`, `goals`, `watch`, `ui`,
+`config`, `cli`. Two contracts
 worth knowing everywhere: providers never throw (failures are messages with
 `stopReason: "error"`), and tools throw while the dispatcher converts throws
 into model-visible error results.
@@ -190,25 +187,20 @@ just attempted is resting on a cooldown, and a failing one backs off
 quadratically, so the loop can never storm the same item. Nightly run counts,
 per-run cost, and wall-clock are all capped.
 
-Memory is **required** here — the ledger lives in abagraph, and without it
-there is nothing stopping a retry loop. `ah watch` refuses to start rather
-than run unbounded.
+The ledger is **required** here — without it there is nothing stopping a retry
+loop. With `memory.enabled: false`, `ah watch` refuses to start rather than run
+unbounded, and so does `ah goal`, whose task graph is itself stored facts.
 
 Pushing is **off by default** (`watch.push`): a night's work stays on local
 branches for you to review. Turn it on to have ah push and open PRs.
 
-Lessons graduate from a repo's namespace into the shared `lessons` namespace
-only when the producing run passed verification with an `ALLOW` verdict — an
-unverified guess never becomes cross-repo advice.
-
 ## Status
 
 Phases 1–4 are in the tree: the engine (loop, tools, sessions, dashboard), the
-real provider stack (routing, safety, compaction, subagents, resume), abagraph
-memory with the verification gate and goal graphs, and unattended `ah watch`
-with lesson promotion. See [`docs/architecture.md`](docs/architecture.md) for
-the module map and [`docs/abagraph-notes.md`](docs/abagraph-notes.md) for the
-server behavior the memory layer depends on.
+real provider stack (routing, safety, compaction, subagents, resume), the fact
+store with the verification gate and goal graphs, and unattended `ah watch`.
+Nothing yet carries what a run learns from one repository to another. See
+[`docs/architecture.md`](docs/architecture.md) for the module map.
 
 ## License
 

@@ -4,8 +4,8 @@ import { join } from "node:path";
 import { ahHome } from "../src/session/paths.js";
 import { Type } from "typebox";
 import { createAgent } from "../src/agent/agent.js";
-import type { ModelRef, ToolResultMsg } from "../src/core/types.js";
-import type { MemoryPort, RunRecord } from "../src/memory/port.js";
+import type { EventBus } from "../src/core/events.js";
+import type { ModelRef, RunEndReason, ToolResultMsg } from "../src/core/types.js";
 import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
 import type { Tool } from "../src/tools/tool.js";
 
@@ -27,12 +27,9 @@ export function teardownTestHome(): void {
 }
 
 /**
- * Writes ~/.ah/config.json for the current AH_HOME.
- *
- * Memory TRANSPORT (baseUrl, apiKey, autoSpawn, serverBin, dataDir) belongs
- * here and nowhere else: loadConfig refuses those keys from a repo's own
- * .ah.json, because a cloned repo authors that file and could otherwise point
- * the client at a server of its choosing while inheriting the user's key.
+ * Writes ~/.ah/config.json for the current AH_HOME — the trusted layer.
+ * loadConfig refuses several keys from a repo's own .ah.json, because a cloned
+ * repo authors that file; a fixture that sets them has to set them here.
  */
 export async function writeHomeConfig(data: unknown): Promise<void> {
 	const home = ahHome();
@@ -70,18 +67,17 @@ export const pingTool: Tool = {
 	execute: async () => ({ output: "pong" }),
 };
 
-export function spyMemory(): { memory: MemoryPort; postRuns: RunRecord[] } {
-	const postRuns: RunRecord[] = [];
-	return {
-		postRuns,
-		memory: {
-			preTurn: async () => null,
-			postRun: async (run) => {
-				postRuns.push(run);
-			},
-			tools: () => [],
-		},
-	};
+/**
+ * Collects the reason of every run:end. The loop promises exactly one of these
+ * per run whatever the outcome, and every recorder downstream hangs off it, so
+ * the length of this array is how a test pins "the run was closed out once".
+ */
+export function spyRunEnds(events: EventBus): RunEndReason[] {
+	const reasons: RunEndReason[] = [];
+	events.on("run:end", (e) => {
+		reasons.push(e.reason);
+	});
+	return reasons;
 }
 
 /** Agent over a two-turn script: one tool-call batch, then a text wrap-up. */

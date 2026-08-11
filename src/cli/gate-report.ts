@@ -3,11 +3,11 @@
  * what the harness observed, then record the verdict for the audit trail.
  */
 import type { Agent } from "../agent/options.js";
-import type { MemoryClient } from "../memory/client-types.js";
-import { runFact } from "../memory/facts.js";
-import type { RunRecord } from "../memory/port.js";
+import type { RunRecord } from "../core/run-record.js";
+import type { FactStore } from "../store/types.js";
 import type { VerifyCommandResult } from "../verify/gate.js";
 import { checkReportText } from "../verify/report-check.js";
+import { runFact } from "../verify/run-facts.js";
 import type { GateOpts } from "./gate-loop.js";
 
 /** The agent's closing words — the only text the model authored. */
@@ -26,13 +26,17 @@ export function finalReport(agent: Agent): string {
 }
 
 /**
- * Check the report against what the harness observed, then record the verdict
- * in memory for the audit trail. Memory is the LEDGER here, not the judge:
- * asking it to confirm facts the harness itself just wrote is circular, and
- * its route answers missing evidence with WARN — see docs/review-findings.md.
+ * Check the report against what the harness observed, then record the run and
+ * the verdict for the audit trail. The store is the LEDGER here, not the
+ * judge: asking it to confirm facts the harness itself just wrote would be
+ * circular, so the verdict is decided from observations alone.
+ *
+ * These are the run's only facts of record, and each predicate needs its own
+ * transact, because one transact may not assert the same (subject, predicate)
+ * twice.
  */
 export async function claimCheck(
-	client: MemoryClient | null,
+	store: FactStore | null,
 	opts: GateOpts,
 	run: RunRecord,
 	results: VerifyCommandResult[],
@@ -43,18 +47,21 @@ export async function claimCheck(
 		filesTouched: run.filesTouched,
 		commandsRun: run.commandsRun,
 	});
-	// The verdict comes from observations alone, so it still applies when
-	// memory is down — gating this behind a live ledger would drop the check
-	// exactly when abagraph is unreachable, which is the common case.
-	if (client !== null) {
+	if (store !== null) {
 		try {
+			await store.transact(opts.ns, [runFact.outcome(run.runId, run.outcome)]);
 			for (const r of results) {
 				if (!r.skipped && r.exitCode === 0)
-					await client.transact(opts.ns, [runFact.verifiedBy(run.runId, r.cmd)]);
+					await store.transact(opts.ns, [runFact.verifiedBy(run.runId, r.cmd)]);
 			}
-			await client.transact(opts.ns, [runFact.reportCheck(run.runId, check.verdict)]);
-		} catch {
-			// An unreachable ledger must not change the verdict.
+			await store.transact(opts.ns, [runFact.reportCheck(run.runId, check.verdict)]);
+		} catch (e) {
+			// A ledger that will not accept the write must not change the
+			// verdict — but it must not pass for a clean run either. These are
+			// the run's only facts of record, and losing them silently leaves
+			// the CLI reporting a completion nothing can be checked against.
+			const detail = e instanceof Error ? e.message : String(e);
+			opts.out.write(`warning: this run was not recorded (${detail})\n`);
 		}
 	}
 	if (check.verdict === "BLOCK") {

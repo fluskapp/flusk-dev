@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"type": "module",
-	"description": "Autonomous coding agent with abagraph as its brain",
+	"description": "Autonomous coding agent that plans, edits and verifies its own work",
 	"license": "Apache-2.0",
 	"keywords": [
 		"agent",
@@ -30,14 +30,15 @@
 		"design": "bash scripts/check-design.sh"
 	},
 	"dependencies": {
-		"@abagraph/client": "^0.1.0",
 		"@earendil-works/pi-ai": "^0.84.1",
 		"typebox": "^1.1.24"
+	},
+	"optionalDependencies": {
+		"typescript": "^5.7.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.0",
 		"@types/node": "^24.0.0",
-		"typescript": "^5.7.0",
 		"vitest": "^3.0.0"
 	}
 }

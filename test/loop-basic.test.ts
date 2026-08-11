@@ -5,10 +5,10 @@ import { afterAll, beforeAll, expect, test } from "vitest";
 import { createAgent } from "../src/agent/agent.js";
 import type { AhEvent } from "../src/core/events.js";
 import type { ModelRef, ToolResultMsg } from "../src/core/types.js";
-import type { MemoryPort, RunRecord, TurnContext } from "../src/memory/port.js";
 import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
 import { Session } from "../src/session/session.js";
 import { readTool } from "../src/tools/read.js";
+import { spyRunEnds } from "./helpers.js";
 
 const model: ModelRef = { provider: "fake", id: "fake-1", contextWindow: 200_000 };
 const EVENT_TYPES: AhEvent["type"][] = [
@@ -48,26 +48,14 @@ test("full loop: read tool turn then completion", async () => {
 		},
 		{ message: assistantText("done") },
 	]);
-	const preTurns: TurnContext[] = [];
-	const postRuns: RunRecord[] = [];
-	const memory: MemoryPort = {
-		preTurn: async (ctx) => {
-			preTurns.push(ctx);
-			return ctx.isFirstTurn ? "<memory>this repo is called demo-pkg</memory>" : null;
-		},
-		postRun: async (run) => {
-			postRuns.push(run);
-		},
-		tools: () => [],
-	};
 	const agent = createAgent({
 		provider,
 		model,
 		tools: [readTool],
-		memory,
 		task: "read the package.json",
 		repoRoot: repo,
 	});
+	const ends = spyRunEnds(agent.events);
 	const seen: string[] = [];
 	for (const type of EVENT_TYPES) {
 		agent.events.on(type, () => {
@@ -104,19 +92,12 @@ test("full loop: read tool turn then completion", async () => {
 	expect(seen.indexOf("tool:start")).toBeLessThan(seen.indexOf("tool:end"));
 	expect(seen.indexOf("tool:end")).toBeLessThan(seen.indexOf("turn:end"));
 
-	// postRun called exactly once, with the full transcript tail.
-	expect(postRuns).toHaveLength(1);
-	expect(postRuns[0]?.outcome).toBe("completed");
-	expect(postRuns[0]?.sessionId).toBe(agent.session.id);
-	expect(postRuns[0]?.transcriptTail).toEqual(context);
+	// The run is closed out exactly once, carrying the outcome.
+	expect(ends).toEqual(["completed"]);
 
-	// preTurn text lands in the first request's system prompt only.
-	expect(preTurns).toHaveLength(2);
-	expect(preTurns[0]?.isFirstTurn).toBe(true);
-	expect(preTurns[1]?.isFirstTurn).toBe(false);
+	// One provider request per turn, each carrying the base system prompt.
 	expect(provider.requests).toHaveLength(2);
 	expect(provider.requests[0]?.system).toContain("You are ah, an autonomous coding agent.");
-	expect(provider.requests[0]?.system).toContain("<memory>this repo is called demo-pkg</memory>");
-	expect(provider.requests[1]?.system).not.toContain("<memory>");
+	expect(provider.requests[1]?.system).toBe(provider.requests[0]?.system);
 	agent.session.close();
 });

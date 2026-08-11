@@ -1,11 +1,8 @@
 import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { MemoryClient } from "../src/memory/client-types.js";
-import { createMemoryClient } from "../src/memory/client.js";
-import { detectVerifyCommands, persistVerifyCommands } from "../src/verify/detect.js";
-import { type MockAbagraph, startMockAbagraph } from "./mock-abagraph.js";
+import { describe, expect, it } from "vitest";
+import { detectVerifyCommands } from "../src/verify/detect.js";
 
 async function fixture(files: Record<string, string>): Promise<string> {
 	const dir = await mkdtemp(join(tmpdir(), "ah-detect-"));
@@ -58,28 +55,5 @@ describe("detectVerifyCommands", () => {
 
 	it("a bare directory yields []", async () => {
 		expect(detectVerifyCommands(await fixture({}))).toEqual([]);
-	});
-});
-
-describe("persistVerifyCommands", () => {
-	let mock: MockAbagraph;
-	let mem: MemoryClient;
-	beforeAll(async () => {
-		mock = await startMockAbagraph();
-		mem = createMemoryClient({ baseUrl: mock.url });
-	});
-	afterAll(async () => {
-		await mock.close();
-	});
-
-	it("writes coexisting Repo verify_cmd facts stamped with the namespace", async () => {
-		const ns = "repo:myrepo-0badf00d";
-		await persistVerifyCommands(mem, ns, ["npm test", "npm run lint"]);
-		const facts = await mem.query(ns, {
-			subject: "Repo:myrepo-0badf00d",
-			predicate: "verify_cmd",
-		});
-		expect(facts.map((f) => f.object).sort()).toEqual(["npm run lint", "npm test"]);
-		expect(mock.dump(ns).every((f) => f.tenant === ns)).toBe(true);
 	});
 });

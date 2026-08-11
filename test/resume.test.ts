@@ -1,7 +1,6 @@
 import { expect, test } from "vitest";
 import { createAgent } from "../src/agent/agent.js";
 import type { Msg, ToolResultMsg } from "../src/core/types.js";
-import type { MemoryPort, TurnContext } from "../src/memory/port.js";
 import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
 import { repairDanglingToolCalls } from "../src/session/repair.js";
 import { Session } from "../src/session/session.js";
@@ -64,15 +63,6 @@ test("resume: repairs dangling calls, persists them, steers, and continues", asy
 		dead.close();
 
 		const provider = new FakeProvider([{ message: assistantText("resumed and finished") }]);
-		const preTurns: TurnContext[] = [];
-		const memory: MemoryPort = {
-			preTurn: async (ctx) => {
-				preTurns.push(ctx);
-				return null;
-			},
-			postRun: async () => {},
-			tools: () => [],
-		};
 		const agent = createAgent({
 			provider,
 			model: fakeModel,
@@ -81,7 +71,6 @@ test("resume: repairs dangling calls, persists them, steers, and continues", asy
 			repoRoot: repo,
 			sessionPath,
 			steer: "skip that command and just summarize",
-			memory,
 		});
 		expect(agent.session.path).toBe(sessionPath);
 		const { reason } = await agent.run();
@@ -104,9 +93,6 @@ test("resume: repairs dangling calls, persists them, steers, and continues", asy
 		expect(provider.requests[0]?.messages).toEqual(context.slice(0, 4));
 		expect(Session.load(sessionPath).buildContext()).toEqual(context);
 
-		// MemoryPort learned this is a resume.
-		expect(preTurns[0]?.isResume).toBe(true);
-		expect(preTurns[0]?.isFirstTurn).toBe(true);
 		agent.session.close();
 	} finally {
 		teardownTestHome();

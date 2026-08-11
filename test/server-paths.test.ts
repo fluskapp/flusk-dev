@@ -7,7 +7,6 @@
  * the right directory.
  */
 import { symlinkSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
@@ -94,12 +93,3 @@ it("answers an over-size chat body instead of resetting the connection", async (
 	expect(res.body).toContain("too large");
 });
 
-it("refuses /api/memory for a directory that is not a known project", async () => {
-	// buildMemoryView loads that directory's config, and a config decides which
-	// server the user's memory.apiKey is sent to.
-	for (const repo of ["/etc", tmpdir(), join(project, "..")]) {
-		const res = await call(ui.url, `/api/memory?repo=${encodeURIComponent(repo)}`);
-		expect(res.status).toBe(400);
-		expect(res.body).toContain("known project");
-	}
-});

@@ -64,7 +64,6 @@ function wireToolbar() {
 	$("#find-btn").addEventListener("click", function () { toggleFind(); });
 	$("#runs-btn").addEventListener("click", function () { openPanel("runs"); });
 	$("#docs-btn").addEventListener("click", function () { openPanel("docs"); });
-	$("#brain-btn").addEventListener("click", toggleBrain);
 	$("#chat-btn").addEventListener("click", toggleChat);
 	$("#search").addEventListener("input", function () {
 		S.query = this.value.toLowerCase();

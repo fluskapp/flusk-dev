@@ -35,20 +35,18 @@ it("ships the handler the help overlay describes, not only the sheet", () => {
 	for (const binding of [
 		'"2": "runs"',
 		'"3": "docs"',
-		'"4": "brain"',
 		'o: "attention"',
 		'r: "runs"',
 		'd: "docs"',
-		'b: "brain"',
 	]) {
 		expect(served).toContain(binding);
 	}
 	// The tool windows are numbered the way IntelliJ numbers them: 1 Projects,
-	// 5 Find, 6 Chat are windows to fold, 2/3/4 are editor panels to open.
+	// 5 Find, 6 Chat are windows to fold, 2/3 are editor panels to open.
 	for (const binding of [
 		'if (n === "1") toggleSide()',
-		'else if (n === "5") toggleFind()',
-		'else if (n === "6") toggleChat()',
+		'else if (n === "4") toggleFind()',
+		'else if (n === "5") toggleChat()',
 	]) {
 		expect(served).toContain(binding);
 	}

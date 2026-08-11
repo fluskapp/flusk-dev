@@ -1,5 +1,24 @@
 import { resolve } from "node:path";
 import type { EventBus } from "./events.js";
+import type { Msg, RunEndReason, RunStats } from "./types.js";
+
+/**
+ * Everything one run leaves behind: the identity of the run, what it changed,
+ * and how it ended. The verification gate checks the agent's closing report
+ * against this and nothing else, so every field here is harness-observed —
+ * a model cannot author any of it.
+ */
+export interface RunRecord {
+	runId: string;
+	sessionId: string;
+	repoPath: string;
+	task: string;
+	outcome: RunEndReason;
+	filesTouched: string[];
+	commandsRun: Array<{ cmd: string; exit: number }>;
+	transcriptTail: Msg[];
+	stats: RunStats;
+}
 
 /**
  * Collects the RunRecord evidence trail off the event bus: bash commands with

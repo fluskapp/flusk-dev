@@ -1,11 +1,11 @@
 /**
  * Does the agent's closing report match what the harness actually saw?
  *
- * The previous check asked abagraph to confirm claims that the harness had
- * just written from its own observations — self-fulfilling by construction,
- * and unable to block. This one compares the REPORT (the only thing the model
- * authored) against observations the model cannot forge: which commands the
- * gate ran, which exited zero, and which files the tools actually wrote.
+ * A check that confirms claims against facts the harness itself just wrote
+ * from its own observations is self-fulfilling by construction, and can never
+ * block. So this one compares the REPORT (the only thing the model authored)
+ * against observations the model cannot forge: which commands the gate ran,
+ * which exited zero, and which files the tools actually wrote.
  *
  * Bias: a false BLOCK costs one wasted run; a false ALLOW is a lie shipped
  * unattended. So verification claims block, while softer mismatches warn.
