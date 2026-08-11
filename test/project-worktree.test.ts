@@ -10,7 +10,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { mainRepoName, mainRepoOf } from "../src/ui/project-worktree.js";
+import { mainRepoName, mainRepoOf } from "../src/profile/worktree.js";
 
 let root: string;
 let main: string;

@@ -17,6 +17,7 @@ export const USAGE = `Usage:
   ah prompt <task> [--repo <path> | --all] [--budget <n>] [--json] [--copy] [--refresh]
   ah feedback <good|bad>
   ah workspace <init|show|path> [--project]
+  ah index [--repo <path>] [--json]  what this repo is, and what would help
   ah runs [-n <count>]
   ah watch [--repo <path>] [--once]
   ah ui [--port <n>] [--no-open]

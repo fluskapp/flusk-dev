@@ -8,7 +8,7 @@ import type { ProjectSummary } from "./api-types.js";
 import { computeAttention } from "./project-attention.js";
 import type { ProjectParts } from "./project-scan.js";
 import { lastActivity, liveRuns, projectSpend } from "./project-scan.js";
-import { mainRepoName } from "./project-worktree.js";
+import { mainRepoName } from "../profile/worktree.js";
 
 export function summarize(p: ProjectParts, nowMs: number, median?: number): ProjectSummary {
 	const at = lastActivity(p);
