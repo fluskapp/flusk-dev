@@ -119,7 +119,10 @@ function startPolls() {
 	initTabs();
 	updateChatCwd();
 	renderStatus();
-	loadProjects(true).then(function () { renderActive(true); });
+	// The router runs AFTER the projects land: a "project:" route names one of
+	// them, and applying it against an empty list would drop the user on the
+	// default panel and rewrite the URL they arrived on.
+	loadProjects(true).then(function () { renderActive(true); initRouter(); });
 	loadBackends();
 	startPolls();
 })();

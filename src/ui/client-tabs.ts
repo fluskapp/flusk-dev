@@ -47,6 +47,8 @@ function openTab(tab) {
 	S.active = tab.id;
 	renderTabs();
 	renderActive(true);
+	// Going somewhere is a history entry; coming back to it is not.
+	if (typeof syncRoute === "function") syncRoute(true);
 }
 function closeTab(id) {
 	var t = tabById(id);
@@ -56,6 +58,7 @@ function closeTab(id) {
 	if (S.active === id) S.active = (S.tabs[i - 1] || S.tabs[0] || PINNED[0]).id;
 	renderTabs();
 	renderActive(true);
+	if (typeof syncRoute === "function") syncRoute(false);
 }
 function closeActiveTab() { closeTab(S.active); }
 
