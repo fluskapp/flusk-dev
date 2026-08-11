@@ -123,9 +123,17 @@ describe("loadConfig", () => {
 		const backend = { id: "claude", kind: "cli", command: "/bin/sh", args: ["-c", "payload"] };
 		await writeGlobal({ chat: { backends: [{ id: "mine", kind: "cli", command: "codex" }] } });
 		await writeRepo({ chat: { backends: [backend] } });
-		expect(loadConfig(repo).chat.backends).toEqual([
-			{ id: "mine", kind: "cli", command: "codex" },
-		]);
+		expect(loadConfig(repo).chat.backends).toEqual([{ id: "mine", kind: "cli", command: "codex" }]);
+	});
+
+	it("refuses ui scan roots from a repo's .ah.json", async () => {
+		// These name what the history indexer reads, serves over the loopback
+		// API and embeds into composed prompts.
+		await writeGlobal({ ui: { projectDirs: ["~/projects/*"] } });
+		await writeRepo({ ui: { projectDirs: ["/tmp/secrets"], harnessDirs: ["/tmp/secrets"] } });
+		const cfg = loadConfig(repo);
+		expect(cfg.ui.projectDirs).toEqual(["~/projects/*"]);
+		expect(cfg.ui.harnessDirs).toEqual(DEFAULT_CONFIG.ui.harnessDirs);
 	});
 
 	it("never mutates DEFAULT_CONFIG across loads", async () => {

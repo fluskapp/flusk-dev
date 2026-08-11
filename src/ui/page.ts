@@ -8,8 +8,11 @@
  * is what test/ui-page.test.ts pins.
  */
 import { CLIENT_JS } from "./client-bundle.js";
+import { CLIENT_PALETTE_JS, PALETTE_HTML } from "./client-palette.js";
+import { PALETTE_PROMPT_JS } from "./client-palette-prompt.js";
 import { CHAT_HTML, HELP_HTML } from "./client-shell.js";
 import { ALL_CSS } from "./styles-bundle.js";
+import { PALETTE_CSS } from "./styles-palette.js";
 
 function escapeHtml(s: string): string {
 	return s.replace(/[&<>"]/g, (c) => {
@@ -35,7 +38,7 @@ export function renderPage(home: string): string {
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>ah</title>
-<style>${ALL_CSS}</style>
+<style>${ALL_CSS}${PALETTE_CSS}</style>
 </head>
 <body>
 <div id="app">
@@ -76,7 +79,8 @@ export function renderPage(home: string): string {
 </div>
 <div id="toast" hidden></div>
 ${HELP_HTML}
-<script>${CLIENT_JS}</script>
+${PALETTE_HTML}
+<script>${CLIENT_JS}${PALETTE_PROMPT_JS}${CLIENT_PALETTE_JS}</script>
 </body>
 </html>`;
 }

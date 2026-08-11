@@ -2,10 +2,12 @@
 import { parseArgs } from "node:util";
 import { feedbackCmd } from "./feedback-cmd.js";
 import { goalCmd } from "./goal-cmd.js";
+import { promptCmd } from "./prompt-cmd.js";
 import { resumeCmd } from "./resume-cmd.js";
 import { parseRunArgs } from "./run-args.js";
 import { runCmd } from "./run-cmd.js";
 import { runsCmd } from "./runs-cmd.js";
+import { searchCmd } from "./search-cmd.js";
 import { uiCmd } from "./ui-cmd.js";
 import { watchCmd } from "./watch-cmd.js";
 
@@ -17,6 +19,9 @@ const USAGE = `Usage:
   ah resume <path-or-id> [--steer <msg>] [--fake <script.json>] [--no-verify] [--quiet]
   ah goal <text> [--repo <path>] [--dry] [--fake <script.json>] [--no-verify] [--quiet]
   ah goal --list [--repo <path>]
+  ah search <query> [--project <name>] [--kind <commit|session|journal|doc|skill>]
+                    [--limit <n>] [--json] [--refresh]
+  ah prompt <task> [--repo <path> | --all] [--budget <n>] [--json] [--copy] [--refresh]
   ah feedback <good|bad>
   ah runs [-n <count>]
   ah watch [--repo <path>] [--once]
@@ -53,6 +58,13 @@ async function main(): Promise<void> {
 				port: { type: "string" },
 				"no-open": { type: "boolean" },
 				once: { type: "boolean" },
+				project: { type: "string" },
+				limit: { type: "string" },
+				budget: { type: "string" },
+				json: { type: "boolean" },
+				copy: { type: "boolean" },
+				all: { type: "boolean" },
+				refresh: { type: "boolean" },
 			},
 		});
 	} catch (e) {
@@ -81,6 +93,19 @@ async function main(): Promise<void> {
 		const limit = v.n === undefined ? 20 : Number(v.n);
 		if (!Number.isInteger(limit) || limit <= 0) return fail("ah: -n must be a positive integer\n");
 		runsCmd({ limit });
+		return;
+	}
+	if (command === "search") {
+		if (arg === undefined) return fail(USAGE);
+		process.exitCode = searchCmd(arg, v);
+		return;
+	}
+	if (command === "prompt") {
+		if (arg === undefined) return fail(USAGE);
+		// Scoped to the current repo like `ah run`, `ah goal` and `ah watch`;
+		// `--all` is how you ask for every project's history at once.
+		const repo = typeof v.repo === "string" ? v.repo : process.cwd();
+		process.exitCode = promptCmd(arg, { ...v, ...(v.all === true ? {} : { repo }) });
 		return;
 	}
 	if (command === "feedback") {

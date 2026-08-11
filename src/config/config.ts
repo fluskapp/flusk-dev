@@ -15,6 +15,10 @@
  *  - `chat.backends`. `ah ui` loads config from its own cwd and spawns what
  *    that list names, so a repo could otherwise choose the binary a click on
  *    Send executes.
+ *  - `ui.projectDirs` / `ui.harnessDirs`. These are the directories the
+ *    history indexer reads, serves over /api/history/search and embeds into
+ *    composed prompts, so a repo could otherwise choose whose files leave the
+ *    machine.
  *
  * Everything else (budgets, models, verify, isolation…) stays per-repo: those
  * only steer a run the user has already asked for in that repo.
@@ -62,6 +66,23 @@ function readLayer(path: string): ConfigLayer | null {
 /** Memory keys only the user's own ~/.ah/config.json may set. */
 const HOME_ONLY_MEMORY = ["baseUrl", "apiKey", "autoSpawn", "serverBin", "dataDir"] as const;
 
+/**
+ * Scan roots only the user's own ~/.ah/config.json may set. These name the
+ * directories the history indexer READS and then serves over the loopback API
+ * and embeds into composed prompts; a cloned repo that could point them at
+ * `~/clients` would have `ah ui` publish the head of every .md under it.
+ */
+const HOME_ONLY_UI = ["projectDirs", "harnessDirs"] as const;
+
+/** The `ui` section a layer is allowed to contribute. */
+function uiOf(layer: ConfigLayer, trusted: boolean): Partial<AhConfig["ui"]> {
+	if (layer.ui === undefined) return {};
+	if (trusted) return layer.ui;
+	const out: Partial<AhConfig["ui"]> = { ...layer.ui };
+	for (const key of HOME_ONLY_UI) delete out[key];
+	return out;
+}
+
 /** The `memory` section a layer is allowed to contribute. */
 function memoryOf(layer: ConfigLayer, trusted: boolean): Partial<AhConfig["memory"]> {
 	const mem = layer.memory;
@@ -94,7 +115,7 @@ function mergeLayer(base: AhConfig, layer: ConfigLayer | null, trusted: boolean)
 			budgets: { ...base.memory.budgets, ...layer.memory?.budgets },
 		},
 		verify: { ...base.verify, ...layer.verify },
-		ui: { ...base.ui, ...layer.ui },
+		ui: { ...base.ui, ...uiOf(layer, trusted) },
 		chat: { ...base.chat, ...chatOf(layer, trusted) },
 		watch: { ...base.watch, ...layer.watch },
 	};

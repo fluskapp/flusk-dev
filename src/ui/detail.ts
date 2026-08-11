@@ -1,4 +1,4 @@
-import type { AssistantMsg, RunStats } from "../core/types.js";
+import type { AssistantMsg, RunEndReason, RunStats } from "../core/types.js";
 import type { HeaderEntry } from "../session/entries.js";
 import { SessionStore } from "../session/store.js";
 import { deriveStatus, type SessionStatus } from "./scan.js";
@@ -27,6 +27,8 @@ export interface SessionDetail {
 	header: HeaderEntry;
 	status: SessionStatus;
 	stats: RunStats | null;
+	/** Why the run ended, verbatim from the stats entry; older files omit it. */
+	reason: RunEndReason | null;
 	items: TranscriptItem[];
 }
 
@@ -40,10 +42,12 @@ export function loadSessionDetail(path: string): SessionDetail {
 	const items: TranscriptItem[] = [];
 	const toolIndex = new Map<string, ToolView>();
 	let stats: RunStats | null = null;
+	let reason: RunEndReason | null = null;
 	let lastAssistant: AssistantMsg | undefined;
 	for (const e of entries) {
 		if (e.type === "stats") {
 			stats = e.stats;
+			reason = e.reason ?? null;
 		} else if (e.type === "compaction") {
 			items.push({ kind: "compaction", summary: e.summary });
 		} else if (e.type === "message") {
@@ -87,5 +91,5 @@ export function loadSessionDetail(path: string): SessionDetail {
 			}
 		}
 	}
-	return { header, status: deriveStatus(stats !== null, lastAssistant), stats, items };
+	return { header, status: deriveStatus(stats !== null, lastAssistant), stats, reason, items };
 }
