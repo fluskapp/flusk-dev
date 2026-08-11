@@ -4,16 +4,20 @@
  */
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { ahHome } from "../session/paths.js";
+import { handleAsk } from "./api-ask.js";
+import { handleAskStream } from "./api-ask-stream.js";
 import { handleChat, liveChats } from "./api-chat.js";
 import { handleContent } from "./api-content.js";
 import { disposeDocRegistries, handleDoc } from "./api-doc.js";
 import { handleFileBody } from "./api-file.js";
 import { handleFind } from "./api-find.js";
+import { handleGraph } from "./api-graph.js";
 import { denyReason, PAGE_HEADERS } from "./api-guard.js";
 import { handleHistory } from "./api-history.js";
 import { handleProjects } from "./api-projects.js";
 import { handleRender } from "./api-render.js";
 import { handleSessions } from "./api-sessions.js";
+import { handleWeb } from "./api-web.js";
 import { renderPage } from "./page.js";
 
 export interface UiServer {
@@ -49,9 +53,13 @@ function handle(req: IncomingMessage, res: ServerResponse, port: number): void {
 	if (handleHistory(method, path, url.searchParams, res)) return;
 	if (handleContent(method, path, repo, res)) return;
 	if (handleDoc(method, path, url.searchParams, res)) return;
+	if (handleGraph(method, path, url.searchParams, res)) return;
 	if (handleProjects(method, path, url.searchParams, res)) return;
+	if (handleWeb(method, path, url.searchParams, res)) return;
 	if (handleRender(method, path, req, res)) return;
 	if (handleChat(method, path, req, res)) return;
+	if (handleAsk(method, path, url.searchParams, res)) return;
+	if (handleAskStream(method, path, req, res)) return;
 	if (handleSessions(method, path, url.searchParams.get("k"), repo, res)) return;
 	json(res, 404, { error: "not found" });
 }

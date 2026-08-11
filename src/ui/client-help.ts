@@ -33,10 +33,16 @@ export const HELP_GROUPS: HelpGroup[] = [
 			["5", "Find in Files (&#8984;5)"],
 			["6", "Chat (&#8984;6)"],
 			["7", "Documentation (&#8984;7)"],
+			["8", "Graph &mdash; what am I about to break (&#8984;8)"],
+			["9", "Web &mdash; read a URL (&#8984;9)"],
+			["0", "Ask AI &mdash; the tenth window (&#8984;0)"],
 			["o", "Attention"],
 			["r", "Runs"],
 			["d", "Docs"],
 			["b", "Brain"],
+			["g", "Graph"],
+			["u", "Web"],
+			["a", "Ask AI"],
 			["c", "Focus chat"],
 		],
 	},
@@ -75,6 +81,39 @@ export const HELP_GROUPS: HelpGroup[] = [
 			["&#8984;B", "Go to the definition of the selected symbol"],
 			["&#8997;F7", "Find usages &mdash; hands the symbol to Find in Files"],
 			["&#8984;F12", "File structure &mdash; focus the outline"],
+		],
+	},
+	{
+		id: "help-web",
+		title: "Web",
+		rows: [
+			// The panel reads a URL YOU typed. What comes back is a stranger's
+			// text: it is rendered as data, and the only way it reaches the
+			// chat is the delimited "fetched content" block Quote in chat
+			// builds — never as raw text pasted into the composer.
+			["9 / &#8984;9", "Web tool window &mdash; fetch and read a URL"],
+			["u", "The same, without the modifier"],
+			["&#9166;", "Web: fetch the URL in the address box"],
+			["Refresh", "Web: fetch again instead of using the cached copy"],
+		],
+	},
+	{
+		id: "help-ask",
+		title: "Ask AI",
+		rows: [
+			// The context is a SNAPSHOT: 0 / a / the toolbar button take a fresh
+			// one, returning to the tab keeps the one the answer was about.
+			["0 / a", "Ask AI about the file and symbol on screen"],
+			["&#8984;&#9166;", "Ask: send the question (a bare &#9166; is a newline)"],
+		],
+	},
+	{
+		id: "help-graph",
+		title: "Graph",
+		rows: [
+			// It follows Documentation: the gesture that AIMS it is not a key.
+			["click", "Any identifier in a source file aims Graph and Documentation at it"],
+			["8 / &#8984;8 / g", "Graph &mdash; blast radius, co-change, provenance"],
 		],
 	},
 	{

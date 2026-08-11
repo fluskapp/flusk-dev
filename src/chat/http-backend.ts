@@ -3,23 +3,34 @@
  * Studio, vLLM. One code path covers all of them because the SSE framing is
  * the one thing they genuinely agree on.
  *
+ * Two layers on purpose. `postSse` owns the TRANSPORT (url, auth header,
+ * HTTP failure, SSE framing) and yields decoded payloads; `streamHttp` owns
+ * the chat mapping (`delta.content` -> ChatChunk). The orchestra's HTTP
+ * worker drives ah's own tool loop over the SAME transport and needs
+ * `delta.tool_calls`, which a chat chunk cannot carry — without the split it
+ * would have to re-implement fetch + SSE and drift from this file.
+ *
  * Like the CLI backend: never throws. A refused connection, a 500, or a line
- * that is not JSON all become an "error" chunk; the engine appends "done".
+ * that is not JSON all become an error; the engine appends "done".
  */
 import type { ChatBackendConfig } from "../config/types.js";
 import type { ChatChunk, ChatMessage } from "./types.js";
 
 const BODY_TAIL = 500;
 
+/** One decoded `data:` payload, or the single error that ended the stream. */
+export type SseEvent = { data: Record<string, unknown> } | { error: string };
+
 function reason(e: unknown): string {
 	return e instanceof Error ? e.message : String(e);
 }
 
-export async function* streamHttp(
+/** POSTs `body` and yields each SSE payload until `[DONE]`. Never throws. */
+export async function* postSse(
 	cfg: ChatBackendConfig,
-	messages: ChatMessage[],
+	body: unknown,
 	signal: AbortSignal,
-): AsyncGenerator<ChatChunk> {
+): AsyncGenerator<SseEvent> {
 	const url = `${(cfg.baseUrl ?? "").replace(/\/+$/, "")}/chat/completions`;
 	const headers: Record<string, string> = {
 		"content-type": "application/json",
@@ -30,31 +41,26 @@ export async function* streamHttp(
 
 	let res: Awaited<ReturnType<typeof fetch>>;
 	try {
-		res = await fetch(url, {
-			method: "POST",
-			headers,
-			signal,
-			body: JSON.stringify({ model: cfg.model, messages, stream: true }),
-		});
+		res = await fetch(url, { method: "POST", headers, signal, body: JSON.stringify(body) });
 	} catch (e) {
-		if (!signal.aborted) yield { type: "error", message: `${url}: ${reason(e)}` };
+		if (!signal.aborted) yield { error: `${url}: ${reason(e)}` };
 		return;
 	}
 	if (!res.ok) {
-		const body = await res.text().catch(() => "");
-		const tail = body.slice(0, BODY_TAIL).trim();
-		yield { type: "error", message: `HTTP ${res.status} from ${url}${tail ? `: ${tail}` : ""}` };
+		const text = await res.text().catch(() => "");
+		const tail = text.slice(0, BODY_TAIL).trim();
+		yield { error: `HTTP ${res.status} from ${url}${tail ? `: ${tail}` : ""}` };
 		return;
 	}
 	if (res.body === null) {
-		yield { type: "error", message: `${url}: no response body` };
+		yield { error: `${url}: no response body` };
 		return;
 	}
 	yield* parseSse(res.body, signal);
 }
 
 /** `data: {json}` lines until `data: [DONE]`; everything else is framing. */
-async function* parseSse(body: unknown, signal: AbortSignal): AsyncGenerator<ChatChunk> {
+async function* parseSse(body: unknown, signal: AbortSignal): AsyncGenerator<SseEvent> {
 	const decoder = new TextDecoder();
 	let buf = "";
 	try {
@@ -65,20 +71,20 @@ async function* parseSse(body: unknown, signal: AbortSignal): AsyncGenerator<Cha
 			for (let nl = buf.indexOf("\n"); nl !== -1; nl = buf.indexOf("\n")) {
 				const line = buf.slice(0, nl);
 				buf = buf.slice(nl + 1);
-				const chunk = parseLine(line);
-				if (chunk === "end") return;
-				if (chunk === null) continue;
-				yield chunk;
-				if (chunk.type === "error") return;
+				const event = parseLine(line);
+				if (event === "end") return;
+				if (event === null) continue;
+				yield event;
+				if ("error" in event) return;
 			}
 		}
 	} catch (e) {
-		if (!signal.aborted) yield { type: "error", message: reason(e) };
+		if (!signal.aborted) yield { error: reason(e) };
 	}
 }
 
 /** null = framing to skip, "end" = the [DONE] terminator. */
-function parseLine(raw: string): ChatChunk | "end" | null {
+function parseLine(raw: string): SseEvent | "end" | null {
 	const line = raw.trimEnd();
 	if (!line.startsWith("data:")) return null;
 	const payload = line.slice(5).trim();
@@ -88,9 +94,25 @@ function parseLine(raw: string): ChatChunk | "end" | null {
 	try {
 		parsed = JSON.parse(payload);
 	} catch {
-		return { type: "error", message: `malformed SSE payload: ${payload.slice(0, 200)}` };
+		return { error: `malformed SSE payload: ${payload.slice(0, 200)}` };
 	}
-	const text = (parsed as { choices?: Array<{ delta?: { content?: unknown } }> }).choices?.[0]
-		?.delta?.content;
-	return typeof text === "string" && text !== "" ? { type: "delta", text } : null;
+	if (typeof parsed !== "object" || parsed === null) return null;
+	return { data: parsed as Record<string, unknown> };
+}
+
+/** The chat view of the stream: assistant text only, no tool calls. */
+export async function* streamHttp(
+	cfg: ChatBackendConfig,
+	messages: ChatMessage[],
+	signal: AbortSignal,
+): AsyncGenerator<ChatChunk> {
+	for await (const event of postSse(cfg, { model: cfg.model, messages, stream: true }, signal)) {
+		if ("error" in event) {
+			yield { type: "error", message: event.error };
+			return;
+		}
+		const text = (event.data as { choices?: Array<{ delta?: { content?: unknown } }> }).choices?.[0]
+			?.delta?.content;
+		if (typeof text === "string" && text !== "") yield { type: "delta", text };
+	}
 }

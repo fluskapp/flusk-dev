@@ -3,6 +3,10 @@
  * then the gestures, then boot. Every module is plain JS in a template
  * string — no build step, no framework, no dependencies.
  */
+import { CLIENT_ASK_JS } from "./client-ask.js";
+import { CLIENT_ASK_CONTEXT_JS } from "./client-ask-context.js";
+import { CLIENT_ASK_SEND_JS } from "./client-ask-send.js";
+import { CLIENT_ASK_WHO_JS } from "./client-ask-who.js";
 import { CLIENT_ATTENTION_JS } from "./client-attention.js";
 import { CLIENT_BOOT_JS } from "./client-boot.js";
 import { CLIENT_BRAIN_JS } from "./client-brain.js";
@@ -26,6 +30,8 @@ import { CLIENT_RUNS_JS } from "./client-runs.js";
 import { CLIENT_STATUS_JS } from "./client-status.js";
 import { CLIENT_TABS_JS } from "./client-tabs.js";
 import { CLIENT_TREE_JS } from "./client-tree.js";
+import { CLIENT_WEB_JS } from "./client-web.js";
+import { CLIENT_WEB_ROWS_JS } from "./client-web-rows.js";
 
 export const CLIENT_JS =
 	CLIENT_CORE_JS +
@@ -48,6 +54,14 @@ export const CLIENT_JS =
 	CLIENT_BRAIN_JS +
 	CLIENT_CHAT_JS +
 	CLIENT_CHAT_STREAM_JS +
+	// After chat: askStream reuses its SSE framing, and `var A` must be
+	// initialised before boot's init() runs at the end of the chain.
+	CLIENT_ASK_JS +
+	CLIENT_ASK_CONTEXT_JS +
+	CLIENT_ASK_WHO_JS +
+	CLIENT_ASK_SEND_JS +
+	CLIENT_WEB_ROWS_JS +
+	CLIENT_WEB_JS +
 	CLIENT_CURSOR_JS +
 	CLIENT_KEYS_JS +
 	CLIENT_BOOT_JS;

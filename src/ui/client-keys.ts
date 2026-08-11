@@ -7,11 +7,14 @@
  * Every binding here has a row in the help sheet (client-help.ts).
  */
 export const CLIENT_KEYS_JS = `
-var PANEL_KEYS = { "2": "runs", "3": "docs", "4": "brain",
-	o: "attention", r: "runs", d: "docs", b: "brain" };
+var PANEL_KEYS = { "2": "runs", "3": "docs", "4": "brain", "8": "graph", "9": "web", "0": "ask",
+	o: "attention", r: "runs", d: "docs", b: "brain", g: "graph", u: "web", a: "ask" };
 var MD_KEYS = { p: "preview", s: "split", R: "raw" };
 
-/** 1 Projects, 2 Runs, 3 Docs, 4 Brain, 5 Find, 6 Chat, 7 Documentation. */
+/** 1 Projects, 2 Runs, 3 Docs, 4 Brain, 5 Find, 6 Chat, 7 Documentation,
+ * 8 Graph, 9 Web, 0 Ask AI \u2014 the tenth slot, which is why it is a zero and
+ * not a ten. The digits with no branch below are EDITOR PANELS: they fall
+ * through to openPanel, which is what makes a number mean the whole panel. */
 function toolWindow(n) {
 	if (n === "1") toggleSide();
 	else if (n === "5") toggleFind();
@@ -62,7 +65,7 @@ function modKey(e) {
 		return true;
 	}
 	if (key === "f12" && !e.shiftKey) { focusOutline(); return true; }
-	if (!e.shiftKey && /^[1-7]$/.test(e.key)) { toolWindow(e.key); return true; }
+	if (!e.shiftKey && /^[0-9]$/.test(e.key)) { toolWindow(e.key); return true; }
 	return false;
 }
 
@@ -110,7 +113,7 @@ document.addEventListener("keydown", function (e) {
 	if (e.key === "/") { e.preventDefault(); search.focus(); search.select(); return; }
 	if (e.key === "?") { $("#help").hidden = false; return; }
 	if (e.key === "Tab") { e.preventDefault(); setZone(S.zone === "tree" ? "view" : "tree"); return; }
-	if (/^[1-7]$/.test(e.key)) { toolWindow(e.key); return; }
+	if (/^[0-9]$/.test(e.key)) { toolWindow(e.key); return; }
 	if (Object.prototype.hasOwnProperty.call(PANEL_KEYS, e.key)) {
 		// openPanel, not togglePanel: a panel key means the whole panel, with
 		// no filter left over from a drill-in.

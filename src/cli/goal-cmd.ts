@@ -32,6 +32,8 @@ export interface GoalCmdOpts {
 	fake?: string;
 	noVerify?: boolean;
 	quiet?: boolean;
+	/** `--no-extensions`: run with the built-in toolbelt alone, for one command. */
+	noExtensions?: boolean;
 	out?: NodeJS.WritableStream;
 }
 
@@ -62,7 +64,9 @@ export async function goalCmd(opts: GoalCmdOpts): Promise<CliOutcome> {
 	const isFake = opts.fake !== undefined;
 	const planModel = isFake ? fakeModel : await pickModel(cfg, "plan");
 	if (!isFake && !(await hasAuth(planModel.provider))) {
-		throw new Error(`no credentials for provider "${planModel.provider}"; set ${envKeyVar(planModel.provider)}`);
+		throw new Error(
+			`no credentials for provider "${planModel.provider}"; set ${envKeyVar(planModel.provider)}`,
+		);
 	}
 	const provider: Provider = isFake
 		? new FakeProvider(await loadFakeScript(opts.fake as string))

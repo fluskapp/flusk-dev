@@ -15,13 +15,20 @@ import { CLIENT_DOC_JS, DOC_HTML } from "./client-doc.js";
 import { CLIENT_DOC_NAV_JS } from "./client-doc-nav.js";
 import { CLIENT_DOC_ROWS_JS } from "./client-doc-rows.js";
 import { PALETTE_FILES_JS } from "./client-goto.js";
+import { CLIENT_GRAPH_JS } from "./client-graph.js";
+import { CLIENT_GRAPH_CELLS_JS } from "./client-graph-cells.js";
+import { CLIENT_GRAPH_DRAW_JS } from "./client-graph-draw.js";
+import { CLIENT_GRAPH_NAV_JS } from "./client-graph-nav.js";
+import { CLIENT_GRAPH_ROWS_JS } from "./client-graph-rows.js";
 import { CLIENT_PALETTE_JS, PALETTE_HTML } from "./client-palette.js";
 import { PALETTE_PROMPT_JS } from "./client-palette-prompt.js";
 import { PALETTE_ROWS_JS } from "./client-palette-rows.js";
 import { CHAT_HTML, FIND_HTML, HELP_HTML } from "./client-shell.js";
+import { ASK_CSS } from "./styles-ask.js";
 import { ALL_CSS } from "./styles-bundle.js";
 import { CODE_CSS } from "./styles-code.js";
 import { DOC_CSS } from "./styles-doc.js";
+import { GRAPH_CSS } from "./styles-graph.js";
 import { PALETTE_CSS } from "./styles-palette.js";
 
 function escapeHtml(s: string): string {
@@ -47,6 +54,11 @@ const PANELS: Array<[string, string, string, string]> = [
 	["find-btn", "5", "Find", "Find in Files (5 / ⌘5 / ⌘⇧F)"],
 	["chat-btn", "6", "Chat", "Chat tool window (6 / ⌘6 / c)"],
 	["doc-btn", "7", "Documentation", "Documentation tool window (7 / ⌘7)"],
+	["graph-btn", "8", "Graph", "What am I about to break (8 / ⌘8 / g)"],
+	["web-btn", "9", "Web", "Read a URL beside the code (9 / ⌘9 / u)"],
+	// 0 is the tenth slot: the single digits are spoken for, and IntelliJ's own
+	// numbering runs 1…9 then 0 for exactly this reason.
+	["ask-btn", "0", "Ask AI", "Ask AI about what is on screen (0 / ⌘0 / a)"],
 ];
 
 /**
@@ -72,7 +84,7 @@ export function renderPage(home: string): string {
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>ah</title>
-<style>${ALL_CSS}${VIEWER_CSS}${PALETTE_CSS}${DOC_CSS}</style>
+<style>${ALL_CSS}${VIEWER_CSS}${PALETTE_CSS}${DOC_CSS}${ASK_CSS}${GRAPH_CSS}</style>
 </head>
 <body>
 <div id="app">
@@ -102,6 +114,9 @@ export function renderPage(home: string): string {
             <div id="run" class="view" hidden></div>
             <div id="doc" class="view" hidden></div>
             <div id="file" class="view" hidden></div>
+            <div id="graph" class="view" hidden></div>
+            <div id="web" class="view" hidden></div>
+            <div id="ask" class="view" hidden></div>
         </div>
     </main>
     ${CHAT_HTML}
@@ -120,7 +135,7 @@ export function renderPage(home: string): string {
 <div id="toast" hidden></div>
 ${HELP_HTML}
 ${PALETTE_HTML}
-<script>${CLIENT_JS}${CODE_JS}${PALETTE_PROMPT_JS}${PALETTE_ROWS_JS}${PALETTE_FILES_JS}${CLIENT_PALETTE_JS}${CLIENT_DOC_ROWS_JS}${CLIENT_DOC_NAV_JS}${CLIENT_DOC_JS}</script>
+<script>${CLIENT_JS}${CODE_JS}${PALETTE_PROMPT_JS}${PALETTE_ROWS_JS}${PALETTE_FILES_JS}${CLIENT_PALETTE_JS}${CLIENT_DOC_ROWS_JS}${CLIENT_DOC_NAV_JS}${CLIENT_DOC_JS}${CLIENT_GRAPH_CELLS_JS}${CLIENT_GRAPH_ROWS_JS}${CLIENT_GRAPH_DRAW_JS}${CLIENT_GRAPH_NAV_JS}${CLIENT_GRAPH_JS}</script>
 </body>
 </html>`;
 }

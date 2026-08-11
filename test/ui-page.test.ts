@@ -36,7 +36,8 @@ afterAll(async () => {
 it("serves every tool window, the tab strip and every view container", () => {
 	has(['id="toolbar"', 'id="side"', 'id="tree"', 'id="main"', 'id="tabs"', 'id="views"']);
 	has(['id="chat"', 'id="find"', 'id="status"', 'id="crumbs"']);
-	for (const view of ["overview", "runs", "docs", "brain", "project", "run", "doc", "file"]) {
+	const views = "overview runs docs brain project run doc file web ask graph".split(" ");
+	for (const view of views) {
 		expect(served).toContain(`<div id="${view}" class="view"`);
 	}
 });
@@ -45,7 +46,7 @@ it("numbers the tool windows the way IntelliJ does: 1 Projects … 6 Chat", () =
 	// The header badge, the toolbar button and the key binding must agree.
 	has(['<span class="tw-num">1</span>', '<span class="tw-num">5</span>']);
 	has(['<span class="tw-num">6</span>', 'id="side-btn"', 'id="find-btn"', 'id="chat-btn"']);
-	for (const n of ["1", "2", "3", "4", "5", "6"]) {
+	for (const n of ["1", "2", "3", "4", "5", "6", "8", "9", "0"]) {
 		expect(served).toContain(`<span class="n">${n}</span>`);
 	}
 	has([

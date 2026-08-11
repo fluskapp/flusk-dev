@@ -11,7 +11,8 @@ import { SessionStore } from "../session/store.js";
 import { sessionsRoot } from "../ui/scan.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import { attachRenderer } from "./render.js";
-import { DEFAULT_TOOLS, envKeyVar, loadFakeScript } from "./run-cmd.js";
+import { toolbelt } from "./ext-tools.js";
+import { envKeyVar, loadFakeScript } from "./run-cmd.js";
 
 export interface ResumeCmdOpts {
 	/** Session file path, or a bare session id to search the sessions dirs for. */
@@ -21,6 +22,8 @@ export interface ResumeCmdOpts {
 	/** Skip the verification gate (commands and claim check) entirely. */
 	noVerify?: boolean;
 	quiet?: boolean;
+	/** `--no-extensions`: run with the built-in toolbelt alone, for one command. */
+	noExtensions?: boolean;
 	out?: NodeJS.WritableStream;
 }
 
@@ -75,20 +78,34 @@ export async function resumeCmd(opts: ResumeCmdOpts): Promise<CliOutcome> {
 		);
 	}
 	const provider =
-		opts.fake !== undefined ? new FakeProvider(await loadFakeScript(opts.fake)) : new PiAiProvider();
+		opts.fake !== undefined
+			? new FakeProvider(await loadFakeScript(opts.fake))
+			: new PiAiProvider();
 	const branch = currentBranch(header.repoRoot);
 	if (header.gitBranch !== null && branch !== header.gitBranch) {
 		out.write(
 			`warning: ${header.repoRoot} is on ${branch ?? "a detached HEAD"} but the session ran on ${header.gitBranch}\n`,
 		);
 	}
-	const mem = await createMemory(cfg, header.repoRoot, repoConfig, opts.quiet === true ? () => {} : undefined);
+	const mem = await createMemory(
+		cfg,
+		header.repoRoot,
+		repoConfig,
+		opts.quiet === true ? () => {} : undefined,
+	);
 	const events = createEventBus();
 	if (opts.quiet !== true) attachRenderer(events, out);
 	const agent = createAgent({
 		provider,
 		model: header.model,
-		tools: DEFAULT_TOOLS,
+		tools: await toolbelt({
+			repoRoot: header.repoRoot,
+			config: cfg,
+			events,
+			out,
+			quiet: opts.quiet === true,
+			...(opts.noExtensions === true ? { noExtensions: true } : {}),
+		}),
 		task: header.task,
 		repoRoot: header.repoRoot,
 		memory: mem.port,
@@ -108,7 +125,9 @@ export async function resumeCmd(opts: ResumeCmdOpts): Promise<CliOutcome> {
 			out,
 			noVerify: opts.noVerify === true,
 		});
-		out.write(`${res.reason} · ${res.stats.turns} turns · $${res.stats.usage.costUsd.toFixed(4)} · ${path}\n`);
+		out.write(
+			`${res.reason} · ${res.stats.turns} turns · $${res.stats.usage.costUsd.toFixed(4)} · ${path}\n`,
+		);
 		return res.outcome;
 	} finally {
 		agent.session.close();

@@ -14,7 +14,8 @@ import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import { taskDescription } from "./goal-list.js";
 import type { GoalCmdOpts } from "./goal-cmd.js";
 import { attachRenderer } from "./render.js";
-import { DEFAULT_TOOLS, fakeModel, pickModel } from "./run-support.js";
+import { toolbelt } from "./ext-tools.js";
+import { fakeModel, pickModel } from "./run-support.js";
 
 export async function runTask(
 	opts: GoalCmdOpts,
@@ -31,7 +32,14 @@ export async function runTask(
 	const agent = createAgent({
 		provider: env.provider,
 		model: opts.fake !== undefined ? fakeModel : await pickModel(cfg, "code"),
-		tools: DEFAULT_TOOLS,
+		tools: await toolbelt({
+			repoRoot: opts.repo,
+			config: cfg,
+			events,
+			out,
+			quiet: opts.quiet === true,
+			...(opts.noExtensions === true ? { noExtensions: true } : {}),
+		}),
 		task: `${desc}\n\nGoal context: ${brief}`,
 		repoRoot: opts.repo,
 		// Fresh port per task so each session gets a current <memory> snapshot.
@@ -45,7 +53,12 @@ export async function runTask(
 	});
 	try {
 		const res = await runWithGate(agent, {
-			cfg, repoRoot: opts.repo, repoConfig, client, ns: env.mem.ns, out,
+			cfg,
+			repoRoot: opts.repo,
+			repoConfig,
+			client,
+			ns: env.mem.ns,
+			out,
 			noVerify: opts.noVerify === true,
 		});
 		return res.outcome;
@@ -53,4 +66,3 @@ export async function runTask(
 		agent.session.close();
 	}
 }
-
