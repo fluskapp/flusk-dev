@@ -28,7 +28,7 @@ const RULE = /^(-{3,}|\*{3,}|_{3,})\s*$/;
  * no table in its place, so a model reply beginning with `---` silently lost
  * its first section on the way through /api/render.
  */
-export function stripFrontmatter(src: string): string {
+function stripFrontmatter(src: string): string {
 	const block = frontmatterBlock(src);
 	if (block === null || frontmatterRows(block).length === 0) return src;
 	const end = src.indexOf("\n---", src.indexOf("\n"));

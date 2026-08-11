@@ -41,7 +41,7 @@ const gatePassed = (s: JournalStage): boolean => /\bpass(ed|es)?\b/i.test(s.deta
  * `failed`, but "the gate blocked this" is the sentence a future run needs.
  * A gate stage that itself errored, or was never reached, is not a refusal.
  */
-export function journalOutcome(j: JournalMeta): Outcome {
+function journalOutcome(j: JournalMeta): Outcome {
 	const status = j.status.toLowerCase();
 	if (status === "running" || j.stages.some((s) => s.status === "running")) return "unknown";
 	const gate = j.stages.find((s) => s.name === "gate");
@@ -53,7 +53,7 @@ export function journalOutcome(j: JournalMeta): Outcome {
 }
 
 /** Files the journal names outright; URLs are stripped so hosts are not paths. */
-export function journalPaths(j: JournalMeta): string[] {
+function journalPaths(j: JournalMeta): string[] {
 	const text = [j.title, ...j.stages.map((s) => s.detail)].join("\n").replace(URLISH, " ");
 	const out: string[] = [];
 	for (const m of text.matchAll(PATHISH)) {

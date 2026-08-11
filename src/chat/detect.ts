@@ -17,7 +17,7 @@ import type { AhConfig, ChatBackendConfig } from "../config/types.js";
 import type { ChatBackend } from "./types.js";
 
 /** Agent CLIs probed by default, with the flag that makes each one-shot. */
-export const DEFAULT_CLIS: ReadonlyArray<{ id: string; label: string; args: string[] }> = [
+const DEFAULT_CLIS: ReadonlyArray<{ id: string; label: string; args: string[] }> = [
 	{ id: "claude", label: "Claude Code", args: ["-p"] },
 	{ id: "codex", label: "Codex", args: ["exec"] },
 	{ id: "kimi", label: "Kimi", args: ["-p"] },

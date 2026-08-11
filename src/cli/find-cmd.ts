@@ -43,7 +43,7 @@ function deindent(text: string, ranges: [number, number][]): [string, [number, n
 }
 
 /** Paints [start, end) spans. Offsets are the same units String.slice uses. */
-export function paintRanges(
+function paintRanges(
 	text: string,
 	ranges: [number, number][],
 	paint: (s: string) => string,

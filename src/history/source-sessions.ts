@@ -88,7 +88,7 @@ function collect(items: TranscriptItem[], repoRoot: string): Facts {
  * "blocked" is for a run stopped from outside — aborted, or refused by the
  * policy — as opposed to one that broke or ran out of road ("failed").
  */
-export function sessionOutcome(status: SessionStatus, reasonCompleted: boolean, f: Facts): Outcome {
+function sessionOutcome(status: SessionStatus, reasonCompleted: boolean, f: Facts): Outcome {
 	if (status === "running") return "unknown";
 	if (status === "completed") return reasonCompleted && f.verifyPassed ? "verified" : "shipped";
 	if (status === "aborted" || f.denied) return "blocked";

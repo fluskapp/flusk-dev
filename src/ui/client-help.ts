@@ -9,7 +9,7 @@
 export type HelpRow = [string, string];
 export type HelpGroup = { id: string; title: string; rows: HelpRow[] };
 
-export const HELP_GROUPS: HelpGroup[] = [
+const HELP_GROUPS: HelpGroup[] = [
 	{
 		id: "help-nav",
 		title: "Navigation",

@@ -19,7 +19,7 @@ export interface RgSub {
 }
 
 /** True when every character is one byte, so offsets need no mapping at all. */
-export function isAscii(line: string): boolean {
+function isAscii(line: string): boolean {
 	return Buffer.byteLength(line, "utf8") === line.length;
 }
 

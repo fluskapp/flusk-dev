@@ -28,9 +28,9 @@ export { loadTypeScript } from "./ts-load.js";
 export type ServiceState = "absent" | "refused" | "indexing" | "ready";
 
 /** Two open projects is the workflow; a third evicts the least recent. */
-export const DEFAULT_MAX_SERVICES = 2;
+const DEFAULT_MAX_SERVICES = 2;
 /** A program build cannot be interrupted, so its budget is generous. */
-export const DEFAULT_WARMUP_MS = 60_000;
+const DEFAULT_WARMUP_MS = 60_000;
 
 export interface ServiceStatus {
 	state: ServiceState;

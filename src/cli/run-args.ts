@@ -11,7 +11,7 @@ const KINDS: ReadonlySet<string> = new Set(["plan", "code", "review", "summarize
 export type ParsedRunArgs = { ok: true; opts: RunCmdOpts } | { ok: false; error: string };
 
 /** "2h", "30m", "45s", "1h30m" → milliseconds; null when unparseable. */
-export function parseDuration(text: string): number | null {
+function parseDuration(text: string): number | null {
 	const m = /^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/.exec(text);
 	if (!m || m[0] === "") return null;
 	return (Number(m[1] ?? 0) * 3600 + Number(m[2] ?? 0) * 60 + Number(m[3] ?? 0)) * 1000;

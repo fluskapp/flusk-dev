@@ -30,7 +30,7 @@ function keep(term: string): boolean {
  * "retryHook" → ["retry", "Hook"]; "retry_hook" → ["retry", "hook"];
  * "HTTPServer" → ["HTTP", "Server"] (an acronym keeps its head).
  */
-export function splitIdentifier(raw: string): string[] {
+function splitIdentifier(raw: string): string[] {
 	return raw
 		.replace(/_+/g, " ")
 		.replace(/([a-z0-9])([A-Z])/g, "$1 $2")

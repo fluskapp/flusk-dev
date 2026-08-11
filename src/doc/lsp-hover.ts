@@ -32,7 +32,7 @@ function marked(value: unknown): string {
 }
 
 /** A hover reply → one markdown string. "" when there was nothing to show. */
-export function hoverMarkdown(hover: unknown): string {
+function hoverMarkdown(hover: unknown): string {
 	if (typeof hover !== "object" || hover === null) return "";
 	const contents = (hover as Record<string, unknown>)["contents"];
 	const parts = Array.isArray(contents) ? contents.map(marked) : [marked(contents)];
@@ -47,7 +47,7 @@ export function hoverMarkdown(hover: unknown): string {
  * over, so a wrapped `@param` continuation line joins the tag it belongs to
  * rather than reappearing in the middle of the description.
  */
-export function splitTags(text: string): { docs: string; tags: DocTag[] } {
+function splitTags(text: string): { docs: string; tags: DocTag[] } {
 	const prose: string[] = [];
 	const tags: DocTag[] = [];
 	for (const line of text.split("\n")) {

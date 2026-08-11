@@ -102,7 +102,7 @@ function listDir(dir: string): string[] {
 }
 
 /** prompts/*.md, then src/prompt*.js, then AGENTS.md, then CLAUDE.md. */
-export function promptCandidates(root: string): string[] {
+function promptCandidates(root: string): string[] {
 	return [
 		...listDir(join(root, "prompts"))
 			.filter((f) => f.endsWith(".md"))

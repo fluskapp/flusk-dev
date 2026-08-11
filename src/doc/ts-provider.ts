@@ -21,7 +21,7 @@ type TS = typeof import("typescript");
 type LS = import("typescript").LanguageService;
 
 /** Usages beyond this are counted, not listed: `referenceCount` stays true. */
-export const MAX_REFERENCES = 200;
+const MAX_REFERENCES = 200;
 
 const EXTENSIONS = new Set([".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".mjs", ".cjs"]);
 

@@ -19,7 +19,7 @@ export interface RunFeedOpts {
 }
 
 /** "8/13 · gate" — finished stages, total, and the stage it is sitting on. */
-export function journalProgress(j: Journal): string | undefined {
+function journalProgress(j: Journal): string | undefined {
 	if (j.stages.length === 0) return undefined;
 	const done = j.stages.filter((s) => DONE.has(s.status.toLowerCase())).length;
 	return `${done}/${j.stages.length} · ${j.stages.at(-1)?.name ?? ""}`;

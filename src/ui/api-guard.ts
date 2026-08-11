@@ -25,14 +25,14 @@ import type { IncomingMessage } from "node:http";
 const LOOPBACK = new Set(["localhost", "127.0.0.1", "::1", "[::1]"]);
 
 /** Split "host:port". An IPv6 literal keeps its brackets and its colons. */
-export function splitHost(host: string): { name: string; port: string } {
+function splitHost(host: string): { name: string; port: string } {
 	if (host.endsWith("]")) return { name: host, port: "" };
 	const i = host.lastIndexOf(":");
 	return i === -1 ? { name: host, port: "" } : { name: host.slice(0, i), port: host.slice(i + 1) };
 }
 
 /** Every spelling of "this server" a browser may put in an Origin header. */
-export function allowedOrigins(port: number): string[] {
+function allowedOrigins(port: number): string[] {
 	return ["localhost", "127.0.0.1", "[::1]"].map((h) => `http://${h}:${port}`);
 }
 
@@ -66,7 +66,7 @@ export function denyReason(req: IncomingMessage, port: number): string | null {
 }
 
 /** A GET the browser is performing to put a document in the address bar. */
-export function isTopLevelNavigation(req: IncomingMessage): boolean {
+function isTopLevelNavigation(req: IncomingMessage): boolean {
 	const h = req.headers;
 	const get = (req.method ?? "GET").toUpperCase() === "GET";
 	const mode = typeof h["sec-fetch-mode"] === "string" ? h["sec-fetch-mode"] : "";

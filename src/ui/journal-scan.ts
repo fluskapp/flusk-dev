@@ -25,7 +25,7 @@ export { parseFrontmatter } from "./journal-frontmatter.js";
  * what a global newest-N slice does. Callers that need a bounded response
  * slice the sorted list themselves.
  */
-export const JOURNAL_LIMIT = 400;
+const JOURNAL_LIMIT = 400;
 
 export interface Journal extends JournalMeta {
 	/** Absolute path — the handle the UI passes back. */

@@ -67,7 +67,7 @@ const HEADING_LIFT = 1.6;
 const ALARMING = new Set<Outcome>(["failed", "blocked"]);
 
 /** 2: it went wrong on this file. 1: a heading names it. 0: everything else. */
-export function tierOf(s: Signals): number {
+function tierOf(s: Signals): number {
 	if (ALARMING.has(s.outcome) && s.touched) return 2;
 	return s.heading ? 1 : 0;
 }
@@ -91,7 +91,7 @@ function better(a: Candidate, b: Candidate): number {
 }
 
 /** Sorted, de-duplicated, capped; `trimmed` is how many lost to the cap. */
-export function rankGroup(
+function rankGroup(
 	candidates: Candidate[],
 	cap = DEFAULT_CAP,
 ): { items: RelatedItem[]; trimmed: number } {
@@ -108,7 +108,7 @@ export function rankGroup(
 }
 
 /** One sentence naming every bound that shortened the answer, or nothing. */
-export function capNote(
+function capNote(
 	trimmed: Record<string, number>,
 	cap: number,
 	extra?: string,

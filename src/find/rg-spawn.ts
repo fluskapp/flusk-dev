@@ -9,7 +9,7 @@
  */
 import { spawn } from "node:child_process";
 
-export const TIMEOUT_MS = 10_000;
+const TIMEOUT_MS = 10_000;
 /** Enough stderr to explain a failure; the rest is repetition. */
 const STDERR_CAP = 4096;
 

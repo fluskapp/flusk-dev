@@ -32,7 +32,7 @@ import { sessionCards } from "./source-sessions.js";
 import { DOC_LIMIT, docCard, gitRoots } from "./sources.js";
 
 /** Which config produced these cards; part of every source id. */
-export function configKey(cfg: AhConfig): string {
+function configKey(cfg: AhConfig): string {
 	const shape = JSON.stringify([cfg.ui.projectDirs, cfg.ui.harnessDirs]);
 	return createHash("sha256").update(shape).digest("hex").slice(0, 12);
 }

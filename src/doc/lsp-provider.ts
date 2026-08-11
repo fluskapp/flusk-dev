@@ -18,7 +18,7 @@ import { parseHover, wordAt } from "./lsp-hover.js";
 import type { DocProvider, OutlineItem, SymbolDoc } from "./types.js";
 
 /** References beyond this are counted, not listed (see SymbolDoc.truncated). */
-export const REFERENCE_CAP = 200;
+const REFERENCE_CAP = 200;
 
 export interface LspProviderSpec extends LspServerSpec {
 	id: string;

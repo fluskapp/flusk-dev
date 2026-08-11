@@ -27,7 +27,7 @@ export function fileToUri(file: string): string {
 	return pathToFileURL(file).href;
 }
 
-export function uriToFile(uri: unknown): string | null {
+function uriToFile(uri: unknown): string | null {
 	if (typeof uri !== "string" || !uri.startsWith("file://")) return null;
 	try {
 		return decodeURIComponent(new URL(uri).pathname);
@@ -100,7 +100,7 @@ const KINDS = [
 	"type-parameter",
 ];
 
-export function kindName(kind: unknown): string {
+function kindName(kind: unknown): string {
 	return typeof kind === "number" ? (KINDS[kind - 1] ?? "symbol") : "symbol";
 }
 

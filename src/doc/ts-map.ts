@@ -48,8 +48,3 @@ export function locIn(sf: SourceFile, span: TextSpan): SourceLoc {
 		endCol: b.character + 1,
 	};
 }
-
-/** 1-based line a flat offset falls on. */
-export function lineAt(sf: SourceFile, offset: number): number {
-	return sf.getLineAndCharacterOfPosition(offset).line + 1;
-}

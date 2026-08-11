@@ -18,7 +18,7 @@
  */
 
 /** Past this with no complete frame, the stream is not LSP; stop buffering. */
-export const MAX_PENDING_BYTES = 32 * 1024 * 1024;
+const MAX_PENDING_BYTES = 32 * 1024 * 1024;
 
 export function encodeFrame(msg: unknown): string {
 	const body = JSON.stringify(msg);

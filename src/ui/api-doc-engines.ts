@@ -17,7 +17,7 @@ import { createDocRegistry, type DocChoice, type DocRegistry } from "../doc/regi
 import { searchRoots } from "../find/files.js";
 
 /** Two open projects is the workflow; a third evicts (and disposes) the first. */
-export const MAX_REGISTRIES = 2;
+const MAX_REGISTRIES = 2;
 
 /** Insertion-ordered: the first key is the least recently used root. */
 const registries = new Map<string, DocRegistry>();

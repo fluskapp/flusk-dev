@@ -35,7 +35,7 @@ interface Block extends Candidate {
  * citation is carried through untouched — an instruction the reader cannot
  * check is worth less than no instruction.
  */
-export function constraintFrom(trap: string): string {
+function constraintFrom(trap: string): string {
 	const at = trap.lastIndexOf(SEP);
 	if (!trap.startsWith(TRIED) || at <= TRIED.length) return `Do not repeat this — ${trap}`;
 	const what = trap.slice(TRIED.length - 1, at);

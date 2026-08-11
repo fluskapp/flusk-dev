@@ -18,7 +18,7 @@ export function storeDir(): string {
 }
 
 /** Collision-safe log filename for `ns`. */
-export function nsFile(ns: string): string {
+function nsFile(ns: string): string {
 	const slug =
 		ns
 			.toLowerCase()

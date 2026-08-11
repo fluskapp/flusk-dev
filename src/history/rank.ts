@@ -48,7 +48,7 @@ const TIE_BAND = 0.04;
  * blocked card. Ordering is still strict, so `verified` beats an otherwise
  * identical `failed`, and a caller that wants failures asks for them.
  */
-export const OUTCOME_WEIGHTS: Record<Outcome, number> = {
+const OUTCOME_WEIGHTS: Record<Outcome, number> = {
 	verified: 1 + TIE_BAND,
 	shipped: 1 + TIE_BAND / 2,
 	unknown: 1,

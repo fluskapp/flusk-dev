@@ -15,7 +15,7 @@
 import { spawn } from "node:child_process";
 
 /** Long enough for a monorepo, short enough that a stuck root is not forever. */
-export const LIST_TIMEOUT_MS = 5_000;
+const LIST_TIMEOUT_MS = 5_000;
 /** Output kept per root; past this the listing is already unusably long. */
 const MAX_BYTES = 32 * 1024 * 1024;
 

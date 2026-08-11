@@ -24,7 +24,7 @@ function json(res: ServerResponse, status: number, body: unknown): void {
 }
 
 /** null when the key is malformed or escapes the sessions root. */
-export function keyToPath(key: string | null): string | null {
+function keyToPath(key: string | null): string | null {
 	if (key === null || !KEY_RE.test(key)) return null;
 	const root = resolve(sessionsRoot());
 	const path = resolve(join(root, key));
@@ -40,7 +40,7 @@ export function keyToPath(key: string | null): string | null {
  * and unlike a prefix test it cannot be walked out of by a symlink that
  * resolves back inside the root.
  */
-export function revealablePath(target: string | null): string | null {
+function revealablePath(target: string | null): string | null {
 	if (target === null || target === "") return null;
 	const path = resolve(expandHome(target));
 	const cfg = loadConfig(process.cwd());

@@ -12,7 +12,7 @@ import { type ChildProcessWithoutNullStreams, spawn } from "node:child_process";
 import { createFrameReader, encodeFrame } from "./lsp-frame.js";
 
 /** Long enough for rust-analyzer's first hover, short enough to not feel hung. */
-export const REQUEST_TIMEOUT_MS = 5_000;
+const REQUEST_TIMEOUT_MS = 5_000;
 
 export interface LspServerSpec {
 	command: string;

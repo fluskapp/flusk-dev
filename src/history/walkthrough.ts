@@ -57,7 +57,7 @@ const WRITING: CardKind[] = ["doc", "skill"];
 const FLAT = { verified: 1, shipped: 1, unknown: 1, blocked: 1, failed: 1 };
 /** Inverted weights: ask the ranker for what it normally buries. */
 const TRAPS = { failed: 2.2, blocked: 2, unknown: 0.6, shipped: 0.4, verified: 0.3 };
-export const asBm25 = (i: Searchable): Bm25Index => ("postings" in i ? i : buildIndex(i.cards));
+const asBm25 = (i: Searchable): Bm25Index => ("postings" in i ? i : buildIndex(i.cards));
 
 export function buildWalkthrough(
 	index: Searchable,

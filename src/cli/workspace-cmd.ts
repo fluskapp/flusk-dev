@@ -14,7 +14,7 @@ import {
 } from "../agent/workspace.js";
 import { SCAFFOLD } from "./workspace-scaffold.js";
 
-export const WORKSPACE_USAGE = `Usage:
+const WORKSPACE_USAGE = `Usage:
   ah workspace init [--project]   scaffold IDENTITY.md, SOUL.md, TOOLS.md
   ah workspace show [--project]   what is loaded, from where, and what is absent
   ah workspace path               print the global workspace directory

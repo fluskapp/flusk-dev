@@ -16,7 +16,7 @@ export type ThemeName = "light" | "dark";
 const R = (s: string): string[] => s.split(" ");
 
 /** colors{} of each theme file, ramp by ramp. Index 0 is …1 (Gray1, Blue1). */
-export const RAMPS: Record<ThemeName, Record<string, string[]>> = {
+const RAMPS: Record<ThemeName, Record<string, string[]>> = {
 	light: {
 		gray: R("#000000 #27282E #383A42 #494B57 #5A5D6B #6C707E #818594 #A8ADBD #C9CCD6 #D3D5DB #DFE1E5 #EBECF0 #F7F8FA #FFFFFF"),
 		blue: R("#2E55A3 #315FBD #3369D6 #3574F0 #4682FA #588CF3 #709CF5 #88ADF7 #A0BDF8 #C2D6FC #D4E2FF #EDF3FF #F5F8FE"),
@@ -100,7 +100,7 @@ export const METRICS: ReadonlyArray<readonly [string, string, string]> = [
 const NO_TYPE = "~ fonts and sizes are IDE settings, not theme keys; workbench value";
 
 /** [token, value, source]. The theme files carry no typography at all. */
-export const TYPE: ReadonlyArray<readonly [string, string, string]> = [
+const TYPE: ReadonlyArray<readonly [string, string, string]> = [
 	["font-ui", `-apple-system, "Segoe UI", "Inter", "Helvetica Neue", sans-serif`, NO_TYPE],
 	["font-mono", `"JetBrains Mono", "SF Mono", Menlo, Consolas, monospace`, NO_TYPE],
 	["fs-1", "10px", NO_TYPE],

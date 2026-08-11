@@ -24,13 +24,13 @@ export function escapeHtml(src: string): string {
  * href that is emitted must therefore both be made on this value, never on
  * the raw capture.
  */
-export function normalizeUrl(url: string): string {
+function normalizeUrl(url: string): string {
 	// biome-ignore lint/suspicious/noControlCharactersInRegex: browsers strip these before parsing
 	return url.replace(/[\u0000-\u0020\u007f]/g, "");
 }
 
 /** Only http(s) and relative paths link; every other scheme stays plain text. */
-export function isSafeUrl(url: string): boolean {
+function isSafeUrl(url: string): boolean {
 	const u = normalizeUrl(url);
 	if (u === "") return false;
 	if (/^https?:\/\//i.test(u)) return true;

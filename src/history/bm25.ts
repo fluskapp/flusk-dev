@@ -18,7 +18,7 @@ const K1 = 1.2;
 const B = 0.75;
 
 /** title x3, paths x2, text x1. */
-export const FIELD_BOOST = { title: 3, paths: 2, text: 1 } as const;
+const FIELD_BOOST = { title: 3, paths: 2, text: 1 } as const;
 
 export interface Posting {
 	doc: number;

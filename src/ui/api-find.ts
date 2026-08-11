@@ -39,7 +39,7 @@ function str(raw: string | null): string | undefined {
 	return raw === null || raw === "" ? undefined : raw;
 }
 
-export function findQuery(q: URLSearchParams): FindQuery {
+function findQuery(q: URLSearchParams): FindQuery {
 	const project = str(q.get("project"));
 	const glob = str(q.get("glob"));
 	const limit = count(q.get("limit"));

@@ -33,7 +33,7 @@ export interface SessionSummary {
 }
 
 /** Newer files persist the RunEndReason in the stats entry; map it directly. */
-export function statusFromReason(reason: RunEndReason): SessionStatus {
+function statusFromReason(reason: RunEndReason): SessionStatus {
 	switch (reason) {
 		case "completed":
 			return "completed";

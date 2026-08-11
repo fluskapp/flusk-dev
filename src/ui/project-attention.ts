@@ -21,11 +21,11 @@ import type { SessionSummary } from "./scan.js";
 
 const MINUTE_MS = 60_000;
 /** A run still "running" this long after its last write is stalled, not busy. */
-export const STALL_MS = 60 * MINUTE_MS;
+const STALL_MS = 60 * MINUTE_MS;
 /** Past this, a finished-badly run is history rather than something to do. */
-export const RECENT_MS = 48 * 60 * MINUTE_MS;
+const RECENT_MS = 48 * 60 * MINUTE_MS;
 export const STALE_MS = 14 * 24 * 60 * MINUTE_MS;
-export const SPEND_FACTOR = 3;
+const SPEND_FACTOR = 3;
 const ATTENTION_LIMIT = 12;
 
 /** Just enough of a project to judge it; keeps this file free of scanning. */
