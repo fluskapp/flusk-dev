@@ -2,9 +2,9 @@ import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vitest";
 import { resolveSessionPath, resumeCmd } from "../src/cli/resume-cmd.js";
-import { assistantText, assistantToolCalls } from "../src/provider/fake.js";
-import { Session } from "../src/session/session.js";
-import { scanSessions } from "../src/ui/scan.js";
+import { assistantText, assistantToolCalls } from "../src/features/provider/fake.js";
+import { Session } from "../src/features/session/session-file.repository.js";
+import { scanSessions } from "../src/features/projects/scan.repository.js";
 import { capture, git, initGitRepo, SLOW } from "./cli2-helpers.js";
 import { fakeModel, setupTestHome, teardownTestHome } from "./helpers.js";
 

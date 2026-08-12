@@ -7,9 +7,9 @@
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { FIX, SHIP } from "../src/lang/library.js";
-import { runFlow } from "../src/lang/runner.js";
-import { loadScores } from "../src/provider/scores.js";
+import { FIX, SHIP } from "../src/features/flows/library.js";
+import { runFlow } from "../src/features/flows/runner.js";
+import { loadScores } from "../src/features/provider/scores.repository.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 import { CFG as cfg, flowOpts, scripted, TASK } from "./lang-flow-helpers.js";
 import { withLangRuntime } from "./lang-guard.js";

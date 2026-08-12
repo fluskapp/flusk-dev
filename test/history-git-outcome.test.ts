@@ -10,7 +10,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, expect, it } from "vitest";
-import { gitCards } from "../src/history/source-git.js";
+import { gitCards } from "../src/features/history/source-git.repository.js";
 
 const dirs: string[] = [];
 afterAll(async () => {

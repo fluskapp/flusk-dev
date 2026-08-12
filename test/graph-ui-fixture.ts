@@ -20,9 +20,9 @@
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { graphPath } from "../src/graph/store-io.js";
-import { openGraphAt } from "../src/graph/store-jsonl.js";
-import type { GraphEdge, GraphNode } from "../src/graph/types.js";
+import { graphPath } from "../src/features/graph/store-io.repository.js";
+import { openGraphAt } from "../src/features/graph/store-jsonl.js";
+import type { GraphEdge, GraphNode } from "../src/features/graph/types.js";
 import { put } from "./find-fixture.js";
 
 /** A FULL 40-hex sha: ids.ts refuses an abbreviated one, and so should this. */

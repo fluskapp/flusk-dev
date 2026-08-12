@@ -18,8 +18,8 @@
  */
 import { statSync } from "node:fs";
 import { relative, resolve } from "node:path";
-import { buildContext } from "../context/build.js";
-import { DEFAULT_BUDGET } from "../ui/api-history.js";
+import { buildContext } from "../features/context/build.js";
+import { DEFAULT_BUDGET } from "../features/history/history.router.js";
 import { contextJson, renderContext } from "./context-report.js";
 
 export interface ContextArgs {

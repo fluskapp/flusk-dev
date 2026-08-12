@@ -1,8 +1,8 @@
 import { appendFileSync, realpathSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
-import { internalWorker } from "../src/orchestra/worker-internal.js";
-import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
+import { internalWorker } from "../src/features/orchestra/worker-internal.js";
+import { assistantText, assistantToolCalls, FakeProvider } from "../src/features/provider/fake.js";
 import { makeTool, setupTestHome, teardownTestHome } from "./helpers.js";
 import { initRepo, makeCtx, makeSpec, makeTask } from "./orchestra-fixture.js";
 

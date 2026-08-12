@@ -10,8 +10,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { describeMigration, didMigrate, migrateHome } from "../src/platform/paths/migrate.js";
-import { FLUSK_NS } from "../src/store/namespaces.js";
-import { nsPath } from "../src/store/paths.js";
+import { FLUSK_NS } from "../src/features/facts/namespaces.js";
+import { nsPath } from "../src/features/facts/paths.js";
 
 const FACT = `${JSON.stringify({ subject: "s", predicate: "p" })}\n`;
 

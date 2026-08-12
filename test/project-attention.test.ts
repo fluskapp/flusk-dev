@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { medianSpend } from "../src/ui/project-attention.js";
+import { medianSpend } from "../src/features/projects/project-attention.js";
 import { ago, DAY, journal, MIN, NOW, run, session } from "./attention-fixture.js";
 
 it("flags a failed or errored harness run, and nothing for a healthy one", () => {

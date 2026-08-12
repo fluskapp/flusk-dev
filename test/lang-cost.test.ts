@@ -4,7 +4,7 @@
  * zero: a step priced at nothing is a run that can spend without limit.
  */
 import { expect, it } from "vitest";
-import { costOf, DEFAULT_RATE, rateFor, usageFrom, usageOf } from "../src/lang/price.js";
+import { costOf, DEFAULT_RATE, rateFor, usageFrom, usageOf } from "../src/features/flows/price.js";
 
 const choice = (id: string) => ({ provider: "anthropic", id });
 

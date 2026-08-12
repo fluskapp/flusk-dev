@@ -5,13 +5,13 @@
  * then claim-check the completion report and record the verdict.
  * Empty command list → pass-through (scratch repos stay gate-free).
  */
-import type { Agent } from "../agent/options.js";
-import type { FluskConfig, RepoConfig } from "../config/types.js";
-import { collectRunRecord } from "../core/run-record.js";
-import type { RunEndReason, RunStats } from "../core/types.js";
-import type { FactStore } from "../store/types.js";
-import { detectVerifyCommands } from "../verify/detect.js";
-import { formatEvidence, runVerify, type VerifyCommandResult } from "../verify/gate.js";
+import type { Agent } from "../features/run/options.js";
+import type { FluskConfig, RepoConfig } from "../platform/config/types.js";
+import { collectRunRecord } from "../features/run/run-record.js";
+import type { RunEndReason, RunStats } from "../features/run/run.types.js";
+import type { FactStore } from "../features/facts/types.js";
+import { detectVerifyCommands } from "../features/verify/detect.repository.js";
+import { formatEvidence, runVerify, type VerifyCommandResult } from "../features/verify/gate.repository.js";
 import { claimCheck, finalReport } from "./gate-report.js";
 
 /** What the CLI exits on: a run end reason, or gate-blocked (exit 1). */

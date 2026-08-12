@@ -1,9 +1,9 @@
 import { expect, test } from "vitest";
-import { createAgent } from "../src/agent/agent.js";
-import type { Msg, ToolResultMsg } from "../src/core/types.js";
-import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
-import { repairDanglingToolCalls } from "../src/session/repair.js";
-import { Session } from "../src/session/session.js";
+import { createAgent } from "../src/features/run/agent.js";
+import type { Msg, ToolResultMsg } from "../src/features/run/run.types.js";
+import { assistantText, assistantToolCalls, FakeProvider } from "../src/features/provider/fake.js";
+import { repairDanglingToolCalls } from "../src/features/session/repair.js";
+import { Session } from "../src/features/session/session-file.repository.js";
 import { fakeModel, setupTestHome, teardownTestHome } from "./helpers.js";
 
 const INTERRUPTED = "[interrupted — no result recorded]";

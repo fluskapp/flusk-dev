@@ -11,10 +11,10 @@
 import { chmodSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
-import { disposeService } from "../src/doc/ts-service.js";
-import { buildGraph } from "../src/graph/build.js";
-import { graphPath, statePath } from "../src/graph/store-io.js";
-import { openGraphStore } from "../src/graph/store-jsonl.js";
+import { disposeService } from "../src/features/docs/ts-service.js";
+import { buildGraph } from "../src/features/graph/build.js";
+import { graphPath, statePath } from "../src/features/graph/store-io.repository.js";
+import { openGraphStore } from "../src/features/graph/store-jsonl.js";
 import { commitCard, type GraphFixture, graphProject, sessionCard } from "./graph-fixture.js";
 
 let fx: GraphFixture | null = null;

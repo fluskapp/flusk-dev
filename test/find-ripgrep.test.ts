@@ -7,10 +7,10 @@
  * where a passing test and a visibly wrong highlight diverge.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { toRanges } from "../src/find/rg-offsets.js";
-import { MAX_LINE, toMatch } from "../src/find/rg-parse.js";
-import { find } from "../src/find/ripgrep.js";
-import type { FindResult } from "../src/find/types.js";
+import { toRanges } from "../src/features/search/rg-offsets.js";
+import { MAX_LINE, toMatch } from "../src/features/search/rg-parse.js";
+import { find } from "../src/features/search/ripgrep.js";
+import type { FindResult } from "../src/features/search/types.js";
 import { type FindTree, findTree, hasRg, UNICODE_LINE } from "./find-fixture.js";
 
 let t: FindTree;

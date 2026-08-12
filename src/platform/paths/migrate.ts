@@ -17,9 +17,9 @@
  * the wrong one. Either the move happened, or there was nothing to move.
  */
 import { existsSync, renameSync } from "node:fs";
-import { fluskHome, legacyHome } from "../../session/paths.js";
-import { nsPath } from "../../store/paths.js";
-import { FLUSK_NS } from "../../store/namespaces.js";
+import { fluskHome, legacyHome } from "./paths.js";
+import { nsPath } from "../../features/facts/paths.js";
+import { FLUSK_NS } from "../../features/facts/namespaces.js";
 import { join } from "node:path";
 
 /** The harness ops namespace before the rename; only this file may know it. */

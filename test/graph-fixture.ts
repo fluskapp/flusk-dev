@@ -15,7 +15,7 @@
 import { cpSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { HistoryCard } from "../src/history/types.js";
+import type { HistoryCard } from "../src/features/history/types.js";
 
 /** Five files: an importer, its two targets, and two islands nothing links to. */
 export const SRC: Record<string, string> = {

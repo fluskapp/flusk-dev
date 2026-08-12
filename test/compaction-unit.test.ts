@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
-import { estimateTokens, findCutIndex, shouldCompact } from "../src/compaction/compact.js";
-import type { Msg } from "../src/core/types.js";
-import { assistantText, assistantToolCalls } from "../src/provider/fake.js";
+import { estimateTokens, findCutIndex, shouldCompact } from "../src/features/compaction/compact.js";
+import type { Msg } from "../src/features/run/run.types.js";
+import { assistantText, assistantToolCalls } from "../src/features/provider/fake.js";
 import { toolResult, user } from "./compaction-helpers.js";
 
 test("estimateTokens is chars/4 over serialized messages", () => {

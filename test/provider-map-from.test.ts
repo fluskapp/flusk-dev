@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { StopReason } from "../src/core/types.js";
-import { fromPiEvent, fromPiMessage, fromPiStopReason, fromPiUsage } from "../src/provider/pi-ai-map.js";
+import type { StopReason } from "../src/features/run/run.types.js";
+import { fromPiEvent, fromPiMessage, fromPiStopReason, fromPiUsage } from "../src/features/provider/pi-ai-map.js";
 import {
 	type AssistantMessageEvent,
 	piAssistant,

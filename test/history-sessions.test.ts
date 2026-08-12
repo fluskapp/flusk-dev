@@ -2,8 +2,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import type { Msg } from "../src/core/types.js";
-import { sessionCards } from "../src/history/source-sessions.js";
+import type { Msg } from "../src/features/run/run.types.js";
+import { sessionCards } from "../src/features/history/source-sessions.js";
 import { asst, call, res, say, session } from "./history-session-fixtures.js";
 
 const GH = "ghp_ABCDEFGHIJKLMNOP1234";

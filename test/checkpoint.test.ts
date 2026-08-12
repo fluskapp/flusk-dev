@@ -1,11 +1,11 @@
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
 import { expect, test } from "vitest";
-import { createAgent } from "../src/agent/agent.js";
-import { collectRunRecord } from "../src/core/run-record.js";
-import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
-import { bashTool } from "../src/tools/bash.js";
-import { writeTool } from "../src/tools/write.js";
+import { createAgent } from "../src/features/run/agent.js";
+import { collectRunRecord } from "../src/features/run/run-record.js";
+import { assistantText, assistantToolCalls, FakeProvider } from "../src/features/provider/fake.js";
+import { bashTool } from "../src/features/tools/bash.repository.js";
+import { writeTool } from "../src/features/tools/write.repository.js";
 import { SLOW } from "./cli2-helpers.js";
 import { fakeModel, setupTestHome, teardownTestHome } from "./helpers.js";
 

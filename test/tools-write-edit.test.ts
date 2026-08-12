@@ -3,12 +3,12 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createEventBus } from "../src/core/events.js";
-import type { Policy } from "../src/safety/policy.js";
-import { allowAllPolicy } from "../src/safety/policy.js";
-import { editTool } from "../src/tools/edit.js";
-import type { ToolContext } from "../src/tools/tool.js";
-import { writeTool } from "../src/tools/write.js";
+import { createEventBus } from "../src/platform/events/events.js";
+import type { Policy } from "../src/features/safety/policy.js";
+import { allowAllPolicy } from "../src/features/safety/policy.js";
+import { editTool } from "../src/features/tools/edit.repository.js";
+import type { ToolContext } from "../src/features/tools/tool.js";
+import { writeTool } from "../src/features/tools/write.repository.js";
 
 let dir: string;
 

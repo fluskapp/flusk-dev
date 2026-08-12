@@ -11,7 +11,7 @@ import {
 	loadWorkspace,
 	projectWorkspaceDir,
 	workspacePaths,
-} from "../agent/workspace.js";
+} from "../features/workspace/workspace.js";
 import { SCAFFOLD } from "./workspace-scaffold.js";
 
 const WORKSPACE_USAGE = `Usage:

@@ -11,10 +11,10 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync } from "
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
-import { agentForTask } from "../src/orchestra/agent-for-task.js";
-import { loadAgentRegistry } from "../src/orchestra/registry.js";
-import { genericDraft, normaliseDraft } from "../src/orchestra/spec-draft.js";
-import { AGENT_NAME, deriveAgentName, safeAgentName } from "../src/orchestra/spec-name.js";
+import { agentForTask } from "../src/features/orchestra/agent-for-task.js";
+import { loadAgentRegistry } from "../src/features/orchestra/registry.js";
+import { genericDraft, normaliseDraft } from "../src/features/orchestra/spec-draft.js";
+import { AGENT_NAME, deriveAgentName, safeAgentName } from "../src/features/orchestra/spec-name.js";
 
 let home: string;
 let repo: string;

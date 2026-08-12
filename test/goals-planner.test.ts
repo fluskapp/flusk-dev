@@ -1,9 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { ModelRef } from "../src/core/types.js";
-import { planGoal, writeGoalGraph } from "../src/goals/planner.js";
-import { frontier } from "../src/goals/scheduler.js";
-import { assistantText, FakeProvider } from "../src/provider/fake.js";
-import type { FactStore } from "../src/store/types.js";
+import type { ModelRef } from "../src/features/run/run.types.js";
+import { planGoal, writeGoalGraph } from "../src/features/goals/planner.js";
+import { frontier } from "../src/features/goals/scheduler.js";
+import { assistantText, FakeProvider } from "../src/features/provider/fake.js";
+import type { FactStore } from "../src/features/facts/types.js";
 import { type Harness, harness } from "./store-harness.js";
 
 const model: ModelRef = { provider: "fake", id: "fake-planner", contextWindow: 200_000 };

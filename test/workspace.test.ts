@@ -1,8 +1,8 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vitest";
-import { loadWorkspace } from "../src/agent/workspace.js";
-import { globalWorkspaceDir, projectWorkspaceDir } from "../src/agent/workspace-files.js";
+import { loadWorkspace } from "../src/features/workspace/workspace.js";
+import { globalWorkspaceDir, projectWorkspaceDir } from "../src/features/workspace/workspace-files.repository.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 
 let repo: string;

@@ -9,9 +9,9 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { goal, task } from "../src/goals/schema.js";
-import { fact } from "../src/store/facts.js";
-import { runFact } from "../src/verify/run-facts.js";
+import { goal, task } from "../src/features/goals/schema.js";
+import { fact } from "../src/features/facts/facts.js";
+import { runFact } from "../src/features/verify/run-facts.js";
 import { type Harness, harness, NS } from "./store-harness.js";
 
 const SRC = fileURLToPath(new URL("../src", import.meta.url));

@@ -6,13 +6,13 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { FluskConfig } from "../src/config/types.js";
-import { createFactStore } from "../src/store/store.js";
-import type { FactStore } from "../src/store/types.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { FluskConfig } from "../src/platform/config/types.js";
+import { createFactStore } from "../src/features/facts/facts.repository.js";
+import type { FactStore } from "../src/features/facts/types.js";
 import type { CliOutcome } from "../src/cli/gate-loop.js";
-import type { WorkItem } from "../src/watch/queue.js";
-import type { WatchDeps } from "../src/watch/tick.js";
+import type { WorkItem } from "../src/features/watch/queue.repository.js";
+import type { WatchDeps } from "../src/features/watch/tick.js";
 
 export const REPO_NS = "repo:watch-test";
 /** Anchored to real time: the store stamps facts with the wall clock, so a

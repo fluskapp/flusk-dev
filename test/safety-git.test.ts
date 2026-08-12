@@ -10,7 +10,7 @@ import {
 	isGitRepo,
 	startRunBranch,
 	summarizeRun,
-} from "../src/safety/git-isolation.js";
+} from "../src/features/safety/git-isolation.repository.js";
 
 const dirs: string[] = [];
 

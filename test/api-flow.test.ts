@@ -6,9 +6,9 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import type { FlowLibrary } from "../src/ui/api-flow.js";
-import type { DryPlan } from "../src/ui/flow-plan.js";
-import type { FlowRunRow } from "../src/ui/flow-runs.js";
+import type { FlowLibrary } from "../src/features/flows/flow.router.js";
+import type { DryPlan } from "../src/features/flows/flow-plan.js";
+import type { FlowRunRow } from "../src/features/flows/flow-runs.repository.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 import { call, post } from "./api-http.js";
 import { journal, type Tree, tree } from "./project-fixture.js";

@@ -6,10 +6,10 @@
  * did not understand looks authoritative while lying about the pipeline.
  */
 import { expect, it } from "vitest";
-import { renderMarkdown } from "../src/ui/markdown.js";
-import { parseMermaid } from "../src/ui/mermaid-parse.js";
-import { layout } from "../src/ui/mermaid-layout.js";
-import { renderMermaid } from "../src/ui/mermaid-svg.js";
+import { renderMarkdown } from "../src/ui/render/markdown.js";
+import { parseMermaid } from "../src/ui/render/mermaid-parse.js";
+import { layout } from "../src/ui/render/mermaid-layout.js";
+import { renderMermaid } from "../src/ui/render/mermaid-svg.js";
 
 /** Copied verbatim from a linof-harness run journal. */
 const REAL = `flowchart LR

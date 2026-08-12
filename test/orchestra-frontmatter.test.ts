@@ -6,8 +6,8 @@
  * end the same way: refused, with something the user can read.
  */
 import { describe, expect, it } from "vitest";
-import { parseSpecFile } from "../src/orchestra/frontmatter.js";
-import { parseAgentSpec } from "../src/orchestra/spec-parse.js";
+import { parseSpecFile } from "../src/features/orchestra/frontmatter.js";
+import { parseAgentSpec } from "../src/features/orchestra/spec-parse.js";
 
 const SPEC = `---
 name: test-writer

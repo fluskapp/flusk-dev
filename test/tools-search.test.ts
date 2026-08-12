@@ -2,11 +2,11 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createEventBus } from "../src/core/events.js";
-import { allowAllPolicy } from "../src/safety/policy.js";
-import { globTool } from "../src/tools/glob.js";
-import { grepTool } from "../src/tools/grep.js";
-import type { ToolContext } from "../src/tools/tool.js";
+import { createEventBus } from "../src/platform/events/events.js";
+import { allowAllPolicy } from "../src/features/safety/policy.js";
+import { globTool } from "../src/features/tools/glob.repository.js";
+import { grepTool } from "../src/features/tools/grep.repository.js";
+import type { ToolContext } from "../src/features/tools/tool.js";
 
 let dir: string;
 

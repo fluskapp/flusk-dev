@@ -16,7 +16,7 @@
  * deletes the only signal this file produces. The report names what missed.
  */
 import { expect, it } from "vitest";
-import type { HistoryCard } from "../src/history/types.js";
+import type { HistoryCard } from "../src/features/history/types.js";
 import { ABLATIONS, FLAT, FX, ids, measure, report, run } from "./history-eval-harness.js";
 
 const TWIN = "wire the budget guard into the agent loop";

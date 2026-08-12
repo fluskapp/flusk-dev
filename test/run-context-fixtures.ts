@@ -6,7 +6,7 @@
  * and one build and two identical builds render the same bytes. So the source
  * counts its own calls and records the isResume it was asked with.
  */
-import type { ContextSource } from "../src/context/types.js";
+import type { ContextSource } from "../src/features/context/types.js";
 
 /** Distinctive enough that finding it in a system prompt proves the route. */
 export const MARKER = "MARKER-VERIFY-CHAIN: this repository is verified with npm test.";

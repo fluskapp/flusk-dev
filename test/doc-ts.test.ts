@@ -9,10 +9,10 @@
  * position the test computed itself from the source text.
  */
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { withDocCache } from "../src/doc/cache.js";
-import { createTsProvider } from "../src/doc/ts-provider.js";
-import { disposeService, serviceStatus } from "../src/doc/ts-service.js";
-import type { DocProvider } from "../src/doc/types.js";
+import { withDocCache } from "../src/features/docs/cache.repository.js";
+import { createTsProvider } from "../src/features/docs/ts-provider.js";
+import { disposeService, serviceStatus } from "../src/features/docs/ts-service.js";
+import type { DocProvider } from "../src/features/docs/types.js";
 import { type DocFixture, docProject, GREET_TS, posOf, USE_TS } from "./doc-fixture.js";
 
 let t: DocFixture;

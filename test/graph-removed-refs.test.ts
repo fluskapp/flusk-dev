@@ -11,10 +11,10 @@
  */
 import { rmSync } from "node:fs";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { disposeService } from "../src/doc/ts-service.js";
-import { blastRadius } from "../src/graph/blast-radius.js";
-import { buildGraph } from "../src/graph/build.js";
-import { openGraphStore } from "../src/graph/store-jsonl.js";
+import { disposeService } from "../src/features/docs/ts-service.js";
+import { blastRadius } from "../src/features/graph/blast-radius.js";
+import { buildGraph } from "../src/features/graph/build.js";
+import { openGraphStore } from "../src/features/graph/store-jsonl.js";
 import { type GraphFixture, graphProject } from "./graph-fixture.js";
 
 const GREET = "symbol:proj/src/greet.ts#greet";

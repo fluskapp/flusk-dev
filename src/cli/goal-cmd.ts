@@ -7,15 +7,15 @@
  * prints only.
  */
 import { randomUUID } from "node:crypto";
-import { loadConfig, loadRepoConfig } from "../config/config.js";
-import { type GoalPlan, planGoal, writeGoalGraph } from "../goals/planner.js";
-import { claimTask, completeTask, failTask, frontier } from "../goals/scheduler.js";
-import { resetFailedTasks, writeGoalStatus } from "../goals/schema.js";
-import { resolveNamespace } from "../store/namespaces.js";
-import { FakeProvider } from "../provider/fake.js";
-import { hasAuth, PiAiProvider } from "../provider/pi-ai.js";
-import type { Provider } from "../provider/provider.js";
-import { createFactStore } from "../store/store.js";
+import { loadConfig, loadRepoConfig } from "../platform/config/config.js";
+import { type GoalPlan, planGoal, writeGoalGraph } from "../features/goals/planner.js";
+import { claimTask, completeTask, failTask, frontier } from "../features/goals/scheduler.js";
+import { resetFailedTasks, writeGoalStatus } from "../features/goals/schema.js";
+import { resolveNamespace } from "../features/facts/namespaces.js";
+import { FakeProvider } from "../features/provider/fake.js";
+import { hasAuth, PiAiProvider } from "../features/provider/pi-ai.js";
+import type { Provider } from "../features/provider/provider.js";
+import { createFactStore } from "../features/facts/facts.repository.js";
 import type { CliOutcome } from "./gate-loop.js";
 import { allTasksDone, renderGoalList } from "./goal-list.js";
 import { runTask } from "./goal-task.js";

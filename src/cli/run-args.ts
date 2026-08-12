@@ -3,7 +3,7 @@
  * a readable table of commands. Returns either the options runCmd wants or a
  * message to print.
  */
-import type { TaskKind } from "../config/types.js";
+import type { TaskKind } from "../platform/config/types.js";
 import type { RunCmdOpts } from "./run-cmd.js";
 
 const KINDS: ReadonlySet<string> = new Set(["plan", "code", "review", "summarize"]);

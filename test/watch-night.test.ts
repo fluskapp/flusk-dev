@@ -7,9 +7,9 @@
  * runs twice as long as configured.
  */
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { nightCount, nightKey, recordNightRun } from "../src/watch/ledger.js";
-import type { FactStore } from "../src/store/types.js";
-import { watchTick } from "../src/watch/tick.js";
+import { nightCount, nightKey, recordNightRun } from "../src/features/watch/ledger.js";
+import type { FactStore } from "../src/features/facts/types.js";
+import { watchTick } from "../src/features/watch/tick.js";
 import { harness, item, startMemory, T0 } from "./watch-harness.js";
 
 let cleanup: () => Promise<void>;

@@ -1,11 +1,11 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vitest";
-import { globalWorkspaceDir } from "../src/agent/workspace-files.js";
-import { createWorkspaceSource } from "../src/context/source-workspace.js";
-import { workspaceBlock } from "../src/context/source-workspace-item.js";
-import type { ContextItem, ContextRequest } from "../src/context/types.js";
-import { estimateTokens } from "../src/history/budget.js";
+import { globalWorkspaceDir } from "../src/features/workspace/workspace-files.repository.js";
+import { createWorkspaceSource } from "../src/features/context/source-workspace.js";
+import { workspaceBlock } from "../src/features/context/source-workspace-item.js";
+import type { ContextItem, ContextRequest } from "../src/features/context/types.js";
+import { estimateTokens } from "../src/features/history/budget.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 
 let repo: string;

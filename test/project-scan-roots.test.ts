@@ -6,8 +6,8 @@
  */
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import type { ProjectSummary } from "../src/ui/api-types.js";
-import { scanProjects } from "../src/ui/project-scan.js";
+import type { ProjectSummary } from "../src/features/projects/projects.types.js";
+import { scanProjects } from "../src/features/projects/project-scan.repository.js";
 import { journal, session, tree, write } from "./project-fixture.js";
 
 const NOW = new Date("2026-08-11T00:00:00.000Z");

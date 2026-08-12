@@ -1,13 +1,13 @@
 import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fluskHome } from "../src/session/paths.js";
+import { fluskHome } from "../src/platform/paths/paths.js";
 import { Type } from "typebox";
-import { createAgent } from "../src/agent/agent.js";
-import type { EventBus } from "../src/core/events.js";
-import type { ModelRef, RunEndReason, ToolResultMsg } from "../src/core/types.js";
-import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
-import type { Tool } from "../src/tools/tool.js";
+import { createAgent } from "../src/features/run/agent.js";
+import type { EventBus } from "../src/platform/events/events.js";
+import type { ModelRef, RunEndReason, ToolResultMsg } from "../src/features/run/run.types.js";
+import { assistantText, assistantToolCalls, FakeProvider } from "../src/features/provider/fake.js";
+import type { Tool } from "../src/features/tools/tool.js";
 
 export const fakeModel: ModelRef = { provider: "fake", id: "fake-1", contextWindow: 200_000 };
 

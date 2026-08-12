@@ -16,7 +16,7 @@ import type {
 	GraphWriteResult,
 	Neighbor,
 	NeighborOptions,
-} from "../src/graph/types.js";
+} from "../src/features/graph/types.js";
 
 export const P = "syn";
 export const file = (rel: string) => `file:${P}/${rel}`;

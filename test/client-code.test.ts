@@ -16,7 +16,7 @@ import { expect, it } from "vitest";
 import { CLIENT_CODE_JS } from "../src/ui/client-code.js";
 import { CLIENT_CODE_OUTLINE_JS } from "../src/ui/client-code-outline.js";
 import { CLIENT_FILE_JS } from "../src/ui/client-file.js";
-import { highlightCode } from "../src/ui/highlight.js";
+import { highlightCode } from "../src/ui/render/highlight.js";
 
 interface CodeApi {
 	codePositions(html: string): string;

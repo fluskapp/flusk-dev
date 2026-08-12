@@ -11,9 +11,9 @@ import { join } from "node:path";
 import { afterEach, beforeEach, expect, it } from "vitest";
 import { parseFlowArgs } from "../src/cli/flow-args.js";
 import { type FlowCmdOpts, flowCmd } from "../src/cli/flow-cmd.js";
-import { saveIndex } from "../src/history/index-store.js";
-import type { HistoryCard } from "../src/history/types.js";
-import { langMissing } from "../src/lang/deps.js";
+import { saveIndex } from "../src/features/history/index-store.repository.js";
+import type { HistoryCard } from "../src/features/history/types.js";
+import { langMissing } from "../src/features/flows/deps.js";
 import { capture } from "./cli2-helpers.js";
 import { setupTestHome, teardownTestHome, writeHomeConfig } from "./helpers.js";
 

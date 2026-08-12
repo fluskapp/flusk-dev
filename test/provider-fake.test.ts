@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { ModelRef, Msg } from "../src/core/types.js";
-import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
-import type { CompletionRequest, StreamEvent } from "../src/provider/provider.js";
+import type { ModelRef, Msg } from "../src/features/run/run.types.js";
+import { assistantText, assistantToolCalls, FakeProvider } from "../src/features/provider/fake.js";
+import type { CompletionRequest, StreamEvent } from "../src/features/provider/provider.js";
 
 const model: ModelRef = { provider: "fake", id: "fake-1", contextWindow: 100_000 };
 

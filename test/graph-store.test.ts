@@ -11,8 +11,8 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, expect, it } from "vitest";
-import { openGraphAt } from "../src/graph/store-jsonl.js";
-import type { GraphNode } from "../src/graph/types.js";
+import { openGraphAt } from "../src/features/graph/store-jsonl.js";
+import type { GraphNode } from "../src/features/graph/types.js";
 
 const dir = mkdtempSync(join(tmpdir(), "flusk-graphstore-"));
 afterAll(() => rmSync(dir, { recursive: true, force: true }));

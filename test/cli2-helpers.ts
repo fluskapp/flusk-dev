@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { PassThrough } from "node:stream";
-import { assistantText, assistantToolCalls } from "../src/provider/fake.js";
+import { assistantText, assistantToolCalls } from "../src/features/provider/fake.js";
 
 // Git-heavy tests spawn many subprocesses; sandboxed CI machines can take
 // seconds per spawn, so give every test (and the hooks) generous room.

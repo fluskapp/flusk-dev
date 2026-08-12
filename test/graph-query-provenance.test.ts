@@ -8,7 +8,7 @@
  * warns about. A query that joined on `card.id` passes no test here.
  */
 import { describe, expect, it } from "vitest";
-import { historyClock, provenance } from "../src/graph/queries.js";
+import { historyClock, provenance } from "../src/features/graph/queries.js";
 import { commit, doc, fakeStore, run, sha } from "./graph-query-fixture.js";
 import { A, cards, edges, nodes } from "./graph-query-graph.js";
 

@@ -8,7 +8,7 @@
  * five MINUTES respectively, with every other request behind them.
  */
 import { expect, it } from "vitest";
-import { highlightCode } from "../src/ui/highlight.js";
+import { highlightCode } from "../src/ui/render/highlight.js";
 
 it("returns promptly for a 500KB single line", () => {
 	const line = `const a=${"{x:1,y:'s',z:[2,3]},".repeat(25_000)};`;

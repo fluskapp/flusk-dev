@@ -1,8 +1,8 @@
 import { afterAll, beforeAll, expect, test } from "vitest";
-import { createAgent } from "../src/agent/agent.js";
-import type { AssistantMsg } from "../src/core/types.js";
-import { zeroUsage } from "../src/core/types.js";
-import { assistantText, FakeProvider } from "../src/provider/fake.js";
+import { createAgent } from "../src/features/run/agent.js";
+import type { AssistantMsg } from "../src/features/run/run.types.js";
+import { zeroUsage } from "../src/features/run/run.types.js";
+import { assistantText, FakeProvider } from "../src/features/provider/fake.js";
 import {
 	fakeModel as model,
 	pingTool,

@@ -9,7 +9,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { renderPayload } from "../src/ui/api-render.js";
+import { renderPayload } from "../src/features/docs/render.router.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 import { call, post } from "./api-http.js";
 

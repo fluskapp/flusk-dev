@@ -10,11 +10,11 @@
  * must mint byte-identical id sets.
  */
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { disposeService } from "../src/doc/ts-service.js";
-import { buildGraph } from "../src/graph/build.js";
-import { readTriples } from "../src/graph/store-io.js";
-import { graphPath } from "../src/graph/store-io.js";
-import { openGraphStore } from "../src/graph/store-jsonl.js";
+import { disposeService } from "../src/features/docs/ts-service.js";
+import { buildGraph } from "../src/features/graph/build.js";
+import { readTriples } from "../src/features/graph/store-io.repository.js";
+import { graphPath } from "../src/features/graph/store-io.repository.js";
+import { openGraphStore } from "../src/features/graph/store-jsonl.js";
 import { cloneFixture, type GraphFixture, graphProject } from "./graph-fixture.js";
 
 let fx: GraphFixture;

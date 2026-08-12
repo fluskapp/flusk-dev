@@ -8,10 +8,10 @@
  * project are all decisions that should be made by a person who saw why.
  */
 import { relative } from "node:path";
-import { loadConfig } from "../config/config.js";
-import { advise } from "../profile/advise.js";
-import { buildProfile } from "../profile/profile.js";
-import type { Detected, Suggestion } from "../profile/types.js";
+import { loadConfig } from "../platform/config/config.js";
+import { advise } from "../features/profile/advise.js";
+import { buildProfile } from "../features/profile/profile.js";
+import type { Detected, Suggestion } from "../features/profile/types.js";
 
 export interface IndexOpts {
 	repo?: string;

@@ -9,7 +9,7 @@
 import { writeFile } from "node:fs/promises";
 import { execPath } from "node:process";
 import { afterEach, describe, expect, it } from "vitest";
-import { createLspProvider, type LspDocProvider } from "../src/doc/lsp-provider.js";
+import { createLspProvider, type LspDocProvider } from "../src/features/docs/lsp-provider.js";
 import { type Fake, FIXTURE, writeFakeServer } from "./doc-lsp-fake.js";
 
 const providers: LspDocProvider[] = [];

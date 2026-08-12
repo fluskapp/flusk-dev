@@ -1,6 +1,6 @@
-import type { TaskKind } from "../config/types.js";
-import { loadScores, nudge } from "../provider/scores.js";
-import { scanSessions } from "../ui/scan.js";
+import type { TaskKind } from "../platform/config/types.js";
+import { loadScores, nudge } from "../features/provider/scores.repository.js";
+import { scanSessions } from "../features/projects/scan.repository.js";
 
 const KINDS = new Set<string>(["plan", "code", "review", "summarize"]);
 const START = 0.5;

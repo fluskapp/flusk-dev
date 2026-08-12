@@ -1,13 +1,13 @@
 import { writeFile } from "node:fs/promises";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { loadFlowStats, statsPath } from "../src/lang/flow-stats.js";
-import { improveFromRun } from "../src/lang/improve.js";
-import { recordFlowRun } from "../src/lang/record.js";
-import type { FlowResult, FlowStep, NodeKind } from "../src/lang/types.js";
-import { createFactStore } from "../src/store/store.js";
-import type { Fact, FactStore } from "../src/store/types.js";
-import { LESSONS_NS } from "../src/lang/facts.js";
-import { loadScores } from "../src/provider/scores.js";
+import { loadFlowStats, statsPath } from "../src/features/flows/flow-stats.repository.js";
+import { improveFromRun } from "../src/features/flows/improve.js";
+import { recordFlowRun } from "../src/features/flows/record.repository.js";
+import type { FlowResult, FlowStep, NodeKind } from "../src/features/flows/types.js";
+import { createFactStore } from "../src/features/facts/facts.repository.js";
+import type { Fact, FactStore } from "../src/features/facts/types.js";
+import { LESSONS_NS } from "../src/features/flows/facts.js";
+import { loadScores } from "../src/features/provider/scores.repository.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 
 let repo: string;

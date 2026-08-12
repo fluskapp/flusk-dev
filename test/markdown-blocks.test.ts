@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { renderMarkdown } from "../src/ui/markdown.js";
+import { renderMarkdown } from "../src/ui/render/markdown.js";
 
 it("renders task list items as disabled checkboxes", () => {
 	const html = renderMarkdown("- [ ] open item\n- [x] done item\n- plain item");

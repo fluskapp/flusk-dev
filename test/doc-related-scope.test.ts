@@ -14,12 +14,12 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { FluskConfig } from "../src/config/types.js";
-import { type RelatedItem, relatedFor } from "../src/doc/related.js";
-import type { FindMatch, FindResult } from "../src/find/types.js";
-import { buildIndex } from "../src/history/bm25.js";
-import type { CardKind, HistoryCard, Outcome } from "../src/history/types.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { FluskConfig } from "../src/platform/config/types.js";
+import { type RelatedItem, relatedFor } from "../src/features/docs/related.js";
+import type { FindMatch, FindResult } from "../src/features/search/types.js";
+import { buildIndex } from "../src/features/history/bm25.js";
+import type { CardKind, HistoryCard, Outcome } from "../src/features/history/types.js";
 
 const NOW = Date.parse("2026-08-10T00:00:00.000Z");
 const ago = (days: number): string => new Date(NOW - days * 86_400_000).toISOString();

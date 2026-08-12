@@ -1,10 +1,10 @@
 import { afterAll, beforeAll, expect, test } from "vitest";
-import type { Agent } from "../src/agent/agent.js";
-import { createAgent } from "../src/agent/agent.js";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { FluskConfig } from "../src/config/types.js";
-import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
-import type { StatsEntry } from "../src/session/entries.js";
+import type { Agent } from "../src/features/run/agent.js";
+import { createAgent } from "../src/features/run/agent.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { FluskConfig } from "../src/platform/config/types.js";
+import { assistantText, assistantToolCalls, FakeProvider } from "../src/features/provider/fake.js";
+import type { StatsEntry } from "../src/features/session/entries.js";
 import {
 	fakeModel as model,
 	pingTool,

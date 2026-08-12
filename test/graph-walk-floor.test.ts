@@ -16,7 +16,7 @@
  * list stamped complete.
  */
 import { describe, expect, it } from "vitest";
-import { blastRadius, neighbourhood } from "../src/graph/queries.js";
+import { blastRadius, neighbourhood } from "../src/features/graph/queries.js";
 import { edge, fakeStore, file, node, sym } from "./graph-query-fixture.js";
 
 const HUB = file("root.ts");

@@ -13,9 +13,9 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { historySource } from "../src/context/source-history.js";
-import type { ContextRequest } from "../src/context/types.js";
-import { INDEX_VERSION, indexDir, indexPath } from "../src/history/index-store.js";
+import { historySource } from "../src/features/context/source-history.js";
+import type { ContextRequest } from "../src/features/context/types.js";
+import { INDEX_VERSION, indexDir, indexPath } from "../src/features/history/index-store.repository.js";
 import { CORPUS, card, MALFORMED, PROJECT, TASK } from "./context-history-fixtures.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 

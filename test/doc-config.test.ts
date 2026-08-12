@@ -11,8 +11,8 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
-import { loadConfig } from "../src/config/config.js";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
+import { loadConfig } from "../src/platform/config/config.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
 import { setupTestHome, teardownTestHome, writeHomeConfig } from "./helpers.js";
 
 const HOSTILE = {

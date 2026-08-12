@@ -6,10 +6,10 @@
 import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { FluskConfig } from "../src/config/types.js";
-import type { RunEndReason } from "../src/core/types.js";
-import { Session } from "../src/session/session.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { FluskConfig } from "../src/platform/config/types.js";
+import type { RunEndReason } from "../src/features/run/run.types.js";
+import { Session } from "../src/features/session/session-file.repository.js";
 
 const MODEL = { provider: "fake", id: "fake-1", contextWindow: 200_000 };
 

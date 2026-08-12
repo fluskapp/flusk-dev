@@ -1,12 +1,12 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { expect, test } from "vitest";
-import { createAgent } from "../src/agent/agent.js";
-import type { Msg, ToolResultMsg } from "../src/core/types.js";
-import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
-import { BudgetTracker } from "../src/safety/budget.js";
-import type { HeaderEntry } from "../src/session/entries.js";
-import { sessionsDir } from "../src/session/paths.js";
+import { createAgent } from "../src/features/run/agent.js";
+import type { Msg, ToolResultMsg } from "../src/features/run/run.types.js";
+import { assistantText, assistantToolCalls, FakeProvider } from "../src/features/provider/fake.js";
+import { BudgetTracker } from "../src/features/safety/budget.js";
+import type { HeaderEntry } from "../src/features/session/entries.js";
+import { sessionsDir } from "../src/platform/paths/paths.js";
 import { fakeModel, setupTestHome, teardownTestHome } from "./helpers.js";
 
 async function readHeaders(repo: string): Promise<HeaderEntry[]> {

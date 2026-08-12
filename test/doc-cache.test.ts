@@ -9,10 +9,10 @@
  * memoizes, and that the engine a caller actually receives is wrapped.
  */
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { withDocCache } from "../src/doc/cache.js";
-import { createTsProvider } from "../src/doc/ts-provider.js";
-import { disposeService } from "../src/doc/ts-service.js";
-import type { DocProvider } from "../src/doc/types.js";
+import { withDocCache } from "../src/features/docs/cache.repository.js";
+import { createTsProvider } from "../src/features/docs/ts-provider.js";
+import { disposeService } from "../src/features/docs/ts-service.js";
+import type { DocProvider } from "../src/features/docs/types.js";
 import { type DocFixture, docProject, GREET_TS, posOf } from "./doc-fixture.js";
 
 let t: DocFixture;

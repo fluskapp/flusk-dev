@@ -9,7 +9,7 @@
  * no remedy is a dead end with better prose. Each case below asserts both.
  */
 import { afterAll, beforeAll, expect, it } from "vitest";
-import type { GraphReply } from "../src/ui/api-graph.js";
+import type { GraphReply } from "../src/features/graph/graph.router.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 import { call } from "./api-http.js";
 import { hasRg } from "./find-fixture.js";

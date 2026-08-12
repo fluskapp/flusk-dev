@@ -8,7 +8,7 @@
  */
 import { readFile, truncate } from "node:fs/promises";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { claimTask } from "../src/goals/scheduler.js";
+import { claimTask } from "../src/features/goals/scheduler.js";
 import { type Harness, harness, NS, T0 } from "./store-harness.js";
 
 let h: Harness;

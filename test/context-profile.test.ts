@@ -15,9 +15,9 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
-import { profileSource } from "../src/context/source-profile.js";
-import type { ContextRequest } from "../src/context/types.js";
-import { estimateTokens } from "../src/history/budget.js";
+import { profileSource } from "../src/features/context/source-profile.js";
+import type { ContextRequest } from "../src/features/context/types.js";
+import { estimateTokens } from "../src/features/history/budget.js";
 
 let dir: string;
 

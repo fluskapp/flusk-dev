@@ -2,10 +2,10 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { Session } from "../src/session/session.js";
-import { repoSlug } from "../src/session/paths.js";
-import type { SessionDetail } from "../src/ui/detail.js";
-import { scanSessions } from "../src/ui/scan.js";
+import { Session } from "../src/features/session/session-file.repository.js";
+import { repoSlug } from "../src/platform/paths/paths.js";
+import type { SessionDetail } from "../src/features/projects/detail.js";
+import { scanSessions } from "../src/features/projects/scan.repository.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 
 let home: string;

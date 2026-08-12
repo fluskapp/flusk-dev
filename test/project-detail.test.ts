@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { projectDetail } from "../src/ui/project-detail.js";
+import { projectDetail } from "../src/features/projects/project-detail.repository.js";
 import { journal, tree, write } from "./project-fixture.js";
 
 const NOW = new Date("2026-08-11T00:00:00.000Z");

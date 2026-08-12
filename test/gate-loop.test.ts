@@ -3,8 +3,8 @@ import { mkdir, readdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vitest";
 import { runCmd } from "../src/cli/run-cmd.js";
-import { assistantText, assistantToolCalls } from "../src/provider/fake.js";
-import { Session } from "../src/session/session.js";
+import { assistantText, assistantToolCalls } from "../src/features/provider/fake.js";
+import { Session } from "../src/features/session/session-file.repository.js";
 import { capture, SLOW } from "./cli2-helpers.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 

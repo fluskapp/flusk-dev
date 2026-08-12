@@ -9,7 +9,7 @@
  * loudly and names the command that fixes it.
  */
 import { describe } from "vitest";
-import { langMissing, loadLang } from "../src/lang/deps.js";
+import { langMissing, loadLang } from "../src/features/flows/deps.js";
 
 export const SKIP_ENV = "FLUSK_SKIP_LANG";
 

@@ -2,10 +2,10 @@ import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, expect, test } from "vitest";
-import { houseRulesSource } from "../src/context/source-house-rules.js";
-import { renderedText } from "../src/context/source-house-rules-read.js";
-import type { ContextRequest } from "../src/context/types.js";
-import { estimateTokens } from "../src/history/budget.js";
+import { houseRulesSource } from "../src/features/context/source-house-rules.js";
+import { renderedText } from "../src/features/context/source-house-rules-read.js";
+import type { ContextRequest } from "../src/features/context/types.js";
+import { estimateTokens } from "../src/features/history/budget.js";
 
 let repo: string;
 

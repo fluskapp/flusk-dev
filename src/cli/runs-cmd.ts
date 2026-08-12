@@ -1,4 +1,4 @@
-import { scanSessions } from "../ui/scan.js";
+import { scanSessions } from "../features/projects/scan.repository.js";
 
 export interface RunsCmdOpts {
 	limit?: number;

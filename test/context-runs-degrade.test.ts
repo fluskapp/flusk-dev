@@ -9,9 +9,9 @@ import { appendFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "n
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { createRunsSource } from "../src/context/source-runs.js";
-import type { ContextRequest } from "../src/context/types.js";
-import { sessionsDir } from "../src/session/paths.js";
+import { createRunsSource } from "../src/features/context/source-runs.js";
+import type { ContextRequest } from "../src/features/context/types.js";
+import { sessionsDir } from "../src/platform/paths/paths.js";
 import { say, session } from "./history-session-fixtures.js";
 
 let home: string;

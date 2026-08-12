@@ -1,14 +1,14 @@
 import { spawnSync } from "node:child_process";
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { CreateAgentOpts } from "../src/agent/agent.js";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { FluskConfig, ChatBackendConfig } from "../src/config/types.js";
-import type { LoopCtx } from "../src/orchestra/delegate.js";
-import type { AgentRegistry, AgentSpec, WorkerTask } from "../src/orchestra/types.js";
-import type { Provider } from "../src/provider/provider.js";
-import { BudgetTracker } from "../src/safety/budget.js";
-import type { Tool } from "../src/tools/tool.js";
+import type { CreateAgentOpts } from "../src/features/run/agent.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { FluskConfig, ChatBackendConfig } from "../src/platform/config/types.js";
+import type { LoopCtx } from "../src/features/orchestra/delegate.js";
+import type { AgentRegistry, AgentSpec, WorkerTask } from "../src/features/orchestra/types.js";
+import type { Provider } from "../src/features/provider/provider.js";
+import { BudgetTracker } from "../src/features/safety/budget.js";
+import type { Tool } from "../src/features/tools/tool.js";
 import { fakeModel } from "./helpers.js";
 
 /** A spec with the required fields filled in; override what a test is about. */

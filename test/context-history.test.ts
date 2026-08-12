@@ -6,9 +6,9 @@
  * task over the same corpus (L5).
  */
 import { expect, it } from "vitest";
-import { gather } from "../src/context/source-history.js";
-import type { ContextItem, ContextRequest } from "../src/context/types.js";
-import { estimateTokens } from "../src/history/budget.js";
+import { gather } from "../src/features/context/source-history.js";
+import type { ContextItem, ContextRequest } from "../src/features/context/types.js";
+import { estimateTokens } from "../src/features/history/budget.js";
 import { CORPUS, card, PROJECT, SECRET, SECRET_PATH, TASK } from "./context-history-fixtures.js";
 
 const req = (over: Partial<ContextRequest> = {}): ContextRequest => ({

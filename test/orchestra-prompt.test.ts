@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { delegationPrompt, labelResult } from "../src/orchestra/prompt.js";
+import { delegationPrompt, labelResult } from "../src/features/orchestra/prompt.js";
 import { makeSpec } from "./orchestra-fixture.js";
 
 const spec = makeSpec({ name: "reviewer", prompt: "You review code.\n" });

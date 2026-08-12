@@ -1,9 +1,9 @@
 import { expect, it } from "vitest";
-import { buildIndex } from "../src/history/bm25.js";
-import { estimateTokens, packToBudget, trimToSentence } from "../src/history/budget.js";
-import { composePrompt } from "../src/history/compose.js";
-import type { HistoryCard, SearchHit, Walkthrough } from "../src/history/types.js";
-import { buildWalkthrough } from "../src/history/walkthrough.js";
+import { buildIndex } from "../src/features/history/bm25.js";
+import { estimateTokens, packToBudget, trimToSentence } from "../src/features/history/budget.js";
+import { composePrompt } from "../src/features/history/compose.js";
+import type { HistoryCard, SearchHit, Walkthrough } from "../src/features/history/types.js";
+import { buildWalkthrough } from "../src/features/history/walkthrough.js";
 
 const NOW = Date.parse("2026-08-11T00:00:00.000Z");
 const TASK = "add retry backoff to the watch tick hook";

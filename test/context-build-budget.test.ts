@@ -7,10 +7,10 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, expect, test } from "vitest";
-import { buildContext } from "../src/context/build.js";
-import { PER_SOURCE_KEEP } from "../src/context/diversify.js";
-import { DEFAULT_FLOOR_SHARE, FLOOR_SHARE } from "../src/context/floors.js";
-import { estimateTokens } from "../src/history/budget.js";
+import { buildContext } from "../src/features/context/build.js";
+import { PER_SOURCE_KEEP } from "../src/features/context/diversify.js";
+import { DEFAULT_FLOOR_SHARE, FLOOR_SHARE } from "../src/features/context/floors.js";
+import { estimateTokens } from "../src/features/history/budget.js";
 import {
 	fakeSource,
 	flood,

@@ -10,8 +10,8 @@
  * when something extra was smuggled in beside it.
  */
 import { expect, it } from "vitest";
-import { ASK_ACTIONS, askPrompt } from "../src/ui/ask-prompt.js";
-import type { AskBlock } from "../src/ui/ask-types.js";
+import { ASK_ACTIONS, askPrompt } from "../src/features/orchestra/ask-prompt.js";
+import type { AskBlock } from "../src/features/orchestra/ask.types.js";
 
 const BLOCKS: AskBlock[] = [
 	{ id: "symbol", label: "symbol greet", text: "function greet(who: string): string" },

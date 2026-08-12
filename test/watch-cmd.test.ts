@@ -9,9 +9,9 @@ import { readFile } from "node:fs/promises";
 import { afterEach, beforeEach, expect, it } from "vitest";
 import { goalCmd } from "../src/cli/goal-cmd.js";
 import { watchCmd } from "../src/cli/watch-cmd.js";
-import { FLUSK_NS } from "../src/store/namespaces.js";
-import { nsPath, storeDir } from "../src/store/paths.js";
-import { createFactStore } from "../src/store/store.js";
+import { FLUSK_NS } from "../src/features/facts/namespaces.js";
+import { nsPath, storeDir } from "../src/features/facts/paths.js";
+import { createFactStore } from "../src/features/facts/facts.repository.js";
 import { capture, SLOW } from "./cli2-helpers.js";
 import { setupTestHome, teardownTestHome, writeHomeConfig } from "./helpers.js";
 

@@ -2,9 +2,9 @@ import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, expect, test } from "vitest";
-import { FILE_MAX } from "../src/agent/workspace-files.js";
-import { houseRulesSource } from "../src/context/source-house-rules.js";
-import type { ContextRequest } from "../src/context/types.js";
+import { FILE_MAX } from "../src/features/workspace/workspace-files.repository.js";
+import { houseRulesSource } from "../src/features/context/source-house-rules.js";
+import type { ContextRequest } from "../src/features/context/types.js";
 
 let repo: string;
 

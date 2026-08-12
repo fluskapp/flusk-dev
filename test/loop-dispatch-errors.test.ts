@@ -1,6 +1,6 @@
 import { Type } from "typebox";
 import { afterAll, beforeAll, expect, test } from "vitest";
-import type { Tool } from "../src/tools/tool.js";
+import type { Tool } from "../src/features/tools/tool.js";
 import { makeTool, runToolBatch, setupTestHome, teardownTestHome } from "./helpers.js";
 
 let repo: string;

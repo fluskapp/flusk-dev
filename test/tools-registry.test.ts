@@ -1,8 +1,8 @@
 import { Type } from "typebox";
 import { describe, expect, it } from "vitest";
-import { ToolRegistry } from "../src/tools/registry.js";
-import type { Tool } from "../src/tools/tool.js";
-import { truncateMiddle } from "../src/tools/truncate.js";
+import { ToolRegistry } from "../src/features/tools/registry.js";
+import type { Tool } from "../src/features/tools/tool.js";
+import { truncateMiddle } from "../src/features/tools/truncate.js";
 
 const echoTool: Tool = {
 	name: "echo",

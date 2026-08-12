@@ -2,7 +2,7 @@ import { chmodSync, mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } 
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { type Artifact, scanArtifacts } from "../src/ui/artifact-scan.js";
+import { type Artifact, scanArtifacts } from "../src/features/projects/artifact-scan.repository.js";
 
 let home: string; // stands in for ~/projects
 let proj: string;

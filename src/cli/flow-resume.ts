@@ -5,9 +5,9 @@
  * what it was asked to do, so a resume reads its spec and its task from there
  * rather than making the user retype either.
  */
-import { readCheckpoint } from "../lang/checkpoint-read.js";
-import { flowByName } from "../lang/library.js";
-import type { FlowSpec } from "../lang/types.js";
+import { readCheckpoint } from "../features/flows/checkpoint-read.repository.js";
+import { flowByName } from "../features/flows/library.js";
+import type { FlowSpec } from "../features/flows/types.js";
 
 /** The run this id checkpointed: its flow and the task it was given. */
 export async function resumed(

@@ -17,8 +17,8 @@
  * r2 has NO card, so provenance has to place an undated row.
  */
 
-import type { GraphEdge, GraphNode } from "../src/graph/types.js";
-import type { HistoryCard } from "../src/history/types.js";
+import type { GraphEdge, GraphNode } from "../src/features/graph/types.js";
+import type { HistoryCard } from "../src/features/history/types.js";
 import { coEdges, commit, doc, edge, file, node, P, run, sha, sym } from "./graph-query-fixture.js";
 
 export const CORE = sym("a.ts", "core");

@@ -10,9 +10,9 @@
  */
 import { homedir } from "node:os";
 import { styleText } from "node:util";
-import { loadConfig } from "../config/config.js";
-import { find } from "../find/ripgrep.js";
-import type { FindQuery, FindResult } from "../find/types.js";
+import { loadConfig } from "../platform/config/config.js";
+import { find } from "../features/search/ripgrep.js";
+import type { FindQuery, FindResult } from "../features/search/types.js";
 
 export interface FindArgs {
 	project?: string | undefined;

@@ -2,7 +2,7 @@ import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { detectVerifyCommands } from "../src/verify/detect.js";
+import { detectVerifyCommands } from "../src/features/verify/detect.repository.js";
 
 async function fixture(files: Record<string, string>): Promise<string> {
 	const dir = await mkdtemp(join(tmpdir(), "flusk-detect-"));

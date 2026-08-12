@@ -9,11 +9,11 @@
  */
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { recordFlowRun } from "../src/lang/record.js";
-import type { FlowResult, FlowStep, NodeKind } from "../src/lang/types.js";
-import { createFactStore } from "../src/store/store.js";
-import type { Fact, FactStore } from "../src/store/types.js";
-import { scanJournals } from "../src/ui/journal-scan.js";
+import { recordFlowRun } from "../src/features/flows/record.repository.js";
+import type { FlowResult, FlowStep, NodeKind } from "../src/features/flows/types.js";
+import { createFactStore } from "../src/features/facts/facts.repository.js";
+import type { Fact, FactStore } from "../src/features/facts/types.js";
+import { scanJournals } from "../src/features/projects/journal-scan.repository.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 
 let repo: string;

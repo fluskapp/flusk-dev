@@ -8,7 +8,7 @@ import { request } from "node:http";
 import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import type { ChatBackend } from "../src/chat/types.js";
+import type { ChatBackend } from "../src/features/chat/types.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 import { type ChatStub, startChatStub } from "./api-chat-stub.js";
 import { call, post, sseChunks } from "./api-http.js";

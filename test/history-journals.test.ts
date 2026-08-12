@@ -2,9 +2,9 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { FluskConfig } from "../src/config/types.js";
-import { journalCards } from "../src/history/source-journals.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { FluskConfig } from "../src/platform/config/types.js";
+import { journalCards } from "../src/features/history/source-journals.js";
 
 let home: string; // stands in for ~/projects
 let runs: string;

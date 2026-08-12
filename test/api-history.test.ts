@@ -7,14 +7,14 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { saveIndex } from "../src/history/index-store.js";
+import { saveIndex } from "../src/features/history/index-store.repository.js";
 import type {
 	CardKind,
 	ComposedPrompt,
 	HistoryCard,
 	SearchHit,
 	Walkthrough,
-} from "../src/history/types.js";
+} from "../src/features/history/types.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 
 let home: string;

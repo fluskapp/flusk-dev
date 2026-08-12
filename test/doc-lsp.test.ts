@@ -6,9 +6,9 @@
  */
 import { execPath } from "node:process";
 import { afterEach, describe, expect, it } from "vitest";
-import { startLsp } from "../src/doc/lsp-client.js";
-import { fileToUri } from "../src/doc/lsp-convert.js";
-import { createFrameReader, encodeFrame } from "../src/doc/lsp-frame.js";
+import { startLsp } from "../src/features/docs/lsp-client.repository.js";
+import { fileToUri } from "../src/features/docs/lsp-convert.js";
+import { createFrameReader, encodeFrame } from "../src/features/docs/lsp-frame.js";
 import { type Fake, writeFakeServer } from "./doc-lsp-fake.js";
 
 const clients: { dispose(): Promise<void> }[] = [];

@@ -9,7 +9,7 @@
  * than being dropped or padded to match the weight.
  */
 import { describe, expect, it } from "vitest";
-import { coChange } from "../src/graph/queries.js";
+import { coChange } from "../src/features/graph/queries.js";
 import { coEdges, commit, fakeStore, file } from "./graph-query-fixture.js";
 import { A, edges, nodes } from "./graph-query-graph.js";
 

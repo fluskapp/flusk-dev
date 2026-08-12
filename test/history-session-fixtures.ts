@@ -12,11 +12,11 @@ import type {
 	RunEndReason,
 	StopReason,
 	ToolResultMsg,
-} from "../src/core/types.js";
-import { zeroUsage } from "../src/core/types.js";
-import { SESSION_VERSION } from "../src/session/entries.js";
-import { newSessionPath, repoSlug } from "../src/session/paths.js";
-import { SessionStore } from "../src/session/store.js";
+} from "../src/features/run/run.types.js";
+import { zeroUsage } from "../src/features/run/run.types.js";
+import { SESSION_VERSION } from "../src/features/session/entries.js";
+import { newSessionPath, repoSlug } from "../src/platform/paths/paths.js";
+import { SessionStore } from "../src/features/session/session.repository.js";
 
 export const model: ModelRef = { provider: "fake", id: "fake-1", contextWindow: 200000 };
 

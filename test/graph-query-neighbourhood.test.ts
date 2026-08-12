@@ -9,7 +9,7 @@
  * ranking that quietly follows the store's ordering fails here.
  */
 import { describe, expect, it } from "vitest";
-import { neighbourhood } from "../src/graph/queries.js";
+import { neighbourhood } from "../src/features/graph/queries.js";
 import { commit, doc, edge, fakeStore, file, run, sym } from "./graph-query-fixture.js";
 import { A, CORE, edges, nodes } from "./graph-query-graph.js";
 

@@ -5,8 +5,8 @@
  * namespace can ask for it.
  */
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { whatsChanged } from "../src/store/changes.js";
-import { DEFAULT_LIMIT, NO_LIMIT } from "../src/store/visibility.js";
+import { whatsChanged } from "../src/features/facts/changes.js";
+import { DEFAULT_LIMIT, NO_LIMIT } from "../src/features/facts/visibility.js";
 import { type Harness, HOUR, harness, iso, NS, T0 } from "./store-harness.js";
 
 let h: Harness;

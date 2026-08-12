@@ -5,8 +5,8 @@
 import { mkdir, symlink, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { loadExtensions } from "../src/ext/load.js";
-import { fluskHome } from "../src/session/paths.js";
+import { loadExtensions } from "../src/features/extensions/load.js";
+import { fluskHome } from "../src/platform/paths/paths.js";
 import { toolExtension, trustProject, writeExtension } from "./ext-fixture.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 

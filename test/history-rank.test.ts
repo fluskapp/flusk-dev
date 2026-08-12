@@ -1,9 +1,9 @@
 import { expect, it } from "vitest";
-import { buildIndex } from "../src/history/bm25.js";
-import { expandTerm } from "../src/history/fuzzy.js";
-import { search, selectDiverse } from "../src/history/rank.js";
-import { tokenize, trigrams } from "../src/history/tokenize.js";
-import type { HistoryCard, Outcome, SearchHit } from "../src/history/types.js";
+import { buildIndex } from "../src/features/history/bm25.js";
+import { expandTerm } from "../src/features/history/fuzzy.js";
+import { search, selectDiverse } from "../src/features/history/rank.js";
+import { tokenize, trigrams } from "../src/features/history/tokenize.js";
+import type { HistoryCard, Outcome, SearchHit } from "../src/features/history/types.js";
 
 const NOW = Date.parse("2026-08-11T00:00:00.000Z");
 const daysAgo = (n: number): string => new Date(NOW - n * 86_400_000).toISOString();

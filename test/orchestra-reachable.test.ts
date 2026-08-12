@@ -14,9 +14,9 @@
  */
 import { rm } from "node:fs/promises";
 import { afterEach, expect, it } from "vitest";
-import { createAgent } from "../src/agent/agent.js";
-import { loadConfig } from "../src/config/config.js";
-import { assistantText, FakeProvider } from "../src/provider/fake.js";
+import { createAgent } from "../src/features/run/agent.js";
+import { loadConfig } from "../src/platform/config/config.js";
+import { assistantText, FakeProvider } from "../src/features/provider/fake.js";
 import { fakeModel, setupTestHome } from "./helpers.js";
 
 let home: string;

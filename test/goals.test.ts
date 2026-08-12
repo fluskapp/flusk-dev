@@ -1,10 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { GoalPlan } from "../src/goals/planner.js";
-import { writeGoalGraph } from "../src/goals/planner.js";
-import { goalBrief } from "../src/goals/resume.js";
-import { claimTask, completeTask, failTask, frontier } from "../src/goals/scheduler.js";
-import { goalId, taskId, writeTaskStatus } from "../src/goals/schema.js";
-import type { FactStore } from "../src/store/types.js";
+import type { GoalPlan } from "../src/features/goals/planner.js";
+import { writeGoalGraph } from "../src/features/goals/planner.js";
+import { goalBrief } from "../src/features/goals/resume.js";
+import { claimTask, completeTask, failTask, frontier } from "../src/features/goals/scheduler.js";
+import { goalId, taskId, writeTaskStatus } from "../src/features/goals/schema.js";
+import type { FactStore } from "../src/features/facts/types.js";
 import { type Harness, HOUR, harness, T0 } from "./store-harness.js";
 
 let h: Harness;

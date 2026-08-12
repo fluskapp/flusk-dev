@@ -9,11 +9,11 @@
  * the prompt: two identical builds and one build produce the same bytes.
  */
 import { afterAll, beforeAll, expect, test } from "vitest";
-import { createAgent } from "../src/agent/agent.js";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { ContextSource } from "../src/context/types.js";
-import type { FluskEvent } from "../src/core/events.js";
-import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
+import { createAgent } from "../src/features/run/agent.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { ContextSource } from "../src/features/context/types.js";
+import type { FluskEvent } from "../src/platform/events/events.js";
+import { assistantText, assistantToolCalls, FakeProvider } from "../src/features/provider/fake.js";
 import { fakeModel, pingTool, setupTestHome, teardownTestHome } from "./helpers.js";
 import {
 	explodingSource,

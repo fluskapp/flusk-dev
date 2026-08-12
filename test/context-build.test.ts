@@ -6,7 +6,7 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, expect, test } from "vitest";
-import { buildContext } from "../src/context/build.js";
+import { buildContext } from "../src/features/context/build.js";
 import { fakeSource, oneCommit, pinnedRules, request } from "./context-build-fixtures.js";
 
 let repo: string;

@@ -14,10 +14,10 @@
 
 import { writeFileSync } from "node:fs";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { MAX_REFERENCES } from "../src/doc/ts-provider.js";
-import { disposeService } from "../src/doc/ts-service.js";
-import { buildGraph } from "../src/graph/build.js";
-import { openGraphStore } from "../src/graph/store-jsonl.js";
+import { MAX_REFERENCES } from "../src/features/docs/ts-provider.js";
+import { disposeService } from "../src/features/docs/ts-service.js";
+import { buildGraph } from "../src/features/graph/build.js";
+import { openGraphStore } from "../src/features/graph/store-jsonl.js";
 import { type GraphFixture, graphProject } from "./graph-fixture.js";
 
 let fx: GraphFixture;

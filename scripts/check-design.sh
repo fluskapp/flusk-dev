@@ -18,7 +18,10 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-files=$(find src/ui -name 'styles-*.ts' -type f ! -name 'styles-tokens.ts' | sort)
+# styles-*.ts modules today, plus any real .css the React port emits — with the
+# generated token file exempt in both worlds.
+files=$(find src/ui \( -name 'styles-*.ts' -o -name '*.css' \) -type f \
+	! -name 'styles-tokens.ts' ! -name 'tokens.css' | sort)
 [ -n "$files" ] || { echo "design: no style modules found" >&2; exit 1; }
 
 # shellcheck disable=SC2086

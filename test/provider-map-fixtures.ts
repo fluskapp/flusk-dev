@@ -1,4 +1,4 @@
-import { fromPiEvent, fromPiMessage, fromPiStopReason, fromPiUsage } from "../src/provider/pi-ai-map.js";
+import { fromPiEvent, fromPiMessage, fromPiStopReason, fromPiUsage } from "../src/features/provider/pi-ai-map.js";
 
 // Pi-ai wire types, derived from the adapter's own signatures so tests
 // never import the SDK (only src/provider/pi-ai*.ts may).

@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { fluskHome } from "../session/paths.js";
+import { fluskHome } from "../platform/paths/paths.js";
 import { startUiServer } from "../ui/server.js";
 
 export interface UiCmdOpts {

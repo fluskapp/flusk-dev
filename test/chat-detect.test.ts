@@ -2,9 +2,9 @@ import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { listBackends, which } from "../src/chat/detect.js";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { FluskConfig, ChatBackendConfig } from "../src/config/types.js";
+import { listBackends, which } from "../src/features/chat/detect.repository.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { FluskConfig, ChatBackendConfig } from "../src/platform/config/types.js";
 
 let bin: string;
 let realPath: string | undefined;

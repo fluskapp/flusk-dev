@@ -2,11 +2,11 @@ import { mkdtemp, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { TaskKind } from "../src/config/types.js";
-import { classifyTask } from "../src/provider/intent.js";
-import { hasAuth, resolveModelRef } from "../src/provider/pi-ai.js";
-import { chooseModel } from "../src/provider/router.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { TaskKind } from "../src/platform/config/types.js";
+import { classifyTask } from "../src/features/provider/intent.js";
+import { hasAuth, resolveModelRef } from "../src/features/provider/pi-ai.js";
+import { chooseModel } from "../src/features/provider/router.js";
 import {
 	bestFor,
 	loadScores,
@@ -14,7 +14,7 @@ import {
 	saveScores,
 	scoresPath,
 	type Scores,
-} from "../src/provider/scores.js";
+} from "../src/features/provider/scores.repository.js";
 import { teardownTestHome } from "./helpers.js";
 
 describe("resolveModelRef (real catalog, offline)", () => {

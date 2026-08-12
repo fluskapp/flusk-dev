@@ -7,11 +7,11 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { saveIndex } from "../src/history/index-store.js";
-import type { CardKind, HistoryCard } from "../src/history/types.js";
-import { isPhrase } from "../src/lang/context.js";
-import { nodePrompt } from "../src/lang/prompt-provider.js";
-import type { FlowNode, FlowSpec, FlowState, FlowStep } from "../src/lang/types.js";
+import { saveIndex } from "../src/features/history/index-store.repository.js";
+import type { CardKind, HistoryCard } from "../src/features/history/types.js";
+import { isPhrase } from "../src/features/flows/context.js";
+import { nodePrompt } from "../src/features/flows/prompt-provider.js";
+import type { FlowNode, FlowSpec, FlowState, FlowStep } from "../src/features/flows/types.js";
 
 /** Everything a user of the flow runtime writes. Nothing here is a prompt. */
 const SPEC: FlowSpec = {

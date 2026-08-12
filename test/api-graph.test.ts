@@ -15,7 +15,7 @@
  *    is honestly reported as absent rather than answered about by accident.
  */
 import { afterAll, beforeAll, expect, it } from "vitest";
-import type { GraphReply } from "../src/ui/api-graph.js";
+import type { GraphReply } from "../src/features/graph/graph.router.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 import { call } from "./api-http.js";
 import { hasRg } from "./find-fixture.js";

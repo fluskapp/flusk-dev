@@ -1,7 +1,7 @@
-import type { FluskConfig } from "../src/config/types.js";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { ModelRef, Msg } from "../src/core/types.js";
-import { assistantText } from "../src/provider/fake.js";
+import type { FluskConfig } from "../src/platform/config/types.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { ModelRef, Msg } from "../src/features/run/run.types.js";
+import { assistantText } from "../src/features/provider/fake.js";
 
 export const smallModel: ModelRef = { provider: "fake", id: "fake-1", contextWindow: 2000 };
 

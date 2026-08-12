@@ -9,7 +9,7 @@ import {
 	createWorktree,
 	currentBranch,
 	removeWorktree,
-} from "../src/watch/isolation.js";
+} from "../src/features/watch/isolation.repository.js";
 
 let repo: string;
 

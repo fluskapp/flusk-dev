@@ -15,7 +15,7 @@
  * Split three ways under the file cap: the context card and the capture live
  * in client-ask-context.ts, the picker and the stream in client-ask-send.ts.
  */
-import { ASK_ACTIONS } from "./ask-prompt.js";
+import { ASK_ACTIONS } from "../features/orchestra/ask-prompt.js";
 
 export const CLIENT_ASK_JS = `
 /** The snapshot, the answer, and the request in flight. One object, like F/D. */

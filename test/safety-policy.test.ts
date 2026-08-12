@@ -2,10 +2,10 @@ import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
-import type { FluskConfig } from "../src/config/types.js";
-import type { Usage } from "../src/core/types.js";
-import { createFluskPolicy } from "../src/safety/flusk-policy.js";
-import { BudgetTracker } from "../src/safety/budget.js";
+import type { FluskConfig } from "../src/platform/config/types.js";
+import type { Usage } from "../src/features/run/run.types.js";
+import { createFluskPolicy } from "../src/features/safety/flusk-policy.js";
+import { BudgetTracker } from "../src/features/safety/budget.js";
 
 let repo: string;
 let outside: string;

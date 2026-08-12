@@ -6,10 +6,10 @@
  * Shared rather than copied, because two suites drifting on what "a run" means
  * is how a runtime ends up with two different definitions of a passing test.
  */
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import { buildIndex } from "../src/history/bm25.js";
-import { fakeChatModel } from "../src/lang/model.js";
-import type { RunFlowOpts } from "../src/lang/runner.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import { buildIndex } from "../src/features/history/bm25.js";
+import { fakeChatModel } from "../src/features/flows/model.js";
+import type { RunFlowOpts } from "../src/features/flows/runner.js";
 
 export const TASK = "add a retry with backoff to the uploader";
 

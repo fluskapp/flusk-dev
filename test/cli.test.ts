@@ -5,8 +5,8 @@ import { PassThrough } from "node:stream";
 import { fileURLToPath } from "node:url";
 import { afterAll, beforeAll, expect, test } from "vitest";
 import { runCmd } from "../src/cli/run-cmd.js";
-import { zeroUsage } from "../src/core/types.js";
-import { Session } from "../src/session/session.js";
+import { zeroUsage } from "../src/features/run/run.types.js";
+import { Session } from "../src/features/session/session-file.repository.js";
 
 const fixture = fileURLToPath(new URL("./fixtures/demo-script.json", import.meta.url));
 

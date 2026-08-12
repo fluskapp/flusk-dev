@@ -9,8 +9,8 @@ import {
 	indexPath,
 	loadIndex,
 	refreshIndex,
-} from "../src/history/index-store.js";
-import type { HistoryCard } from "../src/history/types.js";
+} from "../src/features/history/index-store.repository.js";
+import type { HistoryCard } from "../src/features/history/types.js";
 
 let home: string;
 const previousHome = process.env.FLUSK_HOME;

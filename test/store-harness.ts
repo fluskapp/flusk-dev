@@ -1,9 +1,9 @@
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { nsPath } from "../src/store/paths.js";
-import { createFactStore } from "../src/store/store.js";
-import type { FactStore } from "../src/store/types.js";
+import { nsPath } from "../src/features/facts/paths.js";
+import { createFactStore } from "../src/features/facts/facts.repository.js";
+import type { FactStore } from "../src/features/facts/types.js";
 
 export const HOUR = 3_600_000;
 

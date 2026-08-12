@@ -3,11 +3,11 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createEventBus } from "../src/core/events.js";
-import type { Policy } from "../src/safety/policy.js";
-import { allowAllPolicy } from "../src/safety/policy.js";
-import { bashTool } from "../src/tools/bash.js";
-import type { ToolContext } from "../src/tools/tool.js";
+import { createEventBus } from "../src/platform/events/events.js";
+import type { Policy } from "../src/features/safety/policy.js";
+import { allowAllPolicy } from "../src/features/safety/policy.js";
+import { bashTool } from "../src/features/tools/bash.repository.js";
+import type { ToolContext } from "../src/features/tools/tool.js";
 
 let dir: string;
 

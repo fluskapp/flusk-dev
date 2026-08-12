@@ -14,7 +14,7 @@
  * rows here carry counts instead, so `--json` does not quote every body twice
  * (once inside `text`, once inside the report) for no added fact.
  */
-import type { BuiltContext, Omission, SourceStatus } from "../context/types.js";
+import type { BuiltContext, Omission, SourceStatus } from "../features/context/types.js";
 
 /** One registered source, as the report sees it. Every source gets a row. */
 export interface SourceLine {

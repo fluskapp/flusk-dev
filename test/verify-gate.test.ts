@@ -2,7 +2,7 @@ import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
-import { formatEvidence, runVerify } from "../src/verify/gate.js";
+import { formatEvidence, runVerify } from "../src/features/verify/gate.repository.js";
 
 let cwd: string;
 beforeAll(async () => {

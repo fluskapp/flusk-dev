@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { highlightCode } from "../src/ui/highlight.js";
+import { highlightCode } from "../src/ui/render/highlight.js";
 
 /** Every span the highlighter emits, as [class, text] pairs. */
 function spans(html: string): [string, string][] {

@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { createFactStore } from "../src/store/store.js";
+import { createFactStore } from "../src/features/facts/facts.repository.js";
 import { type Harness, harness, iso, NS, T0 } from "./store-harness.js";
 
 let h: Harness;

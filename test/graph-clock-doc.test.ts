@@ -10,8 +10,8 @@
  * suite missed it because its fixture uses a relative ref no real card carries.
  */
 import { expect, it } from "vitest";
-import { historyClock } from "../src/graph/history-clock.js";
-import type { HistoryCard } from "../src/history/types.js";
+import { historyClock } from "../src/features/graph/history-clock.js";
+import type { HistoryCard } from "../src/features/history/types.js";
 
 const AT = "2026-03-01T00:00:00.000Z";
 

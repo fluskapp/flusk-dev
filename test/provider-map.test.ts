@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { AssistantMsg, Msg, StopReason } from "../src/core/types.js";
-import { toPiContext } from "../src/provider/pi-ai-map.js";
-import type { ToolSchemaJson } from "../src/provider/provider.js";
+import type { AssistantMsg, Msg, StopReason } from "../src/features/run/run.types.js";
+import { toPiContext } from "../src/features/provider/pi-ai-map.js";
+import type { ToolSchemaJson } from "../src/features/provider/provider.js";
 import type { PiStopReason } from "./provider-map-fixtures.js";
 
 const hitMsgs: Msg[] = [

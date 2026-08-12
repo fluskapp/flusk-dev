@@ -1,6 +1,6 @@
 import { expect, it } from "vitest";
-import { renderMarkdown } from "../src/ui/markdown.js";
-import { frontmatterRows, renderFrontmatter } from "../src/ui/markdown-frontmatter.js";
+import { renderMarkdown } from "../src/ui/render/markdown.js";
+import { frontmatterRows, renderFrontmatter } from "../src/ui/render/markdown-frontmatter.js";
 
 const JOURNAL = [
 	"---",

@@ -1,8 +1,8 @@
 import { afterAll, beforeAll, expect, test } from "vitest";
-import { createAgent } from "../src/agent/agent.js";
-import { zeroUsage } from "../src/core/types.js";
-import { assistantText, FakeProvider } from "../src/provider/fake.js";
-import { Session } from "../src/session/session.js";
+import { createAgent } from "../src/features/run/agent.js";
+import { zeroUsage } from "../src/features/run/run.types.js";
+import { assistantText, FakeProvider } from "../src/features/provider/fake.js";
+import { Session } from "../src/features/session/session-file.repository.js";
 import { compactingConfig, smallModel, transcript60 } from "./compaction-helpers.js";
 import { pingTool, setupTestHome, teardownTestHome } from "./helpers.js";
 

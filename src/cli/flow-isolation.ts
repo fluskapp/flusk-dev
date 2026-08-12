@@ -12,9 +12,9 @@
  * work, so a report claiming edits could not be checked against anything.
  */
 import { randomUUID } from "node:crypto";
-import type { FluskConfig, RepoConfig } from "../config/types.js";
-import { ensureCleanTree, isGitRepo, startRunBranch } from "../safety/git-isolation.js";
-import { detectVerifyCommands } from "../verify/detect.js";
+import type { FluskConfig, RepoConfig } from "../platform/config/types.js";
+import { ensureCleanTree, isGitRepo, startRunBranch } from "../features/safety/git-isolation.repository.js";
+import { detectVerifyCommands } from "../features/verify/detect.repository.js";
 
 export interface IsolationOpts {
 	/** `--no-isolation`: run in place, on the user's own branch. */

@@ -12,9 +12,9 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import type { WebReply } from "../src/ui/api-web.js";
+import type { WebReply } from "../src/features/web/web.router.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
-import { LOOPBACK_ENV } from "../src/web/limits.js";
+import { LOOPBACK_ENV } from "../src/features/web/limits.js";
 import { call } from "./api-http.js";
 import { type Site, startSite } from "./web-fixture.js";
 

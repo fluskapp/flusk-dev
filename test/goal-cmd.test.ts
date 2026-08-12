@@ -2,10 +2,10 @@ import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vitest";
 import { goalCmd } from "../src/cli/goal-cmd.js";
-import { assistantText } from "../src/provider/fake.js";
-import { repoSlug } from "../src/session/paths.js";
-import { createFactStore } from "../src/store/store.js";
-import type { Fact } from "../src/store/types.js";
+import { assistantText } from "../src/features/provider/fake.js";
+import { repoSlug } from "../src/platform/paths/paths.js";
+import { createFactStore } from "../src/features/facts/facts.repository.js";
+import type { Fact } from "../src/features/facts/types.js";
 import { capture, SLOW } from "./cli2-helpers.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 

@@ -3,8 +3,8 @@
  * small per-task queries the execution loop needs. Reads are namespace-scoped
  * store queries and nothing else — no goal is ever read across namespaces.
  */
-import type { Fact, FactStore } from "../store/types.js";
-import { NO_LIMIT } from "../store/visibility.js";
+import type { Fact, FactStore } from "../features/facts/types.js";
+import { NO_LIMIT } from "../features/facts/visibility.js";
 
 interface GraphView {
 	statusOf: Map<string, string>;

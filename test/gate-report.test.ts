@@ -8,10 +8,10 @@
 import { expect, it } from "vitest";
 import { claimCheck } from "../src/cli/gate-report.js";
 import type { GateOpts } from "../src/cli/gate-loop.js";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { RunRecord } from "../src/core/run-record.js";
-import { zeroUsage } from "../src/core/types.js";
-import type { FactStore } from "../src/store/types.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { RunRecord } from "../src/features/run/run-record.js";
+import { zeroUsage } from "../src/features/run/run.types.js";
+import type { FactStore } from "../src/features/facts/types.js";
 import { capture } from "./cli2-helpers.js";
 
 const run: RunRecord = {

@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vitest";
 import { runCmd } from "../src/cli/run-cmd.js";
-import { scanSessions } from "../src/ui/scan.js";
+import { scanSessions } from "../src/features/projects/scan.repository.js";
 import { capture, git, initGitRepo, SLOW, writeFakeScript } from "./cli2-helpers.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 

@@ -8,7 +8,7 @@
 import { Writable } from "node:stream";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { findCmd } from "../src/cli/find-cmd.js";
-import type { FindResult } from "../src/find/types.js";
+import type { FindResult } from "../src/features/search/types.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 import { call } from "./api-http.js";
 import { type FindTree, findTree, hasRg } from "./find-fixture.js";

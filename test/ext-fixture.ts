@@ -5,7 +5,7 @@
  */
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { fluskHome } from "../src/session/paths.js";
+import { fluskHome } from "../src/platform/paths/paths.js";
 
 export type Scope = "global" | "project";
 

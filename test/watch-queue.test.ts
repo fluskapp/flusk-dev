@@ -6,7 +6,7 @@ import { chmodSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { pollGhFailingCi, pollGhPrs, pollQueues } from "../src/watch/queue.js";
+import { pollGhFailingCi, pollGhPrs, pollQueues } from "../src/features/watch/queue.repository.js";
 
 let bin: string;
 let repo: string;

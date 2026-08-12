@@ -8,8 +8,8 @@
  * cannot explain to anyone.
  */
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { fetchText } from "../src/web/fetch.js";
-import { LOOPBACK_ENV, MAX_REDIRECTS } from "../src/web/limits.js";
+import { fetchText } from "../src/features/web/fetch.js";
+import { LOOPBACK_ENV, MAX_REDIRECTS } from "../src/features/web/limits.js";
 import { type Site, startSite } from "./web-fixture.js";
 
 let site: Site;

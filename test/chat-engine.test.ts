@@ -2,10 +2,10 @@ import { chmodSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { createChatEngine } from "../src/chat/engine.js";
-import type { ChatChunk, ChatRequest } from "../src/chat/types.js";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { FluskConfig, ChatBackendConfig } from "../src/config/types.js";
+import { createChatEngine } from "../src/features/chat/engine.js";
+import type { ChatChunk, ChatRequest } from "../src/features/chat/types.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { FluskConfig, ChatBackendConfig } from "../src/platform/config/types.js";
 
 let bin: string;
 let realPath: string | undefined;

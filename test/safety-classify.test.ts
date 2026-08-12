@@ -2,8 +2,8 @@ import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
-import type { CommandClass } from "../src/safety/classify.js";
-import { classifyCommand } from "../src/safety/classify.js";
+import type { CommandClass } from "../src/features/safety/classify.js";
+import { classifyCommand } from "../src/features/safety/classify.js";
 
 let repo: string;
 

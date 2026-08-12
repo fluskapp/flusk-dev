@@ -5,7 +5,7 @@
  * harness state is self-fulfilling and could never block anything.
  */
 import { expect, it } from "vitest";
-import { checkReportText, type Observations } from "../src/verify/report-check.js";
+import { checkReportText, type Observations } from "../src/features/verify/report-check.js";
 
 const nothing: Observations = { verify: [], filesTouched: [], commandsRun: [] };
 

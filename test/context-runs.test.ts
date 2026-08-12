@@ -8,9 +8,9 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { createRunsSource } from "../src/context/source-runs.js";
-import type { ContextItem, ContextRequest } from "../src/context/types.js";
-import { estimateTokens } from "../src/history/budget.js";
+import { createRunsSource } from "../src/features/context/source-runs.js";
+import type { ContextItem, ContextRequest } from "../src/features/context/types.js";
+import { estimateTokens } from "../src/features/history/budget.js";
 import { asst, call, res, say, session } from "./history-session-fixtures.js";
 
 const GH = "ghp_ABCDEFGHIJKLMNOP1234";
@@ -59,7 +59,7 @@ beforeAll(async () => {
 		],
 		"completed",
 	);
-	const { SessionStore } = await import("../src/session/store.js");
+	const { SessionStore } = await import("../src/features/session/session.repository.js");
 	const store = SessionStore.open(join(home, "sessions", latest));
 	store.appendEntry({
 		type: "compaction",

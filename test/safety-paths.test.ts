@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
-import { resolveWithin } from "../src/safety/paths.js";
+import { resolveWithin } from "../src/features/safety/paths.repository.js";
 
 let repo: string;
 let outside: string;

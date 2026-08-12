@@ -8,10 +8,10 @@
  * step having run twice.
  */
 import { expect, it } from "vitest";
-import { type LangDeps, loadLang } from "../src/lang/deps.js";
-import { compile, MAX_FLOW_DEPTH } from "../src/lang/graph.js";
-import { outcomeOf } from "../src/lang/nodes.js";
-import type { FlowContext, FlowSpec } from "../src/lang/types.js";
+import { type LangDeps, loadLang } from "../src/features/flows/deps.js";
+import { compile, MAX_FLOW_DEPTH } from "../src/features/flows/graph.js";
+import { outcomeOf } from "../src/features/flows/nodes.js";
+import type { FlowContext, FlowSpec } from "../src/features/flows/types.js";
 import { withLangRuntime } from "./lang-guard.js";
 
 const loaded = await loadLang();

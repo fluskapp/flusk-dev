@@ -2,8 +2,8 @@ import { chmodSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSy
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import type { FluskConfig } from "../src/config/types.js";
-import { cliWorker } from "../src/orchestra/worker-cli.js";
+import type { FluskConfig } from "../src/platform/config/types.js";
+import { cliWorker } from "../src/features/orchestra/worker-cli.js";
 import { cfgWith, initRepo, makeSpec, makeTask } from "./orchestra-fixture.js";
 
 /**

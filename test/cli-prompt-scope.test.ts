@@ -11,8 +11,8 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { promptCmd } from "../src/cli/prompt-cmd.js";
-import { saveIndex } from "../src/history/index-store.js";
-import type { HistoryCard } from "../src/history/types.js";
+import { saveIndex } from "../src/features/history/index-store.repository.js";
+import type { HistoryCard } from "../src/features/history/types.js";
 import { capture } from "./cli2-helpers.js";
 
 let home: string;

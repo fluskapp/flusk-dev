@@ -2,8 +2,8 @@ import { chmodSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSy
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { fluskRepoRoot, renderPrompt, streamCli } from "../src/chat/cli-backend.js";
-import type { ChatChunk } from "../src/chat/types.js";
+import { fluskRepoRoot, renderPrompt, streamCli } from "../src/features/chat/cli-backend.repository.js";
+import type { ChatChunk } from "../src/features/chat/types.js";
 
 let bin: string;
 let out: string;

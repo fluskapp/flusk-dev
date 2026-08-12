@@ -2,12 +2,12 @@
  * The completion check: read the agent's closing report and test it against
  * what the harness observed, then record the verdict for the audit trail.
  */
-import type { Agent } from "../agent/options.js";
-import type { RunRecord } from "../core/run-record.js";
-import type { FactStore } from "../store/types.js";
-import type { VerifyCommandResult } from "../verify/gate.js";
-import { checkReportText } from "../verify/report-check.js";
-import { runFact } from "../verify/run-facts.js";
+import type { Agent } from "../features/run/options.js";
+import type { RunRecord } from "../features/run/run-record.js";
+import type { FactStore } from "../features/facts/types.js";
+import type { VerifyCommandResult } from "../features/verify/gate.repository.js";
+import { checkReportText } from "../features/verify/report-check.js";
+import { runFact } from "../features/verify/run-facts.js";
 import type { GateOpts } from "./gate-loop.js";
 
 /** The agent's closing words — the only text the model authored. */

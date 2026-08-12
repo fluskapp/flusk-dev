@@ -10,10 +10,10 @@
  */
 import { afterEach, beforeEach, expect, it } from "vitest";
 import { allTasksDone } from "../src/cli/goal-list.js";
-import { goalBrief } from "../src/goals/resume.js";
-import { frontier } from "../src/goals/scheduler.js";
-import { goal, goalId, task, taskId } from "../src/goals/schema.js";
-import { DEFAULT_LIMIT } from "../src/store/visibility.js";
+import { goalBrief } from "../src/features/goals/resume.js";
+import { frontier } from "../src/features/goals/scheduler.js";
+import { goal, goalId, task, taskId } from "../src/features/goals/schema.js";
+import { DEFAULT_LIMIT } from "../src/features/facts/visibility.js";
 import { type Harness, harness, NS, T0 } from "./store-harness.js";
 
 let h: Harness;

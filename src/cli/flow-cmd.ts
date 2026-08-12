@@ -16,16 +16,16 @@
  * commands it is about to execute, because a flow node's gate runs those in the
  * user's own checkout.
  */
-import { loadConfig, loadRepoConfig } from "../config/config.js";
-import { type Importer, langMissing, loadLang } from "../lang/deps.js";
-import { loadFlows } from "../lang/flow-files.js";
-import { flowByName, flowResolver } from "../lang/library.js";
-import { planFlow } from "../lang/planner.js";
-import { newRunId } from "../lang/record.js";
-import { type RunFlowOpts, runFlow } from "../lang/runner.js";
-import type { FlowSpec } from "../lang/types.js";
-import { createFactStore } from "../store/store.js";
-import { shapeOf } from "../ui/flow-shape.js";
+import { loadConfig, loadRepoConfig } from "../platform/config/config.js";
+import { type Importer, langMissing, loadLang } from "../features/flows/deps.js";
+import { loadFlows } from "../features/flows/flow-files.repository.js";
+import { flowByName, flowResolver } from "../features/flows/library.js";
+import { planFlow } from "../features/flows/planner.js";
+import { newRunId } from "../features/flows/record.repository.js";
+import { type RunFlowOpts, runFlow } from "../features/flows/runner.js";
+import type { FlowSpec } from "../features/flows/types.js";
+import { createFactStore } from "../features/facts/facts.repository.js";
+import { shapeOf } from "../features/flows/flow-shape.js";
 import { prepareRun } from "./flow-isolation.js";
 import { renderRunSummary } from "./flow-render.js";
 import { resumed } from "./flow-resume.js";

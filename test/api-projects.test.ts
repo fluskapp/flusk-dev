@@ -5,7 +5,7 @@
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import type { ProjectDetail, ProjectSummary, RunRow } from "../src/ui/api-types.js";
+import type { ProjectDetail, ProjectSummary, RunRow } from "../src/features/projects/projects.types.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 import { call } from "./api-http.js";
 import { journal, session, type Tree, tree } from "./project-fixture.js";

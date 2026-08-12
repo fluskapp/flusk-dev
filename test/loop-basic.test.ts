@@ -2,12 +2,12 @@ import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, test } from "vitest";
-import { createAgent } from "../src/agent/agent.js";
-import type { FluskEvent } from "../src/core/events.js";
-import type { ModelRef, ToolResultMsg } from "../src/core/types.js";
-import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
-import { Session } from "../src/session/session.js";
-import { readTool } from "../src/tools/read.js";
+import { createAgent } from "../src/features/run/agent.js";
+import type { FluskEvent } from "../src/platform/events/events.js";
+import type { ModelRef, ToolResultMsg } from "../src/features/run/run.types.js";
+import { assistantText, assistantToolCalls, FakeProvider } from "../src/features/provider/fake.js";
+import { Session } from "../src/features/session/session-file.repository.js";
+import { readTool } from "../src/features/tools/read.repository.js";
 import { spyRunEnds } from "./helpers.js";
 
 const model: ModelRef = { provider: "fake", id: "fake-1", contextWindow: 200_000 };

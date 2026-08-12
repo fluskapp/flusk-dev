@@ -10,9 +10,9 @@ import { execFileSync } from "node:child_process";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import { filesTouched, gate, NO_GATE } from "../src/lang/gate.js";
-import type { NodeOutcome } from "../src/lang/types.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import { filesTouched, gate, NO_GATE } from "../src/features/flows/gate.repository.js";
+import type { NodeOutcome } from "../src/features/flows/types.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 
 let repo: string;

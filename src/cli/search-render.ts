@@ -4,7 +4,7 @@
  * term that did. A hit you cannot explain is a hit you have to re-run with
  * --json to argue with, which is the opposite of the point.
  */
-import type { SearchHit } from "../history/types.js";
+import type { SearchHit } from "../features/history/types.js";
 
 const REGEX_META = /[.*+?^${}()|[\]\\]/g;
 

@@ -1,8 +1,8 @@
 import { afterAll, beforeAll, expect, test } from "vitest";
-import { createAgent } from "../src/agent/agent.js";
-import { assistantText, FakeProvider } from "../src/provider/fake.js";
-import type { CompactionEntry } from "../src/session/entries.js";
-import { Session } from "../src/session/session.js";
+import { createAgent } from "../src/features/run/agent.js";
+import { assistantText, FakeProvider } from "../src/features/provider/fake.js";
+import type { CompactionEntry } from "../src/features/session/entries.js";
+import { Session } from "../src/features/session/session-file.repository.js";
 import {
 	compactingConfig,
 	smallModel,

@@ -15,8 +15,8 @@ import type {
 	ContextTier,
 	SourceResult,
 	SourceStatus,
-} from "../src/context/types.js";
-import { estimateTokens } from "../src/history/budget.js";
+} from "../src/features/context/types.js";
+import { estimateTokens } from "../src/features/history/budget.js";
 
 export interface ItemSpec {
 	id: string;

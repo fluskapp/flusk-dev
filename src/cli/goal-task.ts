@@ -2,13 +2,13 @@
  * One frontier task = one gated agent session. Split out of goal-cmd.ts to
  * keep both files within the size standard.
  */
-import { createAgent } from "../agent/agent.js";
-import { loadConfig, loadRepoConfig } from "../config/config.js";
-import { createEventBus } from "../core/events.js";
-import { goalBrief } from "../goals/resume.js";
-import type { Provider } from "../provider/provider.js";
-import { createFluskPolicy } from "../safety/flusk-policy.js";
-import type { FactStore } from "../store/types.js";
+import { createAgent } from "../features/run/agent.js";
+import { loadConfig, loadRepoConfig } from "../platform/config/config.js";
+import { createEventBus } from "../platform/events/events.js";
+import { goalBrief } from "../features/goals/resume.js";
+import type { Provider } from "../features/provider/provider.js";
+import { createFluskPolicy } from "../features/safety/flusk-policy.js";
+import type { FactStore } from "../features/facts/types.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import type { GoalCmdOpts } from "./goal-cmd.js";
 import { taskDescription } from "./goal-list.js";

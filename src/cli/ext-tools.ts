@@ -20,10 +20,10 @@
  * note: the ToolRegistry is a Map, so a later registration of an existing name
  * wins, and an extension is allowed to replace a built-in on purpose.
  */
-import type { FluskConfig } from "../config/types.js";
-import type { EventBus } from "../core/events.js";
-import { loadExtensions } from "../ext/load.js";
-import type { Tool } from "../tools/tool.js";
+import type { FluskConfig } from "../platform/config/types.js";
+import type { EventBus } from "../platform/events/events.js";
+import { loadExtensions } from "../features/extensions/load.js";
+import type { Tool } from "../features/tools/tool.js";
 import { DEFAULT_TOOLS } from "./run-support.js";
 
 export interface ExtToolsOpts {

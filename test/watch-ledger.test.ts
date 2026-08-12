@@ -9,8 +9,8 @@ import {
 	recordAttempt,
 	recordNightRun,
 	recordOutcome,
-} from "../src/watch/ledger.js";
-import type { FactStore } from "../src/store/types.js";
+} from "../src/features/watch/ledger.js";
+import type { FactStore } from "../src/features/facts/types.js";
 import { startMemory } from "./watch-harness.js";
 
 const HOUR = 3_600_000;

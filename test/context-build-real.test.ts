@@ -7,8 +7,8 @@ import { mkdtemp, writeFile } from "node:fs/promises";
 import { homedir, tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vitest";
-import { buildContext } from "../src/context/build.js";
-import { estimateTokens } from "../src/history/budget.js";
+import { buildContext } from "../src/features/context/build.js";
+import { estimateTokens } from "../src/features/history/budget.js";
 import { fakeSource, paragraph, request } from "./context-build-fixtures.js";
 
 let repo: string;

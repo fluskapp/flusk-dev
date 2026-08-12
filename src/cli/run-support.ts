@@ -3,19 +3,19 @@
  * fake-provider scripts, and model selection.
  */
 import { readFile } from "node:fs/promises";
-import type { FluskConfig, TaskKind } from "../config/types.js";
-import type { AssistantMsg, ModelRef } from "../core/types.js";
-import { zeroUsage } from "../core/types.js";
-import { assistantText, assistantToolCalls, type ScriptedTurn } from "../provider/fake.js";
-import { resolveModelRef } from "../provider/pi-ai.js";
-import { chooseModel } from "../provider/router.js";
-import { loadScores } from "../provider/scores.js";
-import { bashTool } from "../tools/bash.js";
-import { editTool } from "../tools/edit.js";
-import { globTool } from "../tools/glob.js";
-import { grepTool } from "../tools/grep.js";
-import { readTool } from "../tools/read.js";
-import { writeTool } from "../tools/write.js";
+import type { FluskConfig, TaskKind } from "../platform/config/types.js";
+import type { AssistantMsg, ModelRef } from "../features/run/run.types.js";
+import { zeroUsage } from "../features/run/run.types.js";
+import { assistantText, assistantToolCalls, type ScriptedTurn } from "../features/provider/fake.js";
+import { resolveModelRef } from "../features/provider/pi-ai.js";
+import { chooseModel } from "../features/provider/router.js";
+import { loadScores } from "../features/provider/scores.repository.js";
+import { bashTool } from "../features/tools/bash.repository.js";
+import { editTool } from "../features/tools/edit.repository.js";
+import { globTool } from "../features/tools/glob.repository.js";
+import { grepTool } from "../features/tools/grep.repository.js";
+import { readTool } from "../features/tools/read.repository.js";
+import { writeTool } from "../features/tools/write.repository.js";
 
 export const fakeModel: ModelRef = { provider: "fake", id: "fake-1", contextWindow: 200_000 };
 export const DEFAULT_TOOLS = [readTool, bashTool, writeTool, editTool, globTool, grepTool];

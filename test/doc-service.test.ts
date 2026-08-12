@@ -10,13 +10,13 @@
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
-import { createTsProvider } from "../src/doc/ts-provider.js";
+import { createTsProvider } from "../src/features/docs/ts-provider.js";
 import {
 	disposeService,
 	getService,
 	loadTypeScript,
 	serviceStatus,
-} from "../src/doc/ts-service.js";
+} from "../src/features/docs/ts-service.js";
 import { docProject } from "./doc-fixture.js";
 
 afterEach(() => disposeService());

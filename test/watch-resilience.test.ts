@@ -5,10 +5,10 @@
  * and nothing empty may be published.
  */
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { nightKey } from "../src/watch/ledger.js";
-import { watchLoop } from "../src/watch/loop.js";
-import type { FactStore } from "../src/store/types.js";
-import { watchTick } from "../src/watch/tick.js";
+import { nightKey } from "../src/features/watch/ledger.js";
+import { watchLoop } from "../src/features/watch/loop.js";
+import type { FactStore } from "../src/features/facts/types.js";
+import { watchTick } from "../src/features/watch/tick.js";
 import { harness, HOUR, item, startMemory, T0 } from "./watch-harness.js";
 
 let cleanup: () => Promise<void>;

@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { renderMarkdown } from "../src/ui/markdown.js";
+import { renderMarkdown } from "../src/ui/render/markdown.js";
 
 it("escapes HTML so a document can never inject markup", () => {
 	const html = renderMarkdown('<script>alert(1)</script>\n\n<img src=x onerror="boom">');

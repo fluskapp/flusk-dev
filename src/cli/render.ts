@@ -1,5 +1,5 @@
 import { styleText } from "node:util";
-import type { EventBus } from "../core/events.js";
+import type { EventBus } from "../platform/events/events.js";
 
 type Style = Parameters<typeof styleText>[0];
 

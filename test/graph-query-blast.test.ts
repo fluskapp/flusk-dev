@@ -6,7 +6,7 @@
  * like a perfectly ordinary result list.
  */
 import { describe, expect, it } from "vitest";
-import { blastRadius } from "../src/graph/queries.js";
+import { blastRadius } from "../src/features/graph/queries.js";
 import { edge, fakeStore, file, sym } from "./graph-query-fixture.js";
 import { CORE, edges, nodes } from "./graph-query-graph.js";
 

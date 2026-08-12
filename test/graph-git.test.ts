@@ -11,11 +11,11 @@
  */
 import { spawnSync } from "node:child_process";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { disposeService } from "../src/doc/ts-service.js";
-import { buildGraph, type BuildReport } from "../src/graph/build.js";
-import { coChange, historyClock, provenance } from "../src/graph/queries.js";
-import { gitCards } from "../src/history/source-git.js";
-import { type JsonlGraph, openGraphStore } from "../src/graph/store-jsonl.js";
+import { disposeService } from "../src/features/docs/ts-service.js";
+import { buildGraph, type BuildReport } from "../src/features/graph/build.js";
+import { coChange, historyClock, provenance } from "../src/features/graph/queries.js";
+import { gitCards } from "../src/features/history/source-git.repository.js";
+import { type JsonlGraph, openGraphStore } from "../src/features/graph/store-jsonl.js";
 import { type GraphFixture, graphProject } from "./graph-fixture.js";
 
 let fx: GraphFixture;

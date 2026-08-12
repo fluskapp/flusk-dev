@@ -3,10 +3,10 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, sep } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import type { AssistantMsg, ModelRef, Msg, ToolResultMsg, UserMsg } from "../src/core/types.js";
-import { fluskHome, repoSlug, sessionsDir } from "../src/session/paths.js";
-import { Session } from "../src/session/session.js";
-import { SessionStore } from "../src/session/store.js";
+import type { AssistantMsg, ModelRef, Msg, ToolResultMsg, UserMsg } from "../src/features/run/run.types.js";
+import { fluskHome, repoSlug, sessionsDir } from "../src/platform/paths/paths.js";
+import { Session } from "../src/features/session/session-file.repository.js";
+import { SessionStore } from "../src/features/session/session.repository.js";
 
 const model: ModelRef = { provider: "fake", id: "fake-1", contextWindow: 200000 };
 

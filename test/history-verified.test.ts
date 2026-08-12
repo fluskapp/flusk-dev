@@ -7,9 +7,9 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import type { Msg } from "../src/core/types.js";
-import { sessionCards } from "../src/history/source-sessions.js";
-import { isVerifyCommand } from "../src/history/verify-evidence.js";
+import type { Msg } from "../src/features/run/run.types.js";
+import { sessionCards } from "../src/features/history/source-sessions.js";
+import { isVerifyCommand } from "../src/features/history/verify-evidence.js";
 import { asst, call, res, say, session } from "./history-session-fixtures.js";
 
 let home: string;

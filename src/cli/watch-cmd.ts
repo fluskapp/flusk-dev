@@ -8,21 +8,21 @@
  * degraded mode but an unbounded one — so this command refuses to start
  * instead of running without a record.
  */
-import { loadConfig, loadRepoConfig } from "../config/config.js";
-import { repoSlug } from "../session/paths.js";
-import { FLUSK_NS, resolveNamespace } from "../store/namespaces.js";
-import { createFactStore } from "../store/store.js";
-import { sweepTransient } from "../store/sweep.js";
+import { loadConfig, loadRepoConfig } from "../platform/config/config.js";
+import { repoSlug } from "../platform/paths/paths.js";
+import { FLUSK_NS, resolveNamespace } from "../features/facts/namespaces.js";
+import { createFactStore } from "../features/facts/facts.repository.js";
+import { sweepTransient } from "../features/facts/sweep.js";
 import {
 	branchFor,
 	commitCount,
 	createWorktree,
 	currentBranch,
 	removeWorktree,
-} from "../watch/isolation.js";
-import { watchLoop } from "../watch/loop.js";
-import { publish } from "../watch/push.js";
-import { pollQueues } from "../watch/queue.js";
+} from "../features/watch/isolation.repository.js";
+import { watchLoop } from "../features/watch/loop.js";
+import { publish } from "../features/watch/push.repository.js";
+import { pollQueues } from "../features/watch/queue.repository.js";
 import { runCmd } from "./run-cmd.js";
 
 export interface WatchCmdOpts {

@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { createEventBus } from "../src/core/events.js";
-import { zeroUsage } from "../src/core/types.js";
-import { loadExtensions } from "../src/ext/load.js";
+import { createEventBus } from "../src/platform/events/events.js";
+import { zeroUsage } from "../src/features/run/run.types.js";
+import { loadExtensions } from "../src/features/extensions/load.js";
 import { toolExtension, writeExtension } from "./ext-fixture.js";
 import { runToolBatch, setupTestHome, teardownTestHome } from "./helpers.js";
 

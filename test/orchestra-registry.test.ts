@@ -8,8 +8,8 @@ import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeEach, describe, expect, it } from "vitest";
-import type { ChatBackend } from "../src/chat/types.js";
-import { loadAgentRegistry } from "../src/orchestra/registry.js";
+import type { ChatBackend } from "../src/features/chat/types.js";
+import { loadAgentRegistry } from "../src/features/orchestra/registry.js";
 
 let home: string;
 let repo: string;

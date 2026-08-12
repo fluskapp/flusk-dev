@@ -5,7 +5,7 @@
  * never appear. Shared so the source tests and the on-disk index test rank the
  * same material and disagree only about how it was loaded.
  */
-import type { HistoryCard } from "../src/history/types.js";
+import type { HistoryCard } from "../src/features/history/types.js";
 
 export const PROJECT = "myrepo";
 export const TASK = "add retry backoff to the watch tick hook";

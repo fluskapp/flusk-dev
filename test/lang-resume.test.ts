@@ -9,10 +9,10 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { checkpointPath, readCheckpoint } from "../src/lang/checkpoint-read.js";
-import { loadFlowStats } from "../src/lang/flow-stats.js";
-import { FIX } from "../src/lang/library.js";
-import { runFlow } from "../src/lang/runner.js";
+import { checkpointPath, readCheckpoint } from "../src/features/flows/checkpoint-read.repository.js";
+import { loadFlowStats } from "../src/features/flows/flow-stats.repository.js";
+import { FIX } from "../src/features/flows/library.js";
+import { runFlow } from "../src/features/flows/runner.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 import { CFG as cfg, flowOpts, scripted, TASK } from "./lang-flow-helpers.js";
 import { withLangRuntime } from "./lang-guard.js";

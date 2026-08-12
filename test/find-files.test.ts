@@ -7,7 +7,7 @@
  * matcher can legitimately match through.
  */
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { fuzzyPath, listFiles, projectFor, searchRoots } from "../src/find/files.js";
+import { fuzzyPath, listFiles, projectFor, searchRoots } from "../src/features/search/files.js";
 import { type FindTree, findTree, hasRg } from "./find-fixture.js";
 
 let t: FindTree;

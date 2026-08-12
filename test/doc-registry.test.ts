@@ -11,9 +11,9 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { execPath } from "node:process";
 import { afterEach, describe, expect, it } from "vitest";
-import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { FluskConfig, DocServerConfig } from "../src/config/types.js";
-import { createDocRegistry, type DocRegistry, resolveBinary } from "../src/doc/registry.js";
+import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
+import type { FluskConfig, DocServerConfig } from "../src/platform/config/types.js";
+import { createDocRegistry, type DocRegistry, resolveBinary } from "../src/features/docs/registry.repository.js";
 import { writeFakeServer } from "./doc-lsp-fake.js";
 
 const open: DocRegistry[] = [];

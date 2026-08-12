@@ -13,9 +13,9 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { rgArgs } from "../src/find/rg-parse.js";
-import { runRg } from "../src/find/rg-spawn.js";
-import { find, MAX_FILES } from "../src/find/ripgrep.js";
+import { rgArgs } from "../src/features/search/rg-parse.js";
+import { runRg } from "../src/features/search/rg-spawn.repository.js";
+import { find, MAX_FILES } from "../src/features/search/ripgrep.js";
 import { type FindTree, findTree, hasRg, put } from "./find-fixture.js";
 
 let t: FindTree;

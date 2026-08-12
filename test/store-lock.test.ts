@@ -10,7 +10,7 @@ import { mkdtemp, readFile, rm, stat, utimes, writeFile } from "node:fs/promises
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { withLock } from "../src/store/lock.js";
+import { withLock } from "../src/features/facts/lock.repository.js";
 
 let dir: string;
 let path: string;

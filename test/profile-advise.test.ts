@@ -10,8 +10,8 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, expect, it } from "vitest";
-import { advise } from "../src/profile/advise.js";
-import { buildProfile } from "../src/profile/profile.js";
+import { advise } from "../src/features/profile/advise.js";
+import { buildProfile } from "../src/features/profile/profile.js";
 
 let dir: string;
 

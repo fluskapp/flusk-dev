@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { runFeed } from "../src/ui/run-feed.js";
+import { runFeed } from "../src/features/projects/run-feed.js";
 import { journal, session, tree, write } from "./project-fixture.js";
 
 const S1_AT = 1_786_388_400; // 2026-08-10T19:00:00Z

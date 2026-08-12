@@ -9,13 +9,13 @@
  * resets to "3" every time someone commits.
  */
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { coChangeEdges, coChangePairs } from "../src/graph/build-cochange.js";
-import { historyGraph } from "../src/graph/build-history.js";
-import { foldHistory } from "../src/graph/fold-history.js";
-import { idsFor, type Ids } from "../src/graph/ids.js";
-import { coChange, provenance } from "../src/graph/queries.js";
-import { emptyResume } from "../src/graph/state.js";
-import { type JsonlGraph, openGraphAt } from "../src/graph/store-jsonl.js";
+import { coChangeEdges, coChangePairs } from "../src/features/graph/build-cochange.js";
+import { historyGraph } from "../src/features/graph/build-history.repository.js";
+import { foldHistory } from "../src/features/graph/fold-history.js";
+import { idsFor, type Ids } from "../src/features/graph/ids.js";
+import { coChange, provenance } from "../src/features/graph/queries.js";
+import { emptyResume } from "../src/features/graph/state.repository.js";
+import { type JsonlGraph, openGraphAt } from "../src/features/graph/store-jsonl.js";
 import { commitCard, type GraphFixture, graphProject, sessionCard, sha } from "./graph-fixture.js";
 
 let fx: GraphFixture;

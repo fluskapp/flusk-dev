@@ -11,9 +11,9 @@ import { mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "nod
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { fluskHome } from "../src/session/paths.js";
-import { cachePath, listCached, readCached, webCacheDir, writeCached } from "../src/web/cache.js";
-import type { FetchedPage } from "../src/web/types.js";
+import { fluskHome } from "../src/platform/paths/paths.js";
+import { cachePath, listCached, readCached, webCacheDir, writeCached } from "../src/features/web/cache.repository.js";
+import type { FetchedPage } from "../src/features/web/types.js";
 
 let home: string;
 

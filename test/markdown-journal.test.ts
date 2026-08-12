@@ -10,9 +10,9 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, it } from "vitest";
-import { highlightCode } from "../src/ui/highlight.js";
-import { renderMarkdown } from "../src/ui/markdown.js";
-import { renderFrontmatter } from "../src/ui/markdown-frontmatter.js";
+import { highlightCode } from "../src/ui/render/highlight.js";
+import { renderMarkdown } from "../src/ui/render/markdown.js";
+import { renderFrontmatter } from "../src/ui/render/markdown-frontmatter.js";
 
 const RUNS = "/Users/ashb/projects/playground/linof-harness/docs/runs";
 const journals = existsSync(RUNS)

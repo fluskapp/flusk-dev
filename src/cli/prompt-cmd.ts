@@ -13,13 +13,13 @@
  */
 import { spawnSync } from "node:child_process";
 import { basename, resolve } from "node:path";
-import { buildIndex } from "../history/bm25.js";
-import { composePrompt } from "../history/compose.js";
-import { historyCards } from "../history/corpus.js";
-import { renderBlocks } from "../history/render-blocks.js";
-import type { ComposedPrompt } from "../history/types.js";
-import { buildWalkthrough } from "../history/walkthrough.js";
-import { DEFAULT_BUDGET } from "../ui/api-history.js";
+import { buildIndex } from "../features/history/bm25.js";
+import { composePrompt } from "../features/history/compose.js";
+import { historyCards } from "../features/history/corpus.js";
+import { renderBlocks } from "../features/history/render-blocks.js";
+import type { ComposedPrompt } from "../features/history/types.js";
+import { buildWalkthrough } from "../features/history/walkthrough.js";
+import { DEFAULT_BUDGET } from "../features/history/history.router.js";
 import { indexAge, NOTHING_INDEXED } from "./search-cmd.js";
 
 export interface PromptArgs {

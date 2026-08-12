@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { capText, dropPartialTail } from "../src/history/cap.js";
+import { capText, dropPartialTail } from "../src/features/history/cap.js";
 
 describe("capText", () => {
 	it("leaves text that already fits untouched", () => {

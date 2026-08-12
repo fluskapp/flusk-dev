@@ -1,7 +1,7 @@
 import { expect, it } from "vitest";
-import { buildIndex } from "../src/history/bm25.js";
-import type { HistoryCard, SearchHit } from "../src/history/types.js";
-import { buildWalkthrough, extractPaths } from "../src/history/walkthrough.js";
+import { buildIndex } from "../src/features/history/bm25.js";
+import type { HistoryCard, SearchHit } from "../src/features/history/types.js";
+import { buildWalkthrough, extractPaths } from "../src/features/history/walkthrough.js";
 
 const NOW = Date.parse("2026-08-11T00:00:00.000Z");
 const daysAgo = (n: number): string => new Date(NOW - n * 86_400_000).toISOString();

@@ -10,7 +10,7 @@
  * never stops redirecting.
  */
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
-import { MAX_RESPONSE_BYTES } from "../src/web/limits.js";
+import { MAX_RESPONSE_BYTES } from "../src/features/web/limits.js";
 
 /** Navigation, a script, a code block, prose — and a fake instruction. */
 export const PAGE_HTML = `<!doctype html>

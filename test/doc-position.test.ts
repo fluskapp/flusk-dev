@@ -16,10 +16,10 @@
  *    because that is what an editor gutter and the compiler both do.
  */
 import { expect, it } from "vitest";
-import { toLoc } from "../src/doc/lsp-convert.js";
-import { wordAt } from "../src/doc/lsp-hover.js";
-import { locIn, offsetAt } from "../src/doc/ts-map.js";
-import { loadTypeScript } from "../src/doc/ts-service.js";
+import { toLoc } from "../src/features/docs/lsp-convert.js";
+import { wordAt } from "../src/features/docs/lsp-hover.js";
+import { locIn, offsetAt } from "../src/features/docs/ts-map.js";
+import { loadTypeScript } from "../src/features/docs/ts-service.js";
 
 /** A source file the compiler can answer about, with no project around it. */
 async function sourceFile(text: string): Promise<import("typescript").SourceFile> {

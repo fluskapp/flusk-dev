@@ -3,10 +3,10 @@ import { createServer, type IncomingMessage, type Server, type ServerResponse } 
 import { join } from "node:path";
 import { Type } from "typebox";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import type { FluskConfig } from "../src/config/types.js";
-import { httpWorker } from "../src/orchestra/worker-http.js";
-import { FakeProvider } from "../src/provider/fake.js";
-import type { Tool } from "../src/tools/tool.js";
+import type { FluskConfig } from "../src/platform/config/types.js";
+import { httpWorker } from "../src/features/orchestra/worker-http.js";
+import { FakeProvider } from "../src/features/provider/fake.js";
+import type { Tool } from "../src/features/tools/tool.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 import { cfgWith, initRepo, makeCtx, makeSpec, makeTask } from "./orchestra-fixture.js";
 

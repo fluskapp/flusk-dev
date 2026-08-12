@@ -9,9 +9,9 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { buildIndex } from "../src/history/bm25.js";
-import { type RankOptions, search } from "../src/history/rank.js";
-import type { HistoryCard, SearchHit } from "../src/history/types.js";
+import { buildIndex } from "../src/features/history/bm25.js";
+import { type RankOptions, search } from "../src/features/history/rank.js";
+import type { HistoryCard, SearchHit } from "../src/features/history/types.js";
 
 export interface GoldenCase {
 	id: string;

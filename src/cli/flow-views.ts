@@ -4,9 +4,9 @@
  * is why they sit apart from flow-cmd.ts's run path — nothing here can spend
  * money, and that is a property worth being able to see at a glance.
  */
-import type { FlowSpec } from "../lang/types.js";
-import { flowLibrary } from "../ui/api-flow.js";
-import { type DryOpts, dryPlan } from "../ui/flow-plan.js";
+import type { FlowSpec } from "../features/flows/types.js";
+import { flowLibrary } from "../features/flows/flow.router.js";
+import { type DryOpts, dryPlan } from "../features/flows/flow-plan.js";
 import { renderDryPlan, renderFlowList } from "./flow-render.js";
 
 /** `flusk flow list` — built-in and user flows, each as one arrow chain. */

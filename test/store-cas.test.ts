@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, it } from "vitest";
-import type { CompareFailedError, FactStore } from "../src/store/types.js";
+import type { CompareFailedError, FactStore } from "../src/features/facts/types.js";
 import { type Harness, HOUR, harness, iso, NS, T0 } from "./store-harness.js";
 
 let h: Harness;

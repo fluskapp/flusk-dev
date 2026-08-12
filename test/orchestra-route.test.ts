@@ -2,11 +2,11 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import type { FluskConfig } from "../src/config/types.js";
-import { routeTask } from "../src/orchestra/route.js";
-import type { AgentSpec } from "../src/orchestra/types.js";
-import { createWorkers, workerLookup } from "../src/orchestra/workers.js";
-import { FakeProvider } from "../src/provider/fake.js";
+import type { FluskConfig } from "../src/platform/config/types.js";
+import { routeTask } from "../src/features/orchestra/route.js";
+import type { AgentSpec } from "../src/features/orchestra/types.js";
+import { createWorkers, workerLookup } from "../src/features/orchestra/workers.js";
+import { FakeProvider } from "../src/features/provider/fake.js";
 import { cfgWith, fakeRegistry, makeCtx, makeSpec } from "./orchestra-fixture.js";
 
 let repo: string;

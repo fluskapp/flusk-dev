@@ -8,8 +8,8 @@
  * injected, so the proof holds on a machine where the packages ARE installed.
  */
 import { describe, expect, it } from "vitest";
-import { type Importer, LANGCHAIN, LANGCHAIN_ANTHROPIC } from "../src/lang/deps.js";
-import { chatModelFor, fakeChatModel, textOf } from "../src/lang/model.js";
+import { type Importer, LANGCHAIN, LANGCHAIN_ANTHROPIC } from "../src/features/flows/deps.js";
+import { chatModelFor, fakeChatModel, textOf } from "../src/features/flows/model.js";
 
 const absent: Importer = async (specifier) => {
 	throw new Error(`Cannot find package '${specifier}'`);

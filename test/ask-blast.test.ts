@@ -11,10 +11,10 @@
  * look identical when the block is simply absent.
  */
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { disposeService } from "../src/doc/ts-service.js";
-import { buildGraph } from "../src/graph/build.js";
-import { openGraphStore } from "../src/graph/store-jsonl.js";
-import { blastBlock } from "../src/ui/ask-blast.js";
+import { disposeService } from "../src/features/docs/ts-service.js";
+import { buildGraph } from "../src/features/graph/build.js";
+import { openGraphStore } from "../src/features/graph/store-jsonl.js";
+import { blastBlock } from "../src/features/orchestra/ask-blast.js";
 import { type GraphFixture, graphProject } from "./graph-fixture.js";
 
 let fx: GraphFixture;

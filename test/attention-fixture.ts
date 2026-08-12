@@ -3,9 +3,9 @@
  * session that satisfy their types. Shared by the rule tests so each file
  * stays about the rules.
  */
-import type { Journal } from "../src/ui/journal-scan.js";
-import { type AttentionInput, computeAttention } from "../src/ui/project-attention.js";
-import type { SessionSummary } from "../src/ui/scan.js";
+import type { Journal } from "../src/features/projects/journal-scan.repository.js";
+import { type AttentionInput, computeAttention } from "../src/features/projects/project-attention.js";
+import type { SessionSummary } from "../src/features/projects/scan.repository.js";
 
 export const NOW = Date.parse("2026-08-11T00:00:00.000Z");
 export const MIN = 60_000;

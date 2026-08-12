@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, it } from "vitest";
-import type { FactStore } from "../src/store/types.js";
-import { watchTick } from "../src/watch/tick.js";
+import type { FactStore } from "../src/features/facts/types.js";
+import { watchTick } from "../src/features/watch/tick.js";
 import { HOUR, T0, harness, item, startMemory } from "./watch-harness.js";
 
 let cleanup: () => Promise<void>;

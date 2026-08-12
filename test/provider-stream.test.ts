@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { PiAiProvider } from "../src/provider/pi-ai.js";
-import type { CompletionRequest, StreamEvent } from "../src/provider/provider.js";
+import { PiAiProvider } from "../src/features/provider/pi-ai.js";
+import type { CompletionRequest, StreamEvent } from "../src/features/provider/provider.js";
 
 describe("PiAiProvider never throws", () => {
 	async function collect(req: CompletionRequest, signal: AbortSignal): Promise<StreamEvent[]> {

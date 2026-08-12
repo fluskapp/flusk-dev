@@ -10,10 +10,10 @@
  * langMissing() precisely so no second copy of it can drift.
  */
 import { describe, expect, it } from "vitest";
-import { nodeContext } from "../src/lang/context.js";
-import { type Importer, langMissing, loadLang, resetLang } from "../src/lang/deps.js";
-import { aboutOf, behaviourOf } from "../src/lang/nodes.js";
-import type { FlowNode, FlowState } from "../src/lang/types.js";
+import { nodeContext } from "../src/features/flows/context.js";
+import { type Importer, langMissing, loadLang, resetLang } from "../src/features/flows/deps.js";
+import { aboutOf, behaviourOf } from "../src/features/flows/nodes.js";
+import type { FlowNode, FlowState } from "../src/features/flows/types.js";
 
 const absent: Importer = async (specifier) => {
 	throw new Error(`Cannot find package '${specifier}'`);

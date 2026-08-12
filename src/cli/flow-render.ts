@@ -7,9 +7,9 @@
  * prompt to use this, it would have to appear somewhere in here. Nothing does —
  * every byte below is either a label or something the composer produced.
  */
-import type { FlowResult } from "../lang/types.js";
-import type { FlowLibrary, FlowView } from "../ui/api-flow.js";
-import type { DryPlan } from "../ui/flow-plan.js";
+import type { FlowResult } from "../features/flows/types.js";
+import type { FlowLibrary, FlowView } from "../features/flows/flow.router.js";
+import type { DryPlan } from "../features/flows/flow-plan.js";
 
 const pad = (text: string, width: number): string =>
 	text.length >= width ? text : text + " ".repeat(width - text.length);

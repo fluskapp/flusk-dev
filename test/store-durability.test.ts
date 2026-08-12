@@ -2,9 +2,9 @@ import { appendFile, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { nsPath, storeDir } from "../src/store/paths.js";
-import { createFactStore } from "../src/store/store.js";
-import { sweepTransient } from "../src/store/sweep.js";
+import { nsPath, storeDir } from "../src/features/facts/paths.js";
+import { createFactStore } from "../src/features/facts/facts.repository.js";
+import { sweepTransient } from "../src/features/facts/sweep.js";
 import { type Harness, HOUR, harness, iso, NS, T0 } from "./store-harness.js";
 
 /** A second namespace, to prove isolation is by namespace and not by luck. */

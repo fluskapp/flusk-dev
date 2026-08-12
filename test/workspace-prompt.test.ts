@@ -1,9 +1,9 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vitest";
-import { buildSystemPrompt } from "../src/agent/system-prompt.js";
-import { loadWorkspace } from "../src/agent/workspace.js";
-import { FILE_MAX, globalWorkspaceDir, TOTAL_MAX } from "../src/agent/workspace-files.js";
+import { buildSystemPrompt } from "../src/features/run/system-prompt.js";
+import { loadWorkspace } from "../src/features/workspace/workspace.js";
+import { FILE_MAX, globalWorkspaceDir, TOTAL_MAX } from "../src/features/workspace/workspace-files.repository.js";
 import { fakeModel, setupTestHome, teardownTestHome } from "./helpers.js";
 
 let repo: string;

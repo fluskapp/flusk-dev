@@ -14,11 +14,11 @@
  * around the term that did — otherwise the hit is unexplained.
  */
 import { styleText } from "node:util";
-import { buildIndex } from "../history/bm25.js";
-import { historyCards, indexBuiltAt } from "../history/corpus.js";
-import { search } from "../history/rank.js";
-import type { CardKind, SearchHit } from "../history/types.js";
-import { KINDS } from "../ui/api-history.js";
+import { buildIndex } from "../features/history/bm25.js";
+import { historyCards, indexBuiltAt } from "../features/history/corpus.js";
+import { search } from "../features/history/rank.js";
+import type { CardKind, SearchHit } from "../features/history/types.js";
+import { KINDS } from "../features/history/history.router.js";
 import { highlight, snippet } from "./search-render.js";
 
 export { highlight, snippet } from "./search-render.js";

@@ -7,9 +7,9 @@ import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { verifySource } from "../src/context/source-verify.js";
-import type { ContextItem, ContextRequest, SourceResult } from "../src/context/types.js";
-import { estimateTokens } from "../src/history/budget.js";
+import { verifySource } from "../src/features/context/source-verify.js";
+import type { ContextItem, ContextRequest, SourceResult } from "../src/features/context/types.js";
+import { estimateTokens } from "../src/features/history/budget.js";
 
 async function repoWith(files: Record<string, string>): Promise<string> {
 	const repo = await mkdtemp(join(tmpdir(), "flusk-ctx-verify-"));

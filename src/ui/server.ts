@@ -3,22 +3,22 @@
  * Every endpoint's body lives in an api-*.ts module beside this one.
  */
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
-import { fluskHome } from "../session/paths.js";
-import { handleAsk } from "./api-ask.js";
-import { handleAskStream } from "./api-ask-stream.js";
-import { handleChat, liveChats } from "./api-chat.js";
-import { handleContent } from "./api-content.js";
-import { disposeDocRegistries, handleDoc } from "./api-doc.js";
-import { handleFileBody } from "./api-file.js";
-import { handleFind } from "./api-find.js";
-import { handleFlows } from "./api-flow.js";
-import { handleGraph } from "./api-graph.js";
+import { fluskHome } from "../platform/paths/paths.js";
+import { handleAsk } from "../features/orchestra/ask.router.js";
+import { handleAskStream } from "../features/orchestra/ask-stream.router.js";
+import { handleChat, liveChats } from "../features/chat/chat.router.js";
+import { handleContent } from "../features/docs/content.router.js";
+import { disposeDocRegistries, handleDoc } from "../features/docs/doc.router.js";
+import { handleFileBody } from "../features/projects/file.router.js";
+import { handleFind } from "../features/search/find.router.js";
+import { handleFlows } from "../features/flows/flow.router.js";
+import { handleGraph } from "../features/graph/graph.router.js";
 import { denyReason, PAGE_HEADERS } from "./api-guard.js";
-import { handleHistory } from "./api-history.js";
-import { handleProjects } from "./api-projects.js";
-import { handleRender } from "./api-render.js";
-import { handleSessions } from "./api-sessions.js";
-import { handleWeb } from "./api-web.js";
+import { handleHistory } from "../features/history/history.router.js";
+import { handleProjects } from "../features/projects/projects.router.js";
+import { handleRender } from "../features/docs/render.router.js";
+import { handleSessions } from "../features/projects/sessions.router.js";
+import { handleWeb } from "../features/web/web.router.js";
 import { renderPage } from "./page.js";
 
 export interface UiServer {

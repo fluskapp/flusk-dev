@@ -9,10 +9,10 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { loadFlows } from "../src/lang/flow-files.js";
-import { parseFlowSpec } from "../src/lang/library.js";
-import { planFlow } from "../src/lang/planner.js";
-import { fluskHome } from "../src/session/paths.js";
+import { loadFlows } from "../src/features/flows/flow-files.repository.js";
+import { parseFlowSpec } from "../src/features/flows/library.js";
+import { planFlow } from "../src/features/flows/planner.js";
+import { fluskHome } from "../src/platform/paths/paths.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 
 let repo: string;

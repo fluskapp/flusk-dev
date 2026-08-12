@@ -9,9 +9,9 @@
  * block quote.ts builds.
  */
 import { expect, it } from "vitest";
-import { renderMarkdown } from "../src/ui/markdown.js";
-import { extractPage } from "../src/web/extract.js";
-import { asFetchedContext } from "../src/web/quote.js";
+import { renderMarkdown } from "../src/ui/render/markdown.js";
+import { extractPage } from "../src/features/web/extract.js";
+import { asFetchedContext } from "../src/features/web/quote.js";
 import { PAGE_HTML } from "./web-fixture.js";
 
 const page = extractPage(

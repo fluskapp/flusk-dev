@@ -2,10 +2,10 @@ import { mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createEventBus } from "../src/core/events.js";
-import { allowAllPolicy } from "../src/safety/policy.js";
-import { readTool } from "../src/tools/read.js";
-import type { ToolContext } from "../src/tools/tool.js";
+import { createEventBus } from "../src/platform/events/events.js";
+import { allowAllPolicy } from "../src/features/safety/policy.js";
+import { readTool } from "../src/features/tools/read.repository.js";
+import type { ToolContext } from "../src/features/tools/tool.js";
 
 let dir: string;
 

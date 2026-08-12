@@ -2,9 +2,9 @@ import { readFile } from "node:fs/promises";
 import { afterEach, beforeEach, expect, test } from "vitest";
 import { feedbackCmd } from "../src/cli/feedback-cmd.js";
 import { runsCmd } from "../src/cli/runs-cmd.js";
-import { assistantText } from "../src/provider/fake.js";
-import { scoresPath, type Scores } from "../src/provider/scores.js";
-import { Session } from "../src/session/session.js";
+import { assistantText } from "../src/features/provider/fake.js";
+import { scoresPath, type Scores } from "../src/features/provider/scores.repository.js";
+import { Session } from "../src/features/session/session-file.repository.js";
 import { capture, SLOW } from "./cli2-helpers.js";
 import { fakeModel, setupTestHome, teardownTestHome } from "./helpers.js";
 

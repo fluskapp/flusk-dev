@@ -1,9 +1,9 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, test } from "vitest";
-import { globalWorkspaceDir, projectWorkspaceDir } from "../src/agent/workspace-files.js";
-import { createWorkspaceSource } from "../src/context/source-workspace.js";
-import type { ContextRequest } from "../src/context/types.js";
+import { globalWorkspaceDir, projectWorkspaceDir } from "../src/features/workspace/workspace-files.repository.js";
+import { createWorkspaceSource } from "../src/features/context/source-workspace.js";
+import type { ContextRequest } from "../src/features/context/types.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 
 let repo: string;

@@ -1,8 +1,8 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { streamHttp } from "../src/chat/http-backend.js";
-import type { ChatChunk } from "../src/chat/types.js";
-import type { ChatBackendConfig } from "../src/config/types.js";
+import { streamHttp } from "../src/features/chat/http-backend.js";
+import type { ChatChunk } from "../src/features/chat/types.js";
+import type { ChatBackendConfig } from "../src/platform/config/types.js";
 
 let server: Server;
 let base: string;

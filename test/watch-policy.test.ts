@@ -3,9 +3,9 @@ import { afterEach, beforeEach, expect, it } from "vitest";
  * Watch policy that is not the ledger's arithmetic: what gets published, how
  * far a failure backs off, and when the loop sleeps.
  */
-import { watchLoop } from "../src/watch/loop.js";
-import type { FactStore } from "../src/store/types.js";
-import { watchTick } from "../src/watch/tick.js";
+import { watchLoop } from "../src/features/watch/loop.js";
+import type { FactStore } from "../src/features/facts/types.js";
+import { watchTick } from "../src/features/watch/tick.js";
 import { HOUR, T0, harness, item, startMemory } from "./watch-harness.js";
 
 let cleanup: () => Promise<void>;

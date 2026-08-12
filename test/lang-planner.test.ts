@@ -6,10 +6,10 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, expect, it } from "vitest";
-import { isPhrase } from "../src/lang/context.js";
-import { BUILT_IN, FIX, SHIP } from "../src/lang/library.js";
-import { growFrom, planFlow } from "../src/lang/planner.js";
-import { followUps } from "../src/lang/planner-parse.js";
+import { isPhrase } from "../src/features/flows/context.js";
+import { BUILT_IN, FIX, SHIP } from "../src/features/flows/library.js";
+import { growFrom, planFlow } from "../src/features/flows/planner.js";
+import { followUps } from "../src/features/flows/planner-parse.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 
 let _repo: string;
