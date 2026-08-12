@@ -9,6 +9,8 @@
  */
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { loadConfig } from "../../platform/config/config.js";
+import { fluskHome } from "../../platform/paths/paths.js";
+import { version } from "../../platform/version.js";
 import { scanJournals } from "./journal-scan.repository.js";
 import { buildOverview, type Overview } from "./overview.js";
 import { scanProjects } from "./project-scan.repository.js";
@@ -21,6 +23,16 @@ export type { SessionSummary } from "./scan.repository.js";
 export type { ProjectSummary } from "./projects.types.js";
 
 const cfg = createServerOnlyFn(() => loadConfig(process.cwd()));
+
+/** What the chrome itself needs: the status bar's home path and version. */
+export interface WorkbenchMeta {
+	home: string;
+	version: string;
+}
+
+export const getWorkbenchMeta = createServerFn().handler(async (): Promise<WorkbenchMeta> => {
+	return { home: fluskHome(), version: version() };
+});
 
 /** The Attention/Overview payload: stat tiles plus recent activity. */
 export const getOverview = createServerFn().handler(async (): Promise<Overview> => {

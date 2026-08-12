@@ -14,13 +14,16 @@ import { ChatRail } from "../ui/react/chat/ChatRail.js";
 import { DocWindow } from "../ui/react/docwin/DocWindow.js";
 import { FindStrip } from "../ui/react/find/FindStrip.js";
 import { ProjectsRail } from "../ui/react/projects/ProjectsRail.js";
+import { Grip } from "../ui/react/workbench/Grips.js";
 import { StatusBar } from "../ui/react/workbench/StatusBar.js";
 import { Toolbar } from "../ui/react/workbench/Toolbar.js";
 import { WorkbenchKeys } from "../ui/react/workbench/WorkbenchKeys.js";
 import { ROOT_DEFAULTS, validateRootSearch } from "../ui/react/workbench/root-search.js";
+import { getWorkbenchMeta, type WorkbenchMeta } from "../features/projects/projects.functions.js";
 
 export const Route = createRootRoute({
 	validateSearch: validateRootSearch,
+	loader: async (): Promise<WorkbenchMeta> => getWorkbenchMeta() as Promise<WorkbenchMeta>,
 	head: () => ({
 		meta: [
 			{ charSet: "utf-8" },
@@ -37,6 +40,7 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+	const meta = Route.useLoaderData() as WorkbenchMeta;
 	const search = Route.useSearch();
 	const side = search.side ?? ROOT_DEFAULTS.side;
 	const chat = search.chat ?? ROOT_DEFAULTS.chat;
@@ -53,14 +57,24 @@ function RootComponent() {
 			}}
 		>
 			<Toolbar />
-			{side ? <ProjectsRail /> : null}
+			{side ? (
+				<>
+					<ProjectsRail />
+					<Grip side="left" />
+				</>
+			) : null}
 			<main id="main">
 				<Outlet />
 			</main>
-			{chat ? <ChatRail /> : null}
+			{chat ? (
+				<>
+					<Grip side="right" />
+					<ChatRail />
+				</>
+			) : null}
 			{doc ? <DocWindow /> : null}
 			{find ? <FindStrip /> : null}
-			<StatusBar />
+			<StatusBar home={meta.home} version={meta.version} />
 			<WorkbenchKeys />
 		</div>
 	);

@@ -36,6 +36,10 @@ body { margin: 0; background: var(--bg); color: var(--text); font: var(--ij-fs-5
 	padding: 0 var(--ij-space-2); background: var(--panel); border-top: 1px solid var(--border);
 	font-size: var(--ij-fs-3); color: var(--dim);
 }
+.grip { position: relative; width: 0; cursor: col-resize; }
+.grip::after { content: ""; position: absolute; top: 0; bottom: 0; width: var(--ij-space); cursor: col-resize; }
+.grip-left::after { left: calc(-1 * var(--ij-space-1)); }
+.grip-right::after { right: calc(-1 * var(--ij-space-1)); }
 .tw-head {
 	display: flex; align-items: center; gap: var(--ij-space-2);
 	height: var(--ij-toolbar-h); padding: 0 var(--ij-space-2);
