@@ -1,0 +1,45 @@
+/* The workbench grid, cut from the legacy styles-chrome vocabulary: the same
+   tokens, the same regions, expressed once for the React shell. */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: var(--ij-fs-5) var(--font-ui); }
+#app {
+	display: grid; height: 100vh;
+	grid-template:
+		"tb tb tb" var(--ij-toolbar-h)
+		"side main chat" minmax(0, 1fr)
+		"find find find" auto
+		"st st st" var(--ij-status-h)
+		/ var(--tw-left, 280px) minmax(0, 1fr) var(--tw-right, 340px);
+}
+#app[data-side="off"] { grid-template-columns: 0 minmax(0, 1fr) var(--tw-right, 340px); }
+#app[data-chat="off"] { grid-template-columns: var(--tw-left, 280px) minmax(0, 1fr) 0; }
+#toolbar {
+	grid-area: tb; display: flex; align-items: center; gap: var(--ij-space-2);
+	padding: 0 var(--ij-space-2); background: var(--panel); border-bottom: 1px solid var(--border);
+}
+#toolbar .logo { font-weight: 700; }
+#toolbar a, #toolbar button {
+	display: inline-flex; align-items: center; gap: var(--ij-space-1);
+	background: none; border: none; color: var(--text); cursor: pointer;
+	font: inherit; text-decoration: none; padding: var(--ij-space-1) var(--ij-space-2);
+}
+#toolbar a:hover, #toolbar button:hover { background: var(--hover); }
+#toolbar .n { color: var(--dim); font-size: var(--ij-fs-1); }
+.spacer { flex: 1; }
+#side { grid-area: side; border-right: 1px solid var(--border); background: var(--panel); overflow: auto; }
+#main { grid-area: main; overflow: auto; }
+#chat { grid-area: chat; border-left: 1px solid var(--border); background: var(--panel); display: flex; flex-direction: column; }
+#find { grid-area: find; border-top: 1px solid var(--border); background: var(--panel); }
+#docwin { position: fixed; right: 0; bottom: var(--ij-status-h); width: var(--tw-right, 340px); background: var(--panel); border: 1px solid var(--border); }
+#status {
+	grid-area: st; display: flex; align-items: center; gap: var(--ij-space-2);
+	padding: 0 var(--ij-space-2); background: var(--panel); border-top: 1px solid var(--border);
+	font-size: var(--ij-fs-3); color: var(--dim);
+}
+.tw-head {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	height: var(--ij-toolbar-h); padding: 0 var(--ij-space-2);
+	border-bottom: 1px solid var(--border); font-weight: 600;
+}
+.tw-num { color: var(--dim); }
+.st-path { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

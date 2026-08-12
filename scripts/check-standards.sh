@@ -22,7 +22,7 @@ size_dirs="src test"; [ -d crates ] && size_dirs="$size_dirs crates"
 # shellcheck disable=SC2086
 offenders=$(find $size_dirs -type f \( -name '*.ts' -o -name '*.tsx' -o -name '*.rs' \) -print0 2>/dev/null |
 	xargs -0 wc -l 2>/dev/null |
-	awk -v max="$max_lines" '$2 != "total" && $1 > max { printf "  %s (%d lines)\n", $2, $1 }')
+	awk -v max="$max_lines" '$2 != "total" && $1 > max && $2 !~ /routeTree\.gen\.ts$/ { printf "  %s (%d lines)\n", $2, $1 }')
 if [ -n "$offenders" ]; then
 	echo "FAIL: files exceed the ${max_lines}-line hard cap (aim for <= ~100):"
 	echo "$offenders"
@@ -73,12 +73,14 @@ if [ -n "$repo_leaks" ]; then
 fi
 
 # --- 6. route -> feature boundary ---------------------------------------------
-# src/routes/** may import from a feature only via its *.router.ts or
-# *.types.ts. This replaces the package boundary a monorepo would have given
-# us: it is what stops engine code reaching the client bundle.
+# src/routes/** may import from a feature only via its *.router.ts, *.types.ts
+# or *.functions.ts (typed server functions — the Start-era router surface;
+# they take the .router.ts name when the legacy HTTP routers are deleted at
+# the one-cut). This replaces the package boundary a monorepo would have
+# given us: it is what stops engine code reaching the client bundle.
 if [ -d src/routes ]; then
 	route_leaks=$(grep -rEn 'from "[^"]*features/[^"]*"' src/routes --include='*.ts' --include='*.tsx' 2>/dev/null |
-		grep -vE '\.(router|types)\.js"' || true)
+		grep -vE '\.(router|types|functions)\.js"' || true)
 	if [ -n "$route_leaks" ]; then
 		echo "FAIL: src/routes/** imports a feature past its router/types seam:"
 		printf '  %s\n' "$route_leaks"

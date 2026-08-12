@@ -26,22 +26,33 @@
 		"check": "tsc --noEmit",
 		"test": "vitest run",
 		"standards": "bash scripts/check-standards.sh",
-		"design": "bash scripts/check-design.sh"
+		"design": "bash scripts/check-design.sh",
+		"dev": "npm run tokens && vite dev",
+		"tokens": "npm run build && node scripts/gen-tokens.mjs",
+		"build:app": "npm run tokens && vite build"
 	},
 	"dependencies": {
 		"@earendil-works/pi-ai": "^0.84.1",
-		"typebox": "^1.1.24"
+		"@tanstack/react-router": "^1.170.27",
+		"@tanstack/react-start": "^1.168.44",
+		"@vitejs/plugin-react": "^5.2.0",
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8",
+		"typebox": "^1.1.24",
+		"vite": "^7.3.6"
 	},
 	"optionalDependencies": {
-		"typescript": "^5.7.0",
 		"@langchain/anthropic": "^1.5.4",
 		"@langchain/core": "^1.2.5",
 		"@langchain/langgraph": "^1.4.9",
-		"langchain": "^1.5.5"
+		"langchain": "^1.5.5",
+		"typescript": "^5.7.0"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.0.0",
 		"@types/node": "^24.0.0",
+		"@types/react": "^19.2.18",
+		"@types/react-dom": "^19.2.4",
 		"vitest": "^3.0.0"
 	},
 	"homepage": "https://flusk.dev"
