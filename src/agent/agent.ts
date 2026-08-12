@@ -6,25 +6,21 @@ import { SteeringQueue } from "../core/steering.js";
 import type { Limits } from "../core/stop.js";
 import type { Msg } from "../core/types.js";
 import { BudgetTracker } from "../safety/budget.js";
-import { checkpoint } from "../safety/git-isolation.js";
 import { allowAllPolicy } from "../safety/policy.js";
 import { prepareResumeContext } from "../session/repair.js";
 import { Session } from "../session/session.js";
 import { ToolRegistry } from "../tools/registry.js";
 import { taskTool } from "../tools/task.js";
 import type { ToolContext } from "../tools/tool.js";
+import { checkpointMutatingTurns } from "./checkpoints.js";
 import type { Agent, CreateAgentOpts } from "./options.js";
+import { prepareRun, type RunPrompt } from "./run-context.js";
 import { runSubagent } from "./subagent.js";
-import { buildSystemPrompt } from "./system-prompt.js";
 
 export type { Agent, CreateAgentOpts } from "./options.js";
 
 /** Levels 0 and 1 may spawn subagents; level 2 has no task tool. */
 const MAX_SUBAGENT_DEPTH = 2;
-/** Tools whose success marks a turn as mutating (checkpoint-worthy). "task"
- * counts because a subagent may write/edit/run bash on its own event bus;
- * checkpoint() no-ops on a clean tree, so false positives cost one git status. */
-const MUTATING_TOOLS = new Set(["write", "edit", "bash", "task"]);
 
 export function createAgent(opts: CreateAgentOpts): Agent {
 	const policy = opts.policy ?? allowAllPolicy;
@@ -63,19 +59,7 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 		initialContext.push(taskMsg);
 	}
 
-	if (opts.isolation !== undefined) {
-		const isoRoot = opts.isolation.repoRoot;
-		events.on("turn:end", (e) => {
-			const mutated = e.toolResults.some((r) => !r.isError && MUTATING_TOOLS.has(r.name));
-			if (!mutated) return;
-			try {
-				checkpoint(isoRoot, e.turn);
-			} catch {
-				// Non-fatal: a transient git failure (stale index.lock) must not
-				// abort the run; the next mutating turn or run end re-commits.
-			}
-		});
-	}
+	if (opts.isolation !== undefined) checkpointMutatingTurns(events, opts.isolation.repoRoot);
 
 	const controller = new AbortController();
 	// A parent's abort must reach this agent (subagents run on their own controller).
@@ -100,6 +84,24 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 		toolCtx.spawnSubagent = (task: string, kind?: string) => runSubagent(spawnCtx, task, kind);
 		registry.register(taskTool);
 	}
+	/**
+	 * The system prompt and the run-context block are ONE per-run product: the
+	 * block is built here and frozen into the prompt for every turn of that run
+	 * (L6), and the prompt drops whatever the block already quotes. Built again
+	 * on resume, when the tree and the run's own journal have moved.
+	 */
+	const prepare = (resume: boolean): RunPrompt =>
+		prepareRun({
+			repoRoot: opts.repoRoot,
+			task: opts.task,
+			model: opts.model,
+			isResume: resume,
+			events,
+			context: config.context,
+			sessionRef: session.path,
+			...(opts.contextSources !== undefined ? { sources: opts.contextSources } : {}),
+		});
+
 	const deps = {
 		provider: opts.provider,
 		model: opts.model,
@@ -107,11 +109,6 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 		session,
 		events,
 		steering,
-		baseSystem: buildSystemPrompt({
-			repoRoot: opts.repoRoot,
-			cwd: opts.repoRoot,
-			model: opts.model,
-		}),
 		toolCtx,
 		signal: controller.signal,
 		runId: opts.runId ?? randomUUID().slice(0, 8),
@@ -130,11 +127,13 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 		},
 	};
 	return {
-		run: () => runLoop(deps),
-		// Continuation = resume-in-place: same session, fresh run id, steer appended.
+		run: () => runLoop({ ...deps, ...prepare(isResume) }),
+		// Continuation = resume-in-place: same session, fresh run id, steer
+		// appended — and a fresh context build, because it is a new run.
 		continueRun: (steer: string) =>
 			runLoop({
 				...deps,
+				...prepare(true),
 				runId: randomUUID().slice(0, 8),
 				isResume: true,
 				initialContext: prepareResumeContext(session, steer),

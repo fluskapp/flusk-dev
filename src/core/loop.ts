@@ -7,6 +7,13 @@ import { zeroUsage } from "./types.js";
 export interface LoopDeps extends TurnDeps {
 	limits: Limits;
 	initialContext: Msg[];
+	/**
+	 * Called once, after run:start and before the first turn, to report what the
+	 * run was given (the context block). It runs here rather than at the caller
+	 * so the report lands INSIDE the run it describes; it is awaited so a
+	 * subscriber sees it before any turn event, and it cannot fail the run.
+	 */
+	announce?: () => Promise<void>;
 	/** Cost/deadline tracker; absent = no budget wrap-up (bare test loops). */
 	budget?: BudgetTracker;
 	/** Clock injection for deterministic deadline tests. */
@@ -31,6 +38,12 @@ export async function runLoop(deps: LoopDeps): Promise<{ reason: RunEndReason; s
 		task: deps.task,
 		model: deps.model,
 	});
+	try {
+		await deps.announce?.();
+	} catch {
+		// A listener that throws is its own problem; what the run was given is a
+		// report, and a failed report must not cost the run its turns.
+	}
 	const state: TurnState = { context: [...deps.initialContext], turn: 1, usage: zeroUsage() };
 	let turnsCompleted = 0;
 	let reason: RunEndReason;

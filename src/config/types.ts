@@ -65,6 +65,17 @@ export interface AhConfig {
 		 */
 		enabled: boolean;
 	};
+	context: {
+		/**
+		 * Build the run-start context block (house rules, verify chain, what the
+		 * history and past runs say about this task). False leaves a run with the
+		 * system prompt and its task, which is what it had before the block
+		 * existed — the opt-out, not a degraded mode.
+		 */
+		enabled: boolean;
+		/** Ceiling for the WHOLE block, pinned items included. Never exceeded. */
+		budgetTokens: number;
+	};
 	verify: {
 		retries: number;
 		evidenceLines: number;

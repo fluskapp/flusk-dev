@@ -1,5 +1,5 @@
 /**
- * The commands that only READ: index, runs, search, find, prompt.
+ * The commands that only READ: index, runs, search, find, prompt, context.
  *
  * Split from main.ts, which is the argument parser and the safety-relevant
  * dispatch, so that adding another way to interrogate the corpus does not keep
@@ -9,6 +9,7 @@
  * one-line delegations rather than two parallel lists of command names that
  * can drift.
  */
+import { contextCmd } from "./context-cmd.js";
 import { findCmd } from "./find-cmd.js";
 import { indexCmd } from "./index-cmd.js";
 import { promptCmd } from "./prompt-cmd.js";
@@ -50,6 +51,17 @@ export async function queryCommand(
 	if (command === "find") {
 		if (arg === undefined) return fail(USAGE);
 		process.exitCode = await findCmd(arg, v);
+		return true;
+	}
+	if (command === "context") {
+		if (arg === undefined) return fail(USAGE);
+		// Scoped to the current repo like `ah run`: the context a run gets is
+		// built against the repo it is about to edit, so `ah context` asked from
+		// somewhere else would print a block no run would ever receive.
+		process.exitCode = contextCmd(arg, {
+			...v,
+			repo: typeof v.repo === "string" ? v.repo : process.cwd(),
+		});
 		return true;
 	}
 	if (command === "prompt") {

@@ -36,6 +36,7 @@ interface ConfigLayer {
 	isolation?: Partial<AhConfig["isolation"]>;
 	compaction?: Partial<AhConfig["compaction"]>;
 	memory?: Partial<AhConfig["memory"]>;
+	context?: Partial<AhConfig["context"]>;
 	verify?: Partial<AhConfig["verify"]>;
 	ui?: Partial<AhConfig["ui"]>;
 	chat?: Partial<AhConfig["chat"]>;
@@ -104,6 +105,7 @@ function mergeLayer(base: AhConfig, layer: ConfigLayer | null, trusted: boolean)
 		isolation: { ...base.isolation, ...layer.isolation },
 		compaction: { ...base.compaction, ...layer.compaction },
 		memory: { ...base.memory, ...layer.memory },
+		context: { ...base.context, ...layer.context },
 		verify: { ...base.verify, ...layer.verify },
 		ui: { ...base.ui, ...uiOf(layer, trusted) },
 		chat: { ...base.chat, ...chatOf(layer, trusted) },

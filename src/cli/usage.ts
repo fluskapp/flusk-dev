@@ -15,6 +15,8 @@ export const USAGE = `Usage:
                     [--limit <n>] [--json] [--refresh]
   ah find <query> [--project <name>] [--glob <g>] [--regex] [--case] [--limit <n>]
   ah prompt <task> [--repo <path> | --all] [--budget <n>] [--json] [--copy] [--refresh]
+  ah context <task> [--repo <path>] [--budget <n>] [--json]
+                    what a run would be told before its first turn, and what was dropped
   ah feedback <good|bad>
   ah workspace <init|show|path> [--project]
   ah index [--repo <path>] [--json]  what this repo is, and what would help

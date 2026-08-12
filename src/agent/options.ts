@@ -1,4 +1,5 @@
 import type { AhConfig } from "../config/types.js";
+import type { ContextSource } from "../context/types.js";
 import type { EventBus } from "../core/events.js";
 import type { Limits } from "../core/stop.js";
 import type { ModelRef, RunEndReason, RunStats } from "../core/types.js";
@@ -45,6 +46,11 @@ export interface CreateAgentOpts {
 	isolation?: { repoRoot: string; branch: string };
 	/** Clock injection for deterministic deadline tests. */
 	now?: () => number;
+	/**
+	 * Sources for the run-start context block; defaults to the six registered
+	 * ones. Injected by tests, which need a source that misbehaves on purpose.
+	 */
+	contextSources?: readonly ContextSource[];
 }
 
 export interface Agent {

@@ -26,6 +26,12 @@ export const DEFAULT_CONFIG: AhConfig = {
 	memory: {
 		enabled: true,
 	},
+	context: {
+		enabled: true,
+		// ~2% of a 200k window: enough for the house rules, the verify chain and a
+		// handful of history blocks, small enough that the task still dominates.
+		budgetTokens: 4000,
+	},
 	verify: {
 		retries: 3,
 		evidenceLines: 40,

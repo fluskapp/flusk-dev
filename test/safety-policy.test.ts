@@ -4,8 +4,8 @@ import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
 import type { AhConfig } from "../src/config/types.js";
 import type { Usage } from "../src/core/types.js";
-import { BudgetTracker } from "../src/safety/budget.js";
 import { createAhPolicy } from "../src/safety/ah-policy.js";
+import { BudgetTracker } from "../src/safety/budget.js";
 
 let repo: string;
 let outside: string;
@@ -29,6 +29,7 @@ function config(onUnknownCommand: "deny" | "allow"): AhConfig {
 		isolation: { requireGit: true, branchPrefix: "ah/" },
 		compaction: { reserveTokens: 4000, keepRecentTokens: 8000 },
 		memory: { enabled: false },
+		context: { enabled: false, budgetTokens: 4000 },
 		verify: { retries: 3, evidenceLines: 40 },
 		ui: { harnessDirs: [], projectDirs: [] },
 		chat: { backends: [] },
@@ -111,9 +112,7 @@ describe("createAhPolicy", () => {
 			repoRoot: repo,
 			extraWriteRoots: [outside],
 		});
-		expect(withExtra.decide({ kind: "fileWrite", path: join(outside, "y.txt") }).allow).toBe(
-			true,
-		);
+		expect(withExtra.decide({ kind: "fileWrite", path: join(outside, "y.txt") }).allow).toBe(true);
 		expect(withExtra.decide({ kind: "fileWrite", path: "sneaky-link/y.txt" }).allow).toBe(true);
 	});
 
