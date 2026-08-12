@@ -8,7 +8,11 @@ on:
 
 jobs:
   ci:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,7 +25,30 @@ jobs:
         run: npm run check
       - name: Test
         run: npm test
-      - name: Build
+      - name: Build (engine)
         run: npm run build
+      - name: Build (app)
+        run: npm run build:app
       - name: Standards
         run: npm run standards
+        if: runner.os != 'Windows'
+      - name: Design
+        run: npm run design
+        if: runner.os != 'Windows'
+
+  rust:
+    # Becomes required once crates/ lands (Phase 5); green no-op until then.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Cargo test + clippy
+        run: |
+          if [ -f crates/Cargo.toml ] || [ -f Cargo.toml ]; then
+            cargo test --workspace --manifest-path "$( [ -f Cargo.toml ] && echo Cargo.toml || echo crates/Cargo.toml )"
+            cargo clippy --workspace --manifest-path "$( [ -f Cargo.toml ] && echo Cargo.toml || echo crates/Cargo.toml )" -- -D warnings
+          else
+            echo "no Rust workspace yet"
+          fi
