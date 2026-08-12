@@ -59,7 +59,7 @@ function graphBody(d) {
  * Which failure this was, as [title, sentence]. A refusal, a server-side crash
  * and an unreachable server have three different remedies, and the panel used
  * to assert the first one for all three — telling a reader their path is
- * outside their projects when their .flusk.json has a trailing comma.
+ * outside their projects when their .flusk/config.json has a trailing comma.
  */
 function graphFail(e, file) {
 	var status = (e && e.status) || 0;

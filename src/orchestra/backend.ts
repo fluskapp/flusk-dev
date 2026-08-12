@@ -10,7 +10,7 @@
  *
  * That split is also the trust boundary. A spec contributes TEXT and a
  * backend NAME; the binary, argv, base URL and API key env var come only from
- * config, which src/config/config.ts refuses from a repo's own .flusk.json. An
+ * config, which src/config/config.ts refuses from a repo's own .flusk/config.json. An
  * id that does not resolve makes the spec unavailable with a reason — it
  * never falls back to another backend, because silently running a task on a
  * model the user did not choose is the exact surprise the contract forbids.

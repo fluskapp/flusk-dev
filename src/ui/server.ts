@@ -11,6 +11,7 @@ import { handleContent } from "./api-content.js";
 import { disposeDocRegistries, handleDoc } from "./api-doc.js";
 import { handleFileBody } from "./api-file.js";
 import { handleFind } from "./api-find.js";
+import { handleFlows } from "./api-flow.js";
 import { handleGraph } from "./api-graph.js";
 import { denyReason, PAGE_HEADERS } from "./api-guard.js";
 import { handleHistory } from "./api-history.js";
@@ -56,6 +57,7 @@ function handle(req: IncomingMessage, res: ServerResponse, port: number): void {
 	if (handleGraph(method, path, url.searchParams, res)) return;
 	if (handleProjects(method, path, url.searchParams, res)) return;
 	if (handleWeb(method, path, url.searchParams, res)) return;
+	if (handleFlows(method, path, url.searchParams, req, res)) return;
 	if (handleRender(method, path, req, res)) return;
 	if (handleChat(method, path, req, res)) return;
 	if (handleAsk(method, path, url.searchParams, res)) return;

@@ -194,6 +194,21 @@ unbounded, and so does `flusk goal`, whose task graph is itself stored facts.
 Pushing is **off by default** (`watch.push`): a night's work stays on local
 branches for you to review. Turn it on to have flusk push and open PRs.
 
+## Flows (branch `lang`, not merged)
+
+`ah flow` composes and runs LangGraph flows whose prompts are assembled from
+history — no prompt is written by hand. `ah flow list` shows the built-ins;
+`ah flow run <task> --dry` prints the graph and every node's composed prompt
+with its sources.
+
+**What it cannot do yet, stated plainly:** a `code` node calls the model and
+returns its TEXT. It has no tools, so it does not edit files. Today a flow
+plans, reasons and verifies; it does not make the change. Making that real
+means a code node running ah's own agent loop (`createAgent` with the normal
+toolset, policy and git isolation) instead of a bare model call, so that a
+flow step is a real ah run with a composed prompt. Until then, treat `ah flow`
+as orchestration and prompt composition, not as a replacement for `ah run`.
+
 ## Status
 
 Phases 1–4 are in the tree: the engine (loop, tools, sessions, dashboard), the

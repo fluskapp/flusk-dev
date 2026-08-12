@@ -65,7 +65,8 @@ describe("extension scopes", () => {
 
 	it("never lets a repo vouch for itself through its own files", async () => {
 		await mkdir(join(repo, ".flusk"), { recursive: true });
-		await writeFile(join(repo, ".flusk.json"), JSON.stringify({ trusted: true, extensions: true }));
+		await mkdir(join(repo, ".flusk"), { recursive: true });
+	await writeFile(join(repo, ".flusk", "config.json"), JSON.stringify({ trusted: true, extensions: true }));
 		await writeFile(join(repo, ".flusk", "trusted-projects.json"), JSON.stringify([repo]));
 		await writeExtension("project", repo, "theirs.js", toolExtension("theirs", "theirs"));
 

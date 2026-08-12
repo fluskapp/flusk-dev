@@ -20,6 +20,8 @@ export interface JournalMeta {
 	kind?: string;
 	tool?: string;
 	pr?: string;
+	/** `runId:` frontmatter — the exact run this journal belongs to. */
+	runId?: string;
 	/** `cost:`/`usd:` frontmatter, in dollars, when the harness records one. */
 	costUsd?: number;
 	stages: JournalStage[];
@@ -74,6 +76,7 @@ export function parseFrontmatter(text: string): JournalMeta | null {
 		...(out.kind !== undefined ? { kind: out.kind } : {}),
 		...(out.tool !== undefined ? { tool: out.tool } : {}),
 		...(out.pr !== undefined ? { pr: out.pr } : {}),
+		...(out.runId !== undefined ? { runId: out.runId } : {}),
 		...(costUsd !== undefined ? { costUsd } : {}),
 		stages,
 	};

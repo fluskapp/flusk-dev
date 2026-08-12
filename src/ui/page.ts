@@ -14,6 +14,7 @@ import { CLIENT_CODE_OUTLINE_JS } from "./client-code-outline.js";
 import { CLIENT_DOC_JS, DOC_HTML } from "./client-doc.js";
 import { CLIENT_DOC_NAV_JS } from "./client-doc-nav.js";
 import { CLIENT_DOC_ROWS_JS } from "./client-doc-rows.js";
+import { CLIENT_FLOW_JS } from "./client-flow.js";
 import { PALETTE_FILES_JS } from "./client-goto.js";
 import { CLIENT_GRAPH_JS } from "./client-graph.js";
 import { CLIENT_GRAPH_CELLS_JS } from "./client-graph-cells.js";
@@ -28,6 +29,7 @@ import { ASK_CSS } from "./styles-ask.js";
 import { ALL_CSS } from "./styles-bundle.js";
 import { CODE_CSS } from "./styles-code.js";
 import { DOC_CSS } from "./styles-doc.js";
+import { FLOW_CSS } from "./styles-flow.js";
 import { GRAPH_CSS } from "./styles-graph.js";
 import { PALETTE_CSS } from "./styles-palette.js";
 import { version } from "../platform/version.js";
@@ -43,10 +45,6 @@ function escapeHtml(s: string): string {
  * to the window, not to its position in this list: it is the key client-keys.ts
  * binds (the plain digit, and ⌘ plus the digit), so a window that leaves the
  * toolbar takes its number with it rather than renumbering its neighbours.
- *
- * 7's tooltip leads with the digits rather than F1: macOS maps F1 to
- * brightness-down unless the "standard function keys" setting is on, so on
- * this platform the F1 keycode usually never reaches the browser at all.
  */
 const PANELS: Array<[string, string, string, string]> = [
 	["side-btn", "1", "Projects", "Project tool window (1 / ⌘1)"],
@@ -55,10 +53,11 @@ const PANELS: Array<[string, string, string, string]> = [
 	["find-btn", "4", "Find", "Find in Files (4 / ⌘4 / ⌘⇧F)"],
 	["chat-btn", "5", "Chat", "Chat tool window (5 / ⌘5 / c)"],
 	["doc-btn", "6", "Documentation", "Documentation tool window (6 / ⌘6)"],
+	["flows-btn", "7", "Flows", "Flow runs and the prompts composed for them (7 / ⌘7)"],
 	["graph-btn", "8", "Graph", "What am I about to break (8 / ⌘8 / g)"],
 	["web-btn", "9", "Web", "Read a URL beside the code (9 / ⌘9 / u)"],
 	// 0 is the tenth slot: the single digits are spoken for, and IntelliJ's own
-	// numbering runs 1…9 then 0 for exactly this reason (7 is parked).
+	// numbering runs 1…9 then 0 for exactly this reason.
 	["ask-btn", "0", "Ask AI", "Ask AI about what is on screen (0 / ⌘0 / a)"],
 ];
 
@@ -85,7 +84,7 @@ export function renderPage(home: string): string {
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>flusk</title>
-<style>${ALL_CSS}${VIEWER_CSS}${PALETTE_CSS}${DOC_CSS}${ASK_CSS}${GRAPH_CSS}</style>
+<style>${ALL_CSS}${VIEWER_CSS}${PALETTE_CSS}${DOC_CSS}${ASK_CSS}${GRAPH_CSS}${FLOW_CSS}</style>
 </head>
 <body>
 <div id="app">
@@ -117,6 +116,7 @@ export function renderPage(home: string): string {
             <div id="graph" class="view" hidden></div>
             <div id="web" class="view" hidden></div>
             <div id="ask" class="view" hidden></div>
+            <div id="flows" class="view" hidden></div>
         </div>
     </main>
     ${CHAT_HTML}
@@ -135,7 +135,7 @@ export function renderPage(home: string): string {
 <div id="toast" role="status" aria-live="polite" hidden></div>
 ${HELP_HTML}
 ${PALETTE_HTML}
-<script>${CLIENT_JS}${CODE_JS}${PALETTE_PROMPT_JS}${PALETTE_ROWS_JS}${PALETTE_FILES_JS}${CLIENT_PALETTE_JS}${CLIENT_DOC_ROWS_JS}${CLIENT_DOC_NAV_JS}${CLIENT_DOC_JS}${CLIENT_GRAPH_CELLS_JS}${CLIENT_GRAPH_ROWS_JS}${CLIENT_GRAPH_DRAW_JS}${CLIENT_GRAPH_NAV_JS}${CLIENT_GRAPH_JS}</script>
+<script>${CLIENT_JS}${CODE_JS}${PALETTE_PROMPT_JS}${PALETTE_ROWS_JS}${PALETTE_FILES_JS}${CLIENT_PALETTE_JS}${CLIENT_DOC_ROWS_JS}${CLIENT_DOC_NAV_JS}${CLIENT_DOC_JS}${CLIENT_GRAPH_CELLS_JS}${CLIENT_GRAPH_ROWS_JS}${CLIENT_GRAPH_DRAW_JS}${CLIENT_GRAPH_NAV_JS}${CLIENT_GRAPH_JS}${CLIENT_FLOW_JS}</script>
 </body>
 </html>`;
 }

@@ -13,6 +13,10 @@ export const USAGE = `Usage:
   flusk goal <text> [--repo <path>] [--dry] [--fake <script.json>] [--no-verify]
                     [--no-extensions] [--quiet]
   flusk goal --list [--repo <path>]
+  flusk flow run <task> [--flow <name>] [--project <p>] [--max-cost <usd>] [--dry] [--json]
+                    [--no-isolation] [--allow-dirty]
+  flusk flow list [--json]
+  flusk flow resume <runId>
   flusk search <query> [--project <name>] [--kind <commit|session|journal|doc|skill>]
                     [--limit <n>] [--json] [--refresh]
   flusk find <query> [--project <name>] [--glob <g>] [--regex] [--case] [--limit <n>]

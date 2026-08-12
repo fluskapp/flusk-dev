@@ -1,0 +1,24 @@
+/**
+ * The Flows view. Only what the existing vocabulary does not already cover:
+ * stage chips, tables, pills, sections and code blocks are reused as they are,
+ * so a flow run looks like every other run in the workbench.
+ */
+export const FLOW_CSS = `
+.flow-step {
+	border: 1px solid var(--border); border-radius: var(--ij-radius); background: var(--panel);
+	margin-bottom: var(--ij-space-2); overflow: hidden;
+}
+.flow-step-head {
+	display: flex; align-items: baseline; gap: var(--ij-space-2); padding: var(--ij-space-2) var(--ij-space-2); font-size: var(--ij-fs-6);
+}
+.flow-step-head .dim { font: var(--ij-fs-4) var(--font-code); }
+.flow-sources {
+	display: flex; align-items: baseline; gap: var(--ij-space-2); flex-wrap: wrap;
+	padding: 0 var(--ij-space-2) var(--ij-space-2); font-size: var(--ij-fs-4);
+}
+.flow-step .code.out {
+	margin: 0; border-top: 1px solid var(--border); max-height: 320px; overflow: auto; /* design-exempt: one-off scroll cap for a step output block */
+}
+#flows .stages { margin: var(--ij-space) 0; }
+#flows .tbl td .stages { margin: 0; }
+`;

@@ -6,7 +6,7 @@
  * because the user cd'd into a fresh clone is remote code execution with the
  * user's own filesystem, keys and network. src/config/config.ts already draws
  * exactly this line for config layers — `~/.flusk/…` is the user's own file and is
- * trusted, `<repo>/.flusk.json` is authored by whoever wrote the repo and is not —
+ * trusted, `<repo>/.flusk/config.json` is authored by whoever wrote the repo and is not —
  * and the same line has to hold here, harder: a config layer is data, an
  * extension is code.
  *

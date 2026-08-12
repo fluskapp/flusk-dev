@@ -29,7 +29,20 @@ const VOCABULARY: Record<string, Record<string, Cardinality>> = {
 		depends_on: "coexist",
 		attempted_by: "coexist",
 	},
-	Run: { outcome: "functional", verified_by: "coexist", report_check: "functional" },
+	Run: {
+		outcome: "functional",
+		verified_by: "coexist",
+		report_check: "functional",
+		/** Flow steps accumulate under one subject (src/lang/record.ts); readers
+		 * collapse stages by name, newest first. */
+		stage: "coexist",
+		failed_because: "coexist",
+	},
+	/** Portable lessons (src/lang/facts.ts): only fixed_by is functional — a
+	 * better fix supersedes; the rest accumulate. */
+	ErrorClass: { fixed_by: "functional", seen_in: "coexist" },
+	Approach: { worked_for: "coexist", failed_for: "coexist" },
+	Tool: { gotcha: "coexist" },
 	Item: {
 		attempted_at: "functional",
 		outcome: "functional",
