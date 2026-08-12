@@ -46,7 +46,7 @@ const touchesTask = (paths: string[], taskPaths: string[]): boolean =>
 /**
  * `tokens` counts exactly what will be rendered — heading, why line, body —
  * with the one estimator in src/history/budget.ts. No `path`: the transcript
- * lives under ~/.ah, outside the repo, and an absolute path may not reach a
+ * lives under ~/.flusk, outside the repo, and an absolute path may not reach a
  * rendered field; the citation inside `why` is how a reader opens it.
  */
 function make(

@@ -1,7 +1,6 @@
 {
-	"name": "ah",
+	"name": "flusk",
 	"version": "0.1.0",
-	"private": true,
 	"type": "module",
 	"description": "Autonomous coding agent that plans, edits and verifies its own work",
 	"license": "Apache-2.0",
@@ -14,13 +13,13 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/adirbenyossef/ah.git"
+		"url": "git+https://github.com/adirbenyossef/flusk.git"
 	},
 	"engines": {
 		"node": ">=22.8"
 	},
 	"bin": {
-		"ah": "./dist/cli/main.js"
+		"flusk": "./dist/cli/main.js"
 	},
 	"scripts": {
 		"build": "tsc -p tsconfig.build.json",
@@ -40,5 +39,6 @@
 		"@biomejs/biome": "^2.0.0",
 		"@types/node": "^24.0.0",
 		"vitest": "^3.0.0"
-	}
+	},
+	"homepage": "https://flusk.dev"
 }

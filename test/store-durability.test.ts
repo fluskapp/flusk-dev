@@ -18,13 +18,13 @@ beforeEach(async () => {
 
 afterEach(async () => {
 	await h.cleanup();
-	delete process.env.AH_HOME;
+	delete process.env.FLUSK_HOME;
 });
 
 it("a line truncated by a killed process costs that line only", async () => {
-	await h.store.transact(NS, [{ subject: "Repo:ah", predicate: "test_cmd", object: "vitest" }]);
+	await h.store.transact(NS, [{ subject: "Repo:flusk", predicate: "test_cmd", object: "vitest" }]);
 	h.at(T0 + 1000);
-	await h.store.transact(NS, [{ subject: "Repo:ah", predicate: "lint_cmd", object: "biome" }]);
+	await h.store.transact(NS, [{ subject: "Repo:flusk", predicate: "lint_cmd", object: "biome" }]);
 	// Exactly what a process killed mid-write leaves behind: half a record and
 	// no newline.
 	await appendFile(h.logPath(NS), '{"k":"fact","tx":3,"fact":{"id":"x","subj');
@@ -34,23 +34,23 @@ it("a line truncated by a killed process costs that line only", async () => {
 
 	// And the store keeps taking writes on top of the damaged tail.
 	h.at(T0 + 2000);
-	await h.store.transact(NS, [{ subject: "Repo:ah", predicate: "fmt_cmd", object: "biome" }]);
+	await h.store.transact(NS, [{ subject: "Repo:flusk", predicate: "fmt_cmd", object: "biome" }]);
 	expect(await h.store.query(NS, {})).toHaveLength(3);
 });
 
 it("an unreadable line anywhere in the log is skipped, not fatal", async () => {
-	await h.store.transact(NS, [{ subject: "Repo:ah", predicate: "test_cmd", object: "vitest" }]);
+	await h.store.transact(NS, [{ subject: "Repo:flusk", predicate: "test_cmd", object: "vitest" }]);
 	await appendFile(h.logPath(NS), 'not json at all\n\n{"k":"fact","tx":2}\n{"k":"close"}\n');
 	h.at(T0 + 1000);
-	await h.store.transact(NS, [{ subject: "Repo:ah", predicate: "lint_cmd", object: "biome" }]);
+	await h.store.transact(NS, [{ subject: "Repo:flusk", predicate: "lint_cmd", object: "biome" }]);
 	expect((await h.store.query(NS, {})).map((f) => f.object)).toEqual(["vitest", "biome"]);
 });
 
 it("namespaces never see each other, for reads, supersession or guards", async () => {
-	await h.store.transact(NS, [{ subject: "Repo:ah", predicate: "test_cmd", object: "vitest" }]);
+	await h.store.transact(NS, [{ subject: "Repo:flusk", predicate: "test_cmd", object: "vitest" }]);
 	h.at(T0 + 1000);
 	await h.store.transact(OTHER_NS, [
-		{ subject: "Repo:ah", predicate: "test_cmd", object: "npm test" },
+		{ subject: "Repo:flusk", predicate: "test_cmd", object: "npm test" },
 	]);
 
 	expect((await h.store.query(NS, {})).map((f) => f.object)).toEqual(["vitest"]);
@@ -60,15 +60,15 @@ it("namespaces never see each other, for reads, supersession or guards", async (
 	expect(h.logPath(NS)).not.toBe(h.logPath(OTHER_NS));
 });
 
-it("the default store lives under AH_HOME, not in a second convention", async () => {
-	const home = await mkdtemp(join(tmpdir(), "ah-home-"));
-	process.env.AH_HOME = home;
+it("the default store lives under FLUSK_HOME, not in a second convention", async () => {
+	const home = await mkdtemp(join(tmpdir(), "flusk-home-"));
+	process.env.FLUSK_HOME = home;
 	const store = createFactStore({ now: () => T0 });
-	await store.transact("ah", [
+	await store.transact("flusk", [
 		{ subject: "Night:2026-01-01", predicate: "runs_count", object: "1" },
 	]);
 
-	const path = nsPath(storeDir(), "ah");
+	const path = nsPath(storeDir(), "flusk");
 	expect(path.startsWith(join(home, "store"))).toBe(true);
 	expect(await readFile(path, "utf8")).toContain("runs_count");
 	await rm(home, { recursive: true, force: true });

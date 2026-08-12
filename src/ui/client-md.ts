@@ -10,7 +10,7 @@
 export const CLIENT_MD_JS = `
 var MD_MODES = ["preview", "split", "raw"];
 var MD_LABEL = { preview: "Preview", split: "Split", raw: "Raw" };
-var MD_KEY = "ah-md-mode";
+var MD_KEY = "flusk-md-mode";
 
 function mdModes() {
 	try { return JSON.parse(localStorage.getItem(MD_KEY) || "{}") || {}; } catch (e) { return {}; }

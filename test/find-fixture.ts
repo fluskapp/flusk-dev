@@ -8,7 +8,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { AhConfig } from "../src/config/types.js";
+import type { FluskConfig } from "../src/config/types.js";
 
 /** ripgrep is required by the feature; tests skip rather than fail without it. */
 export function hasRg(): boolean {
@@ -34,7 +34,7 @@ export interface FindTree {
 	outsideFile: string;
 	outside: string;
 	home: string;
-	cfg: AhConfig;
+	cfg: FluskConfig;
 	cleanup: () => void;
 }
 
@@ -44,10 +44,10 @@ export const LONG_PREFIX = "x".repeat(500);
 export const UNICODE_LINE = "héllo wörld needle here";
 
 export function findTree(): FindTree {
-	const home = mkdtempSync(join(tmpdir(), "ah-find-home-"));
-	const work = mkdtempSync(join(tmpdir(), "ah-find-work-"));
-	const outside = mkdtempSync(join(tmpdir(), "ah-find-outside-"));
-	process.env.AH_HOME = home;
+	const home = mkdtempSync(join(tmpdir(), "flusk-find-home-"));
+	const work = mkdtempSync(join(tmpdir(), "flusk-find-work-"));
+	const outside = mkdtempSync(join(tmpdir(), "flusk-find-outside-"));
+	process.env.FLUSK_HOME = home;
 
 	const alpha = join(work, "alpha");
 	put(alpha, "src/client-list.ts", "const needle = 1;\nconst other = 2;\nfind the NEEDLE again\n");
@@ -60,7 +60,7 @@ export function findTree(): FindTree {
 	put(join(work, "beta"), "lib/two.ts", "beta needle here\na n.edle literal\n");
 
 	const outsideFile = put(outside, "secret.txt", "needle secret\n");
-	const cfg: AhConfig = {
+	const cfg: FluskConfig = {
 		...structuredClone(DEFAULT_CONFIG),
 		ui: { harnessDirs: [], projectDirs: [join(work, "*")] },
 	};
@@ -72,7 +72,7 @@ export function findTree(): FindTree {
 		home,
 		cfg,
 		cleanup: () => {
-			delete process.env.AH_HOME;
+			delete process.env.FLUSK_HOME;
 			for (const dir of [home, work, outside]) rmSync(dir, { recursive: true, force: true });
 		},
 	};

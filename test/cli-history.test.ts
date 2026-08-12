@@ -1,6 +1,6 @@
 /**
- * How a developer reaches history from the terminal: `ah search` and
- * `ah prompt`, against a SEEDED index in a temp AH_HOME — no network, no
+ * How a developer reaches history from the terminal: `flusk search` and
+ * `flusk prompt`, against a SEEDED index in a temp FLUSK_HOME — no network, no
  * model, no walk of the real machine's repos. (The HTTP half is in
  * api-history.test.ts.)
  */
@@ -51,13 +51,13 @@ const CORPUS = [
 	}),
 ];
 beforeAll(() => {
-	home = mkdtempSync(join(tmpdir(), "ah-history-cli-"));
-	process.env.AH_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "flusk-history-cli-"));
+	process.env.FLUSK_HOME = home;
 	saveIndex({ cards: CORPUS, builtAt: new Date().toISOString(), stamps: {} });
 });
 
 afterAll(() => {
-	delete process.env.AH_HOME;
+	delete process.env.FLUSK_HOME;
 	rmSync(home, { recursive: true, force: true });
 });
 
@@ -122,15 +122,15 @@ it("prompts with a header naming what was included and why, plus the constraints
 	expect(composed.blocks[0]?.source).toBe("task");
 	expect(composed.blocks.every((b) => !b.source.includes("abagraph"))).toBe(true);
 
-	// A typo'd flag is an error a script must be able to see, as in `ah search`.
+	// A typo'd flag is an error a script must be able to see, as in `flusk search`.
 	const bad = capture();
 	expect(promptCmd("x", { budget: "lots", out: bad.out })).toBe(1);
 	expect(bad.text()).toContain("--budget must be a positive integer");
 });
 
 it("says nothing is indexed rather than printing an empty prompt", () => {
-	const empty = mkdtempSync(join(tmpdir(), "ah-history-empty-"));
-	process.env.AH_HOME = empty;
+	const empty = mkdtempSync(join(tmpdir(), "flusk-history-empty-"));
+	process.env.FLUSK_HOME = empty;
 	// No seeded index: the scan really runs, over a config that names no project.
 	writeFileSync(
 		join(empty, "config.json"),
@@ -142,6 +142,6 @@ it("says nothing is indexed rather than printing an empty prompt", () => {
 	expect(promptCmd("anything", { out: prompt.out })).toBe(0);
 	for (const text of [search.text(), prompt.text()]) expect(text).toContain("nothing indexed yet");
 	expect(prompt.text()).not.toContain("## task");
-	process.env.AH_HOME = home;
+	process.env.FLUSK_HOME = home;
 	rmSync(empty, { recursive: true, force: true });
 });

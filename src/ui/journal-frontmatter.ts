@@ -1,6 +1,6 @@
 /**
  * A run journal's frontmatter, parsed by hand: the shape is fixed (scalar
- * keys plus one nested `stages:` block) and ah takes no YAML dependency.
+ * keys plus one nested `stages:` block) and flusk takes no YAML dependency.
  *
  * Split from journal-scan.ts, which is now only about *finding* journals.
  */

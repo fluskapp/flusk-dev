@@ -12,7 +12,7 @@ const RULES = "Tabs, not spaces. Every retry ships with a test.";
 function card(p: Partial<HistoryCard> & { id: string }): HistoryCard {
 	return {
 		kind: "commit",
-		project: "ah",
+		project: "flusk",
 		title: "",
 		text: "",
 		at: "2026-08-01T00:00:00.000Z",
@@ -44,13 +44,13 @@ const walkthrough: Walkthrough = {
 		H({ id: "c:e", ref: "eeeeeeee5555", title: "retry logging", text: big("extra") }),
 	],
 	attempts: [
-		H({ id: "s:a", ref: "ah/a.jsonl", kind: "session", outcome: "failed", text: big("attempt") }),
+		H({ id: "s:a", ref: "flusk/a.jsonl", kind: "session", outcome: "failed", text: big("attempt") }),
 	],
 	conventions: [
 		H({ id: "d:c", ref: "/repo/CLAUDE.md", kind: "doc", text: RULES, paths: ["CLAUDE.md"] }),
 	],
 	traps: [
-		'Tried "retry backoff for the watch tick" in ah — the gate blocked it (journal docs/runs/x.md).',
+		'Tried "retry backoff for the watch tick" in flusk — the gate blocked it (journal docs/runs/x.md).',
 	],
 };
 
@@ -81,10 +81,10 @@ it("orders blocks by usefulness: task, conventions, precedent, attempts", () => 
 	const p = composePrompt(walkthrough, TASK, { budget: 4000 });
 	expect(p.blocks.map((b) => b.source)).toEqual([
 		"task",
-		"doc ah/CLAUDE.md", // project-relative: no absolute path reaches the model
+		"doc flusk/CLAUDE.md", // project-relative: no absolute path reaches the model
 		"commit aaaaaaaa",
 		"commit dddddddd",
-		"session ah/a.jsonl",
+		"session flusk/a.jsonl",
 		"commit eeeeeeee",
 	]);
 	expect(p.blocks[0]?.text).toBe(TASK);
@@ -111,7 +111,7 @@ it("respects the budget exactly and reports the omissions", () => {
 it("turns each trap into a DON'T that keeps the citation", () => {
 	const p = composePrompt(walkthrough, TASK, { budget: 4000 });
 	expect(p.constraints).toEqual([
-		'Do not retry "retry backoff for the watch tick" in ah the same way — a previous run did ' +
+		'Do not retry "retry backoff for the watch tick" in flusk the same way — a previous run did ' +
 			"and the gate blocked it (journal docs/runs/x.md).",
 	]);
 });

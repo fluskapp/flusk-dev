@@ -1,5 +1,5 @@
 /**
- * The index on disk, under `ahHome()/index/`.
+ * The index on disk, under `fluskHome()/index/`.
  *
  * Sources are injected rather than imported: a source is an id, a cheap
  * STAMP (a repo's git HEAD oid, the newest mtime in a directory) and a `load`
@@ -8,7 +8,7 @@
  * never re-read, so adding one commit to one repo does not re-walk 1500
  * commits and 287 journals.
  *
- *   { id: "commits:ah", stamp: () => headOid(root), load: () => gitCards(root) }
+ *   { id: "commits:flusk", stamp: () => headOid(root), load: () => gitCards(root) }
  *
  * Each source's cards live in their own shard file; `history.json` is the
  * assembled HistoryIndex. Anything unreadable, corrupt or written by an older
@@ -18,7 +18,7 @@
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { ahHome } from "../session/paths.js";
+import { fluskHome } from "../session/paths.js";
 import type { HistoryCard, HistoryIndex } from "./types.js";
 
 /** Bump when the card or shard shape changes; old caches then rebuild. */
@@ -40,7 +40,7 @@ interface Shard {
 }
 
 export function indexDir(): string {
-	return join(ahHome(), "index");
+	return join(fluskHome(), "index");
 }
 
 export function indexPath(): string {

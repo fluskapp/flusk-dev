@@ -1,5 +1,5 @@
 /**
- * `ah context <task> [--repo <path>] [--budget <n>] [--json]` — the block a
+ * `flusk context <task> [--repo <path>] [--budget <n>] [--json]` — the block a
  * run would be given, printed before any run is started.
  *
  * The context is assembled once at run start and never shown (src/context/
@@ -8,7 +8,7 @@
  * source spent. Nothing here is a summary — a summary is the one thing that
  * cannot answer "why did it not know that".
  *
- * Read-only, like `ah index` and `ah prompt`: it builds no session, writes
+ * Read-only, like `flusk index` and `flusk prompt`: it builds no session, writes
  * nothing, and asking for a context is never a reason to change one.
  *
  * A missing --repo is answered, not thrown. Sources are total by contract (L7)
@@ -38,28 +38,28 @@ function repoRoot(repo: string): string | null {
 	}
 }
 
-/** `ah context <task> [--repo path] [--budget n] [--json]`. */
+/** `flusk context <task> [--repo path] [--budget n] [--json]`. */
 export function contextCmd(task: string, args: ContextArgs = {}): number {
 	const out = args.out ?? process.stdout;
-	// `ah context … | head` closes the pipe mid-write; that is the reader's
+	// `flusk context … | head` closes the pipe mid-write; that is the reader's
 	// choice, not a failure worth a stack trace.
 	out.on("error", () => {});
 	const budget = args.budget === undefined ? DEFAULT_BUDGET : Number(args.budget);
 	if (!Number.isInteger(budget) || budget <= 0) {
-		out.write("ah: --budget must be a positive integer\n");
+		out.write("flusk: --budget must be a positive integer\n");
 		return 1;
 	}
 	const asked = resolve(args.repo ?? process.cwd());
 	const root = repoRoot(asked);
 	if (root === null) {
-		out.write(`ah: --repo is not a readable directory: ${asked}\n`);
+		out.write(`flusk: --repo is not a readable directory: ${asked}\n`);
 		return 1;
 	}
 	// isResume is false: this is the block a FRESH run starts from. A resume
 	// rebuilds against a moved tree and its own journal, which is a different
 	// question and would need the session it is resuming.
 	const built = buildContext({ task, repoRoot: root, budgetTokens: budget, isResume: false });
-	// Project-relative, like `ah index`: an absolute root in the output leaks
+	// Project-relative, like `flusk index`: an absolute root in the output leaks
 	// $HOME into anything the reader pastes.
 	const where = relative(process.cwd(), root) || ".";
 	if (args.json === true) {

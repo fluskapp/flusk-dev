@@ -21,8 +21,8 @@ function fakeGh(stdout: string, code = 0): void {
 }
 
 beforeEach(() => {
-	bin = mkdtempSync(join(tmpdir(), "ah-bin-"));
-	repo = mkdtempSync(join(tmpdir(), "ah-repo-"));
+	bin = mkdtempSync(join(tmpdir(), "flusk-bin-"));
+	repo = mkdtempSync(join(tmpdir(), "flusk-repo-"));
 	originalPath = process.env.PATH;
 	process.env.PATH = `${bin}:${process.env.PATH ?? ""}`;
 });

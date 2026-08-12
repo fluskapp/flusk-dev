@@ -3,7 +3,7 @@
  * file only — a dashboard listing must not pay for whole documents.
  *
  * Only scalar `key: value` frontmatter is understood; nested blocks are
- * ignored rather than guessed at, and ah takes no YAML dependency.
+ * ignored rather than guessed at, and flusk takes no YAML dependency.
  */
 import { closeSync, openSync, readSync } from "node:fs";
 import { basename } from "node:path";

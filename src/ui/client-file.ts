@@ -6,7 +6,7 @@
  * code gets highlighted); anything else is shown as the lines the search
  * found. Either way, a tab opened AT A LINE carries that line's block with
  * the line marked and scrolled to. It never pretends to a body it was not
- * given: ah serves file contents only for what it indexes.
+ * given: flusk serves file contents only for what it indexes.
  */
 export const CLIENT_FILE_JS = `
 /**
@@ -78,7 +78,7 @@ async function loadFile(t) {
 }
 
 /**
- * Any other file ah tracks: GET /api/file serves the body, highlighted by the
+ * Any other file flusk tracks: GET /api/file serves the body, highlighted by the
  * same server-side renderer everything else uses. Without this, Go to File
  * could locate 4,000 source files and open none of them.
  */

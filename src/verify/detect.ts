@@ -1,5 +1,5 @@
 /**
- * Verify-command detection. A .ah.json verify[] wins outright; otherwise
+ * Verify-command detection. A .flusk/config.json verify[] wins outright; otherwise
  * package.json scripts, then Cargo.toml, then a Makefile test target.
  *
  * The answer is derived from the repository on every run rather than

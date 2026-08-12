@@ -1,7 +1,7 @@
 /**
  * Compaction of TTL ephemera, for maintenance rather than for reads.
  *
- * Cooldowns and other transient rows would otherwise grow the `ah` log without
+ * Cooldowns and other transient rows would otherwise grow the `flusk` log without
  * bound. Only rows explicitly marked transient AND already past their
  * `validUntil` may go: sweeping early would delete a fact that readers still
  * have to see, and sweeping a durable row would erase history no append can

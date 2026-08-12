@@ -2,13 +2,13 @@
  * The `doc` config section, and the one thing about it that is a security
  * boundary rather than a preference.
  *
- * `doc.servers` names binaries the workbench SPAWNS. A repo's own .ah.json is
+ * `doc.servers` names binaries the workbench SPAWNS. A repo's own .flusk/config.json is
  * authored by whatever repository happens to be cloned on disk, so it must not
  * be able to choose what opening a file in the doc panel executes — exactly
  * the rule already applied to `chat.backends`. The rest of the section
  * (enabled, maxFiles) is a preference and stays per-repo.
  */
-import { writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { loadConfig } from "../src/config/config.js";
@@ -33,18 +33,19 @@ describe("doc config", () => {
 	});
 
 	it("takes doc.servers from the user's own config", async () => {
-		const repo = await setupTestHome("ah-doc-cfg-");
+		const repo = await setupTestHome("flusk-doc-cfg-");
 		await writeHomeConfig({ doc: { servers: [MINE] } });
 		const cfg = loadConfig(repo);
 		expect(cfg.doc.servers).toEqual([MINE]);
 		expect(cfg.doc.maxFiles).toBe(DEFAULT_CONFIG.doc.maxFiles); // untouched keys survive
 	});
 
-	it("refuses doc.servers from a repo's .ah.json, keeping the user's list", async () => {
-		const repo = await setupTestHome("ah-doc-cfg-");
+	it("refuses doc.servers from a repo's .flusk/config.json, keeping the user's list", async () => {
+		const repo = await setupTestHome("flusk-doc-cfg-");
 		await writeHomeConfig({ doc: { servers: [MINE] } });
+		await mkdir(join(repo, ".flusk"), { recursive: true });
 		await writeFile(
-			join(repo, ".ah.json"),
+			join(repo, ".flusk", "config.json"),
 			JSON.stringify({ doc: { servers: [HOSTILE], maxFiles: 5 } }),
 		);
 		const cfg = loadConfig(repo);
@@ -54,8 +55,9 @@ describe("doc config", () => {
 	});
 
 	it("refuses doc.servers from a repo even when the user configured none", async () => {
-		const repo = await setupTestHome("ah-doc-cfg-");
-		await writeFile(join(repo, ".ah.json"), JSON.stringify({ doc: { servers: [HOSTILE] } }));
+		const repo = await setupTestHome("flusk-doc-cfg-");
+		await mkdir(join(repo, ".flusk"), { recursive: true });
+	await writeFile(join(repo, ".flusk", "config.json"), JSON.stringify({ doc: { servers: [HOSTILE] } }));
 		expect(loadConfig(repo).doc.servers).toEqual([]);
 	});
 });

@@ -1,7 +1,7 @@
 /**
  * Turns an absolute workspace path into something a prompt may carry.
  *
- * WorkspaceLayer.source is absolute (`/Users/<someone>/.ah/workspace/SOUL.md`),
+ * WorkspaceLayer.source is absolute (`/Users/<someone>/.flusk/workspace/SOUL.md`),
  * and that path is the operator's username plus the on-disk layout of their
  * machine. citation.ts:refLabel already refused to put such a path in a block
  * heading; a workspace file is not a HistoryCard, so it cannot call refLabel,
@@ -9,24 +9,24 @@
  * or `text`. Without this file the context block leaks $HOME to the model.
  *
  * The labels are also what makes this source deterministic under a test
- * AH_HOME: the global directory renders as the fixed string "~/.ah/workspace"
+ * FLUSK_HOME: the global directory renders as the fixed string "~/.flusk/workspace"
  * however the machine spells it, so the block is byte-identical between runs
  * and between machines (L5).
  */
 import { basename, sep } from "node:path";
 import { globalWorkspaceDir, projectWorkspaceDir } from "../agent/workspace-files.js";
 
-/** How the global workspace is spelled in a prompt, whatever AH_HOME is. */
-export const GLOBAL_LABEL = "~/.ah/workspace";
+/** How the global workspace is spelled in a prompt, whatever FLUSK_HOME is. */
+export const GLOBAL_LABEL = "~/.flusk/workspace";
 
 /** Project-relative path of a project workspace file, or undefined if global. */
 export function projectRelPath(source: string, repoRoot: string): string | undefined {
 	const dir = projectWorkspaceDir(repoRoot);
-	return source.startsWith(dir + sep) ? `.ah/workspace/${basename(source)}` : undefined;
+	return source.startsWith(dir + sep) ? `.flusk/workspace/${basename(source)}` : undefined;
 }
 
 /**
- * The citation: "~/.ah/workspace/SOUL.md" or "<project>/.ah/workspace/SOUL.md".
+ * The citation: "~/.flusk/workspace/SOUL.md" or "<project>/.flusk/workspace/SOUL.md".
  * A file from neither directory (a caller passing hand-built layers) degrades
  * to its basename rather than to its absolute path.
  */
@@ -51,7 +51,7 @@ export function layerLabel(source: string, repoRoot: string): string {
 export function relativiseNote(note: string, repoRoot: string): string {
 	const project = basename(repoRoot);
 	return note
-		.replaceAll(projectWorkspaceDir(repoRoot), `${project}/.ah/workspace`)
+		.replaceAll(projectWorkspaceDir(repoRoot), `${project}/.flusk/workspace`)
 		.replaceAll(globalWorkspaceDir(), GLOBAL_LABEL)
 		.replaceAll(repoRoot, project);
 }

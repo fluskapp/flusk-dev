@@ -1,7 +1,7 @@
 /**
- * The files `ah workspace init` writes. They are written as INSTRUCTIONS to
+ * The files `flusk workspace init` writes. They are written as INSTRUCTIONS to
  * the agent, not prose about it, because that is what they become: text at the
- * top of every system prompt. The defaults are what ah already enforces
+ * top of every system prompt. The defaults are what flusk already enforces
  * elsewhere (git isolation, the verification gate, secret scrubbing) stated
  * where the model can actually read them.
  *
@@ -21,7 +21,7 @@ much of it there is.
 
 const SOUL = `1. **No secrets in output.** Never print, echo, log or commit a token, API key,
    password or private key. Redact the value and keep the key name.
-2. **Never push to main.** Stay on the branch ah gave you. \`push\`,
+2. **Never push to main.** Stay on the branch flusk gave you. \`push\`,
    \`push --force\` and opening a PR happen only on an explicit instruction in
    this session.
 3. **Gate irreversible side effects.** History rewrites (\`reset --hard\`,

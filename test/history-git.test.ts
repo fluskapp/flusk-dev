@@ -11,7 +11,7 @@ afterAll(async () => {
 	while (dirs.length > 0) await rm(dirs.pop() as string, { recursive: true, force: true });
 });
 
-async function scratchDir(prefix = "ah-hist-"): Promise<string> {
+async function scratchDir(prefix = "flusk-hist-"): Promise<string> {
 	const dir = await mkdtemp(join(tmpdir(), prefix));
 	dirs.push(dir);
 	return dir;
@@ -125,7 +125,7 @@ describe("git cards", () => {
 	});
 
 	it("spawns exactly ONE git process for the whole log", async () => {
-		const bin = await scratchDir("ah-bin-");
+		const bin = await scratchDir("flusk-bin-");
 		const counter = join(bin, "calls");
 		const real = spawnSync("sh", ["-c", "command -v git"], { encoding: "utf8" }).stdout.trim();
 		await writeFile(join(bin, "git"), `#!/bin/sh\necho . >> "${counter}"\nexec ${real} "$@"\n`, {

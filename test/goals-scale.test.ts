@@ -4,7 +4,7 @@
  * costs nothing: a finished goal is still finished, and a runnable task is
  * still runnable, in a store that already holds more rows than any read's cap.
  *
- * The failure it pins is silent in the worst way — `ah goal` prints "goal
+ * The failure it pins is silent in the worst way — `flusk goal` prints "goal
  * stalled: no runnable tasks remain" and returns blocked on every rerun of a
  * goal whose every task is done.
  */

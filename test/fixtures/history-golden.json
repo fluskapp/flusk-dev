@@ -1,7 +1,7 @@
 {
 	"_readme": [
 		"Golden set for history retrieval. `cards` is a hand-built corpus shaped like the",
-		"real one (commits incl. a reverted pair, ah sessions with verified/blocked/failed",
+		"real one (commits incl. a reverted pair, flusk sessions with verified/blocked/failed",
 		"endings, harness journals with verbatim stage detail, skills and CLAUDE.md-style",
 		"docs, plus cross-project noise). `golden` is (query -> expected card id) with the",
 		"editorial reason the expected card is the best answer, written BEFORE measuring.",
@@ -13,8 +13,8 @@
 	],
 	"now": "2026-08-11T00:00:00.000Z",
 	"twins": {
-		"verified": "session:ah-20260706-1000",
-		"failed": "session:ah-20260706-1400"
+		"verified": "session:flusk-20260706-1000",
+		"failed": "session:flusk-20260706-1400"
 	},
 	"facets": [
 		"exact term",
@@ -27,244 +27,294 @@
 	],
 	"cards": [
 		{
-			"id": "commit:ah:9a1f2b3c",
+			"id": "commit:flusk:9a1f2b3c",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "feat: retryHook with exponential backoff for worker dispatch",
 			"text": "feat: retryHook with exponential backoff for worker dispatch\n\nDispatch used to give up on the first transient failure. The hook now backs\noff exponentially with jitter, capped at five attempts, and surfaces the\nattempt count to the run journal so a reader can see how hard we tried.\n\nsrc/worker/retry-hook.ts\nsrc/worker/dispatch.ts",
 			"at": "2026-06-27T09:12:00.000Z",
-			"paths": ["src/worker/retry-hook.ts", "src/worker/dispatch.ts"],
+			"paths": [
+				"src/worker/retry-hook.ts",
+				"src/worker/dispatch.ts"
+			],
 			"outcome": "shipped",
 			"ref": "9a1f2b3c0000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:4d5e6f70",
+			"id": "commit:flusk:4d5e6f70",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "fix: retry fired twice on transient socket errors",
 			"text": "fix: retry fired twice on transient socket errors\n\nA socket reset raised both the stream error and the close event, so the hook\nscheduled two attempts for one failure. Deduplicate on the attempt id.\n\nsrc/worker/retry-hook.ts",
 			"at": "2026-07-22T14:40:00.000Z",
-			"paths": ["src/worker/retry-hook.ts"],
+			"paths": [
+				"src/worker/retry-hook.ts"
+			],
 			"outcome": "shipped",
 			"ref": "4d5e6f700000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:1b2c3d4e",
+			"id": "commit:flusk:1b2c3d4e",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "chore: raise the retry limit in the http client to five",
 			"text": "chore: raise the retry limit in the http client to five\n\nThe provider rate-limits harder than it used to; three attempts was not\nenough to ride out a 429 burst.\n\nsrc/net/http-client.ts",
 			"at": "2026-08-01T08:05:00.000Z",
-			"paths": ["src/net/http-client.ts"],
+			"paths": [
+				"src/net/http-client.ts"
+			],
 			"outcome": "shipped",
 			"ref": "1b2c3d4e0000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:b14d4aa0",
+			"id": "commit:flusk:b14d4aa0",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "feat: a verification gate that can actually block",
 			"text": "feat: a verification gate that can actually block\n\nThe gate used to advise. It now returns a verdict, and a block verdict stops\nthe run before the branch is pushed. A regression the checks can name is the\nonly thing allowed to produce a block.\n\nsrc/verify/gate.ts\nsrc/verify/checks.ts",
 			"at": "2026-06-12T11:00:00.000Z",
-			"paths": ["src/verify/gate.ts", "src/verify/checks.ts"],
+			"paths": [
+				"src/verify/gate.ts",
+				"src/verify/checks.ts"
+			],
 			"outcome": "shipped",
 			"ref": "b14d4aa00000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:e1592ac1",
+			"id": "commit:flusk:e1592ac1",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "fix: clear the high-severity review backlog",
 			"text": "fix: clear the high-severity review backlog\n\nSeven findings from the adversarial review, applied together because they all\ntouch the same seam.\n\nsrc/review/backlog.ts",
 			"at": "2026-06-14T18:20:00.000Z",
-			"paths": ["src/review/backlog.ts"],
+			"paths": [
+				"src/review/backlog.ts"
+			],
 			"outcome": "shipped",
 			"ref": "e1592ac10000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:2d935900",
+			"id": "commit:flusk:2d935900",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "feat: abagraph memory weave, verification gate, goal graphs",
 			"text": "feat: abagraph memory weave, verification gate, goal graphs\n\nPhase three lands three things at once: the memory weave writes run facts into\nabagraph, the verification gate reads them back, and goals become a graph\nrather than a list.\n\nsrc/memory/weave.ts\nsrc/verify/gate.ts\nsrc/goals/graph.ts",
 			"at": "2026-05-13T10:00:00.000Z",
-			"paths": ["src/memory/weave.ts", "src/verify/gate.ts", "src/goals/graph.ts"],
+			"paths": [
+				"src/memory/weave.ts",
+				"src/verify/gate.ts",
+				"src/goals/graph.ts"
+			],
 			"outcome": "shipped",
 			"ref": "2d9359000000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:aa11bb22",
+			"id": "commit:flusk:aa11bb22",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "feat: journalOutcome tells a gate refusal apart from a crash",
 			"text": "feat: journalOutcome tells a gate refusal apart from a crash\n\nA run the gate refused and a run that threw both landed as failed, which made\nthe warning useless. journalOutcome now reads the gate stage: a gate that does\nnot say it passed means blocked, and only a stage that actually errored means\nfailed.\n\nsrc/history/source-journals.ts",
 			"at": "2026-07-12T09:30:00.000Z",
-			"paths": ["src/history/source-journals.ts"],
+			"paths": [
+				"src/history/source-journals.ts"
+			],
 			"outcome": "shipped",
 			"ref": "aa11bb220000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:cc33dd44",
+			"id": "commit:flusk:cc33dd44",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "refactor: parseFrontmatter returns a typed JournalMeta",
 			"text": "refactor: parseFrontmatter returns a typed JournalMeta\n\nEvery caller was re-validating the same four keys. parseFrontmatter now does\nit once and returns JournalMeta or null, so a malformed header is a skipped\njournal rather than a thrown scan.\n\nsrc/ui/journal-scan.ts",
 			"at": "2026-06-30T16:45:00.000Z",
-			"paths": ["src/ui/journal-scan.ts"],
+			"paths": [
+				"src/ui/journal-scan.ts"
+			],
 			"outcome": "shipped",
 			"ref": "cc33dd440000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:ee55ff66",
+			"id": "commit:flusk:ee55ff66",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "fix: stop the watch tick from overlapping itself under load",
 			"text": "fix: stop the watch tick from overlapping itself under load\n\nA tick that took longer than the interval started the next one on top of\nitself, which is where the flaky ordering in the queue came from. Hold a\nrunning flag and skip rather than queue.\n\nsrc/watch/tick.ts",
 			"at": "2026-07-28T07:15:00.000Z",
-			"paths": ["src/watch/tick.ts"],
+			"paths": [
+				"src/watch/tick.ts"
+			],
 			"outcome": "shipped",
 			"ref": "ee55ff660000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:99887766",
+			"id": "commit:flusk:99887766",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "fix: debounce the file watcher so one save does not queue two runs",
 			"text": "fix: debounce the file watcher so one save does not queue two runs\n\nEditors write a temp file and rename, which the watcher saw as two changes.\nCoalesce inside a 120ms window.\n\nsrc/watch/watcher.ts",
 			"at": "2026-08-04T12:00:00.000Z",
-			"paths": ["src/watch/watcher.ts"],
+			"paths": [
+				"src/watch/watcher.ts"
+			],
 			"outcome": "shipped",
 			"ref": "998877660000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:12ab34cd",
+			"id": "commit:flusk:12ab34cd",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "feat: compaction keeps the first turn and the last five",
 			"text": "feat: compaction keeps the first turn and the last five\n\nThe first turn carries the task and the last five carry the state; everything\nbetween them is summarised into one synthetic turn. Tool output is dropped\nbefore prose because it is the bulk and the least re-readable.\n\nsrc/session/compact.ts",
 			"at": "2026-04-13T13:20:00.000Z",
-			"paths": ["src/session/compact.ts"],
+			"paths": [
+				"src/session/compact.ts"
+			],
 			"outcome": "shipped",
 			"ref": "12ab34cd0000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:56ef78ab",
+			"id": "commit:flusk:56ef78ab",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "Revert \"feat: swap the session store to sqlite\"",
 			"text": "Revert \"feat: swap the session store to sqlite\"\n\nThis reverts commit 90abcdef. Concurrent writers from the watch loop locked\nthe database and a locked write lost the turn instead of retrying, so runs\nended with truncated transcripts.\n\nsrc/session/store.ts",
 			"at": "2026-02-20T09:00:00.000Z",
-			"paths": ["src/session/store.ts"],
+			"paths": [
+				"src/session/store.ts"
+			],
 			"outcome": "failed",
 			"ref": "56ef78ab0000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:90abcdef",
+			"id": "commit:flusk:90abcdef",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "feat: swap the session store to sqlite",
 			"text": "feat: swap the session store to sqlite\n\nReplaces the append-only ndjson transcript with a sqlite table, so a resume\ncan seek instead of replaying the whole file.\n\nsrc/session/store.ts",
 			"at": "2026-02-18T15:30:00.000Z",
-			"paths": ["src/session/store.ts"],
+			"paths": [
+				"src/session/store.ts"
+			],
 			"outcome": "failed",
 			"ref": "90abcdef0000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:34cd56ef",
+			"id": "commit:flusk:34cd56ef",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "feat: budget guard stops a run before it burns the token budget",
 			"text": "feat: budget guard stops a run before it burns the token budget\n\nThe guard checks the projected cost of the next turn rather than the spent\ncost of the last one, so the run stops with budget left to write its report.\n\nsrc/agent/budget.ts",
 			"at": "2026-07-05T10:10:00.000Z",
-			"paths": ["src/agent/budget.ts"],
+			"paths": [
+				"src/agent/budget.ts"
+			],
 			"outcome": "shipped",
 			"ref": "34cd56ef0000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:aabbccdd",
+			"id": "commit:flusk:aabbccdd",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "perf: cache the trigram index per bm25 index",
 			"text": "perf: cache the trigram index per bm25 index\n\nFuzzy expansion rebuilt the gram buckets on every query. Keyed on the index\nobject in a WeakMap, so an immutable index builds them once.\n\nsrc/history/fuzzy.ts",
 			"at": "2026-08-06T17:00:00.000Z",
-			"paths": ["src/history/fuzzy.ts"],
+			"paths": [
+				"src/history/fuzzy.ts"
+			],
 			"outcome": "shipped",
 			"ref": "aabbccdd0000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:11223344",
+			"id": "commit:flusk:11223344",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "feat: scrub secrets out of card text before indexing",
 			"text": "feat: scrub secrets out of card text before indexing\n\nTokens, bearer headers and private keys are redacted at card construction, not\nat display, so a leaked value never reaches the index on disk.\n\nsrc/history/scrub.ts",
 			"at": "2026-07-16T11:45:00.000Z",
-			"paths": ["src/history/scrub.ts"],
+			"paths": [
+				"src/history/scrub.ts"
+			],
 			"outcome": "shipped",
 			"ref": "112233440000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:44556677",
+			"id": "commit:flusk:44556677",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "feat: resume a run from the last checkpoint",
 			"text": "feat: resume a run from the last checkpoint\n\nA resumed run replays the transcript, restores the tool cursor and continues\nfrom the turn after the checkpoint.\n\nsrc/session/resume.ts",
 			"at": "2026-03-22T14:00:00.000Z",
-			"paths": ["src/session/resume.ts"],
+			"paths": [
+				"src/session/resume.ts"
+			],
 			"outcome": "shipped",
 			"ref": "445566770000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:778899aa",
+			"id": "commit:flusk:778899aa",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "feat: IntelliJ-style workbench with projects, attention and chat",
 			"text": "feat: IntelliJ-style workbench with projects, attention and chat\n\nThe dashboard becomes a workbench: a project tree on the left, an attention\nqueue in the middle, harness detail and chat on the right.\n\nsrc/ui/page.ts\nsrc/ui/server.ts",
 			"at": "2026-08-09T20:00:00.000Z",
-			"paths": ["src/ui/page.ts", "src/ui/server.ts"],
+			"paths": [
+				"src/ui/page.ts",
+				"src/ui/server.ts"
+			],
 			"outcome": "shipped",
 			"ref": "778899aa0000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:bbccddee",
+			"id": "commit:flusk:bbccddee",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "fix: rotate the session store file at 64MB",
 			"text": "fix: rotate the session store file at 64MB\n\nA long unattended run wrote a transcript big enough to slow the resume replay.\nRotate to store.1.ndjson and keep reading both on resume.\n\nsrc/session/store.ts",
 			"at": "2026-08-07T09:40:00.000Z",
-			"paths": ["src/session/store.ts"],
+			"paths": [
+				"src/session/store.ts"
+			],
 			"outcome": "shipped",
 			"ref": "bbccddee0000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:ccddeeff",
+			"id": "commit:flusk:ccddeeff",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "feat: subagents get their own tool registry",
 			"text": "feat: subagents get their own tool registry\n\nA subagent inherits the parent policy but not the parent tools, so a research\nsubagent cannot write files.\n\nsrc/agent/subagent.ts\nsrc/tools/registry.ts",
 			"at": "2026-05-02T08:30:00.000Z",
-			"paths": ["src/agent/subagent.ts", "src/tools/registry.ts"],
+			"paths": [
+				"src/agent/subagent.ts",
+				"src/tools/registry.ts"
+			],
 			"outcome": "shipped",
 			"ref": "ccddeeff0000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:d0d1d2d3",
+			"id": "commit:flusk:d0d1d2d3",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "fix: the router no longer prefers a model that just failed",
 			"text": "fix: the router no longer prefers a model that just failed\n\nRouting scores decayed too slowly, so a provider that had just errored kept\nwinning the next dispatch.\n\nsrc/router/score.ts",
 			"at": "2026-07-19T15:05:00.000Z",
-			"paths": ["src/router/score.ts"],
+			"paths": [
+				"src/router/score.ts"
+			],
 			"outcome": "shipped",
 			"ref": "d0d1d2d30000000000000000000000000000abcd"
 		},
 		{
-			"id": "commit:ah:e0e1e2e3",
+			"id": "commit:flusk:e0e1e2e3",
 			"kind": "commit",
-			"project": "ah",
+			"project": "flusk",
 			"title": "chore: bump vitest and cap worker parallelism at four",
 			"text": "chore: bump vitest and cap worker parallelism at four\n\nMany tests spawn git subprocesses; unbounded workers starved their timing on\nwide machines.\n\nvitest.config.ts",
 			"at": "2026-08-03T10:20:00.000Z",
-			"paths": ["vitest.config.ts"],
+			"paths": [
+				"vitest.config.ts"
+			],
 			"outcome": "shipped",
 			"ref": "e0e1e2e30000000000000000000000000000abcd"
 		},
@@ -275,7 +325,9 @@
 			"title": "feat: retry queue for webhook delivery",
 			"text": "feat: retry queue for webhook delivery\n\nFailed deliveries go on a queue and are retried with a fixed delay until the\nendpoint answers or the entry ages out.\n\nsrc/webhooks/queue.ts",
 			"at": "2026-07-25T09:00:00.000Z",
-			"paths": ["src/webhooks/queue.ts"],
+			"paths": [
+				"src/webhooks/queue.ts"
+			],
 			"outcome": "shipped",
 			"ref": "5a5a5a5a0000000000000000000000000000abcd"
 		},
@@ -286,7 +338,9 @@
 			"title": "fix: gate the deploy on a green build",
 			"text": "fix: gate the deploy on a green build\n\nThe deploy job started before the build job reported, so a red build could\nship.\n\nci/gate.sh",
 			"at": "2026-06-20T13:00:00.000Z",
-			"paths": ["ci/gate.sh"],
+			"paths": [
+				"ci/gate.sh"
+			],
 			"outcome": "shipped",
 			"ref": "6b6b6b6b0000000000000000000000000000abcd"
 		},
@@ -297,7 +351,9 @@
 			"title": "chore: bump the abagraph client to 0.1.4",
 			"text": "chore: bump the abagraph client to 0.1.4\n\nPicks up the tenant header fix.\n\npackage.json",
 			"at": "2026-05-30T11:00:00.000Z",
-			"paths": ["package.json"],
+			"paths": [
+				"package.json"
+			],
 			"outcome": "shipped",
 			"ref": "7c7c7c7c0000000000000000000000000000abcd"
 		},
@@ -308,174 +364,209 @@
 			"title": "feat: watch mode ticks every thirty seconds",
 			"text": "feat: watch mode ticks every thirty seconds\n\nA timer drives the poll instead of a filesystem watcher, because the mount is\na network share.\n\nsrc/watch/loop.ts",
 			"at": "2026-07-11T10:30:00.000Z",
-			"paths": ["src/watch/loop.ts"],
+			"paths": [
+				"src/watch/loop.ts"
+			],
 			"outcome": "shipped",
 			"ref": "8d8d8d8d0000000000000000000000000000abcd"
 		},
 		{
-			"id": "session:ah-20260723-1412",
+			"id": "session:flusk-20260723-1412",
 			"kind": "session",
-			"project": "ah",
+			"project": "flusk",
 			"title": "add a retry hook to the worker dispatch path",
 			"text": "add a retry hook to the worker dispatch path\n\nAdded the hook, wired it into dispatch and covered the double-fire case that\nthe socket reset produced. npm test is green.\n\ncommands:\nnpm test\nnpm run check\n\nfiles:\nsrc/worker/retry-hook.ts\ntest/worker-retry.test.ts",
 			"at": "2026-07-23T14:12:00.000Z",
-			"paths": ["src/worker/retry-hook.ts", "test/worker-retry.test.ts"],
+			"paths": [
+				"src/worker/retry-hook.ts",
+				"test/worker-retry.test.ts"
+			],
 			"outcome": "verified",
-			"ref": "ah-20260723-1412"
+			"ref": "flusk-20260723-1412"
 		},
 		{
-			"id": "session:ah-20260610-0902",
+			"id": "session:flusk-20260610-0902",
 			"kind": "session",
-			"project": "ah",
+			"project": "flusk",
 			"title": "make the verification gate block on a failing regression",
 			"text": "make the verification gate block on a failing regression\n\nThe gate returns a verdict now. A named regression produces block; anything\nvaguer produces advise. Ran the gate suite twice to be sure it is not flaky.\n\ncommands:\nnpm test\nnpx vitest run test/verify-gate.test.ts\n\nfiles:\nsrc/verify/gate.ts",
 			"at": "2026-06-10T09:02:00.000Z",
-			"paths": ["src/verify/gate.ts"],
+			"paths": [
+				"src/verify/gate.ts"
+			],
 			"outcome": "verified",
-			"ref": "ah-20260610-0902"
+			"ref": "flusk-20260610-0902"
 		},
 		{
-			"id": "session:ah-20260706-1000",
+			"id": "session:flusk-20260706-1000",
 			"kind": "session",
-			"project": "ah",
+			"project": "flusk",
 			"title": "wire the budget guard into the agent loop",
 			"text": "wire the budget guard into the agent loop\n\nThe guard is consulted before the turn is dispatched, using the projected cost\nof the next turn.\n\ncommands:\nnpm test\n\nfiles:\nsrc/agent/budget.ts",
 			"at": "2026-07-06T10:00:00.000Z",
-			"paths": ["src/agent/budget.ts"],
+			"paths": [
+				"src/agent/budget.ts"
+			],
 			"outcome": "verified",
-			"ref": "ah-20260706-1000"
+			"ref": "flusk-20260706-1000"
 		},
 		{
-			"id": "session:ah-20260706-1400",
+			"id": "session:flusk-20260706-1400",
 			"kind": "session",
-			"project": "ah",
+			"project": "flusk",
 			"title": "wire the budget guard into the agent loop",
 			"text": "wire the budget guard into the agent loop\n\nThe guard is consulted before the turn is dispatched, using the projected cost\nof the next turn.\n\ncommands:\nnpm test\n\nfiles:\nsrc/agent/budget.ts",
 			"at": "2026-07-06T10:00:00.000Z",
-			"paths": ["src/agent/budget.ts"],
+			"paths": [
+				"src/agent/budget.ts"
+			],
 			"outcome": "failed",
-			"ref": "ah-20260706-1400"
+			"ref": "flusk-20260706-1400"
 		},
 		{
-			"id": "session:ah-20260405-1010",
+			"id": "session:flusk-20260405-1010",
 			"kind": "session",
-			"project": "ah",
+			"project": "flusk",
 			"title": "migrate the memory weave onto abagraph v2",
 			"text": "migrate the memory weave onto abagraph v2\n\nThe v2 client changed the tenant header and the weave wrote every fact into\nthe default tenant. Rolled the writes back and stopped; the migration needs a\ntenant-aware client before it can be attempted again.\n\ncommands:\nnpm test\nnode scripts/migrate-weave.mjs\n\nfiles:\nsrc/memory/weave.ts",
 			"at": "2026-04-05T10:10:00.000Z",
-			"paths": ["src/memory/weave.ts"],
+			"paths": [
+				"src/memory/weave.ts"
+			],
 			"outcome": "failed",
-			"ref": "ah-20260405-1010"
+			"ref": "flusk-20260405-1010"
 		},
 		{
-			"id": "session:ah-20260802-0800",
+			"id": "session:flusk-20260802-0800",
 			"kind": "session",
-			"project": "ah",
+			"project": "flusk",
 			"title": "index docs and skills into the history corpus",
 			"text": "index docs and skills into the history corpus\n\nDocs and skills now contribute cards, capped at the head of each file.\n\ncommands:\nnpm test\n\nfiles:\nsrc/history/sources.ts",
 			"at": "2026-08-02T08:00:00.000Z",
-			"paths": ["src/history/sources.ts"],
+			"paths": [
+				"src/history/sources.ts"
+			],
 			"outcome": "shipped",
-			"ref": "ah-20260802-0800"
+			"ref": "flusk-20260802-0800"
 		},
 		{
-			"id": "session:ah-20260728-1600",
+			"id": "session:flusk-20260728-1600",
 			"kind": "session",
-			"project": "ah",
+			"project": "flusk",
 			"title": "chase the flaky ordering in the watch tick queue",
-			"text": "chase the flaky ordering in the watch tick queue\n\nReproduced the overlap, then tried to rm -rf the queue directory to reset\nstate and was denied: denied while unattended. Stopped there.\n\ncommands:\nnpx vitest run test/watch-tick.test.ts\nrm -rf .ah/queue\n\nfiles:\nsrc/watch/tick.ts",
+			"text": "chase the flaky ordering in the watch tick queue\n\nReproduced the overlap, then tried to rm -rf the queue directory to reset\nstate and was denied: denied while unattended. Stopped there.\n\ncommands:\nnpx vitest run test/watch-tick.test.ts\nrm -rf .flusk/queue\n\nfiles:\nsrc/watch/tick.ts",
 			"at": "2026-07-28T16:00:00.000Z",
-			"paths": ["src/watch/tick.ts"],
+			"paths": [
+				"src/watch/tick.ts"
+			],
 			"outcome": "blocked",
-			"ref": "ah-20260728-1600"
+			"ref": "flusk-20260728-1600"
 		},
 		{
-			"id": "session:ah-20260130-0930",
+			"id": "session:flusk-20260130-0930",
 			"kind": "session",
-			"project": "ah",
+			"project": "flusk",
 			"title": "swap the session store to sqlite",
 			"text": "swap the session store to sqlite\n\nGot the schema in and the writes passing, then the watch loop's concurrent\nwriters started losing turns to a locked database. Ran out of turns before it\nwas stable.\n\ncommands:\nnpm test\n\nfiles:\nsrc/session/store.ts",
 			"at": "2026-01-30T09:30:00.000Z",
-			"paths": ["src/session/store.ts"],
+			"paths": [
+				"src/session/store.ts"
+			],
 			"outcome": "failed",
-			"ref": "ah-20260130-0930"
+			"ref": "flusk-20260130-0930"
 		},
 		{
-			"id": "session:ah-20260519-1100",
+			"id": "session:flusk-20260519-1100",
 			"kind": "session",
-			"project": "ah",
+			"project": "flusk",
 			"title": "teach the compactor to keep tool results that were never read",
 			"text": "teach the compactor to keep tool results that were never read\n\nCompaction dropped a tool result the very next turn needed. Keeping unread\nresults fixed it.\n\ncommands:\nnpm test\n\nfiles:\nsrc/session/compact.ts",
 			"at": "2026-05-19T11:00:00.000Z",
-			"paths": ["src/session/compact.ts"],
+			"paths": [
+				"src/session/compact.ts"
+			],
 			"outcome": "verified",
-			"ref": "ah-20260519-1100"
+			"ref": "flusk-20260519-1100"
 		},
 		{
-			"id": "session:ah-20260615-1730",
+			"id": "session:flusk-20260615-1730",
 			"kind": "session",
-			"project": "ah",
+			"project": "flusk",
 			"title": "add a tool adapter for the graph search endpoint",
 			"text": "add a tool adapter for the graph search endpoint\n\nThe adapter returns a typed error result rather than throwing, per the house\nrule.\n\ncommands:\nnpm test\n\nfiles:\nsrc/tools/graph-search.ts",
 			"at": "2026-06-15T17:30:00.000Z",
-			"paths": ["src/tools/graph-search.ts"],
+			"paths": [
+				"src/tools/graph-search.ts"
+			],
 			"outcome": "verified",
-			"ref": "ah-20260615-1730"
+			"ref": "flusk-20260615-1730"
 		},
 		{
-			"id": "journal:harness/ah/2026-06-12-release.md",
+			"id": "journal:harness/flusk/2026-06-12-release.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: release · tool: claude · status: failed\n\nrouting: done|26.0s|-> claude (claude=1.00 codex=0.75)\nplan: done|14.2s|3 steps\nedit: done|91.4s|src/verify/gate.ts, src/verify/checks.ts\nverify: done|23.9s|all checks pass\ngate: done|78.7s|FAIL: 2 regression(s), verdict block\npr: skipped|0.0s|blocked before push",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: release · tool: claude · status: failed\n\nrouting: done|26.0s|-> claude (claude=1.00 codex=0.75)\nplan: done|14.2s|3 steps\nedit: done|91.4s|src/verify/gate.ts, src/verify/checks.ts\nverify: done|23.9s|all checks pass\ngate: done|78.7s|FAIL: 2 regression(s), verdict block\npr: skipped|0.0s|blocked before push",
 			"at": "2026-06-12T19:00:00.000Z",
-			"paths": ["src/verify/gate.ts", "src/verify/checks.ts"],
+			"paths": [
+				"src/verify/gate.ts",
+				"src/verify/checks.ts"
+			],
 			"outcome": "blocked",
-			"ref": "harness/ah/2026-06-12-release.md"
+			"ref": "harness/flusk/2026-06-12-release.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-08-05-release.md",
+			"id": "journal:harness/flusk/2026-08-05-release.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: release · tool: claude · status: done\n\nrouting: done|22.1s|-> claude (claude=1.00 codex=0.70)\nedit: done|64.0s|src/ui/page.ts\nverify: done|31.5s|all checks pass\ngate: done|40.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened\n\npr url: https://example.invalid/ah/pull/881",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: release · tool: claude · status: done\n\nrouting: done|22.1s|-> claude (claude=1.00 codex=0.70)\nedit: done|64.0s|src/ui/page.ts\nverify: done|31.5s|all checks pass\ngate: done|40.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened\n\npr url: https://example.invalid/flusk/pull/881",
 			"at": "2026-08-05T18:30:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-08-05-release.md"
+			"ref": "harness/flusk/2026-08-05-release.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-30-nightly.md",
+			"id": "journal:harness/flusk/2026-07-30-nightly.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "nightly typecheck run for ah",
-			"text": "nightly typecheck run for ah · kind: nightly · tool: codex · status: failed\n\nrouting: done|18.0s|-> codex (codex=0.90 claude=0.85)\nedit: done|55.0s|src/history/rank.ts\nverify: failed|12.0s|tsc: 3 errors in src/history/rank.ts\ngate: pending|0.0s|never reached",
+			"project": "flusk",
+			"title": "nightly typecheck run for flusk",
+			"text": "nightly typecheck run for flusk · kind: nightly · tool: codex · status: failed\n\nrouting: done|18.0s|-> codex (codex=0.90 claude=0.85)\nedit: done|55.0s|src/history/rank.ts\nverify: failed|12.0s|tsc: 3 errors in src/history/rank.ts\ngate: pending|0.0s|never reached",
 			"at": "2026-07-30T02:00:00.000Z",
-			"paths": ["src/history/rank.ts"],
+			"paths": [
+				"src/history/rank.ts"
+			],
 			"outcome": "failed",
-			"ref": "harness/ah/2026-07-30-nightly.md"
+			"ref": "harness/flusk/2026-07-30-nightly.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-04-08-abagraph-v2.md",
+			"id": "journal:harness/flusk/2026-04-08-abagraph-v2.md",
 			"kind": "journal",
-			"project": "ah",
+			"project": "flusk",
 			"title": "migrate the memory weave to abagraph v2",
 			"text": "migrate the memory weave to abagraph v2 · kind: migration · tool: claude · status: failed\n\nrouting: done|20.0s|-> claude (claude=1.00 codex=0.60)\nedit: done|120.0s|src/memory/weave.ts, src/memory/client.ts\nverify: failed|45.0s|memory-e2e: 14 failed, tenant header missing on every write\ngate: pending|0.0s|never reached",
 			"at": "2026-04-08T03:00:00.000Z",
-			"paths": ["src/memory/weave.ts", "src/memory/client.ts"],
+			"paths": [
+				"src/memory/weave.ts",
+				"src/memory/client.ts"
+			],
 			"outcome": "failed",
-			"ref": "harness/ah/2026-04-08-abagraph-v2.md"
+			"ref": "harness/flusk/2026-04-08-abagraph-v2.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-27-watch.md",
+			"id": "journal:harness/flusk/2026-07-27-watch.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "unattended watch run for ah",
-			"text": "unattended watch run for ah · kind: watch · tool: claude · status: done\n\nrouting: done|19.0s|-> claude (claude=1.00 codex=0.80)\nedit: done|70.0s|src/watch/tick.ts\nverify: done|28.0s|all checks pass\ngate: done|33.0s|PASS: 0 regression(s), verdict ship",
+			"project": "flusk",
+			"title": "unattended watch run for flusk",
+			"text": "unattended watch run for flusk · kind: watch · tool: claude · status: done\n\nrouting: done|19.0s|-> claude (claude=1.00 codex=0.80)\nedit: done|70.0s|src/watch/tick.ts\nverify: done|28.0s|all checks pass\ngate: done|33.0s|PASS: 0 regression(s), verdict ship",
 			"at": "2026-07-27T04:00:00.000Z",
-			"paths": ["src/watch/tick.ts"],
+			"paths": [
+				"src/watch/tick.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-27-watch.md"
+			"ref": "harness/flusk/2026-07-27-watch.md"
 		},
 		{
 			"id": "journal:harness/prime-agent/2026-07-15-release.md",
@@ -484,458 +575,516 @@
 			"title": "release run for prime-agent",
 			"text": "release run for prime-agent · kind: release · tool: codex · status: failed\n\nrouting: done|24.0s|-> codex (codex=0.95 claude=0.90)\nedit: done|88.0s|src/webhooks/queue.ts\nverify: done|30.0s|all checks pass\ngate: done|50.0s|FAIL: 1 regression(s), verdict block",
 			"at": "2026-07-15T17:00:00.000Z",
-			"paths": ["src/webhooks/queue.ts"],
+			"paths": [
+				"src/webhooks/queue.ts"
+			],
 			"outcome": "blocked",
 			"ref": "harness/prime-agent/2026-07-15-release.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-03-02-index.md",
+			"id": "journal:harness/flusk/2026-03-02-index.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "rebuild the history index for ah",
-			"text": "rebuild the history index for ah · kind: maintenance · tool: claude · status: done\n\nindex: done|9.4s|3412 cards from 4 sources\nverify: done|11.0s|all checks pass",
+			"project": "flusk",
+			"title": "rebuild the history index for flusk",
+			"text": "rebuild the history index for flusk · kind: maintenance · tool: claude · status: done\n\nindex: done|9.4s|3412 cards from 4 sources\nverify: done|11.0s|all checks pass",
 			"at": "2026-03-02T06:00:00.000Z",
-			"paths": ["src/history/index-store.ts"],
+			"paths": [
+				"src/history/index-store.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-03-02-index.md"
+			"ref": "harness/flusk/2026-03-02-index.md"
 		},
 		{
-			"id": "doc:ah:CLAUDE.md",
+			"id": "doc:flusk:CLAUDE.md",
 			"kind": "doc",
-			"project": "ah",
-			"title": "ah house rules",
-			"text": "ah house rules\n\nEvery module opens with a comment saying why it exists, not what it does.\nNo default exports. Errors cross a module boundary as values, never as\nthrows. Tests live in test/ and are named after the seam they cover, not the\nfile. Never widen a frozen contract in src/history/types.ts without bumping\nINDEX_VERSION.",
+			"project": "flusk",
+			"title": "flusk house rules",
+			"text": "flusk house rules\n\nEvery module opens with a comment saying why it exists, not what it does.\nNo default exports. Errors cross a module boundary as values, never as\nthrows. Tests live in test/ and are named after the seam they cover, not the\nfile. Never widen a frozen contract in src/history/types.ts without bumping\nINDEX_VERSION.",
 			"at": "2026-08-08T10:00:00.000Z",
-			"paths": ["CLAUDE.md"],
+			"paths": [
+				"CLAUDE.md"
+			],
 			"outcome": "unknown",
-			"ref": "/repo/ah/CLAUDE.md"
+			"ref": "/repo/flusk/CLAUDE.md"
 		},
 		{
-			"id": "doc:ah:CONTRIBUTING.md",
+			"id": "doc:flusk:CONTRIBUTING.md",
 			"kind": "doc",
-			"project": "ah",
-			"title": "Contributing to ah",
-			"text": "Contributing to ah\n\nCommit messages use a conventional prefix: feat, fix, chore, refactor, docs,\nperf or test, then a colon and a lowercase summary in the imperative. A\nrevert keeps the reverted subject verbatim in quotes so the history index can\npair the two. One logical change per commit; a commit that needs the word\n\"and\" is usually two commits.",
+			"project": "flusk",
+			"title": "Contributing to flusk",
+			"text": "Contributing to flusk\n\nCommit messages use a conventional prefix: feat, fix, chore, refactor, docs,\nperf or test, then a colon and a lowercase summary in the imperative. A\nrevert keeps the reverted subject verbatim in quotes so the history index can\npair the two. One logical change per commit; a commit that needs the word\n\"and\" is usually two commits.",
 			"at": "2026-08-01T09:00:00.000Z",
-			"paths": ["CONTRIBUTING.md"],
+			"paths": [
+				"CONTRIBUTING.md"
+			],
 			"outcome": "unknown",
-			"ref": "/repo/ah/CONTRIBUTING.md"
+			"ref": "/repo/flusk/CONTRIBUTING.md"
 		},
 		{
-			"id": "skill:ah:.claude/skills/tool-adapters/SKILL.md",
+			"id": "skill:flusk:.claude/skills/tool-adapters/SKILL.md",
 			"kind": "skill",
-			"project": "ah",
+			"project": "flusk",
 			"title": "Writing a tool adapter",
 			"text": "Writing a tool adapter\n\nAn adapter never throws. It returns a typed result whose error arm carries a\nmessage the model can act on, because a thrown adapter kills the turn and the\nmodel learns nothing. Validate arguments with typebox at the boundary, and\nkeep the network call in its own function so it can be faked in tests.",
 			"at": "2026-03-10T12:00:00.000Z",
-			"paths": [".claude/skills/tool-adapters/SKILL.md"],
+			"paths": [
+				".claude/skills/tool-adapters/SKILL.md"
+			],
 			"outcome": "unknown",
-			"ref": "/repo/ah/.claude/skills/tool-adapters/SKILL.md"
+			"ref": "/repo/flusk/.claude/skills/tool-adapters/SKILL.md"
 		},
 		{
-			"id": "skill:ah:.claude/skills/verify-gate/SKILL.md",
+			"id": "skill:flusk:.claude/skills/verify-gate/SKILL.md",
 			"kind": "skill",
-			"project": "ah",
+			"project": "flusk",
 			"title": "Running the verification gate locally",
-			"text": "Running the verification gate locally\n\nah gate --dry runs the checks without a verdict. A block verdict needs a named\nregression: a check that merely warns must never block, or the gate becomes\nsomething people route around.",
+			"text": "Running the verification gate locally\n\nflusk gate --dry runs the checks without a verdict. A block verdict needs a named\nregression: a check that merely warns must never block, or the gate becomes\nsomething people route around.",
 			"at": "2026-06-13T12:00:00.000Z",
-			"paths": [".claude/skills/verify-gate/SKILL.md"],
+			"paths": [
+				".claude/skills/verify-gate/SKILL.md"
+			],
 			"outcome": "unknown",
-			"ref": "/repo/ah/.claude/skills/verify-gate/SKILL.md"
+			"ref": "/repo/flusk/.claude/skills/verify-gate/SKILL.md"
 		},
 		{
-			"id": "doc:ah:docs/design/session-store.md",
+			"id": "doc:flusk:docs/design/session-store.md",
 			"kind": "doc",
-			"project": "ah",
+			"project": "flusk",
 			"title": "Why the session store is append-only ndjson",
 			"text": "Why the session store is append-only ndjson\n\nA transcript is written by a process that can be killed at any moment, so the\nformat has to survive a torn write. Append-only ndjson does: a half-written\nlast line is dropped on read and every earlier turn is still there. A\ndatabase would give us seeks we do not need and a lock we cannot hold across\nconcurrent watch writers. If this is ever revisited, the requirement to beat\nis crash-safety, not read speed.",
 			"at": "2025-03-29T10:00:00.000Z",
-			"paths": ["docs/design/session-store.md"],
+			"paths": [
+				"docs/design/session-store.md"
+			],
 			"outcome": "unknown",
-			"ref": "/repo/ah/docs/design/session-store.md"
+			"ref": "/repo/flusk/docs/design/session-store.md"
 		},
 		{
-			"id": "doc:ah:docs/adr/0007-bm25-not-embeddings.md",
+			"id": "doc:flusk:docs/adr/0007-bm25-not-embeddings.md",
 			"kind": "doc",
-			"project": "ah",
+			"project": "flusk",
 			"title": "ADR 0007: BM25 instead of embeddings for history retrieval",
 			"text": "ADR 0007: BM25 instead of embeddings for history retrieval\n\nRetrieval has to run on every keystroke of a task description, offline, with\nno service to operate and no vectors to store. BM25 over an in-memory\ninverted index costs milliseconds on a few thousand cards. Embeddings would\nbuy synonym recall we can approximate with identifier splitting and trigram\nfuzzing, at the price of an index that has to be rebuilt by a model. Revisit\nonly if recall on prose queries is measured and found wanting.",
 			"at": "2025-07-07T10:00:00.000Z",
-			"paths": ["docs/adr/0007-bm25-not-embeddings.md"],
+			"paths": [
+				"docs/adr/0007-bm25-not-embeddings.md"
+			],
 			"outcome": "unknown",
-			"ref": "/repo/ah/docs/adr/0007-bm25-not-embeddings.md"
+			"ref": "/repo/flusk/docs/adr/0007-bm25-not-embeddings.md"
 		},
 		{
-			"id": "doc:ah:docs/design/history-retrieval.md",
+			"id": "doc:flusk:docs/design/history-retrieval.md",
 			"kind": "doc",
-			"project": "ah",
+			"project": "flusk",
 			"title": "History retrieval: cards, ranking and the walkthrough",
 			"text": "History retrieval: cards, ranking and the walkthrough\n\nOne card shape covers commits, sessions, journals, docs and skills. The\nranker multiplies lexical score by recency, outcome, path overlap and a\ncaller-supplied kind boost. The walkthrough runs four differently-weighted\nsearches, because precedent, attempts, conventions and traps are not the same\nquestion asked four times.",
 			"at": "2026-08-06T10:00:00.000Z",
-			"paths": ["docs/design/history-retrieval.md"],
+			"paths": [
+				"docs/design/history-retrieval.md"
+			],
 			"outcome": "unknown",
-			"ref": "/repo/ah/docs/design/history-retrieval.md"
+			"ref": "/repo/flusk/docs/design/history-retrieval.md"
 		},
 		{
-			"id": "doc:ah:docs/design/watch-mode.md",
+			"id": "doc:flusk:docs/design/watch-mode.md",
 			"kind": "doc",
-			"project": "ah",
+			"project": "flusk",
 			"title": "Watch mode and the attempt ledger",
 			"text": "Watch mode and the attempt ledger\n\nUnattended runs record every attempt as a fact, so a second attempt at the\nsame task can see what the first one did. The tick is single-flight by\ndesign: overlapping ticks were the original source of ordering bugs.",
 			"at": "2026-07-02T10:00:00.000Z",
-			"paths": ["docs/design/watch-mode.md"],
+			"paths": [
+				"docs/design/watch-mode.md"
+			],
 			"outcome": "unknown",
-			"ref": "/repo/ah/docs/design/watch-mode.md"
+			"ref": "/repo/flusk/docs/design/watch-mode.md"
 		},
 		{
 			"id": "doc:prime-agent:CLAUDE.md",
 			"kind": "doc",
 			"project": "prime-agent",
 			"title": "prime-agent house rules",
-			"text": "prime-agent house rules\n\nUse pnpm. Every handler validates its payload. Errors are thrown here and\ncaught at the edge; do not copy ah's value-returning convention into this\nrepo.",
+			"text": "prime-agent house rules\n\nUse pnpm. Every handler validates its payload. Errors are thrown here and\ncaught at the edge; do not copy flusk's value-returning convention into this\nrepo.",
 			"at": "2026-07-20T10:00:00.000Z",
-			"paths": ["CLAUDE.md"],
+			"paths": [
+				"CLAUDE.md"
+			],
 			"outcome": "unknown",
 			"ref": "/repo/prime-agent/CLAUDE.md"
 		},
 		{
-			"id": "doc:ah:README.md",
+			"id": "doc:flusk:README.md",
 			"kind": "doc",
-			"project": "ah",
-			"title": "ah — an autonomous coding agent with abagraph as its brain",
-			"text": "ah — an autonomous coding agent with abagraph as its brain\n\nah runs a coding task end to end: it plans, edits, verifies, and refuses to\nship work the gate does not accept. Install with npm, point it at a repo, and\nrun ah watch to let it work unattended.",
+			"project": "flusk",
+			"title": "flusk — an autonomous coding agent with abagraph as its brain",
+			"text": "flusk — an autonomous coding agent with abagraph as its brain\n\nflusk runs a coding task end to end: it plans, edits, verifies, and refuses to\nship work the gate does not accept. Install with npm, point it at a repo, and\nrun flusk watch to let it work unattended.",
 			"at": "2026-08-02T10:00:00.000Z",
-			"paths": ["README.md"],
+			"paths": [
+				"README.md"
+			],
 			"outcome": "unknown",
-			"ref": "/repo/ah/README.md"
+			"ref": "/repo/flusk/README.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-10-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-10-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|20.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|10.1s|2 steps\nedit: done|60.0s|src/ui/page.ts\nverify: done|30.5s|all checks pass\ngate: done|40.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|20.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|10.1s|2 steps\nedit: done|60.0s|src/ui/page.ts\nverify: done|30.5s|all checks pass\ngate: done|40.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-10T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-10-nightly-run.md"
+			"ref": "harness/flusk/2026-07-10-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-11-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-11-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|21.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|11.1s|2 steps\nedit: done|61.0s|src/ui/page.ts\nverify: done|31.5s|all checks pass\ngate: done|41.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|21.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|11.1s|2 steps\nedit: done|61.0s|src/ui/page.ts\nverify: done|31.5s|all checks pass\ngate: done|41.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-11T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-11-nightly-run.md"
+			"ref": "harness/flusk/2026-07-11-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-12-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-12-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|22.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|12.1s|2 steps\nedit: done|62.0s|src/ui/page.ts\nverify: done|32.5s|all checks pass\ngate: done|42.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|22.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|12.1s|2 steps\nedit: done|62.0s|src/ui/page.ts\nverify: done|32.5s|all checks pass\ngate: done|42.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-12T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-12-nightly-run.md"
+			"ref": "harness/flusk/2026-07-12-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-13-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-13-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|23.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|13.1s|2 steps\nedit: done|63.0s|src/ui/page.ts\nverify: done|33.5s|all checks pass\ngate: done|43.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|23.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|13.1s|2 steps\nedit: done|63.0s|src/ui/page.ts\nverify: done|33.5s|all checks pass\ngate: done|43.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-13T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-13-nightly-run.md"
+			"ref": "harness/flusk/2026-07-13-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-14-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-14-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|24.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|14.1s|2 steps\nedit: done|64.0s|src/ui/page.ts\nverify: done|34.5s|all checks pass\ngate: done|44.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|24.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|14.1s|2 steps\nedit: done|64.0s|src/ui/page.ts\nverify: done|34.5s|all checks pass\ngate: done|44.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-14T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-14-nightly-run.md"
+			"ref": "harness/flusk/2026-07-14-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-15-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-15-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|25.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|15.1s|2 steps\nedit: done|65.0s|src/ui/page.ts\nverify: done|35.5s|all checks pass\ngate: done|45.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|25.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|15.1s|2 steps\nedit: done|65.0s|src/ui/page.ts\nverify: done|35.5s|all checks pass\ngate: done|45.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-15T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-15-nightly-run.md"
+			"ref": "harness/flusk/2026-07-15-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-16-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-16-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|26.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|16.1s|2 steps\nedit: done|66.0s|src/ui/page.ts\nverify: done|36.5s|all checks pass\ngate: done|46.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|26.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|16.1s|2 steps\nedit: done|66.0s|src/ui/page.ts\nverify: done|36.5s|all checks pass\ngate: done|46.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-16T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-16-nightly-run.md"
+			"ref": "harness/flusk/2026-07-16-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-17-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-17-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|27.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|17.1s|2 steps\nedit: done|67.0s|src/ui/page.ts\nverify: done|37.5s|all checks pass\ngate: done|47.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|27.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|17.1s|2 steps\nedit: done|67.0s|src/ui/page.ts\nverify: done|37.5s|all checks pass\ngate: done|47.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-17T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-17-nightly-run.md"
+			"ref": "harness/flusk/2026-07-17-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-18-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-18-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|28.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|18.1s|2 steps\nedit: done|68.0s|src/ui/page.ts\nverify: done|38.5s|all checks pass\ngate: done|48.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|28.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|18.1s|2 steps\nedit: done|68.0s|src/ui/page.ts\nverify: done|38.5s|all checks pass\ngate: done|48.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-18T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-18-nightly-run.md"
+			"ref": "harness/flusk/2026-07-18-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-19-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-19-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|29.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|19.1s|2 steps\nedit: done|69.0s|src/ui/page.ts\nverify: done|39.5s|all checks pass\ngate: done|49.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|29.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|19.1s|2 steps\nedit: done|69.0s|src/ui/page.ts\nverify: done|39.5s|all checks pass\ngate: done|49.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-19T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-19-nightly-run.md"
+			"ref": "harness/flusk/2026-07-19-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-20-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-20-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|30.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|20.1s|2 steps\nedit: done|70.0s|src/ui/page.ts\nverify: done|40.5s|all checks pass\ngate: done|50.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|30.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|20.1s|2 steps\nedit: done|70.0s|src/ui/page.ts\nverify: done|40.5s|all checks pass\ngate: done|50.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-20T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-20-nightly-run.md"
+			"ref": "harness/flusk/2026-07-20-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-21-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-21-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|31.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|21.1s|2 steps\nedit: done|71.0s|src/ui/page.ts\nverify: done|41.5s|all checks pass\ngate: done|51.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|31.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|21.1s|2 steps\nedit: done|71.0s|src/ui/page.ts\nverify: done|41.5s|all checks pass\ngate: done|51.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-21T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-21-nightly-run.md"
+			"ref": "harness/flusk/2026-07-21-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-22-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-22-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|32.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|22.1s|2 steps\nedit: done|72.0s|src/ui/page.ts\nverify: done|42.5s|all checks pass\ngate: done|52.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|32.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|22.1s|2 steps\nedit: done|72.0s|src/ui/page.ts\nverify: done|42.5s|all checks pass\ngate: done|52.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-22T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-22-nightly-run.md"
+			"ref": "harness/flusk/2026-07-22-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-23-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-23-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|33.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|23.1s|2 steps\nedit: done|73.0s|src/ui/page.ts\nverify: done|43.5s|all checks pass\ngate: done|53.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|33.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|23.1s|2 steps\nedit: done|73.0s|src/ui/page.ts\nverify: done|43.5s|all checks pass\ngate: done|53.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-23T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-23-nightly-run.md"
+			"ref": "harness/flusk/2026-07-23-nightly-run.md"
 		},
 		{
-			"id": "journal:harness/ah/2026-07-24-nightly-run.md",
+			"id": "journal:harness/flusk/2026-07-24-nightly-run.md",
 			"kind": "journal",
-			"project": "ah",
-			"title": "release run for ah",
-			"text": "release run for ah · kind: nightly · tool: claude · status: done\n\nrouting: done|34.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|24.1s|2 steps\nedit: done|74.0s|src/ui/page.ts\nverify: done|44.5s|all checks pass\ngate: done|54.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
+			"project": "flusk",
+			"title": "release run for flusk",
+			"text": "release run for flusk · kind: nightly · tool: claude · status: done\n\nrouting: done|34.0s|-> claude (claude=1.00 codex=0.70)\nplan: done|24.1s|2 steps\nedit: done|74.0s|src/ui/page.ts\nverify: done|44.5s|all checks pass\ngate: done|54.2s|PASS: 0 regression(s), verdict ship\npr: done|8.0s|opened",
 			"at": "2026-07-24T03:00:00.000Z",
-			"paths": ["src/ui/page.ts"],
+			"paths": [
+				"src/ui/page.ts"
+			],
 			"outcome": "shipped",
-			"ref": "harness/ah/2026-07-24-nightly-run.md"
+			"ref": "harness/flusk/2026-07-24-nightly-run.md"
 		}
 	],
 	"golden": [
 		{
 			"id": "exact-term",
 			"query": "exponential backoff retry hook",
-			"expected": "commit:ah:9a1f2b3c",
+			"expected": "commit:flusk:9a1f2b3c",
 			"facet": "exact term",
 			"why": "The only card whose title carries all three terms; it is the commit that introduced the hook."
 		},
 		{
 			"id": "typo-retyr",
 			"query": "retyr hook",
-			"expected": "commit:ah:9a1f2b3c",
+			"expected": "commit:flusk:9a1f2b3c",
 			"facet": "typo",
 			"why": "Asking about 'the retry hook' means the commit that introduced retryHook. Requires 'retyr' to survive as a typo of retry rather than dragging the query to the http-client retry-limit chore."
 		},
 		{
 			"id": "typo-verification-gate",
 			"query": "verificaton gate blockd the run",
-			"expected": "journal:harness/ah/2026-06-12-release.md",
+			"expected": "journal:harness/flusk/2026-06-12-release.md",
 			"facet": "typo",
 			"why": "Two typos over the load-bearing terms; the journal whose gate stage reads 'verdict block' is the run that was blocked."
 		},
 		{
 			"id": "typo-compaction",
 			"query": "compation drops tool results",
-			"expected": "session:ah-20260519-1100",
+			"expected": "session:flusk-20260519-1100",
 			"facet": "typo",
 			"why": "'compation' must correct to compaction; the session about dropped tool results is the only card on that failure mode."
 		},
 		{
 			"id": "camel-journal-outcome",
 			"query": "journalOutcome",
-			"expected": "commit:ah:aa11bb22",
+			"expected": "commit:flusk:aa11bb22",
 			"facet": "camelCase identifier",
 			"why": "The identifier is defined by that commit. Many journal cards contain 'journal' and 'outcome' separately, so the whole-token form has to win."
 		},
 		{
 			"id": "camel-parse-frontmatter",
 			"query": "parseFrontmatter typed return",
-			"expected": "commit:ah:cc33dd44",
+			"expected": "commit:flusk:cc33dd44",
 			"facet": "camelCase identifier",
 			"why": "Only card that names parseFrontmatter; tests that a camelCase query still hits a camelCase title."
 		},
 		{
 			"id": "camel-retry-hook-ident",
 			"query": "retryHook double fire",
-			"expected": "commit:ah:4d5e6f70",
+			"expected": "commit:flusk:4d5e6f70",
 			"facet": "camelCase identifier",
 			"why": "The double-fire bug is the fix commit, not the feature commit, even though the identifier appears in the feature commit's title."
 		},
 		{
 			"id": "path-watch-tick",
 			"query": "flaky ordering under load",
-			"paths": ["src/watch/tick.ts"],
-			"expected": "commit:ah:ee55ff66",
+			"paths": [
+				"src/watch/tick.ts"
+			],
+			"expected": "commit:flusk:ee55ff66",
 			"facet": "path-scoped",
 			"why": "With the path named, the overlapping-tick fix in that exact file beats the debounce fix in watcher.ts and the prime-agent watch loop."
 		},
 		{
 			"id": "path-session-store",
 			"query": "rotation and file size",
-			"paths": ["src/session/store.ts"],
-			"expected": "commit:ah:bbccddee",
+			"paths": [
+				"src/session/store.ts"
+			],
+			"expected": "commit:flusk:bbccddee",
 			"facet": "path-scoped",
 			"why": "Path scoping should pull the store cards up; the rotation commit is the only one about file size."
 		},
 		{
 			"id": "convention-tool-adapter-errors",
 			"query": "how do we handle errors in tool adapters here",
-			"expected": "skill:ah:.claude/skills/tool-adapters/SKILL.md",
+			"expected": "skill:flusk:.claude/skills/tool-adapters/SKILL.md",
 			"facet": "convention",
 			"why": "A 'how do we do X here' question wants the written rule, not the session that followed it."
 		},
 		{
 			"id": "convention-commit-prefix",
 			"query": "what is our convention for commit message prefixes",
-			"expected": "doc:ah:CONTRIBUTING.md",
+			"expected": "doc:flusk:CONTRIBUTING.md",
 			"facet": "convention",
 			"why": "CONTRIBUTING.md states the conventional-prefix rule; every commit card is an instance of it, which is exactly the trap."
 		},
 		{
 			"id": "convention-module-comments",
 			"query": "how should a new module start and where do tests go",
-			"expected": "doc:ah:CLAUDE.md",
+			"expected": "doc:flusk:CLAUDE.md",
 			"facet": "convention",
 			"why": "House rules file states both rules verbatim."
 		},
 		{
 			"id": "convention-gate-block-rule",
 			"query": "when is a gate allowed to block",
-			"expected": "skill:ah:.claude/skills/verify-gate/SKILL.md",
+			"expected": "skill:flusk:.claude/skills/verify-gate/SKILL.md",
 			"facet": "convention",
 			"why": "The skill states the rule ('a block verdict needs a named regression'); the gate commit is the implementation, the skill is the convention."
 		},
 		{
 			"id": "failed-before-abagraph",
 			"query": "has migrating the memory weave to abagraph v2 failed before",
-			"expected": "journal:harness/ah/2026-04-08-abagraph-v2.md",
+			"expected": "journal:harness/flusk/2026-04-08-abagraph-v2.md",
 			"facet": "has this failed before",
 			"why": "The journal carries the verbatim evidence (tenant header missing on every write). Must beat the default outcome penalty on failed cards."
 		},
 		{
 			"id": "failed-before-sqlite",
 			"query": "did we already try moving the session store to sqlite",
-			"expected": "commit:ah:90abcdef",
+			"expected": "commit:flusk:90abcdef",
 			"facet": "has this failed before",
 			"why": "The reverted commit is the attempt itself, and the revert marks it failed. A ranker that buries failures loses the one card that answers the question."
 		},
 		{
 			"id": "failed-before-typecheck",
 			"query": "has the nightly ever failed on a typecheck error",
-			"expected": "journal:harness/ah/2026-07-30-nightly.md",
+			"expected": "journal:harness/flusk/2026-07-30-nightly.md",
 			"facet": "has this failed before",
 			"why": "Only card whose verify stage records tsc errors."
 		},
 		{
 			"id": "old-ndjson-rationale",
 			"query": "why are session transcripts append-only ndjson",
-			"expected": "doc:ah:docs/design/session-store.md",
+			"expected": "doc:flusk:docs/design/session-store.md",
 			"facet": "old answer must win",
 			"why": "Nearly 17 months old and still the only card that explains the choice. Newer store commits (rotation, sqlite swap) must not displace it on recency."
 		},
 		{
 			"id": "old-bm25-adr",
 			"query": "why did we pick bm25 instead of embeddings",
-			"expected": "doc:ah:docs/adr/0007-bm25-not-embeddings.md",
+			"expected": "doc:flusk:docs/adr/0007-bm25-not-embeddings.md",
 			"facet": "old answer must win",
 			"why": "13-month-old ADR is the decision record; the recent history-retrieval design doc merely describes the ranker."
 		},
 		{
 			"id": "old-compaction-policy",
 			"query": "what does compaction keep when it summarises a run",
-			"expected": "commit:ah:12ab34cd",
+			"expected": "commit:flusk:12ab34cd",
 			"facet": "old answer must win",
 			"why": "Four months old and states the retention policy; the newer compaction session is about one bug in it."
 		},
 		{
 			"id": "precedent-gate-block",
 			"query": "make the verification gate block a run on a failing regression",
-			"expected": "session:ah-20260610-0902",
+			"expected": "session:flusk-20260610-0902",
 			"facet": "precedent",
 			"why": "A verified session on the exact task is the shape to copy."
 		},
 		{
 			"id": "prose-vs-code",
 			"query": "the agent stops itself before it runs out of tokens",
-			"expected": "commit:ah:34cd56ef",
+			"expected": "commit:flusk:34cd56ef",
 			"facet": "prose query",
 			"why": "Phrased entirely in prose with no shared identifier; the budget-guard commit is the only answer."
 		},
 		{
 			"id": "journal-stage-detail",
 			"query": "run where the gate reported two regressions and refused to push",
-			"expected": "journal:harness/ah/2026-06-12-release.md",
+			"expected": "journal:harness/flusk/2026-06-12-release.md",
 			"facet": "journal stage detail",
 			"why": "The stage line 'FAIL: 2 regression(s), verdict block' is only in that journal — tests that stage detail is indexed verbatim."
 		},
 		{
 			"id": "blocked-session-policy",
 			"query": "a run that was denied while unattended",
-			"expected": "session:ah-20260728-1600",
+			"expected": "session:flusk-20260728-1600",
 			"facet": "blocked outcome",
 			"why": "The only card containing the policy-denial phrasing."
 		},
@@ -944,19 +1093,19 @@
 			"query": "retry queue for webhook delivery",
 			"expected": "commit:prime-agent:5a5a5a5a",
 			"facet": "cross-project",
-			"why": "ah has more retry cards, but this query is unambiguously about the prime-agent webhook queue."
+			"why": "flusk has more retry cards, but this query is unambiguously about the prime-agent webhook queue."
 		},
 		{
 			"id": "secret-scrubbing",
 			"query": "where do we redact secrets before they reach the index",
-			"expected": "commit:ah:11223344",
+			"expected": "commit:flusk:11223344",
 			"facet": "exact term",
 			"why": "Only card about redaction at card construction."
 		},
 		{
 			"id": "router-decay",
 			"query": "model that just errored keeps winning the routing decision",
-			"expected": "commit:ah:d0d1d2d3",
+			"expected": "commit:flusk:d0d1d2d3",
 			"facet": "prose query",
 			"why": "Routing stage lines in journals mention model scores, so the prose has real competition; the fix commit is the answer."
 		}

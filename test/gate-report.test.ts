@@ -2,7 +2,7 @@
  * The gate writes the run's only facts of record. A store that will not accept
  * them must not change the verdict — a full disk is not evidence of a lie —
  * but it must not pass in silence either: the CLI would print a completion
- * whose claims nothing can ever be checked against, and under `ah watch` the
+ * whose claims nothing can ever be checked against, and under `flusk watch` the
  * item is marked done off a run that left no trace.
  */
 import { expect, it } from "vitest";
@@ -29,7 +29,7 @@ const run: RunRecord = {
 const refusing: FactStore = {
 	query: async () => [],
 	transact: async () => {
-		throw new Error("EACCES: permission denied, mkdir '/root/.ah/store'");
+		throw new Error("EACCES: permission denied, mkdir '/root/.flusk/store'");
 	},
 };
 

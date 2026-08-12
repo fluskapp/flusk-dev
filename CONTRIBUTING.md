@@ -1,6 +1,6 @@
-# Contributing to ah
+# Contributing to flusk
 
-Thanks for wanting to help. ah is small on purpose — most of the value is in
+Thanks for wanting to help. flusk is small on purpose — most of the value is in
 its contracts staying stable, so please read this page before opening a PR.
 
 ## Dev setup
@@ -8,7 +8,7 @@ its contracts staying stable, so please read this page before opening a PR.
 - Node >= 22 (ESM, `NodeNext` resolution — relative imports end in `.js`)
 - `npm i`
 - `npm test` — the whole suite is offline: FakeProvider scripts, temp dirs via
-  `fs.mkdtemp`, `AH_HOME` pointed at scratch space. No network, no API keys.
+  `fs.mkdtemp`, `FLUSK_HOME` pointed at scratch space. No network, no API keys.
 - `npm run check` — strict TypeScript, no emit
 - `npm run standards` — file-size cap and dependency-boundary lint
 - `npm run build` then `node dist/cli/main.js …` to try the CLI
@@ -35,7 +35,7 @@ them as a drive-by inside a feature PR:
   two files.
 - **Dependencies**: `node:` builtins, `typebox`, and `@earendil-works/pi-ai`
   only. pi-ai may be imported **only** from `src/provider/pi-ai*.ts`; the rest
-  of the codebase uses ah's own types. The pi-ai `/compat` entrypoint is
+  of the codebase uses flusk's own types. The pi-ai `/compat` entrypoint is
   banned everywhere.
 - Tabs for indentation; Biome for formatting.
 
@@ -71,9 +71,9 @@ They point in opposite directions — keep them straight:
 - Everything lives in `test/`; reuse the fake-run helpers in
   `test/helpers.ts`.
 - Temp dirs come from `fs.mkdtemp`; session paths are redirected with the
-  `AH_HOME` env var. `git init`/`add`/`commit` are fine **inside** those
+  `FLUSK_HOME` env var. `git init`/`add`/`commit` are fine **inside** those
   scratch repos (set `user.email`/`user.name` locally); never run mutating
-  git against the ah checkout itself.
+  git against the flusk checkout itself.
 - Do not weaken or delete existing tests to make a change pass.
 
 ## Running the dashboard
@@ -83,6 +83,6 @@ npm run build
 node dist/cli/main.js ui        # serves http://127.0.0.1:4877, opens browser on macOS
 ```
 
-`ah ui` reads sessions from `~/.ah/sessions/` (or `$AH_HOME/sessions/`).
+`flusk ui` reads sessions from `~/.flusk/sessions/` (or `$FLUSK_HOME/sessions/`).
 Run a task first — e.g. `node dist/cli/main.js run "demo"` — so there is
 something to look at.

@@ -13,16 +13,16 @@ import {
 import type { HistoryCard } from "../src/history/types.js";
 
 let home: string;
-const previousHome = process.env.AH_HOME;
+const previousHome = process.env.FLUSK_HOME;
 
 beforeEach(() => {
-	home = mkdtempSync(join(tmpdir(), "ah-history-index-"));
-	process.env.AH_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "flusk-history-index-"));
+	process.env.FLUSK_HOME = home;
 });
 
 afterEach(() => {
-	if (previousHome === undefined) delete process.env.AH_HOME;
-	else process.env.AH_HOME = previousHome;
+	if (previousHome === undefined) delete process.env.FLUSK_HOME;
+	else process.env.FLUSK_HOME = previousHome;
 	rmSync(home, { recursive: true, force: true });
 });
 

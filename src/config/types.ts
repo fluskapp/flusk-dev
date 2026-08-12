@@ -16,7 +16,7 @@ export interface ChatBackendConfig {
 
 /**
  * One language server the doc view may spawn. Only the user's own
- * ~/.ah/config.json may set these (see config.ts): a cloned repo must not
+ * ~/.flusk/config.json may set these (see config.ts): a cloned repo must not
  * choose what opening a file in the workbench executes.
  */
 export interface DocServerConfig {
@@ -35,7 +35,7 @@ export interface ModelChoice {
 	id: string;
 }
 
-export interface AhConfig {
+export interface FluskConfig {
 	models: Record<TaskKind, ModelChoice>;
 	budgets: {
 		maxTurns: number;
@@ -58,9 +58,9 @@ export interface AhConfig {
 	memory: {
 		/**
 		 * Whether a run keeps a record of itself in the local fact store
-		 * (`~/.ah/store`). False is a request to leave no trace: `ah run` and
-		 * `ah resume` proceed and write nothing, while the commands whose whole
-		 * subject matter is stored state (`ah goal`, `ah watch`) refuse rather
+		 * (`~/.flusk/store`). False is a request to leave no trace: `flusk run` and
+		 * `flusk resume` proceed and write nothing, while the commands whose whole
+		 * subject matter is stored state (`flusk goal`, `flusk watch`) refuse rather
 		 * than pretend.
 		 */
 		enabled: boolean;
@@ -117,12 +117,12 @@ export interface AhConfig {
 	};
 }
 
-/** Per-repo <repo>/.ah.json — sections deep-merge over the global config. */
+/** Per-repo <repo>/.flusk/config.json — sections deep-merge over the global config. */
 export interface RepoConfig {
 	models?: Partial<Record<TaskKind, ModelChoice>>;
-	budgets?: Partial<AhConfig["budgets"]>;
-	unattended?: Partial<AhConfig["unattended"]>;
-	isolation?: Partial<AhConfig["isolation"]>;
+	budgets?: Partial<FluskConfig["budgets"]>;
+	unattended?: Partial<FluskConfig["unattended"]>;
+	isolation?: Partial<FluskConfig["isolation"]>;
 	/** Verify commands; when set they win over auto-detection outright. */
 	verify?: string[];
 	/** Override the derived repo:<slug> memory namespace. */

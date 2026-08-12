@@ -51,7 +51,7 @@ test("repair: ignores dangling calls on a non-final assistant message", () => {
 });
 
 test("resume: repairs dangling calls, persists them, steers, and continues", async () => {
-	const repo = await setupTestHome("ah-resume-");
+	const repo = await setupTestHome("flusk-resume-");
 	try {
 		// A session that died mid-dispatch: dangling toolCall, no stats entry.
 		const dead = Session.create({ task: "fix bug", repoRoot: repo, model: fakeModel });

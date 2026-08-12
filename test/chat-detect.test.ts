@@ -4,12 +4,12 @@ import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { listBackends, which } from "../src/chat/detect.js";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { AhConfig, ChatBackendConfig } from "../src/config/types.js";
+import type { FluskConfig, ChatBackendConfig } from "../src/config/types.js";
 
 let bin: string;
 let realPath: string | undefined;
 
-const cfg = (backends: ChatBackendConfig[]): AhConfig => ({
+const cfg = (backends: ChatBackendConfig[]): FluskConfig => ({
 	...DEFAULT_CONFIG,
 	chat: { backends },
 });
@@ -17,7 +17,7 @@ const row = (backends: ChatBackendConfig[], id: string) =>
 	listBackends(cfg(backends)).find((b) => b.id === id);
 
 beforeAll(() => {
-	bin = mkdtempSync(join(tmpdir(), "ah-chat-bin-"));
+	bin = mkdtempSync(join(tmpdir(), "flusk-chat-bin-"));
 	writeFileSync(join(bin, "claude"), "#!/bin/sh\necho hi\n");
 	chmodSync(join(bin, "claude"), 0o755);
 	// Present but not executable: detection must still call this one missing.
@@ -31,7 +31,7 @@ afterAll(() => {
 	if (realPath === undefined) delete process.env.PATH;
 	else process.env.PATH = realPath;
 	rmSync(bin, { recursive: true, force: true });
-	delete process.env.AH_CHAT_TEST_KEY;
+	delete process.env.FLUSK_CHAT_TEST_KEY;
 });
 
 it("auto-detects the three agent CLIs by PATH lookup, noting the missing ones", () => {
@@ -86,8 +86,8 @@ it("openai-compatible availability needs a baseUrl and a non-empty key env", () 
 		model: "z/whatever",
 	});
 
-	process.env.AH_CHAT_TEST_KEY = "sk-test";
-	expect(row([{ ...noKey, apiKeyEnv: "AH_CHAT_TEST_KEY" }], "openrouter")).toMatchObject({
+	process.env.FLUSK_CHAT_TEST_KEY = "sk-test";
+	expect(row([{ ...noKey, apiKeyEnv: "FLUSK_CHAT_TEST_KEY" }], "openrouter")).toMatchObject({
 		available: true,
 	});
 	expect(row([{ id: "lm", kind: "openai-compatible" }], "lm")).toMatchObject({

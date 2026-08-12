@@ -6,7 +6,7 @@ import { createEventBus } from "../core/events.js";
 import { resolveNamespace } from "../store/namespaces.js";
 import { FakeProvider } from "../provider/fake.js";
 import { hasAuth, PiAiProvider } from "../provider/pi-ai.js";
-import { createAhPolicy } from "../safety/ah-policy.js";
+import { createFluskPolicy } from "../safety/flusk-policy.js";
 import { SessionStore } from "../session/store.js";
 import { createFactStore } from "../store/store.js";
 import { sessionsRoot } from "../ui/scan.js";
@@ -59,7 +59,7 @@ function currentBranch(repoRoot: string): string | null {
 }
 
 /**
- * `ah resume <path-or-id>` — continue an interrupted session in place: same
+ * `flusk resume <path-or-id>` — continue an interrupted session in place: same
  * file, same model, no new isolation branch (the run's branch, if any, is
  * whatever the tree is on; a mismatch only warns).
  */
@@ -95,7 +95,7 @@ export async function resumeCmd(opts: ResumeCmdOpts): Promise<CliOutcome> {
 		tools: DEFAULT_TOOLS,
 		task: header.task,
 		repoRoot: header.repoRoot,
-		policy: createAhPolicy({ config: cfg, repoRoot: header.repoRoot }),
+		policy: createFluskPolicy({ config: cfg, repoRoot: header.repoRoot }),
 		events,
 		config: cfg,
 		sessionPath: path,

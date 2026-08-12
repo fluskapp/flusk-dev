@@ -73,7 +73,7 @@ it("marks the streaming turn so the caret has something to hang on", () => {
 	expect(html).toContain('id="chat-stream"');
 	expect(html).toContain("streaming");
 	expect(CHAT_CSS).toContain(".streaming::after");
-	expect(CHAT_CSS).toContain("ah-caret");
+	expect(CHAT_CSS).toContain("flusk-caret");
 	// A finished turn must not keep the caret.
 	expect(chat.turnHtml({ role: "assistant", content: "part" })).not.toContain("streaming");
 });

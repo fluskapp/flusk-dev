@@ -43,7 +43,7 @@ export function attachRenderer(events: EventBus, out: NodeJS.WritableStream): vo
 	let modelShown = false;
 	let liveCostUsd = 0;
 	events.on("run:start", (e) => {
-		line(paint("bold", `ah · ${e.task}`));
+		line(paint("bold", `flusk · ${e.task}`));
 		if (modelShown) return; // the chosen model is announced exactly once
 		modelShown = true;
 		line(paint("dim", `model ${e.model.provider}/${e.model.id} · run ${e.runId}`));

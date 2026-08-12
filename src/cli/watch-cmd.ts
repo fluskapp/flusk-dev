@@ -1,16 +1,16 @@
 /**
- * `ah watch` — unattended mode. Wires the real dependencies (gh queues, git
+ * `flusk watch` — unattended mode. Wires the real dependencies (gh queues, git
  * worktrees, runCmd, the attempt ledger) into the injectable watch loop.
  *
  * The ledger is REQUIRED here: attempts and cooldowns are facts, and without
  * them an overnight loop would retry the same item forever. `memory.enabled:
- * false` asks ah to leave no trace, which for an unattended loop is not a
+ * false` asks flusk to leave no trace, which for an unattended loop is not a
  * degraded mode but an unbounded one — so this command refuses to start
  * instead of running without a record.
  */
 import { loadConfig, loadRepoConfig } from "../config/config.js";
 import { repoSlug } from "../session/paths.js";
-import { AH_NS, resolveNamespace } from "../store/namespaces.js";
+import { FLUSK_NS, resolveNamespace } from "../store/namespaces.js";
 import { createFactStore } from "../store/store.js";
 import { sweepTransient } from "../store/sweep.js";
 import {
@@ -43,8 +43,8 @@ export async function watchCmd(opts: WatchCmdOpts): Promise<number> {
 	const cfg = loadConfig(opts.repo);
 	const repoConfig = loadRepoConfig(opts.repo);
 	if (!cfg.memory.enabled) {
-		out.write("ah watch needs the fact store: it is the only bound on retries.\n");
-		out.write("Set memory.enabled to true, or run `ah run` for a single unrecorded run.\n");
+		out.write("flusk watch needs the fact store: it is the only bound on retries.\n");
+		out.write("Set memory.enabled to true, or run `flusk run` for a single unrecorded run.\n");
 		return 1;
 	}
 	const store = createFactStore();
@@ -56,7 +56,7 @@ export async function watchCmd(opts: WatchCmdOpts): Promise<number> {
 	// Cooldowns are the ledger's ephemera: expired ones answer no question and
 	// the log they sit in is read whole on every tick. Once per session, at the
 	// one moment no tick is in flight.
-	await sweepTransient(AH_NS).catch(() => undefined);
+	await sweepTransient(FLUSK_NS).catch(() => undefined);
 
 	log(
 		`queues ${cfg.watch.queues.join(", ")} · max ${cfg.watch.maxRunsPerNight}/night · ` +

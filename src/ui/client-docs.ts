@@ -1,5 +1,5 @@
 /**
- * Docs: the markdown ah indexes across your projects as a dense list, and one
+ * Docs: the markdown flusk indexes across your projects as a dense list, and one
  * document rendered in its own tab (the server does the rendering).
  */
 export const CLIENT_DOCS_JS = `
@@ -55,7 +55,7 @@ async function loadDocs() {
 	if (!lastDocs.length) {
 		$("#docs").innerHTML =
 			'<div class="empty small">No markdown indexed.<br/>Set <code>ui.projectDirs</code> in ' +
-			"<code>~/.ah/config.json</code>.</div>";
+			"<code>~/.flusk/config.json</code>.</div>";
 		return;
 	}
 	renderDocs();

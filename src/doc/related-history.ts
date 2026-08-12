@@ -14,7 +14,7 @@
  * Split from related.ts, which owns the ripgrep half and the assembly.
  */
 import { basename, relative } from "node:path";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { searchRoots } from "../find/files.js";
 import { buildIndex } from "../history/bm25.js";
 import { historyCards } from "../history/corpus.js";
@@ -53,7 +53,7 @@ function whyOf(card: HistoryCard, symbol: string, touched: boolean, named: boole
 }
 
 /** Repo-relative: the query is about the file, not about /Users/you. */
-function repoPath(file: string, cfg: AhConfig): string {
+function repoPath(file: string, cfg: FluskConfig): string {
 	const root = searchRoots(cfg).find((r) => file.startsWith(`${r.path}/`));
 	return root === undefined ? basename(file) : relative(root.path, file);
 }
@@ -68,7 +68,7 @@ function repoPath(file: string, cfg: AhConfig): string {
 export function fromHistory(
 	symbol: string,
 	file: string,
-	cfg: AhConfig,
+	cfg: FluskConfig,
 	deps: RelatedDeps,
 	into: Groups,
 ): void {

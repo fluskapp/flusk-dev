@@ -3,20 +3,20 @@
  * out — the models it routes to, the tools it can call, the prompt it runs
  * on, the commands it gates on, and its declarative config.
  *
- * ah answers about itself from its own code and config; a harness answers
+ * flusk answers about itself from its own code and config; a harness answers
  * from config.json, data/benchmarks.json and whatever prompt file it keeps.
  */
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { loadRepoConfig } from "../config/config.js";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { detectVerifyCommands } from "../verify/detect.js";
 import type { ProjectDetail } from "./api-types.js";
 import { medianSpend } from "./project-attention.js";
 import {
-	ahModels,
-	ahPrompt,
-	ahTools,
+	fluskModels,
+	fluskPrompt,
+	fluskTools,
 	benchmarkTable,
 	harnessCandidates,
 	harnessModels,
@@ -64,11 +64,11 @@ function capConfig(obj: Record<string, unknown>): Record<string, unknown> {
 	return out;
 }
 
-/** ah's own checkout — the one project whose internals we can speak for. */
+/** flusk's own checkout — the one project whose internals we can speak for. */
 const isAh = (p: ProjectParts): boolean =>
 	existsSync(join(p.path, "src", "agent", "system-prompt.ts"));
 
-/** .ah.json verify[] wins; then a harness's declared verify; then detection. */
+/** .flusk/config.json verify[] wins; then a harness's declared verify; then detection. */
 function verifyFor(root: string, harnessCfg: Record<string, unknown>): string[] {
 	const repoCfg = loadRepoConfig(root);
 	if (repoCfg?.verify !== undefined) return detectVerifyCommands(root, repoCfg);
@@ -80,7 +80,7 @@ function verifyFor(root: string, harnessCfg: Record<string, unknown>): string[] 
 }
 
 export function projectDetail(
-	cfg: AhConfig,
+	cfg: FluskConfig,
 	name: string,
 	now: Date = new Date(),
 ): ProjectDetail | null {
@@ -90,14 +90,14 @@ export function projectDetail(
 	const summary = summarize(p, now.getTime(), medianSpend(parts.map(projectSpend)));
 	const harnessCfg = readJson(join(p.path, "config.json"));
 	const own = isAh(p);
-	const prompt: PromptRef | undefined = own ? ahPrompt(p.path) : harnessPrompt(p.path);
+	const prompt: PromptRef | undefined = own ? fluskPrompt(p.path) : harnessPrompt(p.path);
 	const benchmarks = benchmarkTable(readJson(join(p.path, "data", "benchmarks.json")));
 	return {
 		...summary,
-		models: own ? ahModels(cfg) : harnessModels(harnessCandidates(harnessCfg), benchmarks),
-		tools: own ? ahTools() : harnessTools(harnessCfg, p.journals),
+		models: own ? fluskModels(cfg) : harnessModels(harnessCandidates(harnessCfg), benchmarks),
+		tools: own ? fluskTools() : harnessTools(harnessCfg, p.journals),
 		...(prompt !== undefined ? { systemPrompt: prompt } : {}),
 		verify: verifyFor(p.path, harnessCfg),
-		config: capConfig({ ...readJson(join(p.path, ".ah.json")), ...harnessCfg }),
+		config: capConfig({ ...readJson(join(p.path, ".flusk/config.json")), ...harnessCfg }),
 	};
 }

@@ -5,7 +5,7 @@
  *
  * Lifecycle is lazy and one-shot: nothing spawns until the first lookup, and
  * the handshake is remembered as a PROMISE including its failure, so a server
- * that is absent or dead costs one spawn per ah process, not one per keystroke.
+ * that is absent or dead costs one spawn per flusk process, not one per keystroke.
  * Documents are opened, not sent, and KEPT IN STEP with the disk — lsp-docs.ts
  * owns that, because a server answering from a stale buffer is the one failure
  * mode that looks like a correct answer.

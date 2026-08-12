@@ -1,7 +1,7 @@
 /**
  * Where a namespace's log lives on disk.
  *
- * Namespaces are caller-supplied strings ("ah", "repo:ah-1a2b3c4d") and
+ * Namespaces are caller-supplied strings ("flusk", "repo:flusk-1a2b3c4d") and
  * are never safe to use as a filename directly: a slash would write outside
  * the store, and two namespaces that differ only in punctuation would share a
  * log and silently merge two tenants' facts. The name is therefore a readable
@@ -10,11 +10,11 @@
  */
 import { createHash } from "node:crypto";
 import { join } from "node:path";
-import { ahHome } from "../session/paths.js";
+import { fluskHome } from "../session/paths.js";
 
 /** Root of the fact store: one append-only JSONL log per namespace. */
 export function storeDir(): string {
-	return join(ahHome(), "store");
+	return join(fluskHome(), "store");
 }
 
 /** Collision-safe log filename for `ns`. */

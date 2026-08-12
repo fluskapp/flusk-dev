@@ -1,13 +1,13 @@
 /**
  * A throwaway project tree for the project-model tests: a temp "projects"
- * directory the config globs point at, plus an AH_HOME for sessions. Nothing
+ * directory the config globs point at, plus an FLUSK_HOME for sessions. Nothing
  * here reads the developer's real home.
  */
 import { mkdirSync, mkdtempSync, rmSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { AhConfig } from "../src/config/types.js";
+import type { FluskConfig } from "../src/config/types.js";
 import type { RunEndReason } from "../src/core/types.js";
 import { Session } from "../src/session/session.js";
 
@@ -79,15 +79,15 @@ export function session(s: FakeSession): string {
 export interface Tree {
 	home: string;
 	work: string;
-	cfg: AhConfig;
+	cfg: FluskConfig;
 	cleanup: () => void;
 }
 
 export function tree(): Tree {
-	const home = mkdtempSync(join(tmpdir(), "ah-proj-home-"));
-	const work = mkdtempSync(join(tmpdir(), "ah-proj-work-"));
-	process.env.AH_HOME = home;
-	const cfg: AhConfig = {
+	const home = mkdtempSync(join(tmpdir(), "flusk-proj-home-"));
+	const work = mkdtempSync(join(tmpdir(), "flusk-proj-work-"));
+	process.env.FLUSK_HOME = home;
+	const cfg: FluskConfig = {
 		...structuredClone(DEFAULT_CONFIG),
 		ui: { harnessDirs: [join(work, "*", "docs", "runs")], projectDirs: [join(work, "*")] },
 	};
@@ -96,7 +96,7 @@ export function tree(): Tree {
 		work,
 		cfg,
 		cleanup: () => {
-			delete process.env.AH_HOME;
+			delete process.env.FLUSK_HOME;
 			rmSync(home, { recursive: true, force: true });
 			rmSync(work, { recursive: true, force: true });
 		},

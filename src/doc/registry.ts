@@ -8,7 +8,7 @@
  *
  * Order: TypeScript and JavaScript go to the bundled compiler-API engine,
  * which needs nothing installed. Everything else needs an entry under
- * `doc.servers` AND that binary on PATH — ah spawns nothing the user did not
+ * `doc.servers` AND that binary on PATH — flusk spawns nothing the user did not
  * name. If TypeScript itself is missing, a configured server for .ts is used
  * rather than refusing, since by then the user has clearly opted in.
  *
@@ -17,7 +17,7 @@
  */
 import { accessSync, constants } from "node:fs";
 import { delimiter, extname, isAbsolute, join } from "node:path";
-import type { AhConfig, DocServerConfig } from "../config/types.js";
+import type { FluskConfig, DocServerConfig } from "../config/types.js";
 import { withDocCache } from "./cache.js";
 import { createLspProvider, type LspDocProvider } from "./lsp-provider.js";
 import { createTsProvider } from "./ts-provider.js";
@@ -61,7 +61,7 @@ function serverFor(servers: DocServerConfig[], ext: string): DocServerConfig | u
 	return servers.find((s) => s.extensions.some((e) => e.toLowerCase() === ext));
 }
 
-export function createDocRegistry(cfg: AhConfig, root: string): DocRegistry {
+export function createDocRegistry(cfg: FluskConfig, root: string): DocRegistry {
 	const doc = cfg.doc;
 	const lsp = new Map<string, LspDocProvider>();
 	let ts: Promise<DocChoice> | null = null;

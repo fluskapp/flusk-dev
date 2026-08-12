@@ -1,5 +1,5 @@
 /**
- * `ah index [--repo <path>]` — look at a repository and say what would help.
+ * `flusk index [--repo <path>]` — look at a repository and say what would help.
  *
  * Prints three things and never changes anything: what the repo is made of,
  * what it documents, and a worklist of suggestions each carrying the file that

@@ -22,7 +22,7 @@ import {
 
 let repo: string;
 beforeEach(async () => {
-	repo = await mkdtemp(join(tmpdir(), "ah-ctx-budget-"));
+	repo = await mkdtemp(join(tmpdir(), "flusk-ctx-budget-"));
 });
 
 test("the budget is never exceeded, at any size", () => {

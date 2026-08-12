@@ -13,7 +13,7 @@ export interface ContextSourceCount {
 	kept: number;
 }
 
-export type AhEvent =
+export type FluskEvent =
 	| { type: "run:start"; runId: string; task: string; model: ModelRef }
 	| { type: "turn:start"; turn: number }
 	| { type: "assistant:delta"; text: string; channel: "text" | "thinking" }
@@ -41,8 +41,8 @@ export type AhEvent =
 	  }
 	| { type: "run:end"; reason: RunEndReason; stats: RunStats };
 
-type Listener<T extends AhEvent["type"]> = (
-	e: Extract<AhEvent, { type: T }>,
+type Listener<T extends FluskEvent["type"]> = (
+	e: Extract<FluskEvent, { type: T }>,
 ) => void | Promise<void>;
 
 /**
@@ -50,12 +50,12 @@ type Listener<T extends AhEvent["type"]> = (
  * memory layer, autonomy layer) observe each event before the loop proceeds.
  */
 export interface EventBus {
-	on<T extends AhEvent["type"]>(type: T, fn: Listener<T>): () => void;
-	emit(e: AhEvent): Promise<void>;
+	on<T extends FluskEvent["type"]>(type: T, fn: Listener<T>): () => void;
+	emit(e: FluskEvent): Promise<void>;
 }
 
 export function createEventBus(): EventBus {
-	const listeners = new Map<string, Set<(e: AhEvent) => void | Promise<void>>>();
+	const listeners = new Map<string, Set<(e: FluskEvent) => void | Promise<void>>>();
 	return {
 		on(type, fn) {
 			let set = listeners.get(type);
@@ -63,7 +63,7 @@ export function createEventBus(): EventBus {
 				set = new Set();
 				listeners.set(type, set);
 			}
-			const untyped = fn as (e: AhEvent) => void | Promise<void>;
+			const untyped = fn as (e: FluskEvent) => void | Promise<void>;
 			set.add(untyped);
 			return () => {
 				set.delete(untyped);

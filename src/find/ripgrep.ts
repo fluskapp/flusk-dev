@@ -12,7 +12,7 @@
  *    sets `truncated` AND a readable `note`; a short list presented as the
  *    whole answer is a lie about what was searched.
  */
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { projectFor, searchRoots } from "./files.js";
 import { parseMatch, rgArgs, toMatch } from "./rg-parse.js";
 import { runRg } from "./rg-spawn.js";
@@ -46,7 +46,7 @@ function noRoots(query: FindQuery): string {
 }
 
 export async function find(
-	cfg: AhConfig,
+	cfg: FluskConfig,
 	query: FindQuery,
 	signal?: AbortSignal,
 ): Promise<FindResult> {

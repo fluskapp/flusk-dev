@@ -1,8 +1,8 @@
 /**
- * `ah workspace` — the user-owned prompt layer: scaffold it, inspect it, find
+ * `flusk workspace` — the user-owned prompt layer: scaffold it, inspect it, find
  * it. It parses its own argv rather than going through main.ts's parseArgs,
  * because `--project` is a boolean here and a string (`--project <name>`) for
- * `ah search` / `ah find`, and one option table cannot be both.
+ * `flusk search` / `flusk find`, and one option table cannot be both.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
@@ -15,9 +15,9 @@ import {
 import { SCAFFOLD } from "./workspace-scaffold.js";
 
 const WORKSPACE_USAGE = `Usage:
-  ah workspace init [--project]   scaffold IDENTITY.md, SOUL.md, TOOLS.md
-  ah workspace show [--project]   what is loaded, from where, and what is absent
-  ah workspace path               print the global workspace directory
+  flusk workspace init [--project]   scaffold IDENTITY.md, SOUL.md, TOOLS.md
+  flusk workspace show [--project]   what is loaded, from where, and what is absent
+  flusk workspace path               print the global workspace directory
 `;
 
 /** Writes only what is absent: an edited file is never overwritten. */
@@ -34,7 +34,7 @@ function initWorkspace(dir: string, out: NodeJS.WritableStream): number {
 			out.write(`kept  ${path} (already exists)\n`);
 		}
 	}
-	out.write(`\nEdit these, then \`ah run …\` — they are injected into every prompt.\n`);
+	out.write(`\nEdit these, then \`flusk run …\` — they are injected into every prompt.\n`);
 	return 0;
 }
 

@@ -1,6 +1,6 @@
 /**
  * What a project runs *with*: the models it routes to, the tools it can
- * call, and the prompt it hands its model. ah answers from its own config
+ * call, and the prompt it hands its model. flusk answers from its own config
  * and code; a harness answers from its config.json, its learned benchmarks
  * (data/benchmarks.json: {kind: {tool: score}}) and whichever prompt file
  * it keeps — the shapes are read off the real linof-harness, not guessed.
@@ -9,7 +9,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { buildSystemPrompt } from "../agent/system-prompt.js";
 import { DEFAULT_TOOLS } from "../cli/run-support.js";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import type { ModelRef as CoreModelRef } from "../core/types.js";
 import type { ModelRef } from "./api-types.js";
 import type { Journal } from "./journal-scan.js";
@@ -24,12 +24,12 @@ export interface PromptRef {
 	text: string;
 }
 
-export const ahModels = (cfg: AhConfig): ModelRef[] =>
+export const fluskModels = (cfg: FluskConfig): ModelRef[] =>
 	Object.entries(cfg.models).map(([role, m]) => ({ id: `${m.provider}/${m.id}`, role }));
 
-export const ahTools = (): string[] => [...DEFAULT_TOOLS.map((t) => t.name), "task"];
+export const fluskTools = (): string[] => [...DEFAULT_TOOLS.map((t) => t.name), "task"];
 
-export const ahPrompt = (repoRoot: string): PromptRef => ({
+export const fluskPrompt = (repoRoot: string): PromptRef => ({
 	source: "src/agent/system-prompt.ts",
 	text: buildSystemPrompt({ repoRoot, cwd: repoRoot, model: PLACEHOLDER }),
 });

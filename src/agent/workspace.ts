@@ -1,8 +1,8 @@
 /**
- * loadWorkspace: the three markdown layers ah injects into every prompt.
+ * loadWorkspace: the three markdown layers flusk injects into every prompt.
  *
- * Precedence, ascending: the global workspace (`~/.ah/workspace`), then the
- * project one (`<repo>/.ah/workspace`) which REPLACES a global file of the
+ * Precedence, ascending: the global workspace (`~/.flusk/workspace`), then the
+ * project one (`<repo>/.flusk/workspace`) which REPLACES a global file of the
  * same kind, then the repository's own house rules (AGENTS.md / CLAUDE.md) —
  * the file the humans on the project already maintain, which is the whole
  * point: the agent that edits their code should have read their rules.
@@ -89,7 +89,7 @@ export function loadWorkspace(repoRoot: string): WorkspaceLayers {
 	};
 }
 
-/** Every path the workspace would read, in precedence order. For `ah workspace show`. */
+/** Every path the workspace would read, in precedence order. For `flusk workspace show`. */
 export function workspacePaths(repoRoot: string, projectOnly = false): string[] {
 	const dirs = projectOnly
 		? [projectWorkspaceDir(repoRoot)]

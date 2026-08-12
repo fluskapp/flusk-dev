@@ -105,10 +105,10 @@ function startPolls() {
 }
 
 (function init() {
-	var savedTheme = localStorage.getItem("ah-theme");
+	var savedTheme = localStorage.getItem("flusk-theme");
 	if (savedTheme) document.documentElement.setAttribute("data-theme", savedTheme);
-	setChatVisible(localStorage.getItem("ah-chat-open") !== "0");
-	setSideVisible(localStorage.getItem("ah-side-open") !== "0");
+	setChatVisible(localStorage.getItem("flusk-chat-open") !== "0");
+	setSideVisible(localStorage.getItem("flusk-side-open") !== "0");
 	// Find starts CLOSED: it is a tool window you summon (⌘⇧F), not a rail
 	// that eats a third of the editor before you have searched for anything.
 	findVisible(localStorage.getItem(FIND_OPEN_KEY) === "1");

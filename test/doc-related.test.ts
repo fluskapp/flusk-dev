@@ -11,7 +11,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { AhConfig } from "../src/config/types.js";
+import type { FluskConfig } from "../src/config/types.js";
 import { type RelatedItem, relatedFor } from "../src/doc/related.js";
 import type { FindMatch, FindResult } from "../src/find/types.js";
 import { buildIndex } from "../src/history/bm25.js";
@@ -25,7 +25,7 @@ let work: string;
 let file: string;
 let skill: string;
 let doc: string;
-let cfg: AhConfig;
+let cfg: FluskConfig;
 
 function put(path: string, body: string): string {
 	mkdirSync(dirname(path), { recursive: true });
@@ -37,21 +37,21 @@ function put(path: string, body: string): string {
 type Seed = [string, CardKind, string, Outcome, number, string[]];
 const REL = "src/doc/related.ts";
 const SEEDS: Seed[] = [
-	["commit:ah:aaa1", "commit", `fix ${SYMBOL} cap`, "shipped", 30, []],
-	["commit:ah:bbb2", "commit", "tidy the panel wiring", "shipped", 2, [REL]],
-	["journal:ah:run7", "journal", "nightly run 7", "failed", 9, [REL]],
-	["session:ah:s1", "session", `session touching ${SYMBOL}`, "shipped", 1, []],
+	["commit:flusk:aaa1", "commit", `fix ${SYMBOL} cap`, "shipped", 30, []],
+	["commit:flusk:bbb2", "commit", "tidy the panel wiring", "shipped", 2, [REL]],
+	["journal:flusk:run7", "journal", "nightly run 7", "failed", 9, [REL]],
+	["session:flusk:s1", "session", `session touching ${SYMBOL}`, "shipped", 1, []],
 ];
 
 /** The seeds, plus the same skill file the grep stub also returns. */
 const cards = (): HistoryCard[] => [
 	...SEEDS.map(([id, kind, title, outcome, days, paths]): HistoryCard => {
-		return { id, kind, project: "ah", title, text: "", at: ago(days), paths, outcome, ref: id };
+		return { id, kind, project: "flusk", title, text: "", at: ago(days), paths, outcome, ref: id };
 	}),
 	{
-		id: "skill:ah:retry",
+		id: "skill:flusk:retry",
 		kind: "skill",
-		project: "ah",
+		project: "flusk",
 		title: "Retry",
 		text: SYMBOL,
 		at: ago(5),
@@ -81,7 +81,7 @@ const hits = (): FindResult => ({
 	truncated: false,
 	tookMs: 1,
 });
-const grep = async (_cfg: AhConfig, symbol: string): Promise<FindResult> =>
+const grep = async (_cfg: FluskConfig, symbol: string): Promise<FindResult> =>
 	symbol === SYMBOL ? hits() : empty;
 
 const ask = (over: { cap?: number } = {}, symbol = SYMBOL) =>
@@ -91,7 +91,7 @@ const why = (items: RelatedItem[], ref: string): string | undefined =>
 	items.find((i) => i.ref === ref)?.why;
 
 beforeAll(() => {
-	work = mkdtempSync(join(tmpdir(), "ah-doc-related-"));
+	work = mkdtempSync(join(tmpdir(), "flusk-doc-related-"));
 	const root = join(work, "proj");
 	file = put(join(root, "src/doc/related.ts"), `export function ${SYMBOL}() {}\n`);
 	skill = put(join(root, ".claude/skills/retry/SKILL.md"), `# ${SYMBOL}\n\nnever loop it.\n`);
@@ -106,10 +106,10 @@ afterAll(() => rmSync(work, { recursive: true, force: true }));
 
 it("groups commits, runs and docs, and says why each row is there", async () => {
 	const r = await ask();
-	expect(r.commits.map((c) => c.ref)).toEqual(["commit:ah:bbb2", "commit:ah:aaa1"]);
-	expect(why(r.commits, "commit:ah:bbb2")).toBe("changed this file");
-	expect(why(r.commits, "commit:ah:aaa1")).toBe(`commit names ${SYMBOL}`);
-	expect(why(r.runs, "session:ah:s1")).toBe(`session names ${SYMBOL}`);
+	expect(r.commits.map((c) => c.ref)).toEqual(["commit:flusk:bbb2", "commit:flusk:aaa1"]);
+	expect(why(r.commits, "commit:flusk:bbb2")).toBe("changed this file");
+	expect(why(r.commits, "commit:flusk:aaa1")).toBe(`commit names ${SYMBOL}`);
+	expect(why(r.runs, "session:flusk:s1")).toBe(`session names ${SYMBOL}`);
 	expect(r.docs.map((d) => d.ref)).toContain(doc);
 	expect(why(r.docs, doc)).toBe(`doc mentions ${SYMBOL}`);
 	expect(r.mentions).toBe(7); // every literal hit counts, including the .py one
@@ -118,7 +118,7 @@ it("groups commits, runs and docs, and says why each row is there", async () => 
 
 it("puts the failed run above the routine session and names the failure", async () => {
 	const r = await ask();
-	expect(r.runs.map((x) => x.ref)).toEqual(["journal:ah:run7", "session:ah:s1"]);
+	expect(r.runs.map((x) => x.ref)).toEqual(["journal:flusk:run7", "session:flusk:s1"]);
 	expect(r.runs[0]?.why).toBe("run failed while editing this file");
 });
 

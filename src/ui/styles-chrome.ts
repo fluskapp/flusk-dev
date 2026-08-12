@@ -65,7 +65,7 @@ body.find-off #find { display: none; }
 }
 
 /* Every tool window's splitter, sitting on the border it drags. IntelliJ
-   makes all three draggable; ah used to make only the chat rail. The left
+   makes all three draggable; flusk used to make only the chat rail. The left
    one hangs off #app rather than #side, which scrolls — a grip inside a
    scrolling rail scrolls away from the border it is supposed to be on. */
 .tw-grip { position: absolute; z-index: 3; touch-action: none; }

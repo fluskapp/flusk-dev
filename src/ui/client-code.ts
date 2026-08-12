@@ -125,7 +125,7 @@ async function codeLookup(file, line, col) {
 /** The documentation window owns rendering; this only hands the answer over. */
 function showDoc(payload) {
     if (typeof showSymbolDoc === "function") { showSymbolDoc(payload); return; }
-    document.dispatchEvent(new CustomEvent("ah-doc", { detail: payload }));
+    document.dispatchEvent(new CustomEvent("flusk-doc", { detail: payload }));
 }
 
 /** Open at a line: Find in Files and go-to-definition both land here. */

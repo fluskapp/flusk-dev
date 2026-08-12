@@ -21,7 +21,7 @@ function ctx(): ToolContext {
 }
 
 beforeAll(async () => {
-	dir = await mkdtemp(join(tmpdir(), "ah-search-"));
+	dir = await mkdtemp(join(tmpdir(), "flusk-search-"));
 	await mkdir(join(dir, "sub"), { recursive: true });
 	await mkdir(join(dir, "node_modules/pkg"), { recursive: true });
 	await mkdir(join(dir, ".git"), { recursive: true });

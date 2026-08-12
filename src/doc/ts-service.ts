@@ -1,7 +1,7 @@
 /**
  * TypeScript LanguageServices, held on a leash.
  *
- * A language service is the most expensive thing in ah: seconds to warm and
+ * A language service is the most expensive thing in flusk: seconds to warm and
  * hundreds of megabytes, all inside the event loop. Every cost here is
  * bounded and *reportable* rather than merely hoped for:
  *

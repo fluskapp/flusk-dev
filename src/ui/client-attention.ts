@@ -72,7 +72,7 @@ async function loadAttention() {
 	var recent = runs.filter(function (r) { return r.status !== "running"; }).slice(0, 20);
 	var recentBody = recent.length
 		? tbl(runHead(true), recent.map(function (r) { return runRow(r, true); }).join(""))
-		: line("No runs recorded yet. Try: ah run \\"task\\"");
+		: line("No runs recorded yet. Try: flusk run \\"task\\"");
 	$("#overview").innerHTML = attentionStats(runs) +
 		sec("Needs attention", attnBody, items.length || null) +
 		sec("Live runs", liveBody, liveRuns.length || null) +

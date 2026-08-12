@@ -21,15 +21,15 @@ const has = (markers: string[]): void => {
 };
 
 beforeAll(async () => {
-	home = mkdtempSync(join(tmpdir(), "ah-page-home-"));
-	process.env.AH_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "flusk-page-home-"));
+	process.env.FLUSK_HOME = home;
 	ui = await startUiServer(0);
 	served = await (await fetch(`${ui.url}/`)).text();
 });
 
 afterAll(async () => {
 	await ui.close();
-	delete process.env.AH_HOME;
+	delete process.env.FLUSK_HOME;
 	rmSync(home, { recursive: true, force: true });
 });
 
@@ -75,7 +75,7 @@ it("ships the Find in Files panel: query, scope, mask, toggles, result tree", ()
 
 it("opens markdown rendered, with the Preview / Split / Raw control", () => {
 	has(['var MD_MODES = ["preview", "split", "raw"]', "'<button data-md=\"'", 'class="seg"']);
-	has(["Preview", "Split", "Raw", 'var MD_KEY = "ah-md-mode"', "function setMdMode("]);
+	has(["Preview", "Split", "Raw", 'var MD_KEY = "flusk-md-mode"', "function setMdMode("]);
 	// Rendering is the server's, and preview is the default a tab falls back to.
 	has([
 		'"/api/render"',
@@ -123,11 +123,11 @@ it("escapes the one value it interpolates", () => {
 });
 
 it("leaves no unexpanded template placeholder in the shipped page", () => {
-	expect(renderPage("/tmp/ah")).not.toContain("${");
+	expect(renderPage("/tmp/flusk")).not.toContain("${");
 });
 
 it("ships a client script that parses", () => {
-	const page = renderPage("/tmp/ah");
+	const page = renderPage("/tmp/flusk");
 	const js = page.slice(page.indexOf("<script>") + 8, page.indexOf("</script>"));
 	expect(js.length).toBeGreaterThan(1000);
 	// Function() compiles the body without running it: a typo in any of the
@@ -141,7 +141,7 @@ it("ships a client script that parses", () => {
  * IntelliJ always puts the caret in the query field.
  */
 it("focuses the find query when the panel opens, not when it closes", () => {
-	const page = renderPage("/tmp/ah-home");
+	const page = renderPage("/tmp/flusk-home");
 	const toggle = page.slice(page.indexOf("function toggleFind"));
 	const body = toggle.slice(0, toggle.indexOf("\nfunction "));
 	expect(body).toContain("focus()");

@@ -41,7 +41,7 @@ function isTyping(el) {
 function modKey(e) {
 	var key = e.key.toLowerCase();
 	// ⌘⇧F is IntelliJ's Find in Files and always opens the panel. Plain ⌘F is
-	// IntelliJ's find in the DOCUMENT, and ah has no in-document find — so on
+	// IntelliJ's find in the DOCUMENT, and flusk has no in-document find — so on
 	// a document tab, or while a field has focus, it is left to the browser,
 	// which does. Swallowing it everywhere meant a long journal could not be
 	// searched at all.

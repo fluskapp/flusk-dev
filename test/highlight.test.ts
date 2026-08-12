@@ -36,9 +36,9 @@ it("highlights TypeScript keywords, strings, numbers, comments and calls", () =>
 });
 
 it("highlights json keys apart from string values", () => {
-	const html = highlightCode('{"name": "ah", "n": 2, "ok": true}', "json");
+	const html = highlightCode('{"name": "flusk", "n": 2, "ok": true}', "json");
 	expect(classOf(html, '"name"')).toBe("hl-fn");
-	expect(classOf(html, '"ah"')).toBe("hl-str");
+	expect(classOf(html, '"flusk"')).toBe("hl-str");
 	expect(classOf(html, "2")).toBe("hl-num");
 	expect(classOf(html, "true")).toBe("hl-kw");
 });
@@ -58,11 +58,11 @@ it("highlights bash, rust, python and yaml", () => {
 	expect(classOf(py, "go")).toBe("hl-fn");
 	expect(classOf(py, "# tail")).toBe("hl-com");
 
-	const yml = highlightCode('# top\nstatus: failed\ncount: 3\nname: "ah"', "yaml");
+	const yml = highlightCode('# top\nstatus: failed\ncount: 3\nname: "flusk"', "yaml");
 	expect(classOf(yml, "# top")).toBe("hl-com");
 	expect(classOf(yml, "status")).toBe("hl-kw");
 	expect(classOf(yml, "3")).toBe("hl-num");
-	expect(classOf(yml, '"ah"')).toBe("hl-str");
+	expect(classOf(yml, '"flusk"')).toBe("hl-str");
 });
 
 it("highlights markdown structure inside a fence", () => {

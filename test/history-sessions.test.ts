@@ -28,10 +28,10 @@ let keys: Record<string, string>;
 const card = (name: string) => sessionCards().find((c) => c.ref === keys[name]);
 
 beforeAll(() => {
-	prevHome = process.env.AH_HOME;
-	home = mkdtempSync(join(tmpdir(), "ah-home-"));
+	prevHome = process.env.FLUSK_HOME;
+	home = mkdtempSync(join(tmpdir(), "flusk-home-"));
 	repoRoot = mkdtempSync(join(tmpdir(), "linof-base-"));
-	process.env.AH_HOME = home;
+	process.env.FLUSK_HOME = home;
 	keys = {
 		verified: session(
 			repoRoot,
@@ -66,8 +66,8 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-	if (prevHome === undefined) delete process.env.AH_HOME;
-	else process.env.AH_HOME = prevHome;
+	if (prevHome === undefined) delete process.env.FLUSK_HOME;
+	else process.env.FLUSK_HOME = prevHome;
 	rmSync(home, { recursive: true, force: true });
 	rmSync(repoRoot, { recursive: true, force: true });
 });

@@ -2,9 +2,14 @@ import { createHash } from "node:crypto";
 import { homedir } from "node:os";
 import { basename, join, resolve } from "node:path";
 
-/** Root of ah's on-disk state; overridable for tests via AH_HOME. */
-export function ahHome(): string {
-	return process.env.AH_HOME ?? join(homedir(), ".ah");
+/** Root of flusk's on-disk state; overridable for tests via FLUSK_HOME. */
+export function fluskHome(): string {
+	return process.env.FLUSK_HOME ?? join(homedir(), ".flusk");
+}
+
+/** The pre-rename root, read only by the one-shot migration in platform/paths. */
+export function legacyHome(): string {
+	return join(homedir(), ".ah");
 }
 
 /**
@@ -23,7 +28,7 @@ export function repoSlug(repoRoot: string): string {
 }
 
 export function sessionsDir(repoRoot: string): string {
-	return join(ahHome(), "sessions", repoSlug(repoRoot));
+	return join(fluskHome(), "sessions", repoSlug(repoRoot));
 }
 
 /** "<compact-iso>-<id>.jsonl" so files sort chronologically. */

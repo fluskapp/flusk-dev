@@ -1,5 +1,5 @@
 /**
- * `ah prompt <task>` — the composed prompt for a new task, built entirely out
+ * `flusk prompt <task>` — the composed prompt for a new task, built entirely out
  * of what already happened here.
  *
  * The header is not decoration: a prompt you cannot audit is a prompt you
@@ -83,17 +83,17 @@ function pbcopy(text: string): boolean {
 	}
 }
 
-/** `ah prompt <task> [--repo path] [--budget n] [--json] [--copy]`. */
+/** `flusk prompt <task> [--repo path] [--budget n] [--json] [--copy]`. */
 export function promptCmd(task: string, args: PromptArgs = {}): number {
 	const out = args.out ?? process.stdout;
-	// `ah prompt … | head` closes the pipe mid-write; that is the reader's
+	// `flusk prompt … | head` closes the pipe mid-write; that is the reader's
 	// choice, not a failure worth a stack trace.
 	out.on("error", () => {});
 	const budget = args.budget === undefined ? DEFAULT_BUDGET : Number(args.budget);
 	if (!Number.isInteger(budget) || budget <= 0) {
-		// Exit 1 like `ah search`'s --limit/--kind: a typo'd flag is an error a
+		// Exit 1 like `flusk search`'s --limit/--kind: a typo'd flag is an error a
 		// script must be able to see. Exit 0 is reserved for "nothing indexed".
-		out.write("ah: --budget must be a positive integer\n");
+		out.write("flusk: --budget must be a positive integer\n");
 		return 1;
 	}
 	const asked = args.repo === undefined ? undefined : basename(resolve(args.repo));

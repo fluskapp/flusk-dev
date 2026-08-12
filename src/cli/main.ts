@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
+import { describeMigration, migrateHome } from "../platform/paths/migrate.js";
 import { feedbackCmd } from "./feedback-cmd.js";
 import { goalCmd } from "./goal-cmd.js";
 import { resumeCmd } from "./resume-cmd.js";
@@ -17,6 +18,10 @@ function fail(message: string): void {
 }
 
 async function main(): Promise<void> {
+	// Before anything reads state: `~/.ah` becomes `~/.flusk` exactly once, and
+	// says so, because a state root that moved without a word is indistinguishable
+	// from a state root that was lost.
+	for (const line of describeMigration(migrateHome())) process.stderr.write(`flusk: ${line}\n`);
 	if (process.argv[2] === "workspace") {
 		process.exitCode = workspaceCmd(process.argv.slice(3));
 		return;
@@ -58,7 +63,7 @@ async function main(): Promise<void> {
 			},
 		});
 	} catch (e) {
-		fail(`ah: ${e instanceof Error ? e.message : String(e)}\n${USAGE}`);
+		fail(`flusk: ${e instanceof Error ? e.message : String(e)}\n${USAGE}`);
 		return;
 	}
 	const { values: v, positionals } = parsed;
@@ -67,7 +72,7 @@ async function main(): Promise<void> {
 	if (command === "ui") {
 		const port = v.port === undefined ? 4877 : Number(v.port);
 		if (!Number.isInteger(port) || port < 0 || port > 65535) {
-			return fail("ah: --port must be a valid port number\n");
+			return fail("flusk: --port must be a valid port number\n");
 		}
 		await uiCmd({ port, open: v["no-open"] !== true });
 		return;
@@ -81,7 +86,7 @@ async function main(): Promise<void> {
 	}
 	if (await queryCommand(command, arg, v)) return;
 	if (command === "feedback") {
-		if (arg !== "good" && arg !== "bad") return fail(`ah: feedback takes "good" or "bad"\n`);
+		if (arg !== "good" && arg !== "bad") return fail(`flusk: feedback takes "good" or "bad"\n`);
 		await feedbackCmd({ good: arg === "good" });
 		return;
 	}
@@ -118,5 +123,5 @@ async function main(): Promise<void> {
 }
 
 main().catch((e) => {
-	fail(`ah: ${e instanceof Error ? e.message : String(e)}\n`);
+	fail(`flusk: ${e instanceof Error ? e.message : String(e)}\n`);
 });

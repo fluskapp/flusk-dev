@@ -32,12 +32,12 @@ const req = (repoRoot: string, isResume = true): ContextRequest => ({
 const gather = (r: ContextRequest) => createRunsSource().gather(r);
 
 beforeAll(() => {
-	prev = process.env.AH_HOME;
-	home = mkdtempSync(join(tmpdir(), "ah-home-degrade-"));
+	prev = process.env.FLUSK_HOME;
+	home = mkdtempSync(join(tmpdir(), "flusk-home-degrade-"));
 	quiet = mkdtempSync(join(tmpdir(), "runs-quiet-"));
 	cardless = mkdtempSync(join(tmpdir(), "runs-cardless-"));
 	torn = mkdtempSync(join(tmpdir(), "runs-torn-"));
-	process.env.AH_HOME = home;
+	process.env.FLUSK_HOME = home;
 	cardlessKey = session(cardless, "half-written run", [say("partway")], "aborted");
 	// Valid JSON, invalid entry: loadSessionDetail dereferences `msg` and dies,
 	// so the index has no card while the header and handoff still read fine.
@@ -51,8 +51,8 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-	if (prev === undefined) delete process.env.AH_HOME;
-	else process.env.AH_HOME = prev;
+	if (prev === undefined) delete process.env.FLUSK_HOME;
+	else process.env.FLUSK_HOME = prev;
 	for (const d of [home, quiet, cardless, torn]) rmSync(d, { recursive: true, force: true });
 });
 

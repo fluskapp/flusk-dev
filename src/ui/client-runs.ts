@@ -1,5 +1,5 @@
 /**
- * The unified run feed: ah sessions and harness journals in one dense table,
+ * The unified run feed: flusk sessions and harness journals in one dense table,
  * newest first, optionally narrowed to one project. Every row opens the run
  * it stands for.
  */
@@ -47,7 +47,7 @@ async function loadRuns() {
 	}
 	if (!rows.length) {
 		$("#runs").innerHTML = runFilterBar() +
-			'<div class="empty small">No runs yet.<br/>Run <code>ah run "task"</code>, or point ' +
+			'<div class="empty small">No runs yet.<br/>Run <code>flusk run "task"</code>, or point ' +
 			"<code>ui.harnessDirs</code> at a harness's <code>docs/runs</code>.</div>";
 		return;
 	}

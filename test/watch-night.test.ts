@@ -1,6 +1,6 @@
 /**
  * The nightly cap is the only thing standing between an unattended loop and a
- * night of unbounded spend, and it is counted from a store two `ah` processes
+ * night of unbounded spend, and it is counted from a store two `flusk` processes
  * share. Two watchers on different repositories work disjoint items under one
  * night key, so a night's budget has to survive being spent concurrently: a
  * read-modify-write counter loses one of the two writes, and the night quietly

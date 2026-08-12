@@ -2,16 +2,16 @@ import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
-import type { AhConfig } from "../src/config/types.js";
+import type { FluskConfig } from "../src/config/types.js";
 import type { Usage } from "../src/core/types.js";
-import { createAhPolicy } from "../src/safety/ah-policy.js";
+import { createFluskPolicy } from "../src/safety/flusk-policy.js";
 import { BudgetTracker } from "../src/safety/budget.js";
 
 let repo: string;
 let outside: string;
 
 beforeAll(() => {
-	const tmp = mkdtempSync(join(tmpdir(), "ah-policy-"));
+	const tmp = mkdtempSync(join(tmpdir(), "flusk-policy-"));
 	repo = join(tmp, "repo");
 	outside = join(tmp, "outside");
 	mkdirSync(repo, { recursive: true });
@@ -20,13 +20,13 @@ beforeAll(() => {
 	symlinkSync(outside, join(repo, "sneaky-link"));
 });
 
-function config(onUnknownCommand: "deny" | "allow"): AhConfig {
+function config(onUnknownCommand: "deny" | "allow"): FluskConfig {
 	const model = { provider: "fake", id: "fake-1" };
 	return {
 		models: { plan: model, code: model, review: model, summarize: model },
 		budgets: { maxTurns: 10, maxCostUsd: 5, deadlineMinutes: null },
 		unattended: { onUnknownCommand },
-		isolation: { requireGit: true, branchPrefix: "ah/" },
+		isolation: { requireGit: true, branchPrefix: "flusk/" },
 		compaction: { reserveTokens: 4000, keepRecentTokens: 8000 },
 		memory: { enabled: false },
 		context: { enabled: false, budgetTokens: 4000 },
@@ -78,9 +78,9 @@ describe("BudgetTracker", () => {
 	});
 });
 
-describe("createAhPolicy", () => {
+describe("createFluskPolicy", () => {
 	it("denies denied bash commands with the classifier's reason", () => {
-		const d = createAhPolicy({ config: config("deny"), repoRoot: repo }).decide({
+		const d = createFluskPolicy({ config: config("deny"), repoRoot: repo }).decide({
 			kind: "bash",
 			command: "sudo rm -rf /",
 		});
@@ -90,24 +90,24 @@ describe("createAhPolicy", () => {
 
 	it("routes unknown commands through unattended.onUnknownCommand", () => {
 		const cmd = { kind: "bash", command: "frobnicate --now" } as const;
-		const denyPolicy = createAhPolicy({ config: config("deny"), repoRoot: repo });
+		const denyPolicy = createFluskPolicy({ config: config("deny"), repoRoot: repo });
 		expect(denyPolicy.decide(cmd).allow).toBe(false);
-		const allowPolicy = createAhPolicy({ config: config("allow"), repoRoot: repo });
+		const allowPolicy = createFluskPolicy({ config: config("allow"), repoRoot: repo });
 		expect(allowPolicy.decide(cmd).allow).toBe(true);
 	});
 
 	it("allows read and write classed commands", () => {
-		const p = createAhPolicy({ config: config("deny"), repoRoot: repo });
+		const p = createFluskPolicy({ config: config("deny"), repoRoot: repo });
 		expect(p.decide({ kind: "bash", command: "ls -la" }).allow).toBe(true);
 		expect(p.decide({ kind: "bash", command: "npm test" }).allow).toBe(true);
 	});
 
 	it("jails file writes to the repo and extra roots", () => {
-		const p = createAhPolicy({ config: config("deny"), repoRoot: repo });
+		const p = createFluskPolicy({ config: config("deny"), repoRoot: repo });
 		expect(p.decide({ kind: "fileWrite", path: "src/index.ts" }).allow).toBe(true);
 		expect(p.decide({ kind: "fileWrite", path: "../outside/x.txt" }).allow).toBe(false);
 		expect(p.decide({ kind: "fileWrite", path: "sneaky-link/x.txt" }).allow).toBe(false);
-		const withExtra = createAhPolicy({
+		const withExtra = createFluskPolicy({
 			config: config("deny"),
 			repoRoot: repo,
 			extraWriteRoots: [outside],
@@ -117,7 +117,7 @@ describe("createAhPolicy", () => {
 	});
 
 	it("caps subagent depth at 2", () => {
-		const p = createAhPolicy({ config: config("deny"), repoRoot: repo });
+		const p = createFluskPolicy({ config: config("deny"), repoRoot: repo });
 		expect(p.decide({ kind: "subagent", depth: 0 }).allow).toBe(true);
 		expect(p.decide({ kind: "subagent", depth: 1 }).allow).toBe(true);
 		expect(p.decide({ kind: "subagent", depth: 2 }).allow).toBe(false);

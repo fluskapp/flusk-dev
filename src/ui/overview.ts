@@ -1,5 +1,5 @@
 /**
- * The dashboard's front page: everything ah can see at a glance — its own
+ * The dashboard's front page: everything flusk can see at a glance — its own
  * sessions, the harness journals it follows, and the markdown it indexes.
  */
 import type { Journal } from "./journal-scan.js";

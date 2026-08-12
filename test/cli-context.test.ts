@@ -1,5 +1,5 @@
 /**
- * `ah context` — the window onto what a run is told before its first turn.
+ * `flusk context` — the window onto what a run is told before its first turn.
  *
  * The thing under test is not the assembler (test/context-build*.test.ts owns
  * that) but the promise this command makes: the block is printed VERBATIM, the
@@ -17,12 +17,12 @@ import { capture } from "./cli2-helpers.js";
 
 let repo: string;
 let home: string;
-const saved = process.env.AH_HOME;
+const saved = process.env.FLUSK_HOME;
 
 beforeEach(async () => {
-	repo = await mkdtemp(join(tmpdir(), "ah-cli-ctx-"));
-	home = await mkdtemp(join(tmpdir(), "ah-cli-ctx-home-"));
-	process.env.AH_HOME = home;
+	repo = await mkdtemp(join(tmpdir(), "flusk-cli-ctx-"));
+	home = await mkdtemp(join(tmpdir(), "flusk-cli-ctx-home-"));
+	process.env.FLUSK_HOME = home;
 	await writeFile(
 		join(repo, "AGENTS.md"),
 		"# House rules\n\nTabs, not spaces. Every file opens with a comment saying why it exists.\nRun the gate before reporting done, and never push to main.\n",
@@ -31,8 +31,8 @@ beforeEach(async () => {
 });
 
 afterEach(() => {
-	if (saved === undefined) delete process.env.AH_HOME;
-	else process.env.AH_HOME = saved;
+	if (saved === undefined) delete process.env.FLUSK_HOME;
+	else process.env.FLUSK_HOME = saved;
 });
 
 test("prints the block itself, a row per source and every omission", () => {
@@ -43,7 +43,7 @@ test("prints the block itself, a row per source and every omission", () => {
 	// The block, verbatim: preamble, fence and provenance line all present.
 	expect(text).toContain("BLOCK  verbatim, exactly what the run is given:");
 	expect(text).toContain("# Run context");
-	expect(text).toContain("<<<AH-CONTEXT quoted House rules");
+	expect(text).toContain("<<<FLUSK-CONTEXT quoted House rules");
 	expect(text).toContain("From: House rules [source house-rules | pinned | AGENTS.md]");
 	expect(text).toContain("1. npm test");
 	// Per-source token counts: every registered source gets a row, including
@@ -103,7 +103,7 @@ test("a nonexistent repo fails cleanly rather than throwing", () => {
 		contextCmd("respect the token budget", { repo: missing, out: out.out }),
 	).not.toThrow();
 	expect(contextCmd("respect the token budget", { repo: missing, out: out.out })).toBe(1);
-	expect(out.text()).toContain("ah: --repo is not a readable directory");
+	expect(out.text()).toContain("flusk: --repo is not a readable directory");
 	expect(out.text()).not.toContain("# Run context");
 });
 
@@ -111,6 +111,6 @@ test("a --budget that is not a positive integer is refused, not rounded", () => 
 	for (const budget of ["0", "-5", "1.5", "lots"]) {
 		const out = capture();
 		expect(contextCmd("respect the token budget", { repo, budget, out: out.out })).toBe(1);
-		expect(out.text()).toBe("ah: --budget must be a positive integer\n");
+		expect(out.text()).toBe("flusk: --budget must be a positive integer\n");
 	}
 });

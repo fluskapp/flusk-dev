@@ -13,7 +13,7 @@ let repo: string;
 let ns: string;
 
 beforeEach(async () => {
-	repo = await setupTestHome("ah-goal-");
+	repo = await setupTestHome("flusk-goal-");
 	ns = `repo:${repoSlug(repo)}`;
 }, SLOW);
 afterEach(() => {
@@ -22,7 +22,7 @@ afterEach(() => {
 
 /**
  * The graph goalCmd actually wrote. It opens the store under the test's own
- * AH_HOME, which is where the command's own default store lives.
+ * FLUSK_HOME, which is where the command's own default store lives.
  */
 async function graph(): Promise<Fact[]> {
 	return createFactStore().query(ns, { limit: 500 });

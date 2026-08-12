@@ -71,7 +71,7 @@ it("keeps a non-ASCII identifier whole", () => {
 	// Measured before the fix: "gr", "" and "a" respectively.
 	expect(wordAt("fn gréet(who: &str) {", 1, 4)).toBe("gréet");
 	expect(wordAt("let 名前 = 1;", 1, 5)).toBe("名前");
-	// An emoji is a Symbol, not a Letter, and no language ah documents allows one
+	// An emoji is a Symbol, not a Letter, and no language flusk documents allows one
 	// in an identifier — so it ENDS the name rather than being swallowed into it,
 	// and the surrogate pair after it does not shift the columns either.
 	expect(wordAt("let a😀b = 1;", 1, 5)).toBe("a");

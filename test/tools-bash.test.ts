@@ -23,7 +23,7 @@ function ctx(overrides: Partial<ToolContext> = {}): ToolContext {
 }
 
 beforeAll(async () => {
-	dir = await mkdtemp(join(tmpdir(), "ah-bash-"));
+	dir = await mkdtemp(join(tmpdir(), "flusk-bash-"));
 });
 
 afterAll(async () => {

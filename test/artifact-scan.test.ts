@@ -18,7 +18,7 @@ const byRel = (list: Artifact[], rel: string): Artifact | undefined =>
 	list.find((a) => a.path === join(proj, rel));
 
 beforeAll(() => {
-	home = mkdtempSync(join(tmpdir(), "ah-artifacts-"));
+	home = mkdtempSync(join(tmpdir(), "flusk-artifacts-"));
 	proj = join(home, "alpha");
 	mkdirSync(proj, { recursive: true });
 	write("CLAUDE.md", "# Context\n", 1_000);

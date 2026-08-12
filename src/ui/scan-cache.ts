@@ -34,7 +34,7 @@ export interface FileCache<T> {
 }
 
 /**
- * `max` bounds the map so a long-lived `ah ui` over a big tree cannot grow
+ * `max` bounds the map so a long-lived `flusk ui` over a big tree cannot grow
  * without limit; crossing it clears the map rather than evicting cleverly —
  * the next scan simply repays one sweep.
  */

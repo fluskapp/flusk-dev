@@ -4,7 +4,7 @@
  * next keystroke, so you can read a symbol and edit beside it.
  *
  * It shows what an IDE shows (signature, doc comment, tags, definition,
- * usages) and then the part only ah can: the commits, runs, sessions and docs
+ * usages) and then the part only flusk can: the commits, runs, sessions and docs
  * that already touched this symbol. Three things it deliberately does NOT do:
  * render markdown (that is POST /api/render — one renderer, one escaping
  * rule), search for usages (that is the Find in Files tool window), or invent
@@ -30,7 +30,7 @@ export const DOC_HTML = `<aside id="docwin">
 export const CLIENT_DOC_JS = `
 /** The symbol on screen, the in-flight lookup, and the sequence guarding it. */
 var D = { payload: null, busy: "", seq: 0 };
-var DOC_OPEN_KEY = "ah-doc-open", DOC_W_KEY = "ah-doc-width";
+var DOC_OPEN_KEY = "flusk-doc-open", DOC_W_KEY = "flusk-doc-width";
 
 /** The chat rail sits to the right of this one, so it is part of the offset. */
 function twRight() {
@@ -128,7 +128,7 @@ async function docPaint(p, seq) {
 	$("#doc-body").addEventListener("click", docClick);
 	// The viewer calls showSymbolDoc when this module is loaded and fires the
 	// event when it is not; honouring both keeps either half worth shipping.
-	document.addEventListener("ah-doc", function (e) { showSymbolDoc(e.detail); });
+	document.addEventListener("flusk-doc", function (e) { showSymbolDoc(e.detail); });
 	// The PENDING half of a lookup belongs to whoever made the request, and
 	// that is the viewer. Wrapping it (rather than duplicating the fetch) is
 	// what lets the panel say "indexing" instead of showing the previous

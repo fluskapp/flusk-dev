@@ -11,7 +11,7 @@ export interface FeedbackCmdOpts {
 }
 
 /**
- * `ah feedback good|bad` — scores the newest ROOT session that recorded a
+ * `flusk feedback good|bad` — scores the newest ROOT session that recorded a
  * routing kind (linof feedback parity): nudges benchmarks.json for that
  * kind's "provider/id" and prints the old → new score. Subagent sessions
  * (parentSession set) are skipped so the verdict lands on the run the user
@@ -23,7 +23,7 @@ export async function feedbackCmd(opts: FeedbackCmdOpts): Promise<void> {
 		(s) => s.parentSession === undefined && s.taskKind !== undefined && KINDS.has(s.taskKind),
 	);
 	if (latest?.taskKind === undefined) {
-		throw new Error("no session with a recorded task kind to score; run `ah run` first");
+		throw new Error("no session with a recorded task kind to score; run `flusk run` first");
 	}
 	const kind = latest.taskKind as TaskKind;
 	const key = `${latest.model.provider}/${latest.model.id}`;

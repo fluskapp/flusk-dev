@@ -1,7 +1,7 @@
 /**
  * Tool-window splitters.
  *
- * In IntelliJ every tool window drags. ah had exactly one — the chat rail —
+ * In IntelliJ every tool window drags. flusk had exactly one — the chat rail —
  * and hard-coded the other two, so the Find results pane was stuck at nine
  * 22px rows and the project tree at 268px whatever you were reading. The
  * difference between skimming nine hits and skimming forty is a splitter.
@@ -47,7 +47,7 @@ function twGrip(panel, id, measure) {
 	return grip;
 }
 
-var SIDE_W_KEY = "ah-side-width", FIND_H_KEY = "ah-find-height";
+var SIDE_W_KEY = "flusk-side-width", FIND_H_KEY = "flusk-find-height";
 
 /** The left rail and the bottom rail, dragged the same way the chat rail is. */
 function wireGrips() {

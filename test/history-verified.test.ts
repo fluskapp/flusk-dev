@@ -33,10 +33,10 @@ const run = (command: string, output: string, editFirst: boolean): Msg[] => {
 };
 
 beforeAll(() => {
-	prevHome = process.env.AH_HOME;
-	home = mkdtempSync(join(tmpdir(), "ah-home-verified-"));
-	repoRoot = mkdtempSync(join(tmpdir(), "ah-repo-"));
-	process.env.AH_HOME = home;
+	prevHome = process.env.FLUSK_HOME;
+	home = mkdtempSync(join(tmpdir(), "flusk-home-verified-"));
+	repoRoot = mkdtempSync(join(tmpdir(), "flusk-repo-"));
+	process.env.FLUSK_HOME = home;
 	keys = {
 		baseline: session(repoRoot, "a", run("npm test", "12 passed", false), "completed"),
 		after: session(repoRoot, "b", run("npm test", "12 passed", true), "completed"),
@@ -52,8 +52,8 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-	if (prevHome === undefined) delete process.env.AH_HOME;
-	else process.env.AH_HOME = prevHome;
+	if (prevHome === undefined) delete process.env.FLUSK_HOME;
+	else process.env.FLUSK_HOME = prevHome;
 	rmSync(home, { recursive: true, force: true });
 	rmSync(repoRoot, { recursive: true, force: true });
 });

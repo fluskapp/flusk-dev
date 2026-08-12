@@ -5,14 +5,14 @@
  * TypeScript program and, for a configured `doc.servers` entry, a SPAWNED
  * CHILD PROCESS. An unbounded map of them meant every project root that ever
  * received one lookup kept its language servers alive for the life of
- * `ah ui`, and nothing ever called `dispose()` — not even on shutdown, so the
+ * `flusk ui`, and nothing ever called `dispose()` — not even on shutdown, so the
  * SIGKILL that reaches the process groups was never sent. So the map is a
  * small LRU that disposes what it evicts, and the server closes it with the
  * rest of its resources.
  *
  * Split from api-doc.ts, which owns the routes.
  */
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { createDocRegistry, type DocChoice, type DocRegistry } from "../doc/registry.js";
 import { searchRoots } from "../find/files.js";
 
@@ -23,7 +23,7 @@ const MAX_REGISTRIES = 2;
 const registries = new Map<string, DocRegistry>();
 
 /** The engine for an indexed file, or the sentence explaining the refusal. */
-export async function engineFor(cfg: AhConfig, file: string): Promise<DocChoice> {
+export async function engineFor(cfg: FluskConfig, file: string): Promise<DocChoice> {
 	const root = searchRoots(cfg).find((r) => file.startsWith(`${r.path}/`))?.path;
 	if (root === undefined) return { provider: null, reason: "not inside a configured project" };
 	const cached = registries.get(root);
@@ -41,8 +41,8 @@ export async function engineFor(cfg: AhConfig, file: string): Promise<DocChoice>
 
 /**
  * Drops every registry and the processes behind it. The server calls this on
- * close: a language server ah spawned must not outlive the dashboard, and its
- * stdio pipes must not be what keeps `ah ui` from exiting.
+ * close: a language server flusk spawned must not outlive the dashboard, and its
+ * stdio pipes must not be what keeps `flusk ui` from exiting.
  */
 export function disposeDocRegistries(): void {
 	for (const registry of registries.values()) registry.dispose();

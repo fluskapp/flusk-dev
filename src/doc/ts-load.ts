@@ -1,7 +1,7 @@
 /**
  * The dynamic import of `typescript`, alone.
  *
- * ah has to build and run on a machine that does not have typescript
+ * flusk has to build and run on a machine that does not have typescript
  * installed, so its absence must be a VALUE — a null the registry turns into
  * a sentence — and never an import-time crash. Nothing at module scope in the
  * doc feature may `import "typescript"` statically; this is the one place the

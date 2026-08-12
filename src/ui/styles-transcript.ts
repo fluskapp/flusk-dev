@@ -51,7 +51,7 @@ export const TRANSCRIPT_CSS = `
 .msg-tag {
 	flex: none; width: var(--tx-gutter); text-align: right; letter-spacing: .04em;
 	font-size: var(--ij-fs-1); font-weight: 700; text-transform: uppercase;
-	line-height: calc(var(--ij-fs-6) * var(--ij-lh)); color: var(--tag-ah);
+	line-height: calc(var(--ij-fs-6) * var(--ij-lh)); color: var(--tag-flusk);
 }
 .msg.user .msg-tag { color: var(--tag-user); padding-top: var(--ij-space); }
 .msg-body { min-width: 0; flex: 1; }

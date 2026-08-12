@@ -3,7 +3,7 @@
  * written by something else, holding rows this version never wrote.
  *
  * The failure modes here are the reason `gather` is total (L7). The served
- * index is a shared file under AH_HOME; an older version's card, a truncated
+ * index is a shared file under FLUSK_HOME; an older version's card, a truncated
  * row or an unreadable file must each cost items and a sentence, never the
  * run. Nothing is mocked — the index is written to a temp home and read back
  * through the same pure `loadIndex()` read production takes, which is also why
@@ -29,7 +29,7 @@ const request = (): ContextRequest => ({
 });
 
 beforeAll(async () => {
-	const scratch = await setupTestHome("ah-context-history-");
+	const scratch = await setupTestHome("flusk-context-history-");
 	repoRoot = join(dirname(scratch), PROJECT);
 	await mkdir(repoRoot, { recursive: true });
 	await mkdir(indexDir(), { recursive: true });

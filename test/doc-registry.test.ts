@@ -12,17 +12,17 @@ import { join } from "node:path";
 import { execPath } from "node:process";
 import { afterEach, describe, expect, it } from "vitest";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { AhConfig, DocServerConfig } from "../src/config/types.js";
+import type { FluskConfig, DocServerConfig } from "../src/config/types.js";
 import { createDocRegistry, type DocRegistry, resolveBinary } from "../src/doc/registry.js";
 import { writeFakeServer } from "./doc-lsp-fake.js";
 
 const open: DocRegistry[] = [];
 
-function config(doc: Partial<AhConfig["doc"]>): AhConfig {
+function config(doc: Partial<FluskConfig["doc"]>): FluskConfig {
 	return { ...DEFAULT_CONFIG, doc: { ...DEFAULT_CONFIG.doc, ...doc } };
 }
 
-function registry(cfg: AhConfig, root: string): DocRegistry {
+function registry(cfg: FluskConfig, root: string): DocRegistry {
 	const made = createDocRegistry(cfg, root);
 	open.push(made);
 	return made;
@@ -40,7 +40,7 @@ afterEach(() => {
 
 describe("resolveBinary", () => {
 	it("finds a command on PATH and rejects one that is absent", async () => {
-		const dir = await mkdtemp(join(tmpdir(), "ah-bin-"));
+		const dir = await mkdtemp(join(tmpdir(), "flusk-bin-"));
 		const bin = join(dir, "faux-server");
 		await writeFile(bin, "#!/bin/sh\n");
 		await chmod(bin, 0o755);
@@ -50,7 +50,7 @@ describe("resolveBinary", () => {
 	});
 
 	it("checks an explicit path directly rather than searching PATH", async () => {
-		const dir = await mkdtemp(join(tmpdir(), "ah-bin-"));
+		const dir = await mkdtemp(join(tmpdir(), "flusk-bin-"));
 		const notExecutable = join(dir, "data.txt");
 		await writeFile(notExecutable, "x");
 		expect(resolveBinary(execPath, {})).toBe(execPath);
@@ -60,7 +60,7 @@ describe("resolveBinary", () => {
 
 describe("createDocRegistry", () => {
 	it("uses the bundled TypeScript engine for .ts, with no server installed", async () => {
-		const root = await mkdtemp(join(tmpdir(), "ah-reg-"));
+		const root = await mkdtemp(join(tmpdir(), "flusk-reg-"));
 		const file = join(root, "a.ts");
 		await writeFile(file, "export function greet(who: string): string {\n\treturn who;\n}\n");
 		const choice = await registry(config({}), root).for(file);
@@ -69,7 +69,7 @@ describe("createDocRegistry", () => {
 	});
 
 	it("explains that no server is configured, naming the extension", async () => {
-		const root = await mkdtemp(join(tmpdir(), "ah-reg-"));
+		const root = await mkdtemp(join(tmpdir(), "flusk-reg-"));
 		const choice = await registry(config({}), root).for(join(root, "main.rs"));
 		expect(choice.provider).toBeNull();
 		expect(choice.reason).toContain(".rs");
@@ -77,7 +77,7 @@ describe("createDocRegistry", () => {
 	});
 
 	it("explains that a configured server's binary is not on PATH", async () => {
-		const root = await mkdtemp(join(tmpdir(), "ah-reg-"));
+		const root = await mkdtemp(join(tmpdir(), "flusk-reg-"));
 		const cfg = config({ servers: [rustServer] });
 		const choice = await registry(cfg, root).for(join(root, "main.rs"));
 		expect(choice.provider).toBeNull();
@@ -101,7 +101,7 @@ describe("createDocRegistry", () => {
 	});
 
 	it("refuses when the feature is off, or the file has no extension", async () => {
-		const root = await mkdtemp(join(tmpdir(), "ah-reg-"));
+		const root = await mkdtemp(join(tmpdir(), "flusk-reg-"));
 		const off = await registry(config({ enabled: false }), root).for(join(root, "a.ts"));
 		expect(off.provider).toBeNull();
 		expect(off.reason).toContain("doc.enabled");

@@ -5,7 +5,7 @@
  * a model.
  */
 import type { CliOutcome } from "../cli/gate-loop.js";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import type { FactStore } from "../store/types.js";
 import {
 	cooldownUntil,
@@ -23,7 +23,7 @@ import type { PollResult, WorkItem } from "./queue.js";
 export interface WatchDeps {
 	repoRoot: string;
 	client: FactStore;
-	cfg: AhConfig;
+	cfg: FluskConfig;
 	now(): number;
 	log(line: string): void;
 	poll(): PollResult;

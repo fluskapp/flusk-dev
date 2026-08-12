@@ -29,7 +29,7 @@ export interface RunsSourceOpts {
 	/**
 	 * The session id, file name or path the resume already resolved. Without
 	 * one the newest transcript for this repo is taken as the run being
-	 * resumed, which is what `ah resume` with no ref means.
+	 * resumed, which is what `flusk resume` with no ref means.
 	 */
 	sessionRef?: string;
 }
@@ -91,7 +91,7 @@ function gather(req: ContextRequest, ref?: string): SourceResult {
 		// the absolute session path, and $HOME must not reach a report.
 		const kind = err instanceof Error ? err.name : "unknown error";
 		return fail(
-			`Reading ah's session store failed with ${kind}, so no prior-run context was gathered.`,
+			`Reading flusk's session store failed with ${kind}, so no prior-run context was gathered.`,
 		);
 	}
 }

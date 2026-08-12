@@ -26,7 +26,7 @@ const SOUL_PRECEDENCE =
 /**
  * One workspace file, with a comment naming the file it came from — a reader
  * of the prompt (or of a session transcript) can then trace any rule back to
- * the file to edit, instead of hunting for it in ah's source.
+ * the file to edit, instead of hunting for it in flusk's source.
  */
 function section(layer: WorkspaceLayer): string[] {
 	const lines = [
@@ -42,7 +42,7 @@ export function buildSystemPrompt(opts: SystemPromptOpts): string {
 	const date = opts.now ? opts.now.toISOString().slice(0, 10) : "unset";
 	const workspace = opts.workspace ?? loadWorkspace(opts.repoRoot);
 	const out = [
-		"You are ah, an autonomous coding agent.",
+		"You are flusk, an autonomous coding agent.",
 		"",
 		"Rules:",
 		"- Use the available tools to inspect the repository and act on the task.",

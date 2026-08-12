@@ -1,7 +1,7 @@
 /**
  * The project tool window. A project is the unit of attention, so the tree is
  * projects — harnesses and repos — each expanding to Runs / Docs / Config.
- * ah's own sessions are counted into their project's Runs; there is no
+ * flusk's own sessions are counted into their project's Runs; there is no
  * session-only sidebar any more.
  */
 export const CLIENT_TREE_JS = `
@@ -65,7 +65,7 @@ function renderTree() {
 	}).join("") || (S.query
 		? '<div class="empty small">No project matches \\u201c' + esc(S.query) + '\\u201d</div>'
 		: '<div class="empty small">No projects indexed.<br/>Set <code>ui.projectDirs</code> in ' +
-			"<code>~/.ah/config.json</code>.</div>");
+			"<code>~/.flusk/config.json</code>.</div>");
 	var live = S.projects.reduce(function (n, p) { return n + p.liveRuns; }, 0);
 	var attn = S.projects.reduce(function (n, p) { return n + p.attention.length; }, 0);
 	$("#count").textContent = shown.length + " project" + (shown.length === 1 ? "" : "s") +
@@ -77,12 +77,12 @@ function renderTree() {
 /** Tool window 1: the Projects rail folds away like any other. */
 function toggleSide() {
 	var off = document.body.classList.toggle("side-off");
-	localStorage.setItem("ah-side-open", off ? "0" : "1");
+	localStorage.setItem("flusk-side-open", off ? "0" : "1");
 	$("#side-btn").classList.toggle("on", !off);
 }
 function setSideVisible(on) {
 	document.body.classList.toggle("side-off", !on);
-	localStorage.setItem("ah-side-open", on ? "1" : "0");
+	localStorage.setItem("flusk-side-open", on ? "1" : "0");
 	$("#side-btn").classList.toggle("on", on);
 }
 

@@ -6,7 +6,7 @@ import { formatEvidence, runVerify } from "../src/verify/gate.js";
 
 let cwd: string;
 beforeAll(async () => {
-	cwd = await mkdtemp(join(tmpdir(), "ah-gate-"));
+	cwd = await mkdtemp(join(tmpdir(), "flusk-gate-"));
 	await writeFile(join(cwd, "marker.txt"), "from-cwd");
 });
 

@@ -1,7 +1,7 @@
 /**
- * `ah goal <text>`: plan a task graph with the plan-kind model, write it to
+ * `flusk goal <text>`: plan a task graph with the plan-kind model, write it to
  * the fact store, then execute frontier tasks one by one — each as a full
- * agent session behind the same verification gate as `ah run`. The graph IS
+ * agent session behind the same verification gate as `flusk run`. The graph IS
  * the store: task status, claims and dependencies are facts, which is what
  * lets a second session join a goal already in flight. `--dry` plans and
  * prints only.
@@ -49,7 +49,7 @@ export async function goalCmd(opts: GoalCmdOpts): Promise<CliOutcome> {
 	// The graph IS the store: task status, claims and dependencies are facts,
 	// so there is no version of this command that records nothing.
 	if (!cfg.memory.enabled) {
-		out.write("ah goal needs the fact store: the goal graph has nowhere else to live.\n");
+		out.write("flusk goal needs the fact store: the goal graph has nowhere else to live.\n");
 		return "blocked";
 	}
 	const store = createFactStore();
@@ -57,7 +57,7 @@ export async function goalCmd(opts: GoalCmdOpts): Promise<CliOutcome> {
 		out.write(await renderGoalList(store, ns));
 		return "completed";
 	}
-	if (opts.goal === undefined) throw new Error("ah goal needs <text> or --list");
+	if (opts.goal === undefined) throw new Error("flusk goal needs <text> or --list");
 	const isFake = opts.fake !== undefined;
 	const planModel = isFake ? fakeModel : await pickModel(cfg, "plan");
 	if (!isFake && !(await hasAuth(planModel.provider))) {

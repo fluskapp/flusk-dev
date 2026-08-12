@@ -37,7 +37,7 @@ export interface Harness {
 
 /** Real temp directory, real files: this is the storage layer under test. */
 export async function harness(): Promise<Harness> {
-	const dir = await mkdtemp(join(tmpdir(), "ah-store-"));
+	const dir = await mkdtemp(join(tmpdir(), "flusk-store-"));
 	let clock = T0;
 	const now = () => clock;
 	return {

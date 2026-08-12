@@ -1,7 +1,7 @@
 /**
  * The DocProvider that works on a machine with no language server installed:
  * the TypeScript compiler API, driven through the bounded service in
- * ts-service.ts. This is the engine ah ships with; the LSP client is the
+ * ts-service.ts. This is the engine flusk ships with; the LSP client is the
  * pluggable second provider for projects that have a real server.
  *
  * Contract, restated because it is the easy thing to break: this provider

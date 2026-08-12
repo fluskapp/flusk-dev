@@ -53,7 +53,7 @@ export interface DocFixture {
 
 /** `extra` writes additional files, e.g. to push a project over the file cap. */
 export function docProject(extra: Record<string, string> = {}): DocFixture {
-	const root = mkdtempSync(join(tmpdir(), "ah-doc-"));
+	const root = mkdtempSync(join(tmpdir(), "flusk-doc-"));
 	mkdirSync(join(root, "src"), { recursive: true });
 	writeFileSync(join(root, "tsconfig.json"), TSCONFIG);
 	writeFileSync(join(root, "src", "greet.ts"), GREET_TS);

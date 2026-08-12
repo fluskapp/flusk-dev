@@ -1,5 +1,5 @@
 /**
- * Scope behaviour of `ah prompt`.
+ * Scope behaviour of `flusk prompt`.
  *
  * Regression: `--repo` defaults to the working directory, so running from a
  * directory that is not an indexed project scoped the cards to a project that
@@ -30,8 +30,8 @@ const card = (id: string, project: string, title: string, text: string): History
 });
 
 beforeAll(() => {
-	home = mkdtempSync(join(tmpdir(), "ah-scope-"));
-	process.env.AH_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "flusk-scope-"));
+	process.env.FLUSK_HOME = home;
 	saveIndex({
 		cards: [
 			card("commit:alpha:1", "alpha", "parser: fix the tokenizer", "the parser dropped a token"),
@@ -43,7 +43,7 @@ beforeAll(() => {
 });
 
 afterAll(() => {
-	delete process.env.AH_HOME;
+	delete process.env.FLUSK_HOME;
 	rmSync(home, { recursive: true, force: true });
 });
 

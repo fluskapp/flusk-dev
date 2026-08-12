@@ -65,8 +65,8 @@ describe("classifyTask", () => {
 
 describe("scores", () => {
 	beforeEach(async () => {
-		const tmp = await mkdtemp(join(tmpdir(), "ah-scores-"));
-		process.env.AH_HOME = join(tmp, "home");
+		const tmp = await mkdtemp(join(tmpdir(), "flusk-scores-"));
+		process.env.FLUSK_HOME = join(tmp, "home");
 	});
 	afterEach(() => teardownTestHome());
 

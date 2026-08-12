@@ -1,5 +1,5 @@
 /**
- * The one place the corpus is assembled: commits, ah's own sessions, harness
+ * The one place the corpus is assembled: commits, flusk's own sessions, harness
  * run journals, and the project's own writing.
  *
  * Fanning out here rather than at each call site is what keeps the mix
@@ -15,7 +15,7 @@
  */
 import { existsSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { HEAD_BYTES, readHead } from "../ui/artifact-meta.js";
 import { type Artifact, resolveProjectRoots, scanArtifacts } from "../ui/artifact-scan.js";
 import { capText, dropPartialTail } from "./cap.js";
@@ -35,7 +35,7 @@ export interface CollectOptions {
 }
 
 /** Project roots that are actually repositories — a worktree's `.git` is a file. */
-export function gitRoots(cfg: AhConfig): string[] {
+export function gitRoots(cfg: FluskConfig): string[] {
 	return resolveProjectRoots(cfg.ui.projectDirs).filter((root) => existsSync(join(root, ".git")));
 }
 
@@ -72,7 +72,7 @@ export function docCard(a: Artifact): HistoryCard {
  * that throws is skipped rather than fatal: one unreadable repo must not cost
  * the index its other three thousand cards.
  */
-export function collectCards(cfg: AhConfig, opts: CollectOptions = {}): HistoryCard[] {
+export function collectCards(cfg: FluskConfig, opts: CollectOptions = {}): HistoryCard[] {
 	const byId = new Map<string, HistoryCard>();
 	const absorb = (load: () => HistoryCard[]): void => {
 		let cards: HistoryCard[] = [];

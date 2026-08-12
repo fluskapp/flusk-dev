@@ -2,13 +2,13 @@ import { randomUUID } from "node:crypto";
 import { createAgent } from "../agent/agent.js";
 import { buildSystemPrompt } from "../agent/system-prompt.js";
 import { loadConfig, loadRepoConfig } from "../config/config.js";
-import type { AhConfig, RepoConfig, TaskKind } from "../config/types.js";
+import type { FluskConfig, RepoConfig, TaskKind } from "../config/types.js";
 import { createEventBus } from "../core/events.js";
 import { resolveNamespace } from "../store/namespaces.js";
 import { FakeProvider } from "../provider/fake.js";
 import { classifyTask } from "../provider/intent.js";
 import { hasAuth, PiAiProvider } from "../provider/pi-ai.js";
-import { createAhPolicy } from "../safety/ah-policy.js";
+import { createFluskPolicy } from "../safety/flusk-policy.js";
 import { ensureCleanTree, isGitRepo, startRunBranch, summarizeRun } from "../safety/git-isolation.js";
 import { createFactStore } from "../store/store.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
@@ -38,15 +38,15 @@ export interface RunCmdOpts {
 	quiet?: boolean;
 	out?: NodeJS.WritableStream;
 	/**
-	 * Config resolved by the caller, used INSTEAD of reading `<repo>/.ah.json`.
+	 * Config resolved by the caller, used INSTEAD of reading `<repo>/.flusk/config.json`.
 	 * Unattended mode passes this because its `repo` is a worktree of a branch
-	 * under review: a hostile `.ah.json` there could otherwise disable the
+	 * under review: a hostile `.flusk/config.json` there could otherwise disable the
 	 * command classifier, add a verify command to execute, or redirect memory.
 	 */
-	trustedConfig?: { cfg: AhConfig; repoConfig: RepoConfig | undefined; namespace?: string };
+	trustedConfig?: { cfg: FluskConfig; repoConfig: RepoConfig | undefined; namespace?: string };
 }
 
-/** Phase 3 run command: config → routed model, ah policy, git isolation,
+/** Phase 3 run command: config → routed model, flusk policy, git isolation,
  * then the run + verification gate. Never calls process.exit; returns the CLI
  * outcome ("blocked" = gate failure, exit 1). */
 export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
@@ -83,7 +83,7 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 	}
 	let isolation: { branch: string; originalRef: string } | undefined;
 	if (!inRepo && opts.noIsolation !== true && !isFake && cfg.isolation.requireGit) {
-		throw new Error(`${opts.repo} is not a git repository; ah isolates runs on a branch (pass --no-isolation to override)`);
+		throw new Error(`${opts.repo} is not a git repository; flusk isolates runs on a branch (pass --no-isolation to override)`);
 	}
 	if (inRepo && opts.noIsolation !== true) {
 		if (opts.allowDirty !== true) ensureCleanTree(opts.repo);
@@ -104,7 +104,7 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 		tools: DEFAULT_TOOLS,
 		task: opts.task,
 		repoRoot: opts.repo,
-		policy: createAhPolicy({ config: cfg, repoRoot: opts.repo }),
+		policy: createFluskPolicy({ config: cfg, repoRoot: opts.repo }),
 		events,
 		config: cfg,
 		taskKind: kind,

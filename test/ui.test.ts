@@ -14,9 +14,9 @@ let ui: UiServer;
 const model = { provider: "fake", id: "fake-1", contextWindow: 200_000 };
 
 beforeAll(async () => {
-	home = mkdtempSync(join(tmpdir(), "ah-ui-home-"));
-	repo = mkdtempSync(join(tmpdir(), "ah-ui-repo-"));
-	process.env.AH_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "flusk-ui-home-"));
+	repo = mkdtempSync(join(tmpdir(), "flusk-ui-repo-"));
+	process.env.FLUSK_HOME = home;
 	const s = Session.create({ task: "polish the dashboard", repoRoot: repo, model });
 	s.appendMessage({ role: "user", content: "polish the dashboard" });
 	s.appendMessage({
@@ -46,7 +46,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
 	await ui.close();
-	delete process.env.AH_HOME;
+	delete process.env.FLUSK_HOME;
 	rmSync(home, { recursive: true, force: true });
 	rmSync(repo, { recursive: true, force: true });
 });
@@ -64,7 +64,7 @@ it("scan finds the session with derived status and stats", () => {
 
 it("serves the IntelliJ-styled page and the sessions API", async () => {
 	const page = await (await fetch(`${ui.url}/`)).text();
-	expect(page).toContain("<title>ah</title>");
+	expect(page).toContain("<title>flusk</title>");
 	expect(page).toContain("JetBrains Mono");
 	expect(page).toContain("data-theme");
 	const list = (await (await fetch(`${ui.url}/api/sessions`)).json()) as unknown[];

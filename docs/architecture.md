@@ -1,6 +1,6 @@
 # Architecture
 
-ah owns its whole agent loop. Modules talk to each other only through a
+flusk owns its whole agent loop. Modules talk to each other only through a
 handful of frozen contract files; everything else is replaceable. This page
 maps the modules, states the contracts, and is honest about what exists today
 versus what is roadmap.
@@ -30,14 +30,14 @@ versus what is roadmap.
   `classify-rules.ts` conservatively classify shell commands; `paths.ts` is
   the realpath write jail; `git-isolation.ts` puts each run on its own
   branch with per-turn checkpoint commits; `budget.ts` tracks spend and
-  deadlines; `ah-policy.ts` composes them behind the `Policy` port in
+  deadlines; `flusk-policy.ts` composes them behind the `Policy` port in
   `policy.ts`.
 
 - **`src/session`** — durable state. Append-only JSONL files under
-  `~/.ah/sessions/<repo-slug>/`, fsynced per entry so a crash loses at most
+  `~/.flusk/sessions/<repo-slug>/`, fsynced per entry so a crash loses at most
   the entry being written. `entries.ts` is the format, `store.ts` the file
   handle, `session.ts` the context rebuild, `repair.ts` fixes dangling tool
-  calls on resume, `paths.ts` maps repos to session directories (`AH_HOME`
+  calls on resume, `paths.ts` maps repos to session directories (`FLUSK_HOME`
   overrides the root for tests).
 
 - **`src/compaction`** — context management. Estimates tokens, and when the
@@ -56,11 +56,11 @@ versus what is roadmap.
   watch and verify are built above it and nothing below it grows a third
   method.
 
-- **`src/ui`** — `ah ui`, a loopback-only HTTP dashboard (IntelliJ-styled)
+- **`src/ui`** — `flusk ui`, a loopback-only HTTP dashboard (IntelliJ-styled)
   over the session files: run list, transcript detail, reveal-in-Finder.
 
 - **`src/config`** — `types.ts` is the frozen contract; global config plus
-  per-repo `<repo>/.ah.json` sections deep-merged over it (`config.ts`,
+  per-repo `<repo>/.flusk/config.json` sections deep-merged over it (`config.ts`,
   `defaults.ts`): models per task kind, budgets, unattended policy,
   isolation, compaction thresholds.
 
@@ -103,7 +103,7 @@ edits.
 2. **Path jail** — file writes must realpath-resolve inside the repo root
    (or explicitly granted extra roots); everything else is refused.
 3. **Git isolation** — runs refuse dirty trees (unless `--allow-dirty`),
-   happen on their own `ah/<runId>` branch, and checkpoint-commit after
+   happen on their own `flusk/<runId>` branch, and checkpoint-commit after
    every mutating turn, so an autonomous session is always reviewable or
    discardable as one diff. Never pushes, never touches global git config.
 4. **Budgets** — max cost (USD), max turns, and an optional wall-clock
@@ -116,7 +116,7 @@ budget, so children cannot multiply spend.
 ## Roadmap
 
 - **Phase 1 — done.** The loop, tools, JSONL sessions, steering, CLI against
-  FakeProvider, and the IntelliJ-styled `ah ui` dashboard.
+  FakeProvider, and the IntelliJ-styled `flusk ui` dashboard.
 - **Phase 2 — done.** The real provider adapter (pi-ai catalog) with model
   routing, the full safety stack (classification, path jail, git isolation,
   budgets), context compaction, subagents, config loading, and resume.
@@ -125,17 +125,17 @@ budget, so children cannot multiply spend.
   `src/store/facts.ts`), the verification gate (detected verify commands,
   retry-with-evidence, then checking the run's own report against what the
   harness observed), and goal/task graphs worked across sessions.
-- **Phase 4 — done.** `ah watch`: the unattended queue loop over open PRs
+- **Phase 4 — done.** `flusk watch`: the unattended queue loop over open PRs
   and failing CI, worktree-per-item isolation, a fact-based attempt ledger
   with quadratic backoff, nightly caps, and opt-in publishing (`src/watch/`).
 
 ### Known gaps
 
 - Nothing generalizes a run's experience beyond its own repository. Every
-  fact ah writes belongs to one namespace, and no step reads a finished run
+  fact flusk writes belongs to one namespace, and no step reads a finished run
   and proposes a lesson from it, so what one repo learns stays there.
 - The Phase 3 adversarial review was cut short; the goal scheduler's edge
   cases and the gate's retry semantics have had less hostile scrutiny than
   the safety layer did.
-- `ah watch` queues are GitHub-only (`gh`); other sources mean writing a
+- `flusk watch` queues are GitHub-only (`gh`); other sources mean writing a
   poller returning `WorkItem[]`.

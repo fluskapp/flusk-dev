@@ -5,12 +5,12 @@ import { afterAll, beforeAll, expect, it } from "vitest";
 import { createChatEngine } from "../src/chat/engine.js";
 import type { ChatChunk, ChatRequest } from "../src/chat/types.js";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { AhConfig, ChatBackendConfig } from "../src/config/types.js";
+import type { FluskConfig, ChatBackendConfig } from "../src/config/types.js";
 
 let bin: string;
 let realPath: string | undefined;
 
-const cfg = (backends: ChatBackendConfig[]): AhConfig => ({
+const cfg = (backends: ChatBackendConfig[]): FluskConfig => ({
 	...DEFAULT_CONFIG,
 	chat: { backends },
 });
@@ -38,7 +38,7 @@ function script(name: string, body: string): void {
 const dones = (chunks: ChatChunk[]) => chunks.filter((c) => c.type === "done").length;
 
 beforeAll(() => {
-	bin = mkdtempSync(join(tmpdir(), "ah-chat-engine-"));
+	bin = mkdtempSync(join(tmpdir(), "flusk-chat-engine-"));
 	realPath = process.env.PATH;
 	process.env.PATH = bin;
 	script("mycli", `printf 'answer to: %s' "$2"\n`);
@@ -84,10 +84,10 @@ it("an unknown backend id is an error chunk plus one done", async () => {
 
 it("an unavailable backend reports its note instead of failing obscurely", async () => {
 	const chunks = await run(
-		[{ id: "or", kind: "openai-compatible", baseUrl: "https://x/v1", apiKeyEnv: "AH_MISSING_KEY" }],
+		[{ id: "or", kind: "openai-compatible", baseUrl: "https://x/v1", apiKeyEnv: "FLUSK_MISSING_KEY" }],
 		ask("or"),
 	);
-	expect(chunks).toEqual([{ type: "error", message: "set AH_MISSING_KEY" }, { type: "done" }]);
+	expect(chunks).toEqual([{ type: "error", message: "set FLUSK_MISSING_KEY" }, { type: "done" }]);
 });
 
 it("a failing CLI still ends with exactly one done", async () => {

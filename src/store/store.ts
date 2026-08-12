@@ -25,7 +25,7 @@ import { planTransact } from "./transact.js";
 import type { FactStore } from "./types.js";
 
 export interface FactStoreOptions {
-	/** Log directory; defaults to <AH_HOME>/store. */
+	/** Log directory; defaults to <FLUSK_HOME>/store. */
 	dir?: string;
 	/** Clock, so one transact stamps every timestamp from a single reading. */
 	now?: () => number;

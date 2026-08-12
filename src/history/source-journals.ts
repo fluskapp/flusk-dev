@@ -13,7 +13,7 @@
  * ("→ claude (claude=1.00 …)"), which is why the card does not need it
  * separately: the frozen frontmatter parser keeps stages, not arbitrary keys.
  */
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import {
 	type Journal,
 	type JournalMeta,
@@ -94,6 +94,6 @@ function toCard(j: Journal): HistoryCard {
 }
 
 /** One card per journal under the configured harness dirs, newest first. */
-export function journalCards(cfg: AhConfig): HistoryCard[] {
+export function journalCards(cfg: FluskConfig): HistoryCard[] {
 	return scanJournals(cfg.ui.harnessDirs).map(toCard);
 }

@@ -32,7 +32,7 @@ async function loadGraph(store: FactStore, ns: string): Promise<GraphView> {
 	};
 }
 
-/** `ah goal --list`: goals with title/status plus per-task status lines. */
+/** `flusk goal --list`: goals with title/status plus per-task status lines. */
 export async function renderGoalList(store: FactStore, ns: string): Promise<string> {
 	const g = await loadGraph(store, ns);
 	if (g.titles.length === 0) return "no goals\n";

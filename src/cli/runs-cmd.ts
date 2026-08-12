@@ -16,7 +16,7 @@ function truncateTask(task: string): string {
 	return oneLine.length > TASK_MAX ? `${oneLine.slice(0, TASK_MAX - 1)}…` : oneLine;
 }
 
-/** `ah runs [-n 20]` — newest-first table of recorded runs (linof runs parity). */
+/** `flusk runs [-n 20]` — newest-first table of recorded runs (linof runs parity). */
 export function runsCmd(opts: RunsCmdOpts = {}): void {
 	const out = opts.out ?? process.stdout;
 	const rows = scanSessions().slice(0, opts.limit ?? 20);

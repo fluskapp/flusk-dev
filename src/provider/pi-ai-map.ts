@@ -1,5 +1,5 @@
 /**
- * Pure mapping between ah's provider-agnostic types and pi-ai wire types.
+ * Pure mapping between flusk's provider-agnostic types and pi-ai wire types.
  * Only src/provider/pi-ai*.ts may import the pi-ai SDK.
  */
 import type {
@@ -80,9 +80,9 @@ function toPiMessage(m: Msg, timestamp: number): Message {
 	return {
 		role: "assistant",
 		content: toPiAssistantContent(m.content),
-		api: "ah-replay",
-		provider: "ah",
-		model: "ah",
+		api: "flusk-replay",
+		provider: "flusk",
+		model: "flusk",
 		usage: toPiUsage(m.usage),
 		stopReason: HIT_TO_PI_STOP[m.stopReason],
 		errorMessage: m.errorMessage,
@@ -95,7 +95,7 @@ export function toPiContext(system: string, msgs: Msg[], tools: ToolSchemaJson[]
 	const piTools: PiTool[] = tools.map((t) => ({
 		name: t.name,
 		description: t.description,
-		// Typebox schemas are TSchema at runtime; ah carries them as plain JSON.
+		// Typebox schemas are TSchema at runtime; flusk carries them as plain JSON.
 		parameters: t.parameters as unknown as TSchema,
 	}));
 	return {
@@ -120,7 +120,7 @@ export function fromPiMessage(m: AssistantMessage): AssistantMsg {
 	};
 }
 
-/** Events with no ah equivalent (start/…_start/…_end bookkeeping) map to null. */
+/** Events with no flusk equivalent (start/…_start/…_end bookkeeping) map to null. */
 export function fromPiEvent(e: AssistantMessageEvent): StreamEvent | null {
 	switch (e.type) {
 		case "text_delta":

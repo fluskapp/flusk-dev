@@ -31,7 +31,7 @@ export function branchFor(prefix: string, key: string): string {
  * from (the item's own ref when it has one, else current HEAD).
  */
 export function createWorktree(repoRoot: string, branch: string, base?: string): Worktree {
-	const dir = mkdtempSync(join(tmpdir(), "ah-wt-"));
+	const dir = mkdtempSync(join(tmpdir(), "flusk-wt-"));
 	const args = ["worktree", "add", "-b", branch, dir];
 	if (base !== undefined && base !== "") args.push(base);
 	const r = git(repoRoot, args);

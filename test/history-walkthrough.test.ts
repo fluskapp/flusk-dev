@@ -9,7 +9,7 @@ const daysAgo = (n: number): string => new Date(NOW - n * 86_400_000).toISOStrin
 function card(p: Partial<HistoryCard> & { id: string }): HistoryCard {
 	return {
 		kind: "commit",
-		project: "ah",
+		project: "flusk",
 		title: "",
 		text: "",
 		at: daysAgo(10),
@@ -31,7 +31,7 @@ const FAILED: Partial<HistoryCard> = {
 /** One corpus with every shape the walkthrough is supposed to separate. */
 const CORPUS = [
 	card({
-		id: "commit:ah:aaaaaaaa",
+		id: "commit:flusk:aaaaaaaa",
 		ref: "aaaaaaaa1111",
 		title: "add retry hook to watch tick",
 		text: "add retry hook to watch tick\n\nbackoff on failure",
@@ -40,8 +40,8 @@ const CORPUS = [
 		at: daysAgo(30),
 	}),
 	card({
-		id: "session:ah/verified.jsonl",
-		ref: "ah/verified.jsonl",
+		id: "session:flusk/verified.jsonl",
+		ref: "flusk/verified.jsonl",
 		kind: "session",
 		title: "add retry backoff to watch tick",
 		text: "add retry backoff to watch tick\n\ncommands:\nnpm test",
@@ -60,7 +60,7 @@ const CORPUS = [
 		at: daysAgo(2),
 	}),
 	card({
-		id: "commit:ah:bbbbbbbb",
+		id: "commit:flusk:bbbbbbbb",
 		ref: "bbbbbbbb2222",
 		title: 'Revert "retry backoff in watch tick"',
 		text: "reverts the retry backoff, it broke the watch loop",
@@ -69,24 +69,24 @@ const CORPUS = [
 		at: daysAgo(20),
 	}),
 	// Shares one word with the task and nothing else: a failure, but not a trap.
-	card({ id: "commit:ah:ffffffff", ref: "ffffffff3333", title: "hook the docs nav", ...FAILED }),
+	card({ id: "commit:flusk:ffffffff", ref: "ffffffff3333", title: "hook the docs nav", ...FAILED }),
 	card({
-		id: "doc:ah:CLAUDE.md",
+		id: "doc:flusk:CLAUDE.md",
 		ref: "/repo/CLAUDE.md",
 		kind: "doc",
-		title: "ah house rules",
+		title: "flusk house rules",
 		text: "House rules: a retry hook always ships with a test; tabs, not spaces.",
 		paths: ["CLAUDE.md"],
 	}),
 	card({
-		id: "skill:ah:retry",
+		id: "skill:flusk:retry",
 		ref: "/repo/skills/retry/SKILL.md",
 		kind: "skill",
 		title: "retry backoff skill",
 		text: "how to write a retry backoff in this repo, with the watch tick as the example",
 		paths: ["skills/retry/SKILL.md"],
 	}),
-	card({ id: "commit:ah:cccccccc", title: "rewrite the markdown parser", outcome: "shipped" }),
+	card({ id: "commit:flusk:cccccccc", title: "rewrite the markdown parser", outcome: "shipped" }),
 ];
 
 const index = buildIndex(CORPUS);
@@ -103,14 +103,14 @@ it("extracts paths the task names, and bare filenames only when the corpus has t
 
 it("puts shipped and verified work in precedent, and nothing else", () => {
 	const w = walk();
-	expect(ids(w.precedent)).toContain("commit:ah:aaaaaaaa");
-	expect(ids(w.precedent)).toContain("session:ah/verified.jsonl");
+	expect(ids(w.precedent)).toContain("commit:flusk:aaaaaaaa");
+	expect(ids(w.precedent)).toContain("session:flusk/verified.jsonl");
 	for (const hit of w.precedent) expect(["shipped", "verified"]).toContain(hit.card.outcome);
 });
 
 it("lists prior attempts at THIS task newest first, whatever the outcome", () => {
 	const w = walk();
-	expect(ids(w.attempts)).toEqual(["journal:docs/runs/2026-08-09.md", "session:ah/verified.jsonl"]);
+	expect(ids(w.attempts)).toEqual(["journal:docs/runs/2026-08-09.md", "session:flusk/verified.jsonl"]);
 	// The blocked run is the whole point: it is not demoted for having failed.
 	expect(w.attempts[0]?.card.outcome).toBe("blocked");
 	for (const hit of w.attempts) expect(["session", "journal"]).toContain(hit.card.kind);
@@ -118,7 +118,7 @@ it("lists prior attempts at THIS task newest first, whatever the outcome", () =>
 
 it("returns conventions from writing only, house rules first", () => {
 	const w = walk();
-	expect(ids(w.conventions)).toEqual(["doc:ah:CLAUDE.md", "skill:ah:retry"]);
+	expect(ids(w.conventions)).toEqual(["doc:flusk:CLAUDE.md", "skill:flusk:retry"]);
 });
 
 it("mines a plain-language trap per failure, and every trap cites its source", () => {
@@ -126,8 +126,8 @@ it("mines a plain-language trap per failure, and every trap cites its source", (
 	expect(traps.length).toBeGreaterThan(0);
 	for (const trap of traps) expect(trap).toMatch(/\((commit|session|journal) [^)]+\)\.$/);
 	expect(traps).toContain(
-		'Tried "retry backoff for the watch tick" in ah — the gate blocked it ' +
-			"(journal ah/2026-08-09.md).",
+		'Tried "retry backoff for the watch tick" in flusk — the gate blocked it ' +
+			"(journal flusk/2026-08-09.md).",
 	);
 	expect(traps.join("\n")).toContain("commit bbbbbbbb"); // the revert, cited by sha
 	// Success is never a trap, and neither is a failure about something else:

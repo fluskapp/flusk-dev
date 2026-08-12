@@ -1,10 +1,10 @@
 /**
- * The unified run feed: ah's own sessions and the harnesses' run journals
+ * The unified run feed: flusk's own sessions and the harnesses' run journals
  * in one newest-first list. "What ran recently, and how did it go?" is one
  * question, so the dashboard must not make you ask it twice.
  */
 import { basename } from "node:path";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import type { RunRow } from "./api-types.js";
 import type { Journal } from "./journal-scan.js";
 import { collectParts, type ProjectParts } from "./project-scan.js";
@@ -52,7 +52,7 @@ function rowsFor(p: ProjectParts): RunRow[] {
 	return [...sessions, ...journals];
 }
 
-export function runFeed(cfg: AhConfig, opts: RunFeedOpts = {}): RunRow[] {
+export function runFeed(cfg: FluskConfig, opts: RunFeedOpts = {}): RunRow[] {
 	const limit = Math.max(0, opts.limit ?? DEFAULT_LIMIT);
 	const rows: RunRow[] = [];
 	for (const p of collectParts(cfg)) {

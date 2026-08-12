@@ -4,7 +4,7 @@ import { deferred, makeTool, runToolBatch, setupTestHome, teardownTestHome } fro
 let repo: string;
 
 beforeAll(async () => {
-	repo = await setupTestHome("ah-loop-dispatch-");
+	repo = await setupTestHome("flusk-loop-dispatch-");
 });
 
 afterAll(() => {

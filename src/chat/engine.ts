@@ -7,13 +7,13 @@
  * moved on. try/catch/finally guarantees both halves: any escaped throw
  * becomes an "error" chunk first, then the single "done".
  */
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { renderPrompt, streamCli } from "./cli-backend.js";
 import { listBackends, type ResolvedBackend, resolveBackends } from "./detect.js";
 import { streamHttp } from "./http-backend.js";
 import type { ChatChunk, ChatEngine, ChatRequest } from "./types.js";
 
-export function createChatEngine(cfg: AhConfig): ChatEngine {
+export function createChatEngine(cfg: FluskConfig): ChatEngine {
 	return {
 		list: async () => listBackends(cfg),
 		stream: (req, signal) => streamChat(cfg, req, signal),
@@ -21,7 +21,7 @@ export function createChatEngine(cfg: AhConfig): ChatEngine {
 }
 
 async function* streamChat(
-	cfg: AhConfig,
+	cfg: FluskConfig,
 	req: ChatRequest,
 	signal: AbortSignal,
 ): AsyncGenerator<ChatChunk> {

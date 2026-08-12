@@ -10,7 +10,7 @@ let repo: string;
 const NOW = new Date("2026-01-02T03:04:05Z");
 
 beforeEach(async () => {
-	repo = await setupTestHome("ah-ws-prompt-");
+	repo = await setupTestHome("flusk-ws-prompt-");
 });
 afterEach(() => teardownTestHome());
 
@@ -23,13 +23,13 @@ async function globalFile(name: string, body: string): Promise<void> {
 
 /**
  * The no-regression guarantee: with no workspace on disk the prompt is exactly
- * the eight lines ah shipped before this feature existed. Written out in full
+ * the eight lines flusk shipped before this feature existed. Written out in full
  * rather than snapshotted, so a change to it has to be typed on purpose.
  */
 test("with no workspace the prompt is byte-identical to the built-in one", () => {
 	expect(prompt()).toBe(
 		[
-			"You are ah, an autonomous coding agent.",
+			"You are flusk, an autonomous coding agent.",
 			"",
 			"Rules:",
 			"- Use the available tools to inspect the repository and act on the task.",
@@ -49,7 +49,7 @@ test("with no workspace the prompt is byte-identical to the built-in one", () =>
 });
 
 test("each present layer becomes a titled section that names its source file", async () => {
-	await globalFile("IDENTITY.md", "call me ah");
+	await globalFile("IDENTITY.md", "call me flusk");
 	await globalFile("SOUL.md", "never push to main");
 	await globalFile("TOOLS.md", "grep before bash");
 	await writeFile(join(repo, "AGENTS.md"), "tabs, not spaces");
@@ -58,7 +58,7 @@ test("each present layer becomes a titled section that names its source file", a
 	expect(text).toContain(
 		`<!-- from ${join(globalWorkspaceDir(), "SOUL.md")} -->\n## Hard constraints`,
 	);
-	expect(text).toContain("## Identity\n\ncall me ah");
+	expect(text).toContain("## Identity\n\ncall me flusk");
 	expect(text).toContain(`<!-- from ${join(repo, "AGENTS.md")} -->`);
 	expect(text).toContain("## House rules for this repository\n\ntabs, not spaces");
 	expect(text).toContain("## Tool guidance\n\ngrep before bash");

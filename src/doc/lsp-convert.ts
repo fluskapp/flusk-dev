@@ -11,7 +11,7 @@
  * next door (see the warning at the top of types.ts).
  *
  * Everything here takes `unknown`: these values came off a pipe from a
- * process ah did not write, so nothing is assumed about their shape and a
+ * process flusk did not write, so nothing is assumed about their shape and a
  * malformed member is dropped rather than thrown over.
  */
 import { pathToFileURL } from "node:url";
@@ -119,7 +119,7 @@ const MAX_DEPTH = 32;
  * SymbolInformation list (everything at depth 0).
  */
 export function toOutline(value: unknown, depth = 0): OutlineItem[] {
-	// Bounded: the tree came off a pipe from a process ah did not write, and an
+	// Bounded: the tree came off a pipe from a process flusk did not write, and an
 	// unbounded recursion over a cyclic or absurdly deep reply is a stack
 	// overflow inside a request handler.
 	if (!Array.isArray(value) || depth > MAX_DEPTH) return [];

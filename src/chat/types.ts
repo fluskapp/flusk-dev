@@ -7,7 +7,7 @@
  *    kimi). Spawned as a subprocess; uses whatever subscription it has.
  *  - "openai-compatible": any /v1/chat/completions endpoint — OpenRouter,
  *    Ollama, LM Studio, vLLM.
- *  - "pi-ai": the catalog ah already routes runs through, when keys exist.
+ *  - "pi-ai": the catalog flusk already routes runs through, when keys exist.
  */
 
 export type ChatBackendKind = "cli" | "openai-compatible" | "pi-ai";

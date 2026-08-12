@@ -26,7 +26,7 @@ it("a worktree that cannot be opened costs one item, not the night", async () =>
 	const h = harness(client);
 	h.items = [item("bad", "2026-08-01T09:00:00Z")];
 	h.deps.openWorktree = () => {
-		throw new Error("fatal: a branch named 'ah/bad' already exists");
+		throw new Error("fatal: a branch named 'flusk/bad' already exists");
 	};
 	const r = await watchTick(h.deps);
 	expect(r.status).toBe("ran");

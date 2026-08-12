@@ -130,7 +130,7 @@ describe("createLspProvider", () => {
 		const fake = await writeFakeServer();
 		const engine = createLspProvider({
 			id: "absent",
-			command: "ah-no-such-language-server",
+			command: "flusk-no-such-language-server",
 			extensions: [".rs"],
 			root: fake.dir,
 			timeoutMs: 500,

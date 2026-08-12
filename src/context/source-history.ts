@@ -11,7 +11,7 @@
  *
  * 1. The corpus is the SERVED index (`loadIndex()`), never `historyCards()`.
  *    That reader scopes itself with `loadConfig(process.cwd())`, so the corpus
- *    would follow the directory `ah` was started from (L5), and on a stamp
+ *    would follow the directory `flusk` was started from (L5), and on a stamp
  *    miss it calls `refreshIndex`, which WRITES shards and spawns git per
  *    moved repo. A gather reads, never writes, and must not stall run start:
  *    a machine that has never indexed gets a stated reason rather than a
@@ -48,7 +48,7 @@ const RESUME_ATTEMPTS = 6;
 
 const fail = (notes: string[]): SourceResult => ({ items: [], status: "failed", notes });
 
-/** The corpus as served: a pure read of `~/.ah/index/history.json`. `null` —
+/** The corpus as served: a pure read of `~/.flusk/index/history.json`. `null` —
  * missing, corrupt or written by an older version — is an empty corpus, which
  * this source reports as a reason rather than as a failure. */
 const servedCards = (): HistoryCard[] => loadIndex()?.cards ?? [];

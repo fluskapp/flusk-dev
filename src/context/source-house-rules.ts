@@ -1,7 +1,7 @@
 /**
  * The repository's own house rules, as the pinned payload of a run's context.
  *
- * Without this, a run starts knowing ah's workspace files and nothing the
+ * Without this, a run starts knowing flusk's workspace files and nothing the
  * humans on the project wrote down: it re-derives the conventions, gets them
  * wrong, and the review says so. Two surfaces exist today and neither subsumes
  * the other — AGENTS.md/CLAUDE.md at the root (the files the agent is addressed

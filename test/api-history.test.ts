@@ -1,7 +1,7 @@
 /**
  * The other half of the same feature: the three history endpoints and the
  * palette that calls them, over the loopback server. Same seeded index in a
- * temp AH_HOME — no network, no model, no walk of the real machine's repos.
+ * temp FLUSK_HOME — no network, no model, no walk of the real machine's repos.
  */
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -52,15 +52,15 @@ const CORPUS = [
 const get = async <T>(path: string): Promise<T> => (await fetch(`${ui.url}${path}`)).json() as T;
 
 beforeAll(async () => {
-	home = mkdtempSync(join(tmpdir(), "ah-history-api-"));
-	process.env.AH_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "flusk-history-api-"));
+	process.env.FLUSK_HOME = home;
 	saveIndex({ cards: CORPUS, builtAt: new Date().toISOString(), stamps: {} });
 	ui = await startUiServer(0);
 });
 
 afterAll(async () => {
 	await ui.close();
-	delete process.env.AH_HOME;
+	delete process.env.FLUSK_HOME;
 	rmSync(home, { recursive: true, force: true });
 });
 
@@ -84,7 +84,7 @@ it("serves search, walkthrough and prompt over the loopback API", async () => {
 
 it("rejects an unknown kind and honours a project scope, as the CLI does", async () => {
 	const bad = await fetch(`${ui.url}/api/history/search?q=retry&kind=commits`);
-	expect(bad.status).toBe(400); // `ah search --kind commits` exits 1
+	expect(bad.status).toBe(400); // `flusk search --kind commits` exits 1
 	const scoped = await get<SearchHit[]>("/api/history/search?q=retry&project=nobody");
 	expect(scoped).toEqual([]);
 	const mine = await get<SearchHit[]>("/api/history/search?q=retry&project=linof-base");

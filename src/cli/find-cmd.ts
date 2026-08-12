@@ -1,5 +1,5 @@
 /**
- * `ah find <query>` — ripgrep across every configured project, in one list.
+ * `flusk find <query>` — ripgrep across every configured project, in one list.
  *
  * Grouped by file, because that is the unit you act on: a path header you can
  * copy, then its lines under it. The matched span is painted from the ranges
@@ -83,14 +83,14 @@ export function footer(result: FindResult): string {
 	return result.truncated ? `${head} · TRUNCATED${why}\n` : `${head}${why}\n`;
 }
 
-/** `ah find <query> [--project p] [--glob g] [--regex] [--case] [--limit n]`. */
+/** `flusk find <query> [--project p] [--glob g] [--regex] [--case] [--limit n]`. */
 export async function findCmd(query: string, args: FindArgs = {}): Promise<number> {
 	const out = args.out ?? process.stdout;
-	// `ah find … | head` closes the pipe mid-write; the reader's choice.
+	// `flusk find … | head` closes the pipe mid-write; the reader's choice.
 	out.on("error", () => {});
 	const limit = args.limit === undefined ? undefined : Number(args.limit);
 	if (limit !== undefined && (!Number.isInteger(limit) || limit <= 0)) {
-		out.write("ah: --limit must be a positive integer\n");
+		out.write("flusk: --limit must be a positive integer\n");
 		return 1;
 	}
 	const q: FindQuery = {

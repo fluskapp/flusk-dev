@@ -4,7 +4,7 @@
  * The estimator is `ceil(chars / 4)`. It is an estimate on purpose: a real
  * tokenizer would be a dependency, and this path must stay cheap enough to run
  * on every keystroke. Anything else that counts prompt tokens should use this
- * function rather than its own arithmetic, so the budgets ah spends are all
+ * function rather than its own arithmetic, so the budgets flusk spends are all
  * counted in one currency.
  *
  * Packing is greedy by value PER TOKEN, not by value: a 40-token house rule

@@ -19,7 +19,7 @@ afterAll(async () => {
 
 /** A scratch repo per shell process: under vitest each spawnSync costs ~300ms. */
 async function build(script: string): Promise<string> {
-	const dir = await mkdtemp(join(tmpdir(), "ah-hist-out-"));
+	const dir = await mkdtemp(join(tmpdir(), "flusk-hist-out-"));
 	dirs.push(dir);
 	const setup = `set -e\ncd "${dir}"\ngit init -q -b main\ngit config user.email t@example.com\ngit config user.name T\ngit config commit.gpgsign false\n`;
 	const res = spawnSync("sh", ["-c", setup + script], { encoding: "utf8" });

@@ -24,8 +24,8 @@ function gitInit(repo: string): void {
 	sh(repo, ["commit", "-q", "--allow-empty", "-m", "seed"]);
 }
 
-test("isolation: a mutating turn is checkpointed as 'ah: turn N'", async () => {
-	const repo = await setupTestHome("ah-checkpoint-");
+test("isolation: a mutating turn is checkpointed as 'flusk: turn N'", async () => {
+	const repo = await setupTestHome("flusk-checkpoint-");
 	try {
 		gitInit(repo);
 		const provider = new FakeProvider([
@@ -43,7 +43,7 @@ test("isolation: a mutating turn is checkpointed as 'ah: turn N'", async () => {
 			tools: [writeTool, bashTool],
 			task: "make a note",
 			repoRoot: repo,
-			isolation: { repoRoot: repo, branch: "ah/test" },
+			isolation: { repoRoot: repo, branch: "flusk/test" },
 		});
 		const rec = collectRunRecord(agent.events, repo);
 		const { reason } = await agent.run();
@@ -51,7 +51,7 @@ test("isolation: a mutating turn is checkpointed as 'ah: turn N'", async () => {
 		rec.stop();
 
 		const subjects = sh(repo, ["log", "--format=%s"]).split("\n");
-		expect(subjects).toEqual(["ah: turn 1", "seed"]);
+		expect(subjects).toEqual(["flusk: turn 1", "seed"]);
 		// The checkpoint captured the file the write tool produced.
 		expect(sh(repo, ["show", "--name-only", "--format=", "HEAD"])).toContain("note.txt");
 
@@ -65,7 +65,7 @@ test("isolation: a mutating turn is checkpointed as 'ah: turn N'", async () => {
 }, SLOW);
 
 test("isolation: non-mutating turns produce no checkpoint commit", async () => {
-	const repo = await setupTestHome("ah-checkpoint-clean-");
+	const repo = await setupTestHome("flusk-checkpoint-clean-");
 	try {
 		gitInit(repo);
 		const provider = new FakeProvider([
@@ -81,7 +81,7 @@ test("isolation: non-mutating turns produce no checkpoint commit", async () => {
 			tools: [writeTool, bashTool],
 			task: "look around",
 			repoRoot: repo,
-			isolation: { repoRoot: repo, branch: "ah/test" },
+			isolation: { repoRoot: repo, branch: "flusk/test" },
 		});
 		const { reason } = await agent.run();
 		expect(reason).toBe("completed");

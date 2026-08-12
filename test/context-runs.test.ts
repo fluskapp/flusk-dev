@@ -1,6 +1,6 @@
 /**
  * The prior-run source against real session files on disk — the same writer
- * the history tests use, so this describes ah's actual transcript format
+ * the history tests use, so this describes flusk's actual transcript format
  * rather than a second approximation of it. Nothing is mocked: the cards come
  * from sessionCards(), the header and handoff from SessionStore.
  */
@@ -39,10 +39,10 @@ const byId = (items: ContextItem[], kind: string): ContextItem | undefined =>
 	items.find((i) => i.id.startsWith(`runs:${kind}:`));
 
 beforeAll(async () => {
-	prev = process.env.AH_HOME;
-	home = mkdtempSync(join(tmpdir(), "ah-home-runs-"));
+	prev = process.env.FLUSK_HOME;
+	home = mkdtempSync(join(tmpdir(), "flusk-home-runs-"));
 	repoRoot = mkdtempSync(join(tmpdir(), "runs-repo-"));
-	process.env.AH_HOME = home;
+	process.env.FLUSK_HOME = home;
 	first = session(repoRoot, "an earlier, unrelated run", [say("done")], "completed");
 	latest = session(
 		repoRoot,
@@ -72,8 +72,8 @@ beforeAll(async () => {
 });
 
 afterAll(() => {
-	if (prev === undefined) delete process.env.AH_HOME;
-	else process.env.AH_HOME = prev;
+	if (prev === undefined) delete process.env.FLUSK_HOME;
+	else process.env.FLUSK_HOME = prev;
 	rmSync(home, { recursive: true, force: true });
 	rmSync(repoRoot, { recursive: true, force: true });
 });

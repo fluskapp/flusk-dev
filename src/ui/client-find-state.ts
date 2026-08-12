@@ -5,8 +5,8 @@
  * forgets you work in `*.ts` with Regex on is remembering the wrong things.
  */
 export const CLIENT_FIND_STATE_JS = `
-var FIND_OPEN_KEY = "ah-find-open";
-var FIND_STATE_KEY = "ah-find-state";
+var FIND_OPEN_KEY = "flusk-find-open";
+var FIND_STATE_KEY = "flusk-find-state";
 
 /**
  * Scope, mask, case and regex, remembered. Everything else in the workbench

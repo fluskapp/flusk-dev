@@ -4,9 +4,9 @@
  * middle, Find in Files along the bottom, Chat on the right, status bar
  * underneath.
  *
- * The only value interpolated into this document is `home`, and it goes
- * through escapeHtml. Everything else is a literal or a bundled asset, which
- * is what test/ui-page.test.ts pins.
+ * The only values interpolated into this document are `home` and the package
+ * version, and both go through escapeHtml. Everything else is a literal or a
+ * bundled asset, which is what test/ui-page.test.ts pins.
  */
 import { CLIENT_JS } from "./client-bundle.js";
 import { CLIENT_CODE_JS } from "./client-code.js";
@@ -23,6 +23,7 @@ import { ALL_CSS } from "./styles-bundle.js";
 import { CODE_CSS } from "./styles-code.js";
 import { DOC_CSS } from "./styles-doc.js";
 import { PALETTE_CSS } from "./styles-palette.js";
+import { version } from "../platform/version.js";
 
 function escapeHtml(s: string): string {
 	return s.replace(/[&<>"]/g, (c) => {
@@ -71,13 +72,13 @@ export function renderPage(home: string): string {
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>ah</title>
+<title>flusk</title>
 <style>${ALL_CSS}${VIEWER_CSS}${PALETTE_CSS}${DOC_CSS}</style>
 </head>
 <body>
 <div id="app">
     <header id="toolbar">
-        <div class="logo">ah</div>
+        <div class="logo">flusk</div>
         <button id="overview-btn" title="What needs me (o)">Attention</button>
         ${panels}
         <div class="spacer"></div>
@@ -107,13 +108,13 @@ export function renderPage(home: string): string {
     ${DOC_HTML}
     ${FIND_HTML}
     <footer id="status">
-        <span id="status-cards" title="Runs, sessions and documents ah has indexed"></span>
+        <span id="status-cards" title="Runs, sessions and documents flusk has indexed"></span>
         <span id="status-live" title="Runs in flight"></span>
         <span id="status-path" class="st-path" title="Current file"></span>
         <div class="spacer"></div>
         <span id="status-activity"></span>
         <span class="st-path">${escapeHtml(home)}</span>
-        <span>ah v0.1.0</span>
+        <span>flusk v${escapeHtml(version())}</span>
     </footer>
 </div>
 <div id="toast" role="status" aria-live="polite" hidden></div>

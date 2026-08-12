@@ -1,6 +1,6 @@
 /**
  * Harness run journals — the markdown files other harnesses (linof-harness,
- * ab) write per run under `docs/runs/`. ah reads them so a watch autopilot can
+ * ab) write per run under `docs/runs/`. flusk reads them so a watch autopilot can
  * be followed live from one dashboard, which is what aihub used to do.
  *
  * A journal carries its harness ROOT, not just the directory basename: two

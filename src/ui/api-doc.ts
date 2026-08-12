@@ -24,7 +24,7 @@
  */
 import type { ServerResponse } from "node:http";
 import { loadConfig } from "../config/config.js";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import type { Related } from "../doc/related.js";
 import { serviceStatus } from "../doc/ts-service.js";
 import type { SymbolDoc } from "../doc/types.js";
@@ -71,7 +71,7 @@ function emptyReason(file: string): string {
 }
 
 /** Which of a symbol's locations this server can serve a body for. */
-async function openableOf(cfg: AhConfig, doc: SymbolDoc): Promise<string[]> {
+async function openableOf(cfg: FluskConfig, doc: SymbolDoc): Promise<string[]> {
 	const wanted = new Set<string>(doc.references.map((r) => r.file));
 	if (doc.defined !== null) wanted.add(doc.defined.file);
 	const out: string[] = [];

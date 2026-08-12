@@ -21,7 +21,7 @@ const RULE = "Tabs, never spaces, and no file over 150 lines.";
 let repo: string;
 
 beforeAll(async () => {
-	repo = await setupTestHome("ah-run-context-house-");
+	repo = await setupTestHome("flusk-run-context-house-");
 	await writeFile(join(repo, "AGENTS.md"), `# House rules\n\n${RULE}\n`);
 });
 

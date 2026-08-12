@@ -13,7 +13,7 @@
  *    which is the difference between a usable Go-to-File and a useless one.
  */
 import { basename, resolve } from "node:path";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { projectRoots } from "../ui/project-scan.js";
 import { rgFiles } from "./rg-list.js";
 
@@ -34,7 +34,7 @@ export interface FindRoot {
  * list, never every root: falling back to "search everything" would turn a
  * typo — or `?project=../` — into a wider read than was asked for.
  */
-export function searchRoots(cfg: AhConfig, project?: string): FindRoot[] {
+export function searchRoots(cfg: FluskConfig, project?: string): FindRoot[] {
 	const roots = projectRoots(cfg).map((path) => ({ path, project: basename(path) || path }));
 	if (project === undefined || project === "") return roots;
 	return roots.filter((r) => r.project === project);
@@ -79,7 +79,7 @@ async function filesUnder(root: string): Promise<string[]> {
 }
 
 /**
- * Is `path` one of the files ah indexes? The membership test every endpoint
+ * Is `path` one of the files flusk indexes? The membership test every endpoint
  * that serves a file body runs before it opens anything.
  *
  * PER ROOT, deliberately. Testing against `listFiles(cfg)` meant testing
@@ -88,7 +88,7 @@ async function filesUnder(root: string): Promise<string[]> {
  * Resolving the owning root first also turns an O(n) scan of 20,000 strings
  * into a Set lookup, on a path the doc panel hits three times per click.
  */
-export async function isIndexedFile(cfg: AhConfig, path: string): Promise<boolean> {
+export async function isIndexedFile(cfg: FluskConfig, path: string): Promise<boolean> {
 	const target = resolve(path);
 	const root = searchRoots(cfg).find((r) => target === r.path || target.startsWith(`${r.path}/`));
 	if (root === undefined) return false;
@@ -101,7 +101,7 @@ export interface ListOptions {
 }
 
 /** Every tracked file under the allowed roots, absolute, capped. */
-export async function listFiles(cfg: AhConfig, options: ListOptions = {}): Promise<string[]> {
+export async function listFiles(cfg: FluskConfig, options: ListOptions = {}): Promise<string[]> {
 	const cap = Math.max(1, Math.min(options.limit ?? MAX_FILES, MAX_FILES));
 	const out: string[] = [];
 	for (const root of searchRoots(cfg, options.project)) {

@@ -8,7 +8,7 @@ import { setupTestHome, teardownTestHome } from "./helpers.js";
 let repo: string;
 
 beforeEach(async () => {
-	repo = await setupTestHome("ah-workspace-");
+	repo = await setupTestHome("flusk-workspace-");
 });
 afterEach(() => teardownTestHome());
 

@@ -11,7 +11,7 @@ import { fakeModel, setupTestHome, teardownTestHome } from "./helpers.js";
 let repo: string;
 
 beforeEach(async () => {
-	repo = await setupTestHome("ah-cli-resume-");
+	repo = await setupTestHome("flusk-cli-resume-");
 }, SLOW);
 afterEach(() => teardownTestHome(), SLOW);
 

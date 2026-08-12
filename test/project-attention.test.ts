@@ -10,7 +10,7 @@ it("flags a failed or errored harness run, and nothing for a healthy one", () =>
 	expect(run({ journals: [journal({ status: "done" })] })).toEqual([]);
 });
 
-it("flags an ah session that errored or was stopped, but not one that ran or aborted", () => {
+it("flags an flusk session that errored or was stopped, but not one that ran or aborted", () => {
 	expect(run({ sessions: [session({ status: "error" })] })).toEqual([
 		{ severity: "high", label: "session error: a task", ref: "plain-abcd1234/run.jsonl" },
 	]);

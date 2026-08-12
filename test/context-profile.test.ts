@@ -24,7 +24,7 @@ let dir: string;
 afterEach(() => rmSync(dir, { recursive: true, force: true }));
 
 function repo(files: Record<string, string>): string {
-	dir = mkdtempSync(join(tmpdir(), "ah-ctx-profile-"));
+	dir = mkdtempSync(join(tmpdir(), "flusk-ctx-profile-"));
 	for (const [rel, body] of Object.entries(files)) {
 		const path = join(dir, rel);
 		mkdirSync(join(path, ".."), { recursive: true });

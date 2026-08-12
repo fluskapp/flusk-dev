@@ -1,7 +1,7 @@
 /**
  * The project model — the spine of the dashboard's IA. A *project* is a
  * directory under `ui.projectDirs`: either a harness (it drives its own
- * pipeline and writes run journals) or a plain repo ah works in. Runs,
+ * pipeline and writes run journals) or a plain repo flusk works in. Runs,
  * sessions and documents are aggregated onto it, and each project carries
  * its attention list (see project-attention.ts) so the front page can say
  * what needs a human instead of listing everything.
@@ -10,7 +10,7 @@ import { existsSync, statSync } from "node:fs";
 import { summarize } from "./project-summary.js";
 export { summarize } from "./project-summary.js";
 import { basename, join, resolve } from "node:path";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import type { ProjectKind, ProjectSummary } from "./api-types.js";
 import { type Artifact, dropNested, resolveProjectRoots, scanArtifacts } from "./artifact-scan.js";
 import { type Journal, scanJournals } from "./journal-scan.js";
@@ -58,7 +58,7 @@ export function classifyProject(root: string): ProjectKind {
  * Existing, de-duplicated, absolute project roots the config points at —
  * never one inside another (see artifact-scan.ts `dropNested`).
  */
-export function projectRoots(cfg: AhConfig): string[] {
+export function projectRoots(cfg: FluskConfig): string[] {
 	const existing = resolveProjectRoots(cfg.ui.projectDirs)
 		.map((root) => resolve(root))
 		.filter(isDir);
@@ -73,7 +73,7 @@ export function projectRoots(cfg: AhConfig): string[] {
  * that share a name, and matching on the name pours each one's journals,
  * documents and attention items into the other.
  */
-export function collectParts(cfg: AhConfig): ProjectParts[] {
+export function collectParts(cfg: FluskConfig): ProjectParts[] {
 	const journals = scanJournals(cfg.ui.harnessDirs);
 	const sessions = scanSessions();
 	const docs = scanArtifacts(cfg.ui.projectDirs, UNCAPPED);
@@ -88,7 +88,7 @@ export function collectParts(cfg: AhConfig): ProjectParts[] {
 }
 
 /**
- * Everything this project is known to have cost. ah sessions record it
+ * Everything this project is known to have cost. flusk sessions record it
  * directly; a harness journal contributes only when it declares a `cost:`
  * frontmatter key, so a harness that records none reads as $0 — which
  * client-project.ts labels rather than presenting as "this was free".
@@ -114,7 +114,7 @@ export function lastActivity(p: ProjectParts): string | undefined {
 		.at(-1);
 }
 
-export function scanProjects(cfg: AhConfig, now: Date = new Date()): ProjectSummary[] {
+export function scanProjects(cfg: FluskConfig, now: Date = new Date()): ProjectSummary[] {
 	const parts = collectParts(cfg);
 	const median = medianSpend(parts.map(projectSpend));
 	return parts

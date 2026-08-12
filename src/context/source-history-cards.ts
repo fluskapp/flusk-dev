@@ -2,7 +2,7 @@
  * What the history source is willing to treat as a card, and what a card's
  * text is allowed to become on its way into the block.
  *
- * The corpus is JSON on disk (`~/.ah/index/history.json`), written by earlier
+ * The corpus is JSON on disk (`~/.flusk/index/history.json`), written by earlier
  * versions of this tool and, through a shared home, potentially by another
  * machine. Nothing revalidates it on load: `loadIndex` checks the version and
  * that `cards` is an array, and stops there. A single card missing `paths`

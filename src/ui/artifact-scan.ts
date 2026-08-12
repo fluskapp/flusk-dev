@@ -1,5 +1,5 @@
 /**
- * Project markdown — the context files, plans, docs and skills ah works from.
+ * Project markdown — the context files, plans, docs and skills flusk works from.
  * The dashboard lists them beside the run journals so a watch autopilot can be
  * read against the writing that drives it.
  *

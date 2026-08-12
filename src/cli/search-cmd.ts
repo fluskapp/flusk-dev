@@ -1,6 +1,6 @@
 /**
- * `ah search <query>` — walking everything that already happened: commits,
- * ah's own sessions, harness run journals, docs and skills, in one list.
+ * `flusk search <query>` — walking everything that already happened: commits,
+ * flusk's own sessions, harness run journals, docs and skills, in one list.
  *
  * One line per hit, because the list is meant to be scanned with the eyes and
  * the arrow keys, not read. The columns are the four things that decide
@@ -39,7 +39,7 @@ const TITLE_W = 62;
 
 export const NOTHING_INDEXED =
 	"nothing indexed yet — no commits, sessions, journals or docs under the configured\n" +
-	"project dirs (ui.projectDirs in ~/.ah/config.json). Run `ah ui` or a task first.\n";
+	"project dirs (ui.projectDirs in ~/.flusk/config.json). Run `flusk ui` or a task first.\n";
 
 function pad(text: string, width: number): string {
 	const one = text.replace(/\s+/g, " ").trim();
@@ -65,20 +65,20 @@ function row(hit: SearchHit, paint: (style: "dim" | "cyan", s: string) => string
 	);
 }
 
-/** `ah search <query> [--project p] [--kind k] [--limit n] [--json]`. */
+/** `flusk search <query> [--project p] [--kind k] [--limit n] [--json]`. */
 export function searchCmd(query: string, args: SearchArgs = {}): number {
 	const out = args.out ?? process.stdout;
-	// `ah search … | head` closes the pipe mid-write; that is the reader's
+	// `flusk search … | head` closes the pipe mid-write; that is the reader's
 	// choice, not a failure worth a stack trace.
 	out.on("error", () => {});
 	const kind = args.kind;
 	if (kind !== undefined && !KINDS.includes(kind as CardKind)) {
-		out.write(`ah: --kind must be one of ${KINDS.join(", ")}\n`);
+		out.write(`flusk: --kind must be one of ${KINDS.join(", ")}\n`);
 		return 1;
 	}
 	const limit = args.limit === undefined ? 20 : Number(args.limit);
 	if (!Number.isInteger(limit) || limit <= 0) {
-		out.write("ah: --limit must be a positive integer\n");
+		out.write("flusk: --limit must be a positive integer\n");
 		return 1;
 	}
 	const cards = historyCards({ refresh: args.refresh === true });

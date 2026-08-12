@@ -22,21 +22,21 @@ const has = (markers: string[]): void => {
 };
 
 beforeAll(async () => {
-	home = mkdtempSync(join(tmpdir(), "ah-page-regions-"));
-	process.env.AH_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "flusk-page-regions-"));
+	process.env.FLUSK_HOME = home;
 	ui = await startUiServer(0);
 	served = await (await fetch(`${ui.url}/`)).text();
 });
 
 afterAll(async () => {
 	await ui.close();
-	delete process.env.AH_HOME;
+	delete process.env.FLUSK_HOME;
 	rmSync(home, { recursive: true, force: true });
 });
 
 it("ships the chat tool window with a backend picker and stop control", () => {
 	has(['id="chat-backend"', 'id="chat-send"', 'id="chat-stop"', 'id="chat-input"']);
-	has(['id="chat-cwd"', "/api/chat/backends", 'fetch("/api/chat"', "ah-chat-backend"]);
+	has(['id="chat-cwd"', "/api/chat/backends", 'fetch("/api/chat"', "flusk-chat-backend"]);
 });
 
 it("leads with the attention region, built from the project scan", () => {
@@ -66,7 +66,7 @@ it("documents the keyboard map in a grouped help overlay", () => {
 
 it("keeps both themes and the theme toggle", () => {
 	has([':root[data-theme="dark"]', "@media (prefers-color-scheme: dark)"]);
-	has([':root:not([data-theme="light"])', 'id="theme"', "ah-theme"]);
+	has([':root:not([data-theme="light"])', 'id="theme"', "flusk-theme"]);
 	// Every colour is a token defined for BOTH themes — including the new ones.
 	for (const token of ["--match-bg", "--match-fg", "--gutter-bg", "--row"]) {
 		expect(served.split(token).length).toBeGreaterThan(2);
@@ -74,17 +74,17 @@ it("keeps both themes and the theme toggle", () => {
 });
 
 it("makes every tool window resizable, not only the chat rail", () => {
-	// IntelliJ drags all three splitters; ah hard-coded --tw-left and
+	// IntelliJ drags all three splitters; flusk hard-coded --tw-left and
 	// --tw-bottom, so Find was stuck at nine rows whatever you searched for.
 	has(["function twGrip(", "function twSize(", "function wireGrips()"]);
 	has(['"--tw-left"', '"--tw-bottom"', '"--tw-right"']);
 	has(["#side-grip", "#find-grip", "#chat-grip", ".tw-grip"]);
 	has(['"side-grip"', '"find-grip"', '"chat-grip"']);
-	has(["ah-side-width", "ah-find-height", "ah-chat-width"]);
+	has(["flusk-side-width", "flusk-find-height", "flusk-chat-width"]);
 });
 
 it("remembers the find controls the way it remembers everything else", () => {
-	has(["ah-find-state", "function saveFindState()", "function restoreFindState()"]);
+	has(["flusk-find-state", "function saveFindState()", "function restoreFindState()"]);
 	// and a superseded search is aborted, not merely ignored
 	has(["F.ac.abort()", "signal: F.ac.signal"]);
 });

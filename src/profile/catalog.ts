@@ -76,7 +76,7 @@ export const CATALOG: CatalogRow[] = [
 		kind: "skill",
 		title: "Write down what verification means here",
 		rationale:
-			"ah found the commands but nothing states which of them must pass before work is " +
+			"flusk found the commands but nothing states which of them must pass before work is " +
 			"called done, so every run has to re-derive it.",
 		needs: ["has-verify"],
 	},

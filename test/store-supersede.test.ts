@@ -70,7 +70,7 @@ it("an identical live fact dedups: same id back, no second row, nothing closed",
 });
 
 it("a different source, or a confidence outside the tolerance, is a new value", async () => {
-	const base = { subject: "Repo:ah", predicate: "test_cmd", object: "npm test", confidence: 0.9 };
+	const base = { subject: "Repo:flusk", predicate: "test_cmd", object: "npm test", confidence: 0.9 };
 	await h.store.transact(NS, [{ ...base, source: "run:1" }]);
 	h.at(T0 + 1000);
 	const nudged = await h.store.transact(NS, [{ ...base, source: "run:1", confidence: 0.9004 }]);
@@ -86,10 +86,10 @@ it("a different source, or a confidence outside the tolerance, is a new value", 
 });
 
 it("a Candidate is parked out of default reads and supersedes nothing", async () => {
-	await h.store.transact(NS, [{ subject: "Repo:ah", predicate: "lint_cmd", object: "biome" }]);
+	await h.store.transact(NS, [{ subject: "Repo:flusk", predicate: "lint_cmd", object: "biome" }]);
 	h.at(T0 + 1000);
 	await h.store.transact(NS, [
-		{ subject: "Repo:ah", predicate: "lint_cmd", object: "eslint", confidence: 0.6 },
+		{ subject: "Repo:flusk", predicate: "lint_cmd", object: "eslint", confidence: 0.6 },
 	]);
 
 	expect((await h.store.query(NS, {})).map((f) => f.object)).toEqual(["biome"]);
@@ -99,7 +99,7 @@ it("a Candidate is parked out of default reads and supersedes nothing", async ()
 	// 0.75 is the boundary itself: at the threshold the fact is active.
 	h.at(T0 + 2000);
 	await h.store.transact(NS, [
-		{ subject: "Repo:ah", predicate: "fmt_cmd", object: "biome", confidence: 0.75 },
+		{ subject: "Repo:flusk", predicate: "fmt_cmd", object: "biome", confidence: 0.75 },
 	]);
 	expect(await h.store.query(NS, { predicate: "fmt_cmd" })).toHaveLength(1);
 });

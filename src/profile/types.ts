@@ -1,5 +1,5 @@
 /**
- * What ah knows about a repository after looking at it, and what it thinks
+ * What flusk knows about a repository after looking at it, and what it thinks
  * would help. Frozen contract.
  *
  * The rule the whole feature turns on: EVERY claim carries the file that
@@ -14,7 +14,7 @@
  * project stays a decision the user makes.
  */
 
-/** Why ah believes something, pointing at a file the reader can open. */
+/** Why flusk believes something, pointing at a file the reader can open. */
 export interface Evidence {
 	/** Repo-relative path — an absolute one leaks the reader's home dir. */
 	file: string;
@@ -66,7 +66,7 @@ export interface RepoProfile {
 	docs: DocEntry[];
 	/** Commands that constitute verification, from src/verify/detect.ts. */
 	verify: string[];
-	/** Files ah could not read; kept so a partial profile says it is partial. */
+	/** Files flusk could not read; kept so a partial profile says it is partial. */
 	unreadable: string[];
 }
 
@@ -77,7 +77,7 @@ export type SuggestionKind =
 	| "skill"
 	/** An agent specification for work this repo keeps needing. */
 	| "agent"
-	/** A verification command ah found but is not configured to run. */
+	/** A verification command flusk found but is not configured to run. */
 	| "verify";
 
 export interface Suggestion {

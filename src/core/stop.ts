@@ -7,7 +7,7 @@ export interface Limits {
 
 /**
  * Pure stop check evaluated before each turn. Returns the run end reason
- * when a limit is ah, null to continue. Time is injected for testability.
+ * when a limit is hit, null to continue. Time is injected for testability.
  */
 export function checkStop(
 	turnsCompleted: number,

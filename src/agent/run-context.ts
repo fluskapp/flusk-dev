@@ -30,7 +30,7 @@
  * was merely gathered.
  */
 import { basename } from "node:path";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { buildContext } from "../context/build.js";
 import { HOUSE_RULES_SOURCE } from "../context/source-house-rules-read.js";
 import { defaultSources } from "../context/sources.js";
@@ -48,7 +48,7 @@ export interface RunContextInput {
 	/** True for a resumed session AND for a resume-in-place (continueRun). */
 	isResume: boolean;
 	events: EventBus;
-	context: AhConfig["context"];
+	context: FluskConfig["context"];
 	/** The session this run writes; the runs source reads it on a resume. */
 	sessionRef: string;
 	/** Injected by tests. Production takes the six registered sources. */

@@ -51,7 +51,7 @@ beforeAll(() => {
 	write(work, "gadget/src/g.js", "\n");
 	write(work, "gadget/config.json", "{}");
 
-	// A plain repo: markdown and ah sessions, nothing that drives runs.
+	// A plain repo: markdown and flusk sessions, nothing that drives runs.
 	write(work, "plain/README.md", "# plain\n", 2_000);
 	write(work, "plain/docs/design.md", "# design\n", 2_000);
 	session({ repoRoot: join(work, "plain"), task: "tidy up", costUsd: 0.25, atSec: SESSION_AT });
@@ -78,7 +78,7 @@ it("aggregates journals, sessions, docs and spend onto the project", () => {
 	expect(linof?.sessions).toBe(1);
 	expect(linof?.liveRuns).toBe(1);
 	expect(linof?.docs).toBe(1);
-	// 1.50 from the ah session plus the 0.75 the journal declares: a harness
+	// 1.50 from the flusk session plus the 0.75 the journal declares: a harness
 	// project used to read $0 however much it had spent.
 	expect(linof?.costUsd).toBeCloseTo(2.25);
 

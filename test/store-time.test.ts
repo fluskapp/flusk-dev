@@ -78,11 +78,11 @@ it("asOf travels in time and accepts ISO-8601 or epoch milliseconds", async () =
 });
 
 it("two snapshots diff into added and superseded, which is what the change feed needs", async () => {
-	await h.store.transact(NS, [{ subject: "Repo:ah", predicate: "test_cmd", object: "vitest" }]);
+	await h.store.transact(NS, [{ subject: "Repo:flusk", predicate: "test_cmd", object: "vitest" }]);
 	const cutoff = T0 + HOUR;
 	h.at(cutoff + 1000);
-	await h.store.transact(NS, [{ subject: "Repo:ah", predicate: "test_cmd", object: "npm test" }]);
-	await h.store.transact(NS, [{ subject: "Repo:ah", predicate: "lint_cmd", object: "biome" }]);
+	await h.store.transact(NS, [{ subject: "Repo:flusk", predicate: "test_cmd", object: "npm test" }]);
+	await h.store.transact(NS, [{ subject: "Repo:flusk", predicate: "lint_cmd", object: "biome" }]);
 
 	const status = "active,candidate,superseded";
 	const before = await h.store.query(NS, { status, asOf: cutoff, limit: 500 });

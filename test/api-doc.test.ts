@@ -31,10 +31,10 @@ let ui: UiServer;
 let greet: string;
 
 beforeAll(async () => {
-	home = mkdtempSync(join(tmpdir(), "ah-apidoc-home-"));
-	work = mkdtempSync(join(tmpdir(), "ah-apidoc-work-"));
-	outside = mkdtempSync(join(tmpdir(), "ah-apidoc-out-"));
-	process.env.AH_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "flusk-apidoc-home-"));
+	work = mkdtempSync(join(tmpdir(), "flusk-apidoc-work-"));
+	outside = mkdtempSync(join(tmpdir(), "flusk-apidoc-out-"));
+	process.env.FLUSK_HOME = home;
 	const app = join(work, "app");
 	greet = put(app, "src/greet.ts", GREET_TS);
 	put(app, "src/use.ts", USE_TS);
@@ -48,7 +48,7 @@ beforeAll(async () => {
 afterAll(async () => {
 	await ui.close();
 	disposeService();
-	delete process.env.AH_HOME;
+	delete process.env.FLUSK_HOME;
 	for (const dir of [home, work, outside]) rmSync(dir, { recursive: true, force: true });
 });
 

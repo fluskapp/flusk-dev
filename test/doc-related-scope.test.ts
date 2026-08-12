@@ -15,7 +15,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { AhConfig } from "../src/config/types.js";
+import type { FluskConfig } from "../src/config/types.js";
 import { type RelatedItem, relatedFor } from "../src/doc/related.js";
 import type { FindMatch, FindResult } from "../src/find/types.js";
 import { buildIndex } from "../src/history/bm25.js";
@@ -29,7 +29,7 @@ let work: string;
 let file: string;
 let skill: string;
 let doc: string;
-let cfg: AhConfig;
+let cfg: FluskConfig;
 
 function put(path: string, body: string): string {
 	mkdirSync(dirname(path), { recursive: true });
@@ -41,21 +41,21 @@ function put(path: string, body: string): string {
 type Seed = [string, CardKind, string, Outcome, number, string[]];
 const REL = "src/doc/related.ts";
 const SEEDS: Seed[] = [
-	["commit:ah:aaa1", "commit", `fix ${SYMBOL} cap`, "shipped", 30, []],
-	["commit:ah:bbb2", "commit", "tidy the panel wiring", "shipped", 2, [REL]],
-	["journal:ah:run7", "journal", "nightly run 7", "failed", 9, [REL]],
-	["session:ah:s1", "session", `session touching ${SYMBOL}`, "shipped", 1, []],
+	["commit:flusk:aaa1", "commit", `fix ${SYMBOL} cap`, "shipped", 30, []],
+	["commit:flusk:bbb2", "commit", "tidy the panel wiring", "shipped", 2, [REL]],
+	["journal:flusk:run7", "journal", "nightly run 7", "failed", 9, [REL]],
+	["session:flusk:s1", "session", `session touching ${SYMBOL}`, "shipped", 1, []],
 ];
 
 /** The seeds, plus the same skill file the grep stub also returns. */
 const cards = (): HistoryCard[] => [
 	...SEEDS.map(([id, kind, title, outcome, days, paths]): HistoryCard => {
-		return { id, kind, project: "ah", title, text: "", at: ago(days), paths, outcome, ref: id };
+		return { id, kind, project: "flusk", title, text: "", at: ago(days), paths, outcome, ref: id };
 	}),
 	{
-		id: "skill:ah:retry",
+		id: "skill:flusk:retry",
 		kind: "skill",
-		project: "ah",
+		project: "flusk",
 		title: "Retry",
 		text: SYMBOL,
 		at: ago(5),
@@ -85,7 +85,7 @@ const hits = (): FindResult => ({
 	truncated: false,
 	tookMs: 1,
 });
-const grep = async (_cfg: AhConfig, symbol: string): Promise<FindResult> =>
+const grep = async (_cfg: FluskConfig, symbol: string): Promise<FindResult> =>
 	symbol === SYMBOL ? hits() : empty;
 
 const ask = (over: { cap?: number } = {}, symbol = SYMBOL) =>
@@ -95,7 +95,7 @@ const why = (items: RelatedItem[], ref: string): string | undefined =>
 	items.find((i) => i.ref === ref)?.why;
 
 beforeAll(() => {
-	work = mkdtempSync(join(tmpdir(), "ah-doc-related-"));
+	work = mkdtempSync(join(tmpdir(), "flusk-doc-related-"));
 	const root = join(work, "proj");
 	file = put(join(root, "src/doc/related.ts"), `export function ${SYMBOL}() {}\n`);
 	skill = put(join(root, ".claude/skills/retry/SKILL.md"), `# ${SYMBOL}\n\nnever loop it.\n`);
@@ -144,5 +144,5 @@ it("never claims a card names a symbol it does not contain", async () => {
 		expect(text.toLowerCase()).toContain(SYMBOL.toLowerCase());
 	}
 	// The failed run touched the file, so it says so and does not claim a name.
-	expect(why(r.runs, "journal:ah:run7")).toBe("run failed while editing this file");
+	expect(why(r.runs, "journal:flusk:run7")).toBe("run failed while editing this file");
 });

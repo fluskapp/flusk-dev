@@ -1,7 +1,7 @@
 import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { ahHome } from "../src/session/paths.js";
+import { fluskHome } from "../src/session/paths.js";
 import { Type } from "typebox";
 import { createAgent } from "../src/agent/agent.js";
 import type { EventBus } from "../src/core/events.js";
@@ -13,26 +13,26 @@ export const fakeModel: ModelRef = { provider: "fake", id: "fake-1", contextWind
 
 export const noParams = Type.Object({});
 
-/** Creates a tmpdir, points AH_HOME inside it, and returns a repo dir path. */
+/** Creates a tmpdir, points FLUSK_HOME inside it, and returns a repo dir path. */
 export async function setupTestHome(prefix: string): Promise<string> {
 	const tmp = await mkdtemp(join(tmpdir(), prefix));
-	process.env.AH_HOME = join(tmp, "home");
+	process.env.FLUSK_HOME = join(tmp, "home");
 	const repo = join(tmp, "repo");
 	await mkdir(repo, { recursive: true });
 	return repo;
 }
 
 export function teardownTestHome(): void {
-	delete process.env.AH_HOME;
+	delete process.env.FLUSK_HOME;
 }
 
 /**
- * Writes ~/.ah/config.json for the current AH_HOME — the trusted layer.
- * loadConfig refuses several keys from a repo's own .ah.json, because a cloned
+ * Writes ~/.flusk/config.json for the current FLUSK_HOME — the trusted layer.
+ * loadConfig refuses several keys from a repo's own .flusk/config.json, because a cloned
  * repo authors that file; a fixture that sets them has to set them here.
  */
 export async function writeHomeConfig(data: unknown): Promise<void> {
-	const home = ahHome();
+	const home = fluskHome();
 	await mkdir(home, { recursive: true });
 	await writeFile(join(home, "config.json"), JSON.stringify(data));
 }

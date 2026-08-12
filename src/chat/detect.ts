@@ -13,7 +13,7 @@
  */
 import { accessSync, constants, statSync } from "node:fs";
 import { delimiter, join } from "node:path";
-import type { AhConfig, ChatBackendConfig } from "../config/types.js";
+import type { FluskConfig, ChatBackendConfig } from "../config/types.js";
 import type { ChatBackend } from "./types.js";
 
 /** Agent CLIs probed by default, with the flag that makes each one-shot. */
@@ -131,7 +131,7 @@ function fromConfig(c: ChatBackendConfig): ResolvedBackend {
 }
 
 /** Detected CLIs, then config merged over them by id. Never throws. */
-export function resolveBackends(cfg: AhConfig): ResolvedBackend[] {
+export function resolveBackends(cfg: FluskConfig): ResolvedBackend[] {
 	const out = DEFAULT_CLIS.map((d) => cli(d.id, d.label, d.id, [...d.args]));
 	for (const c of cfg.chat?.backends ?? []) {
 		if (typeof c?.id !== "string" || c.id === "") continue;
@@ -143,6 +143,6 @@ export function resolveBackends(cfg: AhConfig): ResolvedBackend[] {
 	return out;
 }
 
-export function listBackends(cfg: AhConfig): ChatBackend[] {
+export function listBackends(cfg: FluskConfig): ChatBackend[] {
 	return resolveBackends(cfg).map((r) => r.backend);
 }

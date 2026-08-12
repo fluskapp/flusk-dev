@@ -10,7 +10,7 @@ import { estimateTokens } from "../src/history/budget.js";
 let repo: string;
 
 beforeEach(async () => {
-	repo = await mkdtemp(join(tmpdir(), "ah-house-rules-"));
+	repo = await mkdtemp(join(tmpdir(), "flusk-house-rules-"));
 });
 
 const req = (task = "tighten the verify chain"): ContextRequest => ({

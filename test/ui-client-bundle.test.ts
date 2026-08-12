@@ -16,15 +16,15 @@ let ui: UiServer;
 let served: string;
 
 beforeAll(async () => {
-	home = mkdtempSync(join(tmpdir(), "ah-bundle-home-"));
-	process.env.AH_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "flusk-bundle-home-"));
+	process.env.FLUSK_HOME = home;
 	ui = await startUiServer(0);
 	served = await (await fetch(`${ui.url}/`)).text();
 });
 
 afterAll(async () => {
 	await ui.close();
-	delete process.env.AH_HOME;
+	delete process.env.FLUSK_HOME;
 	rmSync(home, { recursive: true, force: true });
 });
 

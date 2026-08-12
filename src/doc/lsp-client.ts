@@ -90,7 +90,7 @@ export function startLsp(spec: LspServerSpec): LspClient {
 	child?.stdin.on("error", () => {}); // EPIPE: the server died mid-write
 	child?.stderr.resume(); // drain, so a chatty server never blocks on a full pipe
 	// onOverflow ends the session on bytes that can never become a frame; unref
-	// stops a wedged server's pipes from keeping `ah ui` alive forever.
+	// stops a wedged server's pipes from keeping `flusk ui` alive forever.
 	child?.stdout.on("data", createFrameReader(deliver, { onOverflow: die }));
 	child?.unref();
 	for (const p of [child?.stdin, child?.stdout, child?.stderr]) (p as Stream)?.unref?.();

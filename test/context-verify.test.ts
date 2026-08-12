@@ -3,17 +3,20 @@
  * because the whole point of the source is that it agrees with detect.ts and
  * loadRepoConfig, and a mock of either would assert the agreement away.
  */
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { verifySource } from "../src/context/source-verify.js";
 import type { ContextItem, ContextRequest, SourceResult } from "../src/context/types.js";
 import { estimateTokens } from "../src/history/budget.js";
 
 async function repoWith(files: Record<string, string>): Promise<string> {
-	const repo = await mkdtemp(join(tmpdir(), "ah-ctx-verify-"));
-	for (const [name, body] of Object.entries(files)) await writeFile(join(repo, name), body);
+	const repo = await mkdtemp(join(tmpdir(), "flusk-ctx-verify-"));
+	for (const [name, body] of Object.entries(files)) {
+		await mkdir(join(repo, dirname(name)), { recursive: true });
+		await writeFile(join(repo, name), body);
+	}
 	return repo;
 }
 
@@ -50,17 +53,17 @@ describe("verify context source", () => {
 		expect(item.source).toBe("verify");
 	});
 
-	it("lets a .ah.json verify[] win outright, as the gate does", async () => {
+	it("lets a .flusk/config.json verify[] win outright, as the gate does", async () => {
 		const repo = await repoWith({
 			"package.json": pkg({ test: "vitest run" }),
-			".ah.json": JSON.stringify({ verify: ["make ci", "./scripts/smoke.sh"] }),
+			".flusk/config.json": JSON.stringify({ verify: ["make ci", "./scripts/smoke.sh"] }),
 		});
 		const item = only(verifySource.gather(req(repo)));
 		expect(item.body).toContain("1. make ci");
 		expect(item.body).toContain("2. ./scripts/smoke.sh");
 		expect(item.body).not.toContain("npm test");
-		expect(item.path).toBe(".ah.json");
-		expect(item.why).toContain("verify[] array of .ah.json");
+		expect(item.path).toBe(".flusk/config.json");
+		expect(item.why).toContain("verify[] array of .flusk/config.json");
 	});
 
 	it("reports an empty chain as an item, not as a skip", async () => {

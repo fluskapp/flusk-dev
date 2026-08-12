@@ -17,14 +17,14 @@ let home: string;
 let ui: UiServer;
 
 beforeAll(async () => {
-	home = mkdtempSync(join(tmpdir(), "ah-render-home-"));
-	process.env.AH_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "flusk-render-home-"));
+	process.env.FLUSK_HOME = home;
 	ui = await startUiServer(0);
 });
 
 afterAll(async () => {
 	await ui.close();
-	delete process.env.AH_HOME;
+	delete process.env.FLUSK_HOME;
 	rmSync(home, { recursive: true, force: true });
 });
 

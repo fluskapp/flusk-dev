@@ -7,8 +7,8 @@
  * plain text, so a failed render costs formatting and never the reply.
  */
 export const CLIENT_CHAT_JS = `
-var CHAT_KEY = "ah-chat-backend";
-var CHAT_W_KEY = "ah-chat-width";
+var CHAT_KEY = "flusk-chat-backend";
+var CHAT_W_KEY = "flusk-chat-width";
 var CHAT_MIN_W = 300;
 
 function updateChatCwd() {
@@ -103,7 +103,7 @@ function autogrowChat(el) {
 }
 function setChatVisible(on) {
 	document.body.classList.toggle("chat-off", !on);
-	localStorage.setItem("ah-chat-open", on ? "1" : "0");
+	localStorage.setItem("flusk-chat-open", on ? "1" : "0");
 	var btn = $("#chat-btn"); if (btn) btn.classList.toggle("on", on);
 }
 function toggleChat() { setChatVisible(document.body.classList.contains("chat-off")); }

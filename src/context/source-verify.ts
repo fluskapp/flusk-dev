@@ -9,12 +9,12 @@
  *
  * TRAP, and the reason this source exists as its own thing: buildProfile()
  * calls detectVerifyCommands(root) with NO repoConfig, so profile.verify
- * silently ignores a .ah.json verify[] override. Taking profile.verify would
+ * silently ignores a .flusk/config.json verify[] override. Taking profile.verify would
  * pin a chain that differs from the one src/cli/gate-loop.ts executes - worse
  * than pinning none, because it reads as authoritative. This source therefore
  * makes gate-loop's call itself: detectVerifyCommands(repoRoot, loadRepoConfig).
  *
- * gather() is total (L7). loadRepoConfig THROWS on a malformed .ah.json - it
+ * gather() is total (L7). loadRepoConfig THROWS on a malformed .flusk/config.json - it
  * refuses the file rather than half-reading it - and that must cost the
  * override plus a stated note, never the run.
  */
@@ -50,7 +50,7 @@ function loadTotal(repoRoot: string): Loaded {
 	} catch (err) {
 		const why = relativise(detail(err), repoRoot);
 		return {
-			note: `Could not read .ah.json, so any verify[] override in it was ignored: ${why}. The chain below is what detectVerifyCommands derives from the repo files instead, which is also what the gate will run while the file stays unreadable.`,
+			note: `Could not read .flusk/config.json, so any verify[] override in it was ignored: ${why}. The chain below is what detectVerifyCommands derives from the repo files instead, which is also what the gate will run while the file stays unreadable.`,
 		};
 	}
 }
@@ -72,7 +72,7 @@ function gather(req: ContextRequest): SourceResult {
 		return { items: [], status: "failed", notes };
 	}
 	const caveat =
-		loaded.note === undefined ? "" : ", with the unreadable .ah.json override left out";
+		loaded.note === undefined ? "" : ", with the unreadable .flusk/config.json override left out";
 	// An empty chain is a finding, not a skip: "nothing gates this run" is
 	// something the agent must know, and it is not the same as "not asked".
 	const item = buildVerifyItem(commands, loaded.config?.verify !== undefined, caveat);

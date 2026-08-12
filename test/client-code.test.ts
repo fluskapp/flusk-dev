@@ -85,7 +85,7 @@ it("resolves a click into a /api/doc lookup for that position", () => {
 
 it("hands the answer to the documentation window, or announces it", () => {
 	expect(CLIENT_CODE_JS).toContain('typeof showSymbolDoc === "function"');
-	expect(CLIENT_CODE_JS).toContain('new CustomEvent("ah-doc"');
+	expect(CLIENT_CODE_JS).toContain('new CustomEvent("flusk-doc"');
 });
 
 it("opens a file at a line, and lists its structure", () => {

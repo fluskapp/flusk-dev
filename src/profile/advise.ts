@@ -8,10 +8,10 @@
  * indistinguishable from its wrong ones.
  *
  * Things already in place are reported as `present` rather than dropped, so
- * "what about Postgres?" has a visible answer instead of looking like ah
+ * "what about Postgres?" has a visible answer instead of looking like flusk
  * failed to notice.
  */
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { CATALOG, type CatalogRow } from "./catalog.js";
 import type { Advice, Evidence, RepoProfile, Suggestion } from "./types.js";
 
@@ -20,7 +20,7 @@ function mcpApply(row: CatalogRow): { target: string; content: string } | undefi
 	if (row.pkg === undefined) return undefined;
 	const key = row.id.replace(/^mcp:/, "");
 	return {
-		target: "~/.ah/config.json  (mcpServers)",
+		target: "~/.flusk/config.json  (mcpServers)",
 		content: JSON.stringify(
 			{ mcpServers: { [key]: { command: "npx", args: ["-y", row.pkg] } } },
 			null,
@@ -34,14 +34,14 @@ function fileApply(row: CatalogRow, profile: RepoProfile): { target: string; con
 	const name = row.id.replace(/^(skill|agent):/, "");
 	if (row.kind === "agent") {
 		return {
-			target: `<repo>/.ah/agents/${name}.md`,
+			target: `<repo>/.flusk/agents/${name}.md`,
 			content:
 				`---\nname: ${name}\ndescription: ${row.title}\nworker: internal\n---\n\n` +
 				`${row.rationale}\n\nVerify with: ${profile.verify.join(", ") || "(none detected)"}\n`,
 		};
 	}
 	return {
-		target: `<repo>/.ah/skills/${name}.md`,
+		target: `<repo>/.flusk/skills/${name}.md`,
 		content: `# ${row.title}\n\n${row.rationale}\n\nSteps:\n1. \n2. \n`,
 	};
 }
@@ -66,7 +66,7 @@ function signalsOf(profile: RepoProfile): Set<string> {
 }
 
 /** True when this suggestion is already satisfied on disk or in config. */
-function alreadyPresent(row: CatalogRow, profile: RepoProfile, cfg?: AhConfig): boolean {
+function alreadyPresent(row: CatalogRow, profile: RepoProfile, cfg?: FluskConfig): boolean {
 	if (row.kind === "mcp") {
 		const key = row.id.replace(/^mcp:/, "");
 		const servers = (cfg as unknown as { mcpServers?: Record<string, unknown> })?.mcpServers;
@@ -79,7 +79,7 @@ function alreadyPresent(row: CatalogRow, profile: RepoProfile, cfg?: AhConfig): 
 	return false;
 }
 
-export function advise(profile: RepoProfile, cfg?: AhConfig): Advice {
+export function advise(profile: RepoProfile, cfg?: FluskConfig): Advice {
 	const have = signalsOf(profile);
 	const suggestions: Suggestion[] = [];
 	for (const row of CATALOG) {

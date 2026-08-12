@@ -31,7 +31,7 @@ const denyWrites: Policy = {
 };
 
 beforeAll(async () => {
-	dir = await mkdtemp(join(tmpdir(), "ah-write-edit-"));
+	dir = await mkdtemp(join(tmpdir(), "flusk-write-edit-"));
 });
 
 afterAll(async () => {

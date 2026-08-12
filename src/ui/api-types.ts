@@ -12,7 +12,7 @@ export interface ProjectSummary {
 	name: string;
 	path: string;
 	kind: ProjectKind;
-	/** Harness runs (journals) plus ah sessions, and how many are in flight. */
+	/** Harness runs (journals) plus flusk sessions, and how many are in flight. */
 	runs: number;
 	liveRuns: number;
 	sessions: number;
@@ -51,11 +51,11 @@ export interface ProjectDetail extends ProjectSummary {
 	systemPrompt?: { source: string; text: string };
 	/** Verify commands the project gates on. */
 	verify: string[];
-	/** Declarative config worth showing (harness config.json, .ah.json). */
+	/** Declarative config worth showing (harness config.json, .flusk/config.json). */
 	config: Record<string, unknown>;
 }
 
-/** One row in the unified run feed: an ah session or a harness journal. */
+/** One row in the unified run feed: an flusk session or a harness journal. */
 export interface RunRow {
 	id: string;
 	kind: "session" | "journal";

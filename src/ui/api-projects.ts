@@ -7,11 +7,11 @@
  * fall out of date.
  *
  * Config is re-read per request on purpose — the same choice api-content.ts
- * makes — so editing ~/.ah/config.json shows up without restarting `ah ui`.
+ * makes — so editing ~/.flusk/config.json shows up without restarting `flusk ui`.
  */
 import type { ServerResponse } from "node:http";
 import { loadConfig } from "../config/config.js";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { projectDetail } from "./project-detail.js";
 import { scanProjects } from "./project-scan.js";
 import { runFeed } from "./run-feed.js";
@@ -21,7 +21,7 @@ function json(res: ServerResponse, status: number, body: unknown): void {
 	res.end(JSON.stringify(body));
 }
 
-const config = (): AhConfig => loadConfig(process.cwd());
+const config = (): FluskConfig => loadConfig(process.cwd());
 
 /** A positive integer query param, or undefined when absent/garbage. */
 function count(raw: string | null): number | undefined {

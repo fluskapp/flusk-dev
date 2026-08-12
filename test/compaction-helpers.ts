@@ -1,11 +1,11 @@
-import type { AhConfig } from "../src/config/types.js";
+import type { FluskConfig } from "../src/config/types.js";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
 import type { ModelRef, Msg } from "../src/core/types.js";
 import { assistantText } from "../src/provider/fake.js";
 
 export const smallModel: ModelRef = { provider: "fake", id: "fake-1", contextWindow: 2000 };
 
-export function compactingConfig(): AhConfig {
+export function compactingConfig(): FluskConfig {
 	const cfg = structuredClone(DEFAULT_CONFIG);
 	cfg.compaction = { reserveTokens: 1500, keepRecentTokens: 100 };
 	return cfg;

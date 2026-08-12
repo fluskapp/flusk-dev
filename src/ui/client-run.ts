@@ -1,5 +1,5 @@
 /**
- * The run view: one ah session as a transcript. Which view a run tab gets is
+ * The run view: one flusk session as a transcript. Which view a run tab gets is
  * decided by the ref it carries — a session key lands here, a journal path
  * lands in client-journal.ts, which renders it as markdown.
  */
@@ -30,7 +30,7 @@ async function loadSessionRun(key) {
 
 /**
  * \`nvim +LINE "path"\` when the tab was opened at a line. The peek surface is
- * the documented escape hatch for files ah cannot render whole, so dropping
+ * the documented escape hatch for files flusk cannot render whole, so dropping
  * the line — the one thing the search hit knew — threw away the point.
  */
 function nvimCmd(path) {

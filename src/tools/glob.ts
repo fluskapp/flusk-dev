@@ -19,7 +19,7 @@ type GlobFn = (
 function globFn(): GlobFn {
 	const fn = (fsp as { glob?: GlobFn }).glob;
 	if (typeof fn !== "function") {
-		throw new Error("fs.promises.glob is unavailable; ah requires Node.js >= 22");
+		throw new Error("fs.promises.glob is unavailable; flusk requires Node.js >= 22");
 	}
 	return fn;
 }

@@ -26,7 +26,7 @@ afterEach(() => {
 });
 
 function repo(files: Record<string, string>): string {
-	const dir = mkdtempSync(join(tmpdir(), "ah-ctx-profile-"));
+	const dir = mkdtempSync(join(tmpdir(), "flusk-ctx-profile-"));
 	dirs.push(dir);
 	for (const [rel, body] of Object.entries(files)) {
 		const path = join(dir, rel);

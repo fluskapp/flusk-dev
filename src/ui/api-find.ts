@@ -5,8 +5,8 @@
  * Both are GETs behind the loopback guard server.ts already runs, and neither
  * takes a path from the caller — only a project NAME, which src/find resolves
  * against the configured roots. Config is re-read per request, the same choice
- * api-content.ts and api-projects.ts make, so editing ~/.ah/config.json shows
- * up without restarting `ah ui`.
+ * api-content.ts and api-projects.ts make, so editing ~/.flusk/config.json shows
+ * up without restarting `flusk ui`.
  */
 import type { ServerResponse } from "node:http";
 import { loadConfig } from "../config/config.js";

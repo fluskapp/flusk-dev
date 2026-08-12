@@ -9,7 +9,7 @@
  */
 import type { ServerResponse } from "node:http";
 import { resolve } from "node:path";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { isIndexedFile } from "../find/files.js";
 import { expandHome } from "./journal-scan.js";
 
@@ -19,7 +19,7 @@ export function json(res: ServerResponse, status: number, body: unknown): void {
 }
 
 /** The indexed file the request names, or null — never a prefix test. */
-export async function indexedFile(cfg: AhConfig, raw: string | null): Promise<string | null> {
+export async function indexedFile(cfg: FluskConfig, raw: string | null): Promise<string | null> {
 	if (raw === null || raw === "") return null;
 	const path = resolve(expandHome(raw));
 	return (await isIndexedFile(cfg, path)) ? path : null;

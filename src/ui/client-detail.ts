@@ -43,7 +43,7 @@ function itemHtml(it) {
 	var err = it.errorMessage
 		? '<div class="error-line">\\u26a0 ' + esc(it.errorMessage) + "</div>" : "";
 	var tools = it.tools.map(toolHtml).join("");
-	return '<div class="msg assistant"><div class="msg-tag">ah</div>' +
+	return '<div class="msg assistant"><div class="msg-tag">flusk</div>' +
 		'<div class="msg-body">' + text + tools + err + "</div></div>";
 }
 

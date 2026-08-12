@@ -3,7 +3,7 @@
  * Every endpoint's body lives in an api-*.ts module beside this one.
  */
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
-import { ahHome } from "../session/paths.js";
+import { fluskHome } from "../session/paths.js";
 import { handleChat, liveChats } from "./api-chat.js";
 import { handleContent } from "./api-content.js";
 import { disposeDocRegistries, handleDoc } from "./api-doc.js";
@@ -41,7 +41,7 @@ function handle(req: IncomingMessage, res: ServerResponse, port: number): void {
 	const repo = url.searchParams.get("repo");
 	if (method === "GET" && path === "/") {
 		res.writeHead(200, PAGE_HEADERS);
-		res.end(renderPage(ahHome()));
+		res.end(renderPage(fluskHome()));
 		return;
 	}
 	if (handleFind(method, path, url.searchParams, res)) return;
@@ -82,7 +82,7 @@ export function startUiServer(port: number): Promise<UiServer> {
 						// nothing else will ever end them (see api-chat.ts liveChats).
 						for (const chat of [...liveChats]) chat.abort();
 						liveChats.clear();
-						// Then the doc engines: a language server ah spawned is detached
+						// Then the doc engines: a language server flusk spawned is detached
 						// too, and its ref'd stdio pipes outlived the dashboard entirely.
 						disposeDocRegistries();
 						server.close(() => r());

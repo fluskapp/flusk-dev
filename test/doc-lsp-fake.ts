@@ -2,7 +2,7 @@
  * A fake language server, written to a temp .mjs and spawned like a real one.
  *
  * This is the only way to prove the LSP half works on a machine with no
- * language server installed — which is every machine ah currently runs on. It
+ * language server installed — which is every machine flusk currently runs on. It
  * speaks the real framing, so the test exercises the real bytes rather than a
  * mocked client, and it ECHOES the position it was sent back into the hover
  * text: that is how the 1-based → 0-based conversion is asserted exactly
@@ -126,7 +126,7 @@ export interface Fake {
 }
 
 export async function writeFakeServer(): Promise<Fake> {
-	const dir = await mkdtemp(join(tmpdir(), "ah-lsp-"));
+	const dir = await mkdtemp(join(tmpdir(), "flusk-lsp-"));
 	const script = join(dir, "fake-server.mjs");
 	const file = join(dir, "demo.rs");
 	await writeFile(script, SERVER);

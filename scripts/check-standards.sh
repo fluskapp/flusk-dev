@@ -5,7 +5,7 @@
 #    The aspiration is <= ~100 lines (one concern per file); 150 is the
 #    hard cap this script enforces.
 # 2. Dependency boundary: `@earendil-works/pi-ai` may only be imported from
-#    files matching src/provider/pi-ai*.ts. Everything else uses ah's own
+#    files matching src/provider/pi-ai*.ts. Everything else uses flusk's own
 #    types (src/core/types.ts, src/provider/provider.ts).
 # 3. The pi-ai "/compat" entrypoint must never be imported.
 set -euo pipefail

@@ -3,7 +3,7 @@
  * fake-provider scripts, and model selection.
  */
 import { readFile } from "node:fs/promises";
-import type { AhConfig, TaskKind } from "../config/types.js";
+import type { FluskConfig, TaskKind } from "../config/types.js";
 import type { AssistantMsg, ModelRef } from "../core/types.js";
 import { zeroUsage } from "../core/types.js";
 import { assistantText, assistantToolCalls, type ScriptedTurn } from "../provider/fake.js";
@@ -28,7 +28,7 @@ export const envKeyVar = (provider: string): string =>
 export function demoScript(): ScriptedTurn[] {
 	const finale = "Demo complete — the loop, tools, sessions and renderer all work.";
 	return [
-		{ message: assistantToolCalls([{ id: "demo-1", name: "bash", args: { command: "echo hello from ah" } }]) },
+		{ message: assistantToolCalls([{ id: "demo-1", name: "bash", args: { command: "echo hello from flusk" } }]) },
 		{ deltas: [{ channel: "text", text: finale }], message: assistantText(finale) },
 	];
 }
@@ -48,7 +48,7 @@ export async function loadFakeScript(source: string): Promise<ScriptedTurn[]> {
 	});
 }
 
-export async function pickModel(cfg: AhConfig, kind: TaskKind, override?: string): Promise<ModelRef> {
+export async function pickModel(cfg: FluskConfig, kind: TaskKind, override?: string): Promise<ModelRef> {
 	if (override === undefined) return chooseModel(cfg, kind, await loadScores()).ref;
 	const slash = override.indexOf("/");
 	if (slash <= 0 || slash === override.length - 1) {

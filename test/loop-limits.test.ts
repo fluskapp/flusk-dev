@@ -13,7 +13,7 @@ import {
 let repo: string;
 
 beforeAll(async () => {
-	repo = await setupTestHome("ah-loop-limits-");
+	repo = await setupTestHome("flusk-loop-limits-");
 });
 
 afterAll(() => {

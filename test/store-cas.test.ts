@@ -117,7 +117,7 @@ it("an expired or superseded value cannot satisfy a guard", async () => {
 it("exactly one of several concurrent sessions claims the task", async () => {
 	await h.store.transact(NS, [{ subject: "Task:1", predicate: "status", object: "pending" }]);
 	h.at(T0 + 1000);
-	// Separate store instances: the competing claimer is another `ah` process,
+	// Separate store instances: the competing claimer is another `flusk` process,
 	// so the in-process queue alone would not stop a double claim.
 	const claimers = [h.store, h.rival(), h.rival()];
 	const results = await Promise.all(claimers.map((s, i) => claim(s, "Task:1", `run:${i}`)));

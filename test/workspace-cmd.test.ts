@@ -10,7 +10,7 @@ import { setupTestHome, teardownTestHome } from "./helpers.js";
 let repo: string;
 
 beforeEach(async () => {
-	repo = await setupTestHome("ah-ws-cmd-");
+	repo = await setupTestHome("flusk-ws-cmd-");
 });
 afterEach(() => teardownTestHome());
 

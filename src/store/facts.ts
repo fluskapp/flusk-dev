@@ -6,7 +6,7 @@
  * goal's status stops advancing) or the old one (a task's dependencies
  * collapse to the last edge).
  *
- * Every assert ah makes is built by `fact()`, so this table is not a
+ * Every assert flusk makes is built by `fact()`, so this table is not a
  * description of the behaviour, it IS the behaviour: no other module decides a
  * cardinality, and an assert whose (subject type, predicate) has no row here
  * is refused rather than guessed at. The predicates themselves are spelled by

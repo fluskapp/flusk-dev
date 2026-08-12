@@ -1,5 +1,5 @@
 /**
- * ah's own runs, as history cards.
+ * flusk's own runs, as history cards.
  *
  * A session is the richest card in the corpus: it holds the task as it was
  * actually phrased, the closing report, every command the agent ran and every
@@ -27,7 +27,7 @@ const REPORT_CAP = 1500;
 const MAX_COMMANDS = 40;
 const MAX_PATHS = 60;
 
-/** Verbatim shapes of a policy refusal (src/safety/ah-policy.ts). */
+/** Verbatim shapes of a policy refusal (src/safety/flusk-policy.ts). */
 const POLICY_DENIAL = /^denied: |denied while unattended/;
 
 /** The bash tool appends this tail instead of erroring on a non-zero exit. */
@@ -103,7 +103,7 @@ function cardText(task: string, f: Facts): string {
 	return capText(redact(parts.filter((p) => p !== "").join("\n\n")), TEXT_CAP);
 }
 
-/** One card per ah session, newest first (the order `scanSessions` returns). */
+/** One card per flusk session, newest first (the order `scanSessions` returns). */
 export function sessionCards(): HistoryCard[] {
 	const cards: HistoryCard[] = [];
 	for (const s of scanSessions()) {

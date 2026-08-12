@@ -1,5 +1,5 @@
 /**
- * The report half of `ah context`: per-source token counts, the omission list
+ * The report half of `flusk context`: per-source token counts, the omission list
  * and the block itself, computed ONCE and shared by the printed output and
  * `--json`.
  *

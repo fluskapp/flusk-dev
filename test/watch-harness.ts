@@ -7,7 +7,7 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { AhConfig } from "../src/config/types.js";
+import type { FluskConfig } from "../src/config/types.js";
 import { createFactStore } from "../src/store/store.js";
 import type { FactStore } from "../src/store/types.js";
 import type { CliOutcome } from "../src/cli/gate-loop.js";
@@ -43,15 +43,15 @@ export interface Harness {
 
 /** A fact store over its own temp directory, plus the way to delete it. */
 export async function startMemory(): Promise<{ store: FactStore; cleanup(): Promise<void> }> {
-	const dir = await mkdtemp(join(tmpdir(), "ah-watch-store-"));
+	const dir = await mkdtemp(join(tmpdir(), "flusk-watch-store-"));
 	return {
 		store: createFactStore({ dir }),
 		cleanup: () => rm(dir, { recursive: true, force: true }),
 	};
 }
 
-export function harness(client: FactStore, over: Partial<AhConfig["watch"]> = {}): Harness {
-	const cfg: AhConfig = { ...DEFAULT_CONFIG, watch: { ...DEFAULT_CONFIG.watch, ...over } };
+export function harness(client: FactStore, over: Partial<FluskConfig["watch"]> = {}): Harness {
+	const cfg: FluskConfig = { ...DEFAULT_CONFIG, watch: { ...DEFAULT_CONFIG.watch, ...over } };
 	const h: Harness = {
 		log: [],
 		ran: [],

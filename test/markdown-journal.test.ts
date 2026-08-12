@@ -1,6 +1,6 @@
 /**
  * Golden-ish rendering checks against files that exist on this machine: the
- * harness journals ah is a dashboard *for*, and real project docs.
+ * harness journals flusk is a dashboard *for*, and real project docs.
  *
  * Fixtures lie by omission — the stage table with a command's output wrapped
  * across three source lines was rendered as a broken table plus loose

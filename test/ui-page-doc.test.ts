@@ -22,15 +22,15 @@ const has = (markers: string[]): void => {
 };
 
 beforeAll(async () => {
-	home = mkdtempSync(join(tmpdir(), "ah-page-doc-"));
-	process.env.AH_HOME = home;
+	home = mkdtempSync(join(tmpdir(), "flusk-page-doc-"));
+	process.env.FLUSK_HOME = home;
 	ui = await startUiServer(0);
 	served = await (await fetch(`${ui.url}/`)).text();
 });
 
 afterAll(async () => {
 	await ui.close();
-	delete process.env.AH_HOME;
+	delete process.env.FLUSK_HOME;
 	rmSync(home, { recursive: true, force: true });
 });
 
@@ -47,7 +47,7 @@ it("docks a Documentation tool window numbered 6, pinned rather than a popup", (
 	has(["body.doc-on #app", "var(--tw-doc)", "body.doc-on.side-off.chat-off #app"]);
 	// Pinned: the panel is updated in place by the viewer's hand-off, and the
 	// event is honoured too, so either half is worth shipping alone.
-	has(["function showSymbolDoc(payload)", 'document.addEventListener("ah-doc"']);
+	has(["function showSymbolDoc(payload)", 'document.addEventListener("flusk-doc"']);
 });
 
 it("shows signature, docs, tags, definition and usages, and who answered", () => {

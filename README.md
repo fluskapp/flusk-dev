@@ -1,8 +1,8 @@
-# ah
+# flusk
 
 An autonomous coding agent that owns its whole loop.
 
-ah is not a wrapper around another agent CLI. It runs its own
+flusk is not a wrapper around another agent CLI. It runs its own
 turn/tool/session engine, keeps every run on an isolated git branch with
 per-turn checkpoints, and writes what it learns about your repos (verify
 commands, cross-repo lessons, goal graphs, the unattended ledger) to a local
@@ -31,7 +31,7 @@ node dist/cli/main.js run "demo"     # offline demo run (scripted fake provider)
 node dist/cli/main.js ui             # dashboard over your sessions
 ```
 
-(`npm link` gives you a global `ah` command instead of `node dist/cli/main.js`.)
+(`npm link` gives you a global `flusk` command instead of `node dist/cli/main.js`.)
 
 Real runs use the pi-ai model catalog and need a provider key
 (`ANTHROPIC_API_KEY` for the defaults); `--fake` replays a scripted transcript
@@ -39,34 +39,34 @@ instead, which is how the demo and the whole test suite run without a key or a
 network. `--dry` composes and prints the prompt, model, and isolation plan
 without calling anything.
 
-The fact store is local files under `~/.ah/store` — no server, nothing to
-reach. Setting `memory.enabled: false` is a request to leave no trace: `ah run`
-and `ah resume` proceed and record nothing, while `ah goal` and `ah watch`,
+The fact store is local files under `~/.flusk/store` — no server, nothing to
+reach. Setting `memory.enabled: false` is a request to leave no trace: `flusk run`
+and `flusk resume` proceed and record nothing, while `flusk goal` and `flusk watch`,
 whose subject matter IS the stored state, refuse to start.
 
 ## Commands
 
 ```
-ah run <task> [--model <provider/id>] [--kind <plan|code|review|summarize>]
+flusk run <task> [--model <provider/id>] [--kind <plan|code|review|summarize>]
                [--max-cost <usd>] [--for <2h|30m>] [--max-turns <n>] [--repo <path>]
                [--dry] [--no-isolation] [--allow-dirty] [--no-verify] [--quiet]
                [--fake <script.json>]
-ah resume <path-or-id> [--steer <msg>] [--no-verify] [--quiet]
-ah goal <text> [--repo <path>] [--dry] [--no-verify]
-ah goal --list [--repo <path>]
-ah watch [--repo <path>] [--once]
-ah feedback <good|bad>
-ah workspace <init|show|path> [--project]
-ah runs [-n <count>]
-ah ui [--port <n>] [--no-open]
+flusk resume <path-or-id> [--steer <msg>] [--no-verify] [--quiet]
+flusk goal <text> [--repo <path>] [--dry] [--no-verify]
+flusk goal --list [--repo <path>]
+flusk watch [--repo <path>] [--once]
+flusk feedback <good|bad>
+flusk workspace <init|show|path> [--project]
+flusk runs [-n <count>]
+flusk ui [--port <n>] [--no-open]
 ```
 
-- **`ah run <task>`** — run one task. `--repo` selects the working
+- **`flusk run <task>`** — run one task. `--repo` selects the working
   directory (default: cwd); `--max-turns` caps the loop; `--quiet` silences
   the streaming renderer; `--fake` replays a JSON array of scripted
   assistant turns (how the demo and tests work). Exit code 0 only when the
   run ends `completed`.
-- **`ah ui`** — IntelliJ-styled dashboard over `~/.ah/sessions/`
+- **`flusk ui`** — IntelliJ-styled dashboard over `~/.flusk/sessions/`
   (loopback-only HTTP; `--port`, default 4877; `--no-open` skips opening the
   browser). Panels: **sessions** (list + full transcripts), **Overview**
   (`o`) — stat tiles, recent activity across sessions and harness runs,
@@ -77,25 +77,25 @@ ah ui [--port <n>] [--no-open]
   with a rendered preview.
 
   Configure what is indexed with `ui.harnessDirs` and `ui.projectDirs` in
-  `~/.ah/config.json`; both default to `~/projects/*` and
+  `~/.flusk/config.json`; both default to `~/projects/*` and
   `~/projects/playground/*`. The markdown renderer is dependency-free and
   escapes its input before rendering, so an indexed document cannot inject
   markup into the dashboard.
-- **`ah resume <path-or-id>`** — continue a stopped or crashed session,
+- **`flusk resume <path-or-id>`** — continue a stopped or crashed session,
   repairing any tool call left dangling by the interruption. `--steer` adds
   a new instruction on the way back in.
-- **`ah goal <text>`** — decompose a goal into a task graph stored in the
+- **`flusk goal <text>`** — decompose a goal into a task graph stored in the
   fact store, then work the frontier task by task across sessions.
-- **`ah watch`** — unattended queue mode (see below).
-- **`ah feedback good|bad`** — score the last run's model for its task kind;
+- **`flusk watch`** — unattended queue mode (see below).
+- **`flusk feedback good|bad`** — score the last run's model for its task kind;
   routing learns from it.
-- **`ah runs`** — recent sessions with status, turns, and cost.
-- **`ah workspace`** — scaffold (`init`), inspect (`show`) or locate (`path`)
+- **`flusk runs`** — recent sessions with status, turns, and cost.
+- **`flusk workspace`** — scaffold (`init`), inspect (`show`) or locate (`path`)
   the prompt workspace (see below).
 
 ## Workspace
 
-ah's prompt is not only ah's. Three markdown files you own are injected into
+flusk's prompt is not only flusk's. Three markdown files you own are injected into
 every system prompt, so behaviour is tuned by editing files rather than
 TypeScript:
 
@@ -105,7 +105,7 @@ TypeScript:
 | `SOUL.md` | `## Hard constraints` | the lines it may never cross |
 | `TOOLS.md` | `## Tool guidance` | how to use the toolbelt in your world |
 
-They are read from `~/.ah/workspace/` (global), then `<repo>/.ah/workspace/`
+They are read from `~/.flusk/workspace/` (global), then `<repo>/.flusk/workspace/`
 which **replaces** the global file of the same name, then the repository's own
 `AGENTS.md` — or `CLAUDE.md`, or both when both exist — as
 `## House rules for this repository`. The rules your team already wrote are
@@ -123,18 +123,18 @@ along into a request. Missing files are normal; with none present the prompt
 is exactly what it was before.
 
 ```bash
-ah workspace init            # ~/.ah/workspace/{IDENTITY,SOUL,TOOLS}.md, never overwriting
-ah workspace init --project  # <repo>/.ah/workspace/… instead
-ah workspace show            # what is loaded, from where, and what is absent
-ah run "…" --dry             # see the assembled prompt
+flusk workspace init            # ~/.flusk/workspace/{IDENTITY,SOUL,TOOLS}.md, never overwriting
+flusk workspace init --project  # <repo>/.flusk/workspace/… instead
+flusk workspace show            # what is loaded, from where, and what is absent
+flusk run "…" --dry             # see the assembled prompt
 ```
 
 ## Verification
 
 A run does not get to declare victory. When the repo has verify commands —
-from `.ah.json`, or auto-detected from `package.json` scripts, `Cargo.toml`,
-or a `Makefile` — ah runs them at the end. Failures come back to the agent as
-evidence to fix, up to a retry limit. Then ah checks the agent's closing **report** against what it actually
+from `.flusk/config.json`, or auto-detected from `package.json` scripts, `Cargo.toml`,
+or a `Makefile` — flusk runs them at the end. Failures come back to the agent as
+evidence to fix, up to a retry limit. Then flusk checks the agent's closing **report** against what it actually
 observed — which commands ran, which exited zero, which files the tools
 wrote. A report claiming "all tests pass" when nothing was verified is
 `blocked`: exit 1, with the code left on its branch for you to look at.
@@ -152,9 +152,9 @@ Four layers, all on by default for unattended runs:
    anything not provably safe is denied rather than guessed at.
 2. **Write jail** — file writes must resolve inside the repo root.
 3. **Git isolation** — a run refuses a dirty tree, works on its own
-   `ah/<runId>` branch, and checkpoint-commits every mutating turn (with the
+   `flusk/<runId>` branch, and checkpoint-commits every mutating turn (with the
    repo's own git hooks disabled), so you review or discard the whole session
-   as one diff. `git push` is blocked at the command classifier; ah is not a
+   as one diff. `git push` is blocked at the command classifier; flusk is not a
    network sandbox, so an allowed interpreter could still reach the network.
 4. **Budgets** — max cost, max turns, optional deadline; on breach the agent
    gets one wrap-up turn to summarize, then stops.
@@ -176,11 +176,11 @@ into model-visible error results.
 ## Unattended mode
 
 ```bash
-ah watch            # poll queues, work the oldest item, repeat
-ah watch --once     # a single tick
+flusk watch            # poll queues, work the oldest item, repeat
+flusk watch --once     # a single tick
 ```
 
-`ah watch` polls GitHub through `gh` (open PRs, failing CI runs), works the
+`flusk watch` polls GitHub through `gh` (open PRs, failing CI runs), works the
 oldest eligible item in its **own git worktree**, and records what happened as
 facts. That ledger is what makes it safe to leave running: an item that was
 just attempted is resting on a cooldown, and a failing one backs off
@@ -188,17 +188,17 @@ quadratically, so the loop can never storm the same item. Nightly run counts,
 per-run cost, and wall-clock are all capped.
 
 The ledger is **required** here — without it there is nothing stopping a retry
-loop. With `memory.enabled: false`, `ah watch` refuses to start rather than run
-unbounded, and so does `ah goal`, whose task graph is itself stored facts.
+loop. With `memory.enabled: false`, `flusk watch` refuses to start rather than run
+unbounded, and so does `flusk goal`, whose task graph is itself stored facts.
 
 Pushing is **off by default** (`watch.push`): a night's work stays on local
-branches for you to review. Turn it on to have ah push and open PRs.
+branches for you to review. Turn it on to have flusk push and open PRs.
 
 ## Status
 
 Phases 1–4 are in the tree: the engine (loop, tools, sessions, dashboard), the
 real provider stack (routing, safety, compaction, subagents, resume), the fact
-store with the verification gate and goal graphs, and unattended `ah watch`.
+store with the verification gate and goal graphs, and unattended `flusk watch`.
 Nothing yet carries what a run learns from one repository to another. See
 [`docs/architecture.md`](docs/architecture.md) for the module map.
 

@@ -17,19 +17,19 @@ let main: string;
 let tree: string;
 
 beforeAll(() => {
-	root = mkdtempSync(join(tmpdir(), "ah-wt-"));
-	main = join(root, "ah");
-	tree = join(root, "ah-ui");
-	mkdirSync(join(main, ".git", "worktrees", "ah-ui"), { recursive: true });
+	root = mkdtempSync(join(tmpdir(), "flusk-wt-"));
+	main = join(root, "flusk");
+	tree = join(root, "flusk-ui");
+	mkdirSync(join(main, ".git", "worktrees", "flusk-ui"), { recursive: true });
 	mkdirSync(tree, { recursive: true });
-	writeFileSync(join(tree, ".git"), `gitdir: ${join(main, ".git", "worktrees", "ah-ui")}\n`);
+	writeFileSync(join(tree, ".git"), `gitdir: ${join(main, ".git", "worktrees", "flusk-ui")}\n`);
 });
 
 afterAll(() => rmSync(root, { recursive: true, force: true }));
 
 it("reads the parent repo out of a worktree's .git file", () => {
 	expect(mainRepoOf(tree)).toBe(main);
-	expect(mainRepoName(tree)).toBe("ah");
+	expect(mainRepoName(tree)).toBe("flusk");
 });
 
 it("calls a main checkout what it is: not a worktree", () => {

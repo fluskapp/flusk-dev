@@ -12,7 +12,7 @@ import { afterAll, beforeAll, expect, test } from "vitest";
 import { createAgent } from "../src/agent/agent.js";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
 import type { ContextSource } from "../src/context/types.js";
-import type { AhEvent } from "../src/core/events.js";
+import type { FluskEvent } from "../src/core/events.js";
 import { assistantText, assistantToolCalls, FakeProvider } from "../src/provider/fake.js";
 import { fakeModel, pingTool, setupTestHome, teardownTestHome } from "./helpers.js";
 import {
@@ -24,10 +24,10 @@ import {
 } from "./run-context-fixtures.js";
 
 let repo: string;
-const built: Array<Extract<AhEvent, { type: "context:built" }>> = [];
+const built: Array<Extract<FluskEvent, { type: "context:built" }>> = [];
 
 beforeAll(async () => {
-	repo = await setupTestHome("ah-run-context-");
+	repo = await setupTestHome("flusk-run-context-");
 });
 
 afterAll(() => {

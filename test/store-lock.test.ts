@@ -16,7 +16,7 @@ let dir: string;
 let path: string;
 
 beforeEach(async () => {
-	dir = await mkdtemp(join(tmpdir(), "ah-lock-"));
+	dir = await mkdtemp(join(tmpdir(), "flusk-lock-"));
 	path = join(dir, "ns.jsonl");
 	await writeFile(path, "");
 });

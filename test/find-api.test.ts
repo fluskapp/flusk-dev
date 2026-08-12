@@ -1,8 +1,8 @@
 /**
- * The search endpoints over a real socket, and `ah find` over a real stream.
+ * The search endpoints over a real socket, and `flusk find` over a real stream.
  *
- * Config is read from AH_HOME per request (the fixture writes it), so this is
- * the same path `ah ui` takes — including the containment rule: `?project=`
+ * Config is read from FLUSK_HOME per request (the fixture writes it), so this is
+ * the same path `flusk ui` takes — including the containment rule: `?project=`
  * names a project, never a directory.
  */
 import { Writable } from "node:stream";
@@ -107,7 +107,7 @@ describe.skipIf(!hasRg())("/api/file", () => {
 	});
 });
 
-describe.skipIf(!hasRg())("ah find", () => {
+describe.skipIf(!hasRg())("flusk find", () => {
 	it("groups by file and states the totals", async () => {
 		const { out, text } = sink();
 		expect(await findCmd("needle", { out })).toBe(0);

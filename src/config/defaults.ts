@@ -1,6 +1,6 @@
-import type { AhConfig } from "./types.js";
+import type { FluskConfig } from "./types.js";
 
-export const DEFAULT_CONFIG: AhConfig = {
+export const DEFAULT_CONFIG: FluskConfig = {
 	models: {
 		plan: { provider: "anthropic", id: "claude-sonnet-5" },
 		code: { provider: "anthropic", id: "claude-sonnet-5" },
@@ -17,7 +17,7 @@ export const DEFAULT_CONFIG: AhConfig = {
 	},
 	isolation: {
 		requireGit: true,
-		branchPrefix: "ah/",
+		branchPrefix: "flusk/",
 	},
 	compaction: {
 		reserveTokens: 16384,

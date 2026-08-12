@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import type { AhConfig } from "../src/config/types.js";
+import type { FluskConfig } from "../src/config/types.js";
 import { journalCards } from "../src/history/source-journals.js";
 
 let home: string; // stands in for ~/projects
@@ -13,7 +13,7 @@ function journal(name: string, frontmatter: string): void {
 	writeFileSync(join(runs, `${name}.md`), `---\n${frontmatter}---\n\n# ${name}\n`);
 }
 
-const cfg = (): AhConfig => ({
+const cfg = (): FluskConfig => ({
 	...DEFAULT_CONFIG,
 	ui: { ...DEFAULT_CONFIG.ui, harnessDirs: [join(home, "*", "docs", "runs")] },
 });
@@ -21,7 +21,7 @@ const cfg = (): AhConfig => ({
 const card = (ref: string) => journalCards(cfg()).find((c) => c.ref === join(runs, `${ref}.md`));
 
 beforeAll(() => {
-	home = mkdtempSync(join(tmpdir(), "ah-journals-"));
+	home = mkdtempSync(join(tmpdir(), "flusk-journals-"));
 	runs = join(home, "linof-harness", "docs", "runs");
 	mkdirSync(runs, { recursive: true });
 	journal(

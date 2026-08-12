@@ -57,7 +57,7 @@ const NAV = {
 it("allows a cross-site top-level navigation", async () => {
 	const nav = await rawGet(`${ui.url}/`, NAV);
 	expect(nav.status).toBe(200);
-	expect(nav.body).toContain("<title>ah</title>");
+	expect(nav.body).toContain("<title>flusk</title>");
 });
 
 it("still blocks a cross-site data fetch", async () => {

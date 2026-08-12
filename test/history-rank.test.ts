@@ -11,7 +11,7 @@ const daysAgo = (n: number): string => new Date(NOW - n * 86_400_000).toISOStrin
 function card(p: Partial<HistoryCard> & { id: string }): HistoryCard {
 	return {
 		kind: "commit",
-		project: "ah",
+		project: "flusk",
 		title: "",
 		text: "",
 		at: daysAgo(10),
@@ -113,7 +113,7 @@ it("filters by project and kind and honours the limit", () => {
 		card({ id: "b", title: "retry hook", kind: "doc" }),
 		card({ id: "c", title: "retry hook" }),
 	]);
-	expect(idsOf(search(index, { text: "retry hook", project: "ah" }, { now: NOW }))).toEqual([
+	expect(idsOf(search(index, { text: "retry hook", project: "flusk" }, { now: NOW }))).toEqual([
 		"b",
 		"c",
 	]);

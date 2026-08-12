@@ -7,7 +7,7 @@ import { loadConfig, loadRepoConfig } from "../config/config.js";
 import { createEventBus } from "../core/events.js";
 import { goalBrief } from "../goals/resume.js";
 import type { Provider } from "../provider/provider.js";
-import { createAhPolicy } from "../safety/ah-policy.js";
+import { createFluskPolicy } from "../safety/flusk-policy.js";
 import type { FactStore } from "../store/types.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import type { GoalCmdOpts } from "./goal-cmd.js";
@@ -39,7 +39,7 @@ export async function runTask(
 		tools: DEFAULT_TOOLS,
 		task: `${desc}\n\nGoal context: ${brief}`,
 		repoRoot: opts.repo,
-		policy: createAhPolicy({ config: cfg, repoRoot: opts.repo }),
+		policy: createFluskPolicy({ config: cfg, repoRoot: opts.repo }),
 		events,
 		config: cfg,
 		taskKind: "code",

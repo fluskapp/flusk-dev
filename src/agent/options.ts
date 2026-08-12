@@ -1,4 +1,4 @@
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import type { ContextSource } from "../context/types.js";
 import type { EventBus } from "../core/events.js";
 import type { Limits } from "../core/stop.js";
@@ -23,7 +23,7 @@ export interface CreateAgentOpts {
 	/** On resume: injected as a fresh user message after dangling-call repair. */
 	steer?: string;
 	/** Budgets + compaction thresholds; defaults to DEFAULT_CONFIG. */
-	config?: AhConfig;
+	config?: FluskConfig;
 	/** Model for compaction summaries; defaults to the main model. */
 	summarizeModel?: ModelRef;
 	/** Routing kind recorded in the session header (plan|code|review|summarize). */

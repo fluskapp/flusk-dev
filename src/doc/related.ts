@@ -4,7 +4,7 @@
  * A language service answers "what is this symbol": signature, docs,
  * definition, usages. It has no idea that a run FAILED the last time someone
  * edited this function, or that the skill next door forbids the pattern it
- * uses. ah does — the history index is already built from commits, sessions,
+ * uses. flusk does — the history index is already built from commits, sessions,
  * harness journals, skills and docs — so a lookup can also answer "what
  * happened to this symbol". That fusion is the feature; the language-service
  * half alone is a worse IDE.
@@ -20,7 +20,7 @@
  * the evidence for why it had to be written down.
  */
 import { basename, resolve } from "node:path";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { find } from "../find/ripgrep.js";
 import type { FindResult } from "../find/types.js";
 import type { Bm25Index } from "../history/bm25.js";
@@ -52,8 +52,8 @@ export interface Related {
 export interface RelatedDeps {
 	/** Pre-built BM25 index; the server already caches one per process. */
 	index?: Bm25Index;
-	grep?: (cfg: AhConfig, symbol: string) => Promise<FindResult>;
-	artifacts?: (cfg: AhConfig) => Artifact[];
+	grep?: (cfg: FluskConfig, symbol: string) => Promise<FindResult>;
+	artifacts?: (cfg: FluskConfig) => Artifact[];
 	/** Per-group cap; `note` says so whenever it trimmed. */
 	cap?: number;
 	now?: number;
@@ -67,14 +67,14 @@ const HEADING = /^\s{0,3}#{1,6}\s/;
 /** Literal hits: the markdown ones become doc rows, all of them are counted. */
 async function fromGrep(
 	symbol: string,
-	cfg: AhConfig,
+	cfg: FluskConfig,
 	deps: RelatedDeps,
 	into: Groups,
 ): Promise<{ mentions: number; note?: string }> {
 	const grep = deps.grep ?? ((c, q) => find(c, { q, caseSensitive: true, limit: GREP_LIMIT }));
 	const res = await grep(cfg, symbol).catch((): null => null);
 	if (res === null) return { mentions: 0, note: "search across projects failed" };
-	const scan = deps.artifacts ?? ((c: AhConfig) => scanArtifacts(c.ui.projectDirs));
+	const scan = deps.artifacts ?? ((c: FluskConfig) => scanArtifacts(c.ui.projectDirs));
 	const byPath = new Map(scan(cfg).map((a) => [resolve(a.path), a]));
 	for (const hit of res.files.filter((f) => f.path.endsWith(".md"))) {
 		const doc = byPath.get(resolve(hit.path));
@@ -93,7 +93,7 @@ async function fromGrep(
 export async function relatedFor(
 	symbol: string,
 	file: string,
-	cfg: AhConfig,
+	cfg: FluskConfig,
 	deps: RelatedDeps = {},
 ): Promise<Related> {
 	if (symbol.trim() === "")

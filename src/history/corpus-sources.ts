@@ -1,5 +1,5 @@
 /**
- * The corpus as SOURCES: one per git repo, one for ah's own sessions, one for
+ * The corpus as SOURCES: one per git repo, one for flusk's own sessions, one for
  * the harness journals, one for the project writing.
  *
  * index-store.ts is built around a per-source stamp — "a repo's git HEAD oid,
@@ -21,7 +21,7 @@
 import { createHash } from "node:crypto";
 import { readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
-import type { AhConfig } from "../config/types.js";
+import type { FluskConfig } from "../config/types.js";
 import { scanArtifacts } from "../ui/artifact-scan.js";
 import { resolveJournalDirs, scanJournals } from "../ui/journal-scan.js";
 import { scanSessions } from "../ui/scan.js";
@@ -32,7 +32,7 @@ import { sessionCards } from "./source-sessions.js";
 import { DOC_LIMIT, docCard, gitRoots } from "./sources.js";
 
 /** Which config produced these cards; part of every source id. */
-function configKey(cfg: AhConfig): string {
+function configKey(cfg: FluskConfig): string {
 	const shape = JSON.stringify([cfg.ui.projectDirs, cfg.ui.harnessDirs]);
 	return createHash("sha256").update(shape).digest("hex").slice(0, 12);
 }
@@ -69,7 +69,7 @@ const fileStamp = (files: { mtimeMs: number }[]): string =>
  * One source per repo and per scanner. Ordered strongest-evidence-first, the
  * same order collectCards uses, so the dedup by card id resolves identically.
  */
-export function corpusSources(cfg: AhConfig): IndexSource[] {
+export function corpusSources(cfg: FluskConfig): IndexSource[] {
 	const key = configKey(cfg);
 	const sources: IndexSource[] = gitRoots(cfg).map((root) => ({
 		id: `commits:${key}:${root}`,

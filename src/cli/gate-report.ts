@@ -65,7 +65,7 @@ export async function claimCheck(
 		}
 	}
 	if (check.verdict === "BLOCK") {
-		opts.out.write(`blocked: the completion report is not supported by what ah observed
+		opts.out.write(`blocked: the completion report is not supported by what flusk observed
 `);
 		for (const r of check.reasons) opts.out.write(`  - ${r}
 `);

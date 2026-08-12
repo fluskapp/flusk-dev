@@ -125,7 +125,7 @@ describe("startLsp", () => {
 	});
 
 	it("yields null for a binary that does not exist rather than throwing", async () => {
-		const client = startLsp({ command: "ah-no-such-language-server", timeoutMs: 500 });
+		const client = startLsp({ command: "flusk-no-such-language-server", timeoutMs: 500 });
 		clients.push(client);
 		expect(await client.initialize("file:///tmp")).toBeNull();
 		expect(client.available()).toBe(false);

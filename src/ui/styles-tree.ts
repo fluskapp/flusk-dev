@@ -70,13 +70,13 @@ body:not(.zone-view) .tree-row.active, body:not(.zone-view) .tree-row.active:hov
 	margin-left: auto; font: 600 var(--ij-fs-2) var(--font-code);
 	color: var(--ij-button-default-fg);
 	background: var(--accent); padding: 0 var(--ij-space);
-	animation: ah-pulse 1.6s ease-in-out infinite;
+	animation: flusk-pulse 1.6s ease-in-out infinite;
 }
 .badge-attn {
 	font: 600 var(--ij-fs-2) var(--font-code); color: var(--on-accent);
 	background: var(--err); padding: 0 var(--ij-space);
 }
 .badge-live + .badge-attn { margin-left: var(--ij-space-2); }
-@keyframes ah-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+@keyframes flusk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
 @media (prefers-reduced-motion: reduce) { .badge-live { animation: none; } }
 `;

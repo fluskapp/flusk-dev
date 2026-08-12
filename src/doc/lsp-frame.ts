@@ -1,6 +1,6 @@
 /**
  * The LSP wire format, alone: `Content-Length: N\r\n\r\n` then N bytes of
- * JSON. Forty lines, which is why ah speaks LSP with no dependency.
+ * JSON. Forty lines, which is why flusk speaks LSP with no dependency.
  *
  * Split from lsp-client.ts because framing is decidable without a process —
  * the reader is a pure function of the bytes, so a torn frame, a header with

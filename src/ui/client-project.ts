@@ -8,7 +8,7 @@ function projectCounts(d) {
 	return '<div class="stats-row">' +
 		statTile(String(d.runs), "runs", "sessions + journals", "runs:" + d.name) +
 		statTile(String(d.liveRuns), "live", "in flight", "runs:" + d.name) +
-		statTile(String(d.sessions), "ah sessions", "recorded here", "runs:" + d.name) +
+		statTile(String(d.sessions), "flusk sessions", "recorded here", "runs:" + d.name) +
 		statTile(String(d.docs), "documents", "indexed markdown", "docs:" + d.name) +
 		// A harness journal only contributes cost when it declares one, so $0
 		// here means "nothing recorded", never "this was free". Say which.

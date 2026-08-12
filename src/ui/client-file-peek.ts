@@ -2,7 +2,7 @@
  * The fallback file view: the lines Find matched, plus a straight answer about
  * why the rest is not here.
  *
- * Split from client-file.ts for the size standard. ah serves whole bodies only
+ * Split from client-file.ts for the size standard. flusk serves whole bodies only
  * for what it indexes, and inventing a body for anything else would be the one
  * thing a file viewer must never do.
  */
@@ -16,7 +16,7 @@ function filePeek(host, t) {
 		'<div class="meta-actions">' + pathActions() + "</div></div>" +
 		(file
 			? '<div class="peek-wrap"><div class="peek">' + peekRows(file, t.line) + "</div></div>"
-			: '<div class="empty small">ah serves whole file bodies for the documents and ' +
+			: '<div class="empty small">flusk serves whole file bodies for the documents and ' +
 				"journals it indexes.<br/>Search this file (\\u2318\\u21e7F) to read its matching " +
 				"lines here, or copy the nvim command above.</div>");
 	wirePathActions("#file", t.ref);

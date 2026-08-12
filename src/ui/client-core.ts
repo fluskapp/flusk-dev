@@ -115,7 +115,7 @@ function toggleTheme() {
 	var osDark = matchMedia("(prefers-color-scheme: dark)").matches;
 	var next = cur === "dark" ? "light" : cur === "light" ? "dark" : osDark ? "light" : "dark";
 	document.documentElement.setAttribute("data-theme", next);
-	localStorage.setItem("ah-theme", next);
+	localStorage.setItem("flusk-theme", next);
 }
 
 /** Session key, harness journal, or indexed document — decided by shape. */

@@ -23,7 +23,7 @@ export interface CliRun {
 }
 
 /** Repo root: two levels up from src/chat (and from dist/chat once built). */
-export function ahRepoRoot(): string {
+export function fluskRepoRoot(): string {
 	const dir = fileURLToPath(new URL("../..", import.meta.url));
 	return dir.length > 1 && dir.endsWith("/") ? dir.slice(0, -1) : dir;
 }
@@ -60,7 +60,7 @@ export async function* streamCli(run: CliRun, signal: AbortSignal): AsyncGenerat
 	// detached: the child leads its own group, so a kill reaches the shells and
 	// sleeps an agent CLI spawns — otherwise they hold the stdout pipe open.
 	const child = spawn(run.command, [...run.args, run.prompt], {
-		cwd: run.cwd ?? ahRepoRoot(),
+		cwd: run.cwd ?? fluskRepoRoot(),
 		stdio: ["ignore", "pipe", "pipe"],
 		detached: true,
 	});

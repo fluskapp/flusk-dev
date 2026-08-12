@@ -9,7 +9,7 @@ import { setupTestHome, teardownTestHome } from "./helpers.js";
 let repo: string;
 
 beforeEach(async () => {
-	repo = await setupTestHome("ah-cli2-");
+	repo = await setupTestHome("flusk-cli2-");
 }, SLOW);
 afterEach(() => teardownTestHome(), SLOW);
 
@@ -31,7 +31,7 @@ test("--dry on the real path prints model/kind/tools/isolation and system prompt
 		expect(text).toContain("model: anthropic/claude-sonnet-5");
 		expect(text).toContain("tools: read, bash, write, edit, glob, grep, task");
 		expect(text).toContain("isolation: off (not a git repository)");
-		expect(text).toContain("You are ah, an autonomous coding agent.");
+		expect(text).toContain("You are flusk, an autonomous coding agent.");
 		expect(scanSessions()).toHaveLength(0); // no agent, no session, no provider
 	} finally {
 		if (savedKey !== undefined) process.env.ANTHROPIC_API_KEY = savedKey;
@@ -53,7 +53,7 @@ test("--dry honors --kind and --model overrides and shows the isolation plan for
 	expect(reason).toBe("completed");
 	expect(cap.text()).toContain("kind: review");
 	expect(cap.text()).toContain("model: anthropic/claude-haiku-4-5");
-	expect(cap.text()).toMatch(/isolation: branch ah\/<run-id>/);
+	expect(cap.text()).toMatch(/isolation: branch flusk\/<run-id>/);
 }, SLOW);
 
 test("real run preflight fails fast on missing auth or missing git, never reaching a provider", async () => {
@@ -71,7 +71,7 @@ test("real run preflight fails fast on missing auth or missing git, never reachi
 	}
 }, SLOW);
 
-test("fake run with isolation lands checkpoint commits on a ah/<id> branch and prints the review hint", async () => {
+test("fake run with isolation lands checkpoint commits on a flusk/<id> branch and prints the review hint", async () => {
 	await initGitRepo(repo);
 	const script = await writeFakeScript(join(repo, "..", "script.json"), "echo data > out.txt");
 	const cap = capture();
@@ -79,10 +79,10 @@ test("fake run with isolation lands checkpoint commits on a ah/<id> branch and p
 	expect(reason).toBe("completed");
 
 	const branch = git(repo, "rev-parse", "--abbrev-ref", "HEAD").trim();
-	expect(branch).toMatch(/^ah\/[0-9a-f-]{8}$/);
-	expect(git(repo, "log", "--format=%s")).toContain("ah: turn 1");
+	expect(branch).toMatch(/^flusk\/[0-9a-f-]{8}$/);
+	expect(git(repo, "log", "--format=%s")).toContain("flusk: turn 1");
 	expect(git(repo, "show", "HEAD:out.txt")).toBe("data\n");
-	expect(cap.text()).toMatch(/1 commit on ah\//);
+	expect(cap.text()).toMatch(/1 commit on flusk\//);
 	expect(cap.text()).toContain("review with: git diff");
 }, SLOW);
 

@@ -75,9 +75,9 @@ export const CHAT_CSS = `
 	border-left: 1px solid var(--err);
 }
 .streaming::after {
-	content: "▍"; color: var(--accent); animation: ah-caret 1s steps(2) infinite;
+	content: "▍"; color: var(--accent); animation: flusk-caret 1s steps(2) infinite;
 }
-@keyframes ah-caret { 50% { opacity: 0; } }
+@keyframes flusk-caret { 50% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .streaming::after { animation: none; } }
 
 #chat-compose {

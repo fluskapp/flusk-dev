@@ -1,5 +1,5 @@
 /**
- * The attempt ledger: facts in the `ah` namespace that stop an unattended
+ * The attempt ledger: facts in the `flusk` namespace that stop an unattended
  * loop from retrying the same item forever. Attempts are recorded BEFORE the
  * run, so a crash mid-run still leaves a cooldown behind.
  *
@@ -9,7 +9,7 @@
  */
 
 import { watchFact } from "../store/facts.js";
-import { AH_NS } from "../store/namespaces.js";
+import { FLUSK_NS } from "../store/namespaces.js";
 import type { FactStore } from "../store/types.js";
 import { NO_LIMIT } from "../store/visibility.js";
 
@@ -36,7 +36,7 @@ export async function isCoolingDown(
 	// carries a `validUntil`, and the store stops returning it the instant that
 	// passes. Reading at `nowMs` is what makes "still resting" and "still
 	// visible" the same question on a tick whose clock is not wall time.
-	const facts = await store.query(AH_NS, {
+	const facts = await store.query(FLUSK_NS, {
 		subject: `Item:${key}`,
 		predicate: "cooldown_until",
 		asOf: nowMs,
@@ -49,7 +49,7 @@ export async function isCoolingDown(
 
 /** Past attempts that did not finish cleanly — drives the backoff exponent. */
 export async function failureCount(store: FactStore, key: string): Promise<number> {
-	const facts = await store.query(AH_NS, {
+	const facts = await store.query(FLUSK_NS, {
 		subject: `Item:${key}`,
 		predicate: "failure_count",
 	});
@@ -64,7 +64,7 @@ export async function recordAttempt(
 	nowMs: number,
 	untilIso: string,
 ): Promise<void> {
-	await store.transact(AH_NS, [
+	await store.transact(FLUSK_NS, [
 		watchFact.attemptedAt(key, new Date(nowMs).toISOString()),
 		watchFact.cooldownUntil(key, untilIso),
 	]);
@@ -77,9 +77,9 @@ export async function recordOutcome(
 	outcome: string,
 	priorFailures = 0,
 ): Promise<void> {
-	await store.transact(AH_NS, [watchFact.outcome(key, outcome)]);
+	await store.transact(FLUSK_NS, [watchFact.outcome(key, outcome)]);
 	if (outcome !== "completed") {
-		await store.transact(AH_NS, [watchFact.failureCount(key, priorFailures + 1)]);
+		await store.transact(FLUSK_NS, [watchFact.failureCount(key, priorFailures + 1)]);
 	}
 }
 
@@ -89,7 +89,7 @@ export async function extendCooldown(
 	key: string,
 	untilIso: string,
 ): Promise<void> {
-	await store.transact(AH_NS, [watchFact.cooldownUntil(key, untilIso)]);
+	await store.transact(FLUSK_NS, [watchFact.cooldownUntil(key, untilIso)]);
 }
 
 /**
@@ -109,7 +109,7 @@ export function nightKey(nowMs: number): string {
  * as a fresh night and spend the cap again.
  */
 export async function nightCount(store: FactStore, date: string): Promise<number> {
-	const facts = await store.query(AH_NS, {
+	const facts = await store.query(FLUSK_NS, {
 		subject: `Night:${date}`,
 		predicate: "run",
 		limit: NO_LIMIT,
@@ -129,7 +129,7 @@ export async function recordNightRun(
 	itemKey: string,
 	nowMs: number,
 ): Promise<void> {
-	await store.transact(AH_NS, [
+	await store.transact(FLUSK_NS, [
 		watchFact.nightRun(date, `${itemKey}@${new Date(nowMs).toISOString()}`),
 	]);
 }

@@ -1,5 +1,5 @@
 /**
- * The workspace ContextSource: ah's own markdown layers, pinned.
+ * The workspace ContextSource: flusk's own markdown layers, pinned.
  *
  * A run is already told its identity, its hard constraints and its tool
  * guidance by src/agent/system-prompt.ts, which calls loadWorkspace itself.
@@ -117,7 +117,7 @@ function gather(req: ContextRequest, opts: WorkspaceSourceOptions): SourceResult
 			);
 	if (owned.length === 0)
 		notes.push(
-			`no IDENTITY.md, SOUL.md or TOOLS.md under ${GLOBAL_LABEL} or ${basename(req.repoRoot)}/.ah/workspace: this run has no ah identity, hard-constraint or tool-guidance layer.`,
+			`no IDENTITY.md, SOUL.md or TOOLS.md under ${GLOBAL_LABEL} or ${basename(req.repoRoot)}/.flusk/workspace: this run has no flusk identity, hard-constraint or tool-guidance layer.`,
 		);
 
 	// Explicit total order with `id` as the final tie-break, so adding an

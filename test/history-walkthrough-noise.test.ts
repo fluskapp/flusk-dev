@@ -19,7 +19,7 @@ const daysAgo = (n: number): string => new Date(NOW - n * 86_400_000).toISOStrin
 function card(p: Partial<HistoryCard> & { id: string }): HistoryCard {
 	return {
 		kind: "commit",
-		project: "ah",
+		project: "flusk",
 		title: "",
 		text: "",
 		at: daysAgo(10),
@@ -37,11 +37,11 @@ const ALIEN = "add the billing invoice exporter";
 /** Twelve runs of the same nightly, one word away from the task ("add"). */
 const NIGHTLIES = Array.from({ length: 12 }, (_, i) =>
 	card({
-		id: `journal:ah:nightly-${i}`,
+		id: `journal:flusk:nightly-${i}`,
 		ref: `docs/runs/2026-07-${10 + i}-nightly.md`,
 		kind: "journal",
-		title: "release run for ah",
-		text: `release run for ah · status: failed\n\nrouting: done|2${i}.0s|-> claude\nadd: done|1${i}.1s|2 steps\ngate: done|4${i}.2s|FAIL: verdict block`,
+		title: "release run for flusk",
+		text: `release run for flusk · status: failed\n\nrouting: done|2${i}.0s|-> claude\nadd: done|1${i}.1s|2 steps\ngate: done|4${i}.2s|FAIL: verdict block`,
 		outcome: "failed",
 		at: daysAgo(20 + i),
 	}),
@@ -49,7 +49,7 @@ const NIGHTLIES = Array.from({ length: 12 }, (_, i) =>
 
 const CORPUS: HistoryCard[] = [
 	card({
-		id: "commit:ah:best",
+		id: "commit:flusk:best",
 		title: "add retry backoff to the watch tick hook",
 		text: "add retry backoff to the watch tick hook\n\nexponential backoff on the tick",
 		paths: ["src/watch/tick.ts"],
@@ -57,7 +57,7 @@ const CORPUS: HistoryCard[] = [
 		at: daysAgo(30),
 	}),
 	card({
-		id: "commit:ah:second",
+		id: "commit:flusk:second",
 		title: "retry the watch tick once before giving up",
 		text: "retry the watch tick once before giving up",
 		paths: ["src/watch/tick.ts"],
@@ -65,8 +65,8 @@ const CORPUS: HistoryCard[] = [
 		at: daysAgo(60),
 	}),
 	card({
-		id: "session:ah/real-attempt.jsonl",
-		ref: "ah/real-attempt.jsonl",
+		id: "session:flusk/real-attempt.jsonl",
+		ref: "flusk/real-attempt.jsonl",
 		kind: "session",
 		title: "add retry backoff to the watch tick",
 		text: "add retry backoff to the watch tick hook\n\ncommands:\nnpm test",
@@ -75,13 +75,13 @@ const CORPUS: HistoryCard[] = [
 		at: daysAgo(4),
 	}),
 	...NIGHTLIES,
-	card({ id: "commit:ah:noise1", title: "add a changelog entry", outcome: "failed" }),
-	card({ id: "commit:ah:noise2", title: "add the vendored fonts", outcome: "failed" }),
-	card({ id: "doc:ah:CLAUDE.md", kind: "doc", title: "ah house rules", paths: ["CLAUDE.md"] }),
+	card({ id: "commit:flusk:noise1", title: "add a changelog entry", outcome: "failed" }),
+	card({ id: "commit:flusk:noise2", title: "add the vendored fonts", outcome: "failed" }),
+	card({ id: "doc:flusk:CLAUDE.md", kind: "doc", title: "flusk house rules", paths: ["CLAUDE.md"] }),
 	card({
-		id: "doc:ah:CONTRIBUTING.md",
+		id: "doc:flusk:CONTRIBUTING.md",
 		kind: "doc",
-		title: "ah contributing",
+		title: "flusk contributing",
 		text: "how to add a retry hook here: always with a test",
 		paths: ["CONTRIBUTING.md"],
 	}),
@@ -110,13 +110,13 @@ const walk = (task: string): ReturnType<typeof buildWalkthrough> =>
 
 it("puts the best-ranked landed card first in precedent, not merely somewhere", () => {
 	const w = walk(TASK);
-	expect(ids(w.precedent)[0]).toBe("commit:ah:best");
+	expect(ids(w.precedent)[0]).toBe("commit:flusk:best");
 	expect(new Set(ids(w.precedent)).size).toBe(w.precedent.length);
 });
 
 it("admits only runs that are really about this task, deduplicated", () => {
 	const w = walk(TASK);
-	expect(ids(w.attempts)).toContain("session:ah/real-attempt.jsonl");
+	expect(ids(w.attempts)).toContain("session:flusk/real-attempt.jsonl");
 	expect(new Set(ids(w.attempts)).size).toBe(w.attempts.length);
 	// The nightlies share one word ("add") and a template with each other; a
 	// list of them labelled "a previous attempt at this same task" is a lie.
@@ -129,7 +129,7 @@ it("returns no attempts at all when nothing was ever attempted", () => {
 	// with nothing close, half of nothing still admits the nightlies.
 	expect(w.attempts).toEqual([]);
 	expect(ids(buildWalkthrough(index, ALIEN, { now: NOW }).precedent)).not.toContain(
-		"session:ah/real-attempt.jsonl",
+		"session:flusk/real-attempt.jsonl",
 	);
 });
 
@@ -137,8 +137,8 @@ it("keeps at most two house rules, all from the repo the work is in", () => {
 	const w = walk(TASK);
 	const rules = w.conventions.filter((h) => isHouseRule(h.card));
 	expect(rules.length).toBeLessThanOrEqual(2);
-	expect(new Set(rules.map((h) => h.card.project))).toEqual(new Set(["ah"]));
-	expect(ids(w.conventions)[0]).toMatch(/^doc:ah:/); // a rule still leads
+	expect(new Set(rules.map((h) => h.card.project))).toEqual(new Set(["flusk"]));
+	expect(ids(w.conventions)[0]).toMatch(/^doc:flusk:/); // a rule still leads
 });
 
 it("warns about failures that are about this task, and not about the rest", () => {

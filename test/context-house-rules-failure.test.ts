@@ -9,7 +9,7 @@ import type { ContextRequest } from "../src/context/types.js";
 let repo: string;
 
 beforeEach(async () => {
-	repo = await mkdtemp(join(tmpdir(), "ah-house-rules-fail-"));
+	repo = await mkdtemp(join(tmpdir(), "flusk-house-rules-fail-"));
 });
 
 const req = (): ContextRequest => ({

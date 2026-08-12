@@ -5,7 +5,7 @@
  * same state and both act on it: without this, each would evaluate its guard
  * against a log neither had written to yet, both would see {status pending},
  * and both would start the same task. The in-process queue cannot help — the
- * competing writer is another `ah` run entirely.
+ * competing writer is another `flusk` run entirely.
  *
  * A lock is stolen once it is older than STALE_MS, because the alternative to
  * a rare double-claim is a store wedged forever by one killed process. That

@@ -3,26 +3,27 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { loadConfig } from "../src/config/config.js";
 import { DEFAULT_CONFIG } from "../src/config/defaults.js";
-import { ahHome } from "../src/session/paths.js";
+import { fluskHome } from "../src/session/paths.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 
 describe("loadConfig", () => {
 	let repo: string;
 
 	beforeEach(async () => {
-		repo = await setupTestHome("ah-config-");
+		repo = await setupTestHome("flusk-config-");
 	});
 	afterEach(() => teardownTestHome());
 
 	async function writeGlobal(data: unknown): Promise<string> {
-		await mkdir(ahHome(), { recursive: true });
-		const path = join(ahHome(), "config.json");
+		await mkdir(fluskHome(), { recursive: true });
+		const path = join(fluskHome(), "config.json");
 		await writeFile(path, typeof data === "string" ? data : JSON.stringify(data));
 		return path;
 	}
 
 	async function writeRepo(data: unknown): Promise<string> {
-		const path = join(repo, ".ah.json");
+		await mkdir(join(repo, ".flusk"), { recursive: true });
+		const path = join(repo, ".flusk", "config.json");
 		await writeFile(path, typeof data === "string" ? data : JSON.stringify(data));
 		return path;
 	}
@@ -34,7 +35,7 @@ describe("loadConfig", () => {
 		expect(cfg.models.summarize).toEqual({ provider: "anthropic", id: "claude-haiku-4-5" });
 		expect(cfg.budgets).toEqual({ maxTurns: 100, maxCostUsd: 10, deadlineMinutes: null });
 		expect(cfg.unattended.onUnknownCommand).toBe("deny");
-		expect(cfg.isolation).toEqual({ requireGit: true, branchPrefix: "ah/" });
+		expect(cfg.isolation).toEqual({ requireGit: true, branchPrefix: "flusk/" });
 		expect(cfg.compaction).toEqual({ reserveTokens: 16384, keepRecentTokens: 20000 });
 	});
 
@@ -51,7 +52,7 @@ describe("loadConfig", () => {
 		expect(cfg.isolation.requireGit).toBe(true);
 	});
 
-	it("gives repo .ah.json precedence over the global config", async () => {
+	it("gives repo .flusk/config.json precedence over the global config", async () => {
 		await writeGlobal({
 			budgets: { maxTurns: 7, maxCostUsd: 3 },
 			unattended: { onUnknownCommand: "allow" },
@@ -98,15 +99,15 @@ describe("loadConfig", () => {
 		expect(Object.keys(loadConfig(repo).memory)).toEqual(["enabled"]);
 	});
 
-	it("refuses chat.backends from a repo's .ah.json", async () => {
-		// `ah ui` loads config from its own cwd and spawns what this list names.
+	it("refuses chat.backends from a repo's .flusk/config.json", async () => {
+		// `flusk ui` loads config from its own cwd and spawns what this list names.
 		const backend = { id: "claude", kind: "cli", command: "/bin/sh", args: ["-c", "payload"] };
 		await writeGlobal({ chat: { backends: [{ id: "mine", kind: "cli", command: "codex" }] } });
 		await writeRepo({ chat: { backends: [backend] } });
 		expect(loadConfig(repo).chat.backends).toEqual([{ id: "mine", kind: "cli", command: "codex" }]);
 	});
 
-	it("refuses ui scan roots from a repo's .ah.json", async () => {
+	it("refuses ui scan roots from a repo's .flusk/config.json", async () => {
 		// These name what the history indexer reads, serves over the loopback
 		// API and embeds into composed prompts.
 		await writeGlobal({ ui: { projectDirs: ["~/projects/*"] } });

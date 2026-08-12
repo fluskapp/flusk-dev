@@ -9,7 +9,7 @@ import { setupTestHome, teardownTestHome } from "./helpers.js";
 let repo: string;
 
 beforeEach(async () => {
-	repo = await setupTestHome("ah-ctx-workspace-");
+	repo = await setupTestHome("flusk-ctx-workspace-");
 });
 afterEach(() => teardownTestHome());
 
@@ -36,7 +36,7 @@ test("no workspace on disk is a skip with a reason, not a failure", () => {
 	expect(out.items).toEqual([]);
 	expect(out.status).toBe("skipped");
 	expect(out.notes.join("\n")).toContain("IDENTITY.md");
-	expect(out.notes.join("\n")).toContain("~/.ah/workspace");
+	expect(out.notes.join("\n")).toContain("~/.flusk/workspace");
 });
 
 test("by default the layers the system prompt already renders are not repeated", async () => {
@@ -50,22 +50,22 @@ test("by default the layers the system prompt already renders are not repeated",
 
 test("the three owned layers are emitted in prompt order when the caller asks for them", async () => {
 	await globalFile("TOOLS.md", "prefer rg over grep");
-	await globalFile("IDENTITY.md", "you are ah");
+	await globalFile("IDENTITY.md", "you are flusk");
 	await globalFile("SOUL.md", "never force-push");
 
 	const out = emitting().gather(req());
 	expect(out.status).toBe("ok");
 	expect(out.notes).toEqual([]);
 	expect(out.items.map((i) => i.id)).toEqual([
-		"workspace:identity:~/.ah/workspace/IDENTITY.md",
-		"workspace:soul:~/.ah/workspace/SOUL.md",
-		"workspace:tools:~/.ah/workspace/TOOLS.md",
+		"workspace:identity:~/.flusk/workspace/IDENTITY.md",
+		"workspace:soul:~/.flusk/workspace/SOUL.md",
+		"workspace:tools:~/.flusk/workspace/TOOLS.md",
 	]);
 });
 
 test("an unreadable layer degrades to partial: the rest still load, with the reason", async () => {
 	await mkdir(join(globalWorkspaceDir(), "SOUL.md"), { recursive: true }); // a directory
-	await globalFile("IDENTITY.md", "you are ah");
+	await globalFile("IDENTITY.md", "you are flusk");
 
 	const out = emitting().gather(req());
 	expect(out.status).toBe("partial");
@@ -74,15 +74,15 @@ test("an unreadable layer degrades to partial: the rest still load, with the rea
 	expect(notes).toContain("SOUL.md");
 	// The loader writes its notes with absolute paths; none may survive.
 	expect(notes).not.toContain(globalWorkspaceDir());
-	expect(notes).toContain("~/.ah/workspace/SOUL.md");
+	expect(notes).toContain("~/.flusk/workspace/SOUL.md");
 });
 
 test("house rules are left to the house-rules source and said so", async () => {
 	await writeFile(join(repo, "AGENTS.md"), "tabs, 150 lines");
-	await globalFile("IDENTITY.md", "you are ah");
+	await globalFile("IDENTITY.md", "you are flusk");
 
 	const out = emitting().gather(req());
-	expect(out.items.map((i) => i.id)).toEqual(["workspace:identity:~/.ah/workspace/IDENTITY.md"]);
+	expect(out.items.map((i) => i.id)).toEqual(["workspace:identity:~/.flusk/workspace/IDENTITY.md"]);
 	expect(out.notes.join("\n")).toContain("house-rules source");
 });
 
@@ -93,8 +93,8 @@ test("a project file overrides the global one and is cited project-relative", as
 
 	const item = emitting().gather(req()).items[0];
 	expect(item?.body).toBe("project soul");
-	expect(item?.path).toBe(".ah/workspace/SOUL.md");
-	expect(item?.title).toContain("repo/.ah/workspace/SOUL.md");
+	expect(item?.path).toBe(".flusk/workspace/SOUL.md");
+	expect(item?.title).toContain("repo/.flusk/workspace/SOUL.md");
 });
 
 test("gather is total: a repoRoot that is not a directory returns a result, not a throw", () => {
@@ -105,7 +105,7 @@ test("gather is total: a repoRoot that is not a directory returns a result, not 
 });
 
 test("the same repo and corpus gather byte-identically, resume included", async () => {
-	await globalFile("IDENTITY.md", "you are ah");
+	await globalFile("IDENTITY.md", "you are flusk");
 	await globalFile("SOUL.md", "never force-push");
 
 	const first = JSON.stringify(emitting().gather(req()));

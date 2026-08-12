@@ -1,6 +1,6 @@
 /**
  * What "search across every project" returns. Frozen shape: src/find/*
- * produces it, /api/find serves it, and `ah find` and the webview render it.
+ * produces it, /api/find serves it, and `flusk find` and the webview render it.
  *
  * Matches are grouped BY FILE rather than served flat because that is how the
  * result is read — a file header with its lines under it — and because the

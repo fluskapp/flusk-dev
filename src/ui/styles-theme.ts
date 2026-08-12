@@ -40,7 +40,7 @@ const ALIASES = `
 	--code-bg: var(--ij-bg-inset);
 	--gutter-bg: var(--ij-bg-inset);
 	--tag-user: var(--ij-status-warning);
-	--tag-ah: var(--ij-accent);
+	--tag-flusk: var(--ij-accent);
 	--match-bg: var(--ij-match-bg);
 	--match-fg: var(--ij-match-fg);
 	/* Text drawn ON a filled BADGE (Badge.blueForeground's pair, which the pill
@@ -48,7 +48,7 @@ const ALIASES = `
 	   --ij-button-default-fg, which is white in both themes. */
 	--on-accent: var(--ij-text-on-accent);
 	/* One row height for every list in the workbench. Tree.rowHeight is 24px,
-	   two more than the 22 ah used to draw: fidelity, not densification. */
+	   two more than the 22 flusk used to draw: fidelity, not densification. */
 	--row: var(--ij-row-h);
 	--font-ui: var(--ij-font-ui);
 	--font-code: var(--ij-font-mono);

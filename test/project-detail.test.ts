@@ -54,10 +54,10 @@ beforeAll(() => {
 	);
 	write(work, "bare/CLAUDE.md", "Bare harness context.\n");
 
-	// ah's own checkout, recognised by the system-prompt module it owns.
-	write(work, "ah/src/agent/system-prompt.ts", "export {};\n");
-	write(work, "ah/.ah.json", JSON.stringify({ verify: ["npm test"], namespace: "repo:ah" }));
-	write(work, "ah/package.json", JSON.stringify({ scripts: { build: "tsc" } }));
+	// flusk's own checkout, recognised by the system-prompt module it owns.
+	write(work, "flusk/src/agent/system-prompt.ts", "export {};\n");
+	write(work, "flusk/.flusk/config.json", JSON.stringify({ verify: ["npm test"], namespace: "repo:flusk" }));
+	write(work, "flusk/package.json", JSON.stringify({ scripts: { build: "tsc" } }));
 });
 
 afterAll(() => t.cleanup());
@@ -66,8 +66,8 @@ it("returns null for a project the config does not point at", () => {
 	expect(projectDetail(t.cfg, "nope", NOW)).toBeNull();
 });
 
-it("describes ah from its own config, toolbelt and prompt builder", () => {
-	const d = projectDetail(t.cfg, "ah", NOW);
+it("describes flusk from its own config, toolbelt and prompt builder", () => {
+	const d = projectDetail(t.cfg, "flusk", NOW);
 	expect(d?.kind).toBe("repo");
 	expect(d?.models).toEqual([
 		{ id: "anthropic/claude-sonnet-5", role: "plan" },
@@ -77,9 +77,9 @@ it("describes ah from its own config, toolbelt and prompt builder", () => {
 	]);
 	expect(d?.tools).toEqual(["read", "bash", "write", "edit", "glob", "grep", "task"]);
 	expect(d?.systemPrompt?.source).toBe("src/agent/system-prompt.ts");
-	expect(d?.systemPrompt?.text).toContain(`repoRoot: ${join(t.work, "ah")}`);
-	expect(d?.verify).toEqual(["npm test"]); // .ah.json wins over the build script
-	expect(d?.config).toEqual({ verify: ["npm test"], namespace: "repo:ah" });
+	expect(d?.systemPrompt?.text).toContain(`repoRoot: ${join(t.work, "flusk")}`);
+	expect(d?.verify).toEqual(["npm test"]); // .flusk/config.json wins over the build script
+	expect(d?.config).toEqual({ verify: ["npm test"], namespace: "repo:flusk" });
 });
 
 it("describes a harness from config.json, learned benchmarks and its prompt file", () => {

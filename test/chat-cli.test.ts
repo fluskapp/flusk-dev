@@ -2,7 +2,7 @@ import { chmodSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSy
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { ahRepoRoot, renderPrompt, streamCli } from "../src/chat/cli-backend.js";
+import { fluskRepoRoot, renderPrompt, streamCli } from "../src/chat/cli-backend.js";
 import type { ChatChunk } from "../src/chat/types.js";
 
 let bin: string;
@@ -23,8 +23,8 @@ async function collect(cmd: string, args: string[], signal: AbortSignal): Promis
 }
 
 beforeAll(() => {
-	bin = mkdtempSync(join(tmpdir(), "ah-chat-cli-"));
-	out = mkdtempSync(join(tmpdir(), "ah-chat-out-"));
+	bin = mkdtempSync(join(tmpdir(), "flusk-chat-cli-"));
+	out = mkdtempSync(join(tmpdir(), "flusk-chat-out-"));
 	realPath = process.env.PATH;
 	process.env.PATH = `${bin}:${realPath ?? ""}`;
 	script(
@@ -68,8 +68,8 @@ it("streams stdout as deltas, passing the prompt as the final argument", async (
 	expect(chunks.some((c) => c.type === "error")).toBe(false);
 	expect(chunks.some((c) => c.type === "done")).toBe(false); // the engine owns "done"
 	expect(readFileSync(join(out, "argv.txt"), "utf8")).toBe("-p User: hi");
-	// default cwd is the ah checkout, not wherever the dashboard was started
-	expect(readFileSync(join(out, "cwd.txt"), "utf8").trim()).toBe(realpathSync(ahRepoRoot()));
+	// default cwd is the flusk checkout, not wherever the dashboard was started
+	expect(readFileSync(join(out, "cwd.txt"), "utf8").trim()).toBe(realpathSync(fluskRepoRoot()));
 });
 
 it("honours an explicit cwd", async () => {
@@ -94,10 +94,10 @@ it("keeps output that arrived before a non-zero exit rather than erroring over i
 });
 
 it("reports a missing binary as an error chunk, never a throw", async () => {
-	const chunks = await collect("ah-no-such-cli-9fd2", [], new AbortController().signal);
+	const chunks = await collect("flusk-no-such-cli-9fd2", [], new AbortController().signal);
 	expect(chunks).toHaveLength(1);
 	expect(chunks[0]?.type).toBe("error");
-	expect((chunks[0] as { message: string }).message).toContain("ah-no-such-cli-9fd2");
+	expect((chunks[0] as { message: string }).message).toContain("flusk-no-such-cli-9fd2");
 });
 
 it("kills the child on abort and stops the stream", async () => {

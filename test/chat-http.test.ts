@@ -63,12 +63,12 @@ beforeAll(async () => {
 
 afterAll(async () => {
 	await new Promise<void>((r) => server.close(() => r()));
-	delete process.env.AH_CHAT_HTTP_KEY;
+	delete process.env.FLUSK_CHAT_HTTP_KEY;
 });
 
 it("posts /chat/completions and yields deltas until [DONE]", async () => {
-	process.env.AH_CHAT_HTTP_KEY = "sk-live";
-	const chunks = await collect(backend("/ok", "AH_CHAT_HTTP_KEY"));
+	process.env.FLUSK_CHAT_HTTP_KEY = "sk-live";
+	const chunks = await collect(backend("/ok", "FLUSK_CHAT_HTTP_KEY"));
 	expect(chunks).toEqual([
 		{ type: "delta", text: "Hel" },
 		{ type: "delta", text: "lo" },
