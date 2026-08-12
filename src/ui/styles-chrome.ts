@@ -105,7 +105,7 @@ body.side-off #side-grip, body.find-off #find-grip { display: none; }
    a wide window the cap left roughly a third of the editor empty while the
    detail column beside it was still eliding text. The measure moved down to
    the paragraphs that want it, below. */
-#overview, #runs, #project, #run {
+#overview, #runs, #project, #run, #graph {
 	padding: var(--ij-space-2) var(--ij-space-4) calc(var(--ij-space-4) * 2);
 }
 #docs, #doc, #file { padding: 0; }

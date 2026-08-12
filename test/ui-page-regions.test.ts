@@ -45,7 +45,7 @@ it("leads with the attention region, built from the project scan", () => {
 });
 
 it("documents the keyboard map in a grouped help overlay", () => {
-	const keys = ["/", "j", "k", "Enter", "1", "2", "3", "5", "6", "o", "r", "d", "c", "t"];
+	const keys = "/ j k Enter 1 2 3 4 5 6 8 9 0 o r d g u a c t".split(" ");
 	for (const k of [...keys, "Esc", "?", "w"]) expect(served).toContain(`<kbd>${k}</kbd>`);
 	has(['id="help"', "Search projects", 'class="help-groups"', 'class="help-group"']);
 	for (const group of [
@@ -53,6 +53,9 @@ it("documents the keyboard map in a grouped help overlay", () => {
 		"help-tw",
 		"help-search",
 		"help-find",
+		"help-web",
+		"help-ask",
+		"help-graph",
 		"help-editor",
 		"help-window",
 	]) {

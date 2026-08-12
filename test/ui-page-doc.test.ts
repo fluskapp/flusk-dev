@@ -97,7 +97,9 @@ it("binds F1, 6, ⌘B, ⌥F7 and ⌘F12, and documents every one of them", () =>
 	// The shift guards: ⌘⇧B is the browsers' bookmarks shortcut and must survive.
 	has(['if (key === "b" && !e.shiftKey && !isTyping(document.activeElement))']);
 	has(["docGoToDefinition()", 'if (key === "f12" && !e.shiftKey)', "function focusOutline()"]);
-	has(["/^[1-6]$/.test(e.key)"]);
+	// The digit gate admits exactly the digits with a window behind them — 7 is
+	// parked, so it must NOT be swallowed by the handler.
+	has(["/^[0-689]$/.test(e.key)"]);
 	// Every gesture has a row in the help sheet, grouped.
 	has(['id="help-doc"', "Documentation tool window &mdash; look up, or show"]);
 	has(["Go to the definition of the selected symbol", "Find usages &mdash;"]);

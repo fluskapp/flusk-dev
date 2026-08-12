@@ -57,6 +57,7 @@ export function parseRunArgs(task: string, v: Values, cwd: string): ParsedRunArg
 			noIsolation: v["no-isolation"] === true,
 			allowDirty: v["allow-dirty"] === true,
 			noVerify: v["no-verify"] === true,
+			noExtensions: v["no-extensions"] === true,
 			quiet: v.quiet === true,
 		},
 	};

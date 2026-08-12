@@ -9,24 +9,28 @@ export const CLIENT_TABS_JS = `
 var VIEW_OF = {
 	attention: "#overview", runs: "#runs", docs: "#docs",
 	project: "#project", run: "#run", doc: "#doc", file: "#file",
+	web: "#web", ask: "#ask", graph: "#graph",
 };
 var PINNED = [
 	{ id: "attention", kind: "attention", label: "Attention" },
 	{ id: "runs", kind: "runs", label: "Runs" },
 	{ id: "docs", kind: "docs", label: "Docs" },
+	{ id: "web", kind: "web", label: "Web" }, { id: "ask", kind: "ask", label: "Ask AI" },
+	{ id: "graph", kind: "graph", label: "Graph" },
 ];
 var PANEL_BTN = {
 	attention: "#overview-btn", runs: "#runs-btn", docs: "#docs-btn",
+	web: "#web-btn", ask: "#ask-btn", graph: "#graph-btn",
 };
 /** The glyph vocabulary; the Find tool window's header uses "find" too. */
 var TAB_GLYPH = {
 	attention: "att", runs: "run", docs: "doc",
-	project: "prj", find: "find",
+	project: "prj", find: "find", web: "www", ask: "ask", graph: "gph",
 };
 /** Which area of the workbench a tab belongs to — the middle breadcrumb. */
 var TAB_AREA = {
-	attention: "Attention", runs: "Runs", docs: "Docs",
-	project: "Projects", run: "Runs", doc: "Docs", file: "Files",
+	attention: "Attention", runs: "Runs", docs: "Docs", project: "Projects", run: "Runs",
+	doc: "Docs", file: "Files", web: "Web", ask: "Ask AI", graph: "Graph",
 };
 
 function fileGlyph(path) { return isMd(path) ? "md" : ext(path) || "file"; }
@@ -37,9 +41,7 @@ function tabGlyph(t) {
 	return TAB_GLYPH[t.kind] || "tab";
 }
 
-function tabById(id) {
-	return S.tabs.filter(function (t) { return t.id === id; })[0] || null;
-}
+function tabById(id) { return S.tabs.filter(function (t) { return t.id === id; })[0] || null; }
 function activeTab() { return tabById(S.active); }
 
 function openTab(tab) {
@@ -118,6 +120,8 @@ function loadView(t) {
 	else if (t.kind === "run") loadRun(t.ref);
 	else if (t.kind === "doc") loadDoc(t.ref);
 	else if (t.kind === "file") loadFile(t);
+	else if (t.kind === "web") loadWeb(); else if (t.kind === "ask") loadAsk();
+	else if (t.kind === "graph") loadGraph();
 }
 
 function togglePanel(kind) {

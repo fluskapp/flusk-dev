@@ -3,7 +3,7 @@ import { createAgent } from "../agent/agent.js";
 import { buildSystemPrompt } from "../agent/system-prompt.js";
 import { loadConfig, loadRepoConfig } from "../config/config.js";
 import type { FluskConfig, RepoConfig, TaskKind } from "../config/types.js";
-import { createEventBus } from "../core/events.js";
+import { createEventBus, type EventBus } from "../core/events.js";
 import { resolveNamespace } from "../store/namespaces.js";
 import { FakeProvider } from "../provider/fake.js";
 import { classifyTask } from "../provider/intent.js";
@@ -11,9 +11,10 @@ import { hasAuth, PiAiProvider } from "../provider/pi-ai.js";
 import { createFluskPolicy } from "../safety/flusk-policy.js";
 import { ensureCleanTree, isGitRepo, startRunBranch, summarizeRun } from "../safety/git-isolation.js";
 import { createFactStore } from "../store/store.js";
+import { toolbelt } from "./ext-tools.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import { attachRenderer } from "./render.js";
-import { DEFAULT_TOOLS, demoScript, envKeyVar, fakeModel, loadFakeScript, pickModel } from "./run-support.js";
+import { demoScript, envKeyVar, fakeModel, loadFakeScript, pickModel } from "./run-support.js";
 
 export { DEFAULT_TOOLS, envKeyVar, fakeModel, loadFakeScript } from "./run-support.js";
 
@@ -36,6 +37,8 @@ export interface RunCmdOpts {
 	/** Skip the verification gate (commands and claim check) entirely. */
 	noVerify?: boolean;
 	quiet?: boolean;
+	/** `--no-extensions`: run with the built-in toolbelt alone, for one command. */
+	noExtensions?: boolean;
 	out?: NodeJS.WritableStream;
 	/**
 	 * Config resolved by the caller, used INSTEAD of reading `<repo>/.flusk/config.json`.
@@ -45,6 +48,13 @@ export interface RunCmdOpts {
 	 */
 	trustedConfig?: { cfg: FluskConfig; repoConfig: RepoConfig | undefined; namespace?: string };
 }
+
+/** DEFAULT_TOOLS plus whatever the extensions registered — the seam that makes
+ * src/ext/ reachable at all (src/cli/ext-tools.ts). */
+const belt = (o: RunCmdOpts, cfg: FluskConfig, events?: EventBus) =>
+	toolbelt({ repoRoot: o.repo, config: cfg, out: o.out ?? process.stdout,
+		quiet: o.quiet === true, ...(events === undefined ? {} : { events }),
+		...(o.noExtensions === true ? { noExtensions: true } : {}) });
 
 /** Phase 3 run command: config → routed model, flusk policy, git isolation,
  * then the run + verification gate. Never calls process.exit; returns the CLI
@@ -72,7 +82,9 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 			: inRepo
 				? `branch ${cfg.isolation.branchPrefix}<run-id>, checkpoint commit per mutating turn`
 				: "off (not a git repository)";
-		const tools = [...DEFAULT_TOOLS.map((t) => t.name), "task"].join(", ");
+		// The REAL toolbelt, extensions included: anything else answers a
+		// different question from the one --dry is asked.
+		const tools = [...(await belt(opts, cfg)).map((t) => t.name), "task"].join(", ");
 		const prompt = buildSystemPrompt({ repoRoot: opts.repo, cwd: opts.repo, model });
 		out.write(`kind: ${kind}\nmodel: ${model.provider}/${model.id}\ntools: ${tools}\n` +
 			`isolation: ${plan}\n--- system prompt ---\n${prompt}\n`);
@@ -101,7 +113,7 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 	const agent = createAgent({
 		provider,
 		model,
-		tools: DEFAULT_TOOLS,
+		tools: await belt(opts, cfg, events),
 		task: opts.task,
 		repoRoot: opts.repo,
 		policy: createFluskPolicy({ config: cfg, repoRoot: opts.repo }),

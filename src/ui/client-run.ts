@@ -5,7 +5,7 @@
  */
 export const CLIENT_RUN_JS = `
 async function loadRun(ref) {
-	window.__ahRunStatus = null;
+	window.__fluskRunStatus = null;
 	setStatusPath(ref);
 	if (refKind(ref) === "session") await loadSessionRun(ref);
 	else await loadJournalRun(ref);
@@ -18,7 +18,7 @@ async function loadSessionRun(key) {
 		$("#run").innerHTML = '<div class="empty small">could not read that session</div>';
 		return;
 	}
-	window.__ahRunStatus = d.status;
+	window.__fluskRunStatus = d.status;
 	setStatusPath(d.path);
 	$("#run").innerHTML =
 		'<div class="head-row"><h2>' + esc(d.header.task) + "</h2>" +

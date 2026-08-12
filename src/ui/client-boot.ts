@@ -23,6 +23,12 @@ function handleOpen(spec) {
 		S.runFilter = null;
 		S.runSort = "cost";
 		togglePanel("runs");
+	} else if (verb === "web") {
+		openWeb(value); // a row in the Web panel's reading list: reopened from the cache
+	} else if (verb === "gnode") {
+		openGraphNode(value); // a Graph row opens the file its node names, at its line
+	} else if (verb === "gbuild") {
+		graphBuild(value); // that panel's empty state actually doing what its sentence names
 	} else if (verb === "docs") {
 		S.docProject = value || null;
 		if (value) selectProject(value);
@@ -38,6 +44,17 @@ function handleOpen(spec) {
 function openPanel(kind) {
 	if (kind === "runs") { S.runFilter = null; S.runSort = null; }
 	if (kind === "docs") { S.docProject = null; }
+	// The toolbar's Web button means the panel, not the page you last read:
+	// it lands on the reading list of everything already fetched.
+	if (kind === "web") { S.webUrl = null; }
+	// The Ask button means "about what is on screen NOW", so it re-snapshots.
+	// Clicking the TAB deliberately does not: coming back to read an answer
+	// must not replace the context that answer was about.
+	if (kind === "ask") { A.recapture = true; }
+	// The Graph button means "about whatever is open NOW" — and a symbol clicked
+	// in the file on screen IS open now, so graphReaim drops the aim only when it
+	// names some other file (client-graph-nav.ts).
+	if (kind === "graph") { graphReaim(); }
 	togglePanel(kind);
 }
 
@@ -64,6 +81,9 @@ function wireToolbar() {
 	$("#find-btn").addEventListener("click", function () { toggleFind(); });
 	$("#runs-btn").addEventListener("click", function () { openPanel("runs"); });
 	$("#docs-btn").addEventListener("click", function () { openPanel("docs"); });
+	$("#web-btn").addEventListener("click", function () { openPanel("web"); });
+	$("#ask-btn").addEventListener("click", function () { openPanel("ask"); });
+	$("#graph-btn").addEventListener("click", function () { openPanel("graph"); });
 	$("#chat-btn").addEventListener("click", toggleChat);
 	$("#search").addEventListener("input", function () {
 		S.query = this.value.toLowerCase();
@@ -100,7 +120,7 @@ function startPolls() {
 	}, 4000);
 	setInterval(function () {
 		var t = activeTab();
-		if (t && t.kind === "run" && window.__ahRunStatus === "running") loadView(t);
+		if (t && t.kind === "run" && window.__fluskRunStatus === "running") loadView(t);
 	}, 5000);
 }
 

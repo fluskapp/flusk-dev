@@ -10,6 +10,8 @@ var S = {
 	/** Where the cursor was left in each zone, so Tab returns to it. */
 	cursorOf: { tree: 0, view: 0 },
 	runFilter: null, runSort: null, docFilter: "", docProject: null,
+	/** The URL the Web panel is reading; null means show its reading list. */
+	webUrl: null,
 	chat: { msgs: [], busy: false, abort: null },
 	/** The path the status bar is showing — the active tab's file. */
 	path: "",
@@ -76,11 +78,31 @@ function projectLink(name) {
 	return '<span class="ev" data-open="project:' + esc(name) + '">' + esc(name) + "</span>";
 }
 
-/** \`opts\` carries an AbortSignal, so a superseded search can be cancelled. */
+/**
+ * \`opts\` carries an AbortSignal, so a superseded search can be cancelled.
+ *
+ * A REJECTION CARRIES THE REASON. Every route in this server answers a failure
+ * with {error: "…"}; throwing the status alone destroyed that sentence at the
+ * fetch boundary and left each caller to invent one — which is how a panel ends
+ * up asserting "that path is outside your projects" about a 500. \`status\` is 0
+ * when the request never landed at all, which is a third thing again.
+ */
 async function getJson(url, opts) {
 	var r = await fetch(url, opts || undefined);
-	if (!r.ok) throw new Error("HTTP " + r.status);
-	return r.json();
+	if (r.ok) return r.json();
+	var body = null;
+	try { body = await r.json(); } catch (e) { body = null; }
+	var err = new Error("HTTP " + r.status);
+	err.status = r.status;
+	err.reason = (body && body.error) || "";
+	throw err;
+}
+
+/** The one sentence a failed getJson is worth, never a guess about the cause. */
+function failWhy(e) {
+	if (e && e.reason) return e.reason;
+	if (e && e.status) return "the server answered HTTP " + e.status;
+	return "the dashboard could not reach the server (" + String((e && e.message) || e) + ")";
 }
 
 /**

@@ -36,7 +36,8 @@ afterAll(async () => {
 it("serves every tool window, the tab strip and every view container", () => {
 	has(['id="toolbar"', 'id="side"', 'id="tree"', 'id="main"', 'id="tabs"', 'id="views"']);
 	has(['id="chat"', 'id="find"', 'id="status"', 'id="crumbs"']);
-	for (const view of ["overview", "runs", "docs", "project", "run", "doc", "file"]) {
+	const views = "overview runs docs project run doc file web ask graph".split(" ");
+	for (const view of views) {
 		expect(served).toContain(`<div id="${view}" class="view"`);
 	}
 });
@@ -45,12 +46,11 @@ it("numbers the tool windows the way IntelliJ does: 1 Projects … 6 Documentati
 	// The header badge, the toolbar button and the key binding must agree.
 	has(['<span class="tw-num">1</span>', '<span class="tw-num">4</span>']);
 	has(['<span class="tw-num">5</span>', 'id="side-btn"', 'id="find-btn"', 'id="chat-btn"']);
-	// 1..N with no hole. Deleting a tool window is exactly when a gap appears,
-	// and the shortcut in the middle then opens nothing.
-	const shown = [...served.matchAll(/<span class="n">(\d)<\/span>/g)]
-		.map((m) => Number(m[1]))
-		.sort((a, b) => a - b);
-	expect(shown).toEqual([1, 2, 3, 4, 5, 6]);
+	// Every advertised digit is on a button; 7 is deliberately parked, so the
+	// sequence runs 1..6 then 8, 9, 0 — a hole past the end, never in the middle.
+	for (const n of ["1", "2", "3", "4", "5", "6", "8", "9", "0"]) {
+		expect(served).toContain(`<span class="n">${n}</span>`);
+	}
 	has([
 		"function toolWindow(n)",
 		'if (n === "1") toggleSide()',

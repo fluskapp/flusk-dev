@@ -13,6 +13,7 @@ import { STAGES_CSS } from "./styles-stages.js";
 import { TRANSCRIPT_CSS } from "./styles-transcript.js";
 import { TREE_CSS } from "./styles-tree.js";
 import { WIDGETS_CSS } from "./styles-widgets.js";
+import { WEB_CSS } from "./styles-web.js";
 import { WORK_CSS } from "./styles-work.js";
 
 export const ALL_CSS =
@@ -26,4 +27,5 @@ export const ALL_CSS =
 	MD_CSS +
 	FIND_CSS +
 	WIDGETS_CSS +
-	CHAT_CSS;
+	CHAT_CSS +
+	WEB_CSS;

@@ -73,7 +73,7 @@ async function loadJournalRun(path) {
 	// while the run is live, and the index is a rescan of every journal on disk.
 	try { meta = await getJson("/api/journal-meta?repo=" + encodeURIComponent(path)); }
 	catch (e) { meta = null; }
-	if (meta) window.__ahRunStatus = meta.status;
+	if (meta) window.__fluskRunStatus = meta.status;
 	var host = $("#run");
 	var head = journalHead(meta, path);
 	var text = "";

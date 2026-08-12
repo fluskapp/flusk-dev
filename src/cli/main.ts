@@ -43,6 +43,7 @@ async function main(): Promise<void> {
 				"no-isolation": { type: "boolean" },
 				"allow-dirty": { type: "boolean" },
 				"no-verify": { type: "boolean" },
+				"no-extensions": { type: "boolean" }, // src/ext/types.ts's escape hatch
 				list: { type: "boolean" },
 				quiet: { type: "boolean" },
 				steer: { type: "string" },
@@ -97,6 +98,7 @@ async function main(): Promise<void> {
 			...(typeof v.steer === "string" ? { steer: v.steer } : {}),
 			...(typeof v.fake === "string" ? { fake: v.fake } : {}),
 			noVerify: v["no-verify"] === true,
+			noExtensions: v["no-extensions"] === true,
 			quiet: v.quiet === true,
 		});
 		process.exitCode = reason === "completed" ? 0 : 1;
@@ -110,6 +112,7 @@ async function main(): Promise<void> {
 			dry: v.dry === true,
 			...(typeof v.fake === "string" ? { fake: v.fake } : {}),
 			noVerify: v["no-verify"] === true,
+			noExtensions: v["no-extensions"] === true,
 			quiet: v.quiet === true,
 		});
 		process.exitCode = outcome === "completed" ? 0 : 1;

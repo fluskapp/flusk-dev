@@ -10,12 +10,11 @@ import { allowAllPolicy } from "../safety/policy.js";
 import { prepareResumeContext } from "../session/repair.js";
 import { Session } from "../session/session.js";
 import { ToolRegistry } from "../tools/registry.js";
-import { taskTool } from "../tools/task.js";
+import { wireDelegation } from "./delegation.js";
 import type { ToolContext } from "../tools/tool.js";
 import { checkpointMutatingTurns } from "./checkpoints.js";
 import type { Agent, CreateAgentOpts } from "./options.js";
 import { prepareRun, type RunPrompt } from "./run-context.js";
-import { runSubagent } from "./subagent.js";
 
 export type { Agent, CreateAgentOpts } from "./options.js";
 
@@ -74,15 +73,15 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 		events,
 	};
 	if (depth < MAX_SUBAGENT_DEPTH && policy.decide({ kind: "subagent", depth }).allow) {
-		const spawnCtx = {
-			parent: opts,
+		wireDelegation({
+			opts,
 			budget,
-			parentSessionId: session.id,
+			sessionId: session.id,
 			depth: depth + 1,
-			parentSignal: controller.signal,
-		};
-		toolCtx.spawnSubagent = (task: string, kind?: string) => runSubagent(spawnCtx, task, kind);
-		registry.register(taskTool);
+			signal: controller.signal,
+			registry,
+			toolCtx,
+		});
 	}
 	/**
 	 * The system prompt and the run-context block are ONE per-run product: the
