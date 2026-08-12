@@ -10,11 +10,58 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AskRouteImport } from './routes/ask'
+import { Route as ChatRouteImport } from './routes/chat'
+import { Route as DocRouteImport } from './routes/doc'
+import { Route as DocsRouteImport } from './routes/docs'
+import { Route as FindRouteImport } from './routes/find'
+import { Route as FlowsRouteImport } from './routes/flows'
+import { Route as GraphRouteImport } from './routes/graph'
 import { Route as RunsRouteImport } from './routes/runs'
+import { Route as WebRouteImport } from './routes/web'
+import { Route as DocsSplatRouteImport } from './routes/docs.$'
+import { Route as FilesSplatRouteImport } from './routes/files.$'
+import { Route as ProjectsProjectRouteImport } from './routes/projects.$project'
+import { Route as RunsRunIdRouteImport } from './routes/runs.$runId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AskRoute = AskRouteImport.update({
+  id: '/ask',
+  path: '/ask',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatRoute = ChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocRoute = DocRouteImport.update({
+  id: '/doc',
+  path: '/doc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FindRoute = FindRouteImport.update({
+  id: '/find',
+  path: '/find',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FlowsRoute = FlowsRouteImport.update({
+  id: '/flows',
+  path: '/flows',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GraphRoute = GraphRouteImport.update({
+  id: '/graph',
+  path: '/graph',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RunsRoute = RunsRouteImport.update({
@@ -22,31 +69,145 @@ const RunsRoute = RunsRouteImport.update({
   path: '/runs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WebRoute = WebRouteImport.update({
+  id: '/web',
+  path: '/web',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsSplatRoute = DocsSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
+  getParentRoute: () => DocsRoute,
+} as any)
+const FilesSplatRoute = FilesSplatRouteImport.update({
+  id: '/files/$',
+  path: '/files/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectsProjectRoute = ProjectsProjectRouteImport.update({
+  id: '/projects/$project',
+  path: '/projects/$project',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RunsRunIdRoute = RunsRunIdRouteImport.update({
+  id: '/$runId',
+  path: '/$runId',
+  getParentRoute: () => RunsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/runs': typeof RunsRoute
+  '/ask': typeof AskRoute
+  '/chat': typeof ChatRoute
+  '/doc': typeof DocRoute
+  '/docs': typeof DocsRouteWithChildren
+  '/find': typeof FindRoute
+  '/flows': typeof FlowsRoute
+  '/graph': typeof GraphRoute
+  '/runs': typeof RunsRouteWithChildren
+  '/web': typeof WebRoute
+  '/docs/$': typeof DocsSplatRoute
+  '/files/$': typeof FilesSplatRoute
+  '/projects/$project': typeof ProjectsProjectRoute
+  '/runs/$runId': typeof RunsRunIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/runs': typeof RunsRoute
+  '/ask': typeof AskRoute
+  '/chat': typeof ChatRoute
+  '/doc': typeof DocRoute
+  '/docs': typeof DocsRouteWithChildren
+  '/find': typeof FindRoute
+  '/flows': typeof FlowsRoute
+  '/graph': typeof GraphRoute
+  '/runs': typeof RunsRouteWithChildren
+  '/web': typeof WebRoute
+  '/docs/$': typeof DocsSplatRoute
+  '/files/$': typeof FilesSplatRoute
+  '/projects/$project': typeof ProjectsProjectRoute
+  '/runs/$runId': typeof RunsRunIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/runs': typeof RunsRoute
+  '/ask': typeof AskRoute
+  '/chat': typeof ChatRoute
+  '/doc': typeof DocRoute
+  '/docs': typeof DocsRouteWithChildren
+  '/find': typeof FindRoute
+  '/flows': typeof FlowsRoute
+  '/graph': typeof GraphRoute
+  '/runs': typeof RunsRouteWithChildren
+  '/web': typeof WebRoute
+  '/docs/$': typeof DocsSplatRoute
+  '/files/$': typeof FilesSplatRoute
+  '/projects/$project': typeof ProjectsProjectRoute
+  '/runs/$runId': typeof RunsRunIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/runs'
+  fullPaths:
+    | '/'
+    | '/ask'
+    | '/chat'
+    | '/doc'
+    | '/docs'
+    | '/find'
+    | '/flows'
+    | '/graph'
+    | '/runs'
+    | '/web'
+    | '/docs/$'
+    | '/files/$'
+    | '/projects/$project'
+    | '/runs/$runId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/runs'
-  id: '__root__' | '/' | '/runs'
+  to:
+    | '/'
+    | '/ask'
+    | '/chat'
+    | '/doc'
+    | '/docs'
+    | '/find'
+    | '/flows'
+    | '/graph'
+    | '/runs'
+    | '/web'
+    | '/docs/$'
+    | '/files/$'
+    | '/projects/$project'
+    | '/runs/$runId'
+  id:
+    | '__root__'
+    | '/'
+    | '/ask'
+    | '/chat'
+    | '/doc'
+    | '/docs'
+    | '/find'
+    | '/flows'
+    | '/graph'
+    | '/runs'
+    | '/web'
+    | '/docs/$'
+    | '/files/$'
+    | '/projects/$project'
+    | '/runs/$runId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  RunsRoute: typeof RunsRoute
+  AskRoute: typeof AskRoute
+  ChatRoute: typeof ChatRoute
+  DocRoute: typeof DocRoute
+  DocsRoute: typeof DocsRouteWithChildren
+  FindRoute: typeof FindRoute
+  FlowsRoute: typeof FlowsRoute
+  GraphRoute: typeof GraphRoute
+  RunsRoute: typeof RunsRouteWithChildren
+  WebRoute: typeof WebRoute
+  FilesSplatRoute: typeof FilesSplatRoute
+  ProjectsProjectRoute: typeof ProjectsProjectRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -58,6 +219,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ask': {
+      id: '/ask'
+      path: '/ask'
+      fullPath: '/ask'
+      preLoaderRoute: typeof AskRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat': {
+      id: '/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/doc': {
+      id: '/doc'
+      path: '/doc'
+      fullPath: '/doc'
+      preLoaderRoute: typeof DocRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/find': {
+      id: '/find'
+      path: '/find'
+      fullPath: '/find'
+      preLoaderRoute: typeof FindRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/flows': {
+      id: '/flows'
+      path: '/flows'
+      fullPath: '/flows'
+      preLoaderRoute: typeof FlowsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/graph': {
+      id: '/graph'
+      path: '/graph'
+      fullPath: '/graph'
+      preLoaderRoute: typeof GraphRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/runs': {
       id: '/runs'
       path: '/runs'
@@ -65,12 +275,77 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RunsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/web': {
+      id: '/web'
+      path: '/web'
+      fullPath: '/web'
+      preLoaderRoute: typeof WebRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/$': {
+      id: '/docs/$'
+      path: '/$'
+      fullPath: '/docs/$'
+      preLoaderRoute: typeof DocsSplatRouteImport
+      parentRoute: typeof DocsRoute
+    }
+    '/files/$': {
+      id: '/files/$'
+      path: '/files/$'
+      fullPath: '/files/$'
+      preLoaderRoute: typeof FilesSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/$project': {
+      id: '/projects/$project'
+      path: '/projects/$project'
+      fullPath: '/projects/$project'
+      preLoaderRoute: typeof ProjectsProjectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/runs/$runId': {
+      id: '/runs/$runId'
+      path: '/$runId'
+      fullPath: '/runs/$runId'
+      preLoaderRoute: typeof RunsRunIdRouteImport
+      parentRoute: typeof RunsRoute
+    }
   }
 }
 
+interface DocsRouteChildren {
+  DocsSplatRoute: typeof DocsSplatRoute
+}
+
+const DocsRouteChildren: DocsRouteChildren = {
+  DocsSplatRoute: DocsSplatRoute,
+}
+
+const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
+
+interface RunsRouteChildren {
+  RunsRunIdRoute: typeof RunsRunIdRoute
+}
+
+const RunsRouteChildren: RunsRouteChildren = {
+  RunsRunIdRoute: RunsRunIdRoute,
+}
+
+const RunsRouteWithChildren = RunsRoute._addFileChildren(RunsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  RunsRoute: RunsRoute,
+  AskRoute: AskRoute,
+  ChatRoute: ChatRoute,
+  DocRoute: DocRoute,
+  DocsRoute: DocsRouteWithChildren,
+  FindRoute: FindRoute,
+  FlowsRoute: FlowsRoute,
+  GraphRoute: GraphRoute,
+  RunsRoute: RunsRouteWithChildren,
+  WebRoute: WebRoute,
+  FilesSplatRoute: FilesSplatRoute,
+  ProjectsProjectRoute: ProjectsProjectRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
