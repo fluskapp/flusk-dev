@@ -25,6 +25,8 @@ const engineDir = () => (app.isPackaged ? join(process.resourcesPath, "dist") : 
 let serverP;
 
 async function startServer() {
+	// Packaged: the prebuilt native binaries live under resources/native.
+	if (app.isPackaged) process.env.FLUSK_NATIVE_DIR = join(process.resourcesPath, "native");
 	// The one-shot ~/.ah -> ~/.flusk migration, before anything reads state.
 	const { migrateHome, describeMigration } = await import(join(engineDir(), "platform/paths/migrate.js"));
 	for (const line of describeMigration(migrateHome())) console.log(`flusk: ${line}`);

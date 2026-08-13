@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>flusk — an autonomous coding agent that owns its whole loop</title>
+<meta name="description" content="flusk runs its own turn/tool/session engine, keeps every run on an isolated git branch, and remembers what it learns. Open source, Apache-2.0, desktop-first." />
+<link rel="stylesheet" href="./tokens.css" />
+<link rel="stylesheet" href="./site.css" />
+</head>
+<body>
+<header class="hero">
+	<div class="wrap">
+		<div class="brand">flusk</div>
+		<h1>An autonomous coding agent that owns its whole loop.</h1>
+		<p class="lede">
+			Not a wrapper around another agent CLI. flusk runs its own turn/tool/session
+			engine, keeps every run on an isolated <code>flusk/&lt;runId&gt;</code> branch with
+			per-turn checkpoints, and writes what it learns about your repositories to a
+			local bitemporal fact store — so knowledge outlives the context window.
+		</p>
+		<div class="actions">
+			<a class="btn primary" href="https://github.com/adirbenyossef/flusk/releases">Download</a>
+			<a class="btn" href="https://github.com/adirbenyossef/flusk">Source · Apache-2.0</a>
+		</div>
+	</div>
+</header>
+
+<main class="wrap">
+	<section class="cols">
+		<div>
+			<h2>Safe unattended</h2>
+			<p>
+				Four layers, in order: conservative shell-command classification (unknown
+				commands are denied), a realpath filesystem write jail, git-branch isolation
+				with hooks disabled, and hard budgets for turns, dollars and wall-clock.
+				The classifier is deliberately boring TypeScript — its value is that it has
+				been read.
+			</p>
+		</div>
+		<div>
+			<h2>Everything on disk</h2>
+			<p>
+				Sessions are append-only, fsynced JSONL. Crash mid-run, lose at most one
+				entry, resume where you were. Facts are bitemporal: a status change closes
+				the old row instead of mutating it, so history stays readable and a
+				concurrent reader never sees two live answers.
+			</p>
+		</div>
+		<div>
+			<h2>A real workbench</h2>
+			<p>
+				An IntelliJ-styled desktop app: numbered tool windows for runs, docs,
+				search, chat, documentation, flows, the code graph and the web — every
+				token in its theme traced to the IDE theme dumps it was measured from.
+				The address bar names the whole workbench state.
+			</p>
+		</div>
+	</section>
+
+	<section>
+		<h2>Quoted material stays quoted</h2>
+		<p>
+			Everything flusk quotes into a prompt — your repo's docs, its own history —
+			sits inside <code>&lt;&lt;&lt;FLUSK-CONTEXT ...&gt;&gt;&gt;</code> fences, and the sentinel is
+			neutralised inside quoted bodies, so a document in a cloned repository cannot
+			close the quotation it was placed in and continue as instructions. A cloned
+			repo's config cannot name the binaries the workbench spawns, or the
+			directories the history indexer reads. The details are in
+			<a href="https://github.com/adirbenyossef/flusk/blob/main/SECURITY.md">SECURITY.md</a> —
+			including how to tell us when you get past them.
+		</p>
+	</section>
+
+	<section>
+		<h2>Fast where it counts</h2>
+		<p>
+			The CPU-bound floor — history indexing and search today, scanning, rendering
+			and the fact store as they prove out — moves to Rust behind a stable
+			TypeScript interface, with differential tests holding both implementations
+			byte-equal and <code>FLUSK_NATIVE=0</code> as a runtime kill switch. Budgets are
+			checked in CI: sub-100ms index rebuilds, sub-10ms search, a main process that
+			never blocks.
+		</p>
+	</section>
+
+	<footer>
+		<p>
+			Apache-2.0 ·
+			<a href="https://github.com/adirbenyossef/flusk">GitHub</a> ·
+			<a href="https://github.com/adirbenyossef/flusk/blob/main/docs/architecture.md">Architecture</a>
+		</p>
+	</footer>
+</main>
+</body>
+</html>

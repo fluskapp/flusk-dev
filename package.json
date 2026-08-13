@@ -30,7 +30,10 @@
 		"dev": "npm run tokens && vite dev",
 		"tokens": "npm run build && node scripts/gen-tokens.mjs",
 		"build:app": "npm run tokens && vite build",
-		"app": "npm run build:app && electron ."
+		"app": "npm run build:app && electron .",
+		"pack": "npm run build && npm run build:app && electron-builder --dir",
+		"dist": "npm run build && npm run build:app && electron-builder",
+		"site": "npm run tokens && cp src/ui/react/tokens.css site/tokens.css && vite build --config site/vite.config.ts"
 	},
 	"dependencies": {
 		"@earendil-works/pi-ai": "^0.84.1",
@@ -55,11 +58,54 @@
 		"@types/react": "^19.2.18",
 		"@types/react-dom": "^19.2.4",
 		"electron": "^43.4.0",
+		"electron-builder": "^26.15.3",
 		"vitest": "^3.0.0"
 	},
 	"homepage": "https://flusk.dev",
 	"allowScripts": {
 		"electron@43.4.0": true
 	},
-	"main": "electron/main.mjs"
+	"main": "electron/main.mjs",
+	"build": {
+		"appId": "dev.flusk.app",
+		"productName": "flusk",
+		"directories": {
+			"output": "dist-pack"
+		},
+		"files": [
+			"electron/**",
+			"package.json"
+		],
+		"extraResources": [
+			{
+				"from": "dist",
+				"to": "dist"
+			},
+			{
+				"from": "dist-app",
+				"to": "dist-app"
+			},
+			{
+				"from": "src/platform/native/prebuilt",
+				"to": "native"
+			}
+		],
+		"mac": {
+			"target": [
+				"dmg"
+			],
+			"category": "public.app-category.developer-tools"
+		},
+		"win": {
+			"target": [
+				"nsis"
+			]
+		},
+		"linux": {
+			"target": [
+				"AppImage"
+			],
+			"category": "Development"
+		}
+	}
 }

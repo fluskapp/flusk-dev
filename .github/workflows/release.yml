@@ -1,0 +1,80 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  prebuilds:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            target: darwin
+          - os: ubuntu-latest
+            target: linux
+          - os: windows-latest
+            target: win32
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Build native binding
+        shell: bash
+        run: |
+          cargo build -p flusk-node --release
+          mkdir -p prebuilt
+          case "${{ matrix.target }}" in
+            darwin) cp target/release/libflusk_node.dylib "prebuilt/flusk-node.darwin-$(node -p process.arch).node" ;;
+            linux)  cp target/release/libflusk_node.so    "prebuilt/flusk-node.linux-$(node -p process.arch).node" ;;
+            win32)  cp target/release/flusk_node.dll      "prebuilt/flusk-node.win32-$(node -p process.arch).node" ;;
+          esac
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prebuilt-${{ matrix.target }}
+          path: prebuilt/
+
+  package:
+    needs: prebuilds
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install
+        run: npm ci
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: prebuilt-*
+          merge-multiple: true
+          path: src/platform/native/prebuilt/
+      - name: Build engine and app
+        run: |
+          npm run build
+          npm run build:app
+      # Signing/notarization run only when the credentials exist as secrets;
+      # an unsigned build still packages, so forks and CI stay green.
+      - name: Package
+        env:
+          CSC_LINK: ${{ secrets.MAC_CERT_P12 }}
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: npx electron-builder --publish never
+      - name: Attach to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist-pack/*.dmg
+            dist-pack/*.exe
+            dist-pack/*.AppImage

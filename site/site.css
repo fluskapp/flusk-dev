@@ -1,0 +1,23 @@
+/* flusk.dev — every value a product token, so the site cannot drift from the
+   app. tokens.css is the generated file the workbench itself links. */
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: var(--ij-fs-8)/1.6 var(--font-ui); }
+.wrap { max-width: 72ch; margin: 0 auto; padding: 0 var(--ij-space-4); }
+.hero { background: var(--panel); border-bottom: 1px solid var(--border); padding: calc(var(--ij-space-4) * 3) 0; }
+.brand { font: 700 var(--ij-fs-7) var(--font-code); color: var(--accent); margin-bottom: var(--ij-space-4); }
+h1 { font-size: calc(var(--ij-fs-9) * 1.6); line-height: 1.2; margin: 0 0 var(--ij-space-3); }
+.lede { color: var(--dim); }
+code { font-family: var(--font-code); background: var(--code-bg); padding: 0 var(--ij-space-1); }
+.actions { display: flex; gap: var(--ij-space-2); margin-top: var(--ij-space-4); }
+.btn {
+	display: inline-block; padding: var(--ij-space-2) var(--ij-space-4);
+	border: 1px solid var(--border); border-radius: var(--ij-radius);
+	color: var(--text); text-decoration: none;
+}
+.btn:hover { background: var(--hover); border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--ij-text-on-accent, #fff); border-color: var(--accent); }
+section { margin: calc(var(--ij-space-4) * 2) 0; }
+.cols { display: grid; gap: var(--ij-space-4); grid-template-columns: repeat(auto-fit, minmax(28ch, 1fr)); }
+h2 { font-size: var(--ij-fs-9); margin: 0 0 var(--ij-space-2); }
+a { color: var(--accent); }
+footer { border-top: 1px solid var(--border); margin-top: calc(var(--ij-space-4) * 2); padding: var(--ij-space-4) 0; color: var(--dim); }
