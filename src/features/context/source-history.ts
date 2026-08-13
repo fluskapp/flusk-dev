@@ -18,7 +18,7 @@
  *    multi-second build nobody asked for.
  * 2. Scope goes on the ANSWER instead, via `buildWalkthrough`'s `project` —
  *    the repo's basename, as `src/cli/prompt-cmd.ts` derives it.
- * 3. `buildIndex` rebuilds the BM25 postings in process and is cached nowhere,
+ * 3. The searcher rebuilds its postings in process and is cached nowhere,
  *    so it is built ONCE and passed by identity — the four searches share one
  *    trigram index only while the object is the same object (`fuzzy.ts`).
  *
@@ -31,7 +31,7 @@
  * item's `why` says so, so no delimiter is applied twice (L3).
  */
 import { basename, resolve } from "node:path";
-import { buildIndex } from "../history/bm25.js";
+import { createHistorySearcher } from "../../platform/native/history-search.js";
 import { loadIndex } from "../history/index-store.repository.js";
 import type { HistoryCard } from "../history/types.js";
 import { buildWalkthrough } from "../history/walkthrough.js";
@@ -116,7 +116,7 @@ function ranked(
 	partial: boolean,
 ): SourceResult {
 	const limits = { ...LIMITS, ...(req.isResume ? { attempts: RESUME_ATTEMPTS } : {}) };
-	const walkthrough = buildWalkthrough(buildIndex(cards), req.task, {
+	const walkthrough = buildWalkthrough(createHistorySearcher(cards), req.task, {
 		project,
 		now: corpusNow(cards),
 		...limits,

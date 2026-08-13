@@ -1,0 +1,110 @@
+/* The shared row vocabulary the tool windows are written in — sections,
+   tables, pills, stage chips, tags — ported from styles-table.ts,
+   styles-stages.ts and styles-transcript.ts. It lives beside vocab.tsx: the
+   class names are the shared contract, and this file should be hoisted the
+   moment a shared React kit exists. Every value is a token. */
+
+/* A section is IntelliJ's group header: a small uppercase label sitting on a
+   separator, then its rows. One spacing step under it, never air. */
+.sec { margin: 0 0 var(--ij-space-4); }
+.sec > h3 {
+	margin: 0 0 var(--ij-space-1); font-size: var(--ij-fs-3); text-transform: uppercase;
+	letter-spacing: .5px; color: var(--ij-text-secondary);
+	border-bottom: 1px solid var(--ij-separator); padding-bottom: var(--ij-space-1);
+}
+.sec > h3 .count { color: var(--ij-text-disabled); font-weight: 400; margin-left: var(--ij-space); }
+/* An empty state is one ROW tall, so a table with nothing in it takes exactly
+   the space one row of it would. */
+.line {
+	display: flex; align-items: center; min-height: var(--ij-row-h);
+	padding: 0 var(--ij-space-2); color: var(--ij-text-secondary); font-size: var(--ij-fs-6);
+}
+.empty { display: flex; height: 55%; align-items: center; justify-content: center; color: var(--dim); text-align: center; }
+.empty.small { display: block; height: auto; padding: var(--ij-space-3) var(--ij-space-2); }
+
+.tbl { width: 100%; border-collapse: collapse; font-size: var(--ij-fs-6); }
+.tbl thead th {
+	height: var(--ij-row-h); background: var(--ij-bg-panel); color: var(--ij-text-secondary);
+	font-weight: 400; font-size: var(--ij-fs-3); text-transform: uppercase; letter-spacing: .5px;
+	border-bottom: 1px solid var(--ij-separator);
+}
+.tbl tbody tr { height: var(--ij-row-h); border-bottom: 1px solid var(--ij-separator); }
+/* No cell wraps: a JBTable row is one line tall and truncates what does not
+   fit. The .grow cell absorbs the slack (width:100% + max-width:0). */
+.tbl td, .tbl th { padding: 0 var(--ij-space-2); text-align: left; vertical-align: middle; white-space: nowrap; }
+/* Only a row that actually opens something looks like it does: a pointer over
+   an inert row is a promise the workbench cannot keep. */
+.tbl tbody tr[data-open], .tbl tbody tr[data-flow-run] { cursor: pointer; }
+.tbl tbody tr[data-open]:hover, .tbl tbody tr[data-flow-run]:hover { background: var(--ij-hover); }
+.tbl td.num, .tbl th.num {
+	text-align: right; font: var(--ij-fs-4) var(--ij-font-mono); color: var(--ij-text-secondary);
+	white-space: nowrap;
+}
+.tbl td.mono {
+	font: var(--ij-fs-4) var(--ij-font-mono); color: var(--ij-text-secondary);
+	max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tbl td.grow { width: 100%; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.off { color: var(--ij-text-disabled); }
+
+a.ev, .ev { color: var(--ij-link); cursor: pointer; }
+a.ev:hover, .ev:hover { text-decoration: underline; }
+a.ev:focus-visible, .ev:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(-1 * var(--ij-focus-ring-w));
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: var(--ij-space); }
+/* List.Tag — a filled tag, not an outlined box: the outline read as a control
+   you could press, and a tool name is not a control. */
+.chip {
+	display: inline-flex; align-items: center; height: var(--ij-space-4);
+	font: var(--ij-fs-4) var(--ij-font-mono); color: var(--ij-text-secondary);
+	background: var(--ij-separator); border-radius: var(--ij-radius-sm);
+	padding: 0 var(--ij-space-2);
+}
+
+/* Badge.*: a filled plate in the status colour with the theme's own on-badge
+   foreground. */
+.pill {
+	display: inline-block; padding: 0 var(--ij-space-2);
+	border-radius: var(--ij-radius-sm); letter-spacing: .04em;
+	font-size: var(--ij-fs-1); font-weight: 600; line-height: var(--ij-lh-loose);
+	color: var(--on-accent); background: var(--run); text-transform: uppercase;
+}
+.pill.completed { background: var(--ok); }
+.pill.error { background: var(--err); }
+/* blocked is MEDIUM in the attention rules; red would contradict that. */
+.pill.blocked, .pill.stopped { background: var(--warn); }
+.pill.running { background: var(--accent); color: var(--ij-button-default-fg); }
+
+/* The stage pipeline as a Badge row. A pending stage is not a disabled
+   control — its name is content — so it is secondary text on a real border. */
+.stages { display: flex; flex-wrap: wrap; gap: var(--ij-space-1); margin: var(--ij-space-2) 0; }
+.stage {
+	font: var(--ij-fs-2) var(--font-code);
+	line-height: calc(var(--ij-row-h) - var(--ij-space-2));
+	padding: 0 var(--ij-space-2); border-radius: var(--ij-radius-sm);
+	background: transparent; color: var(--ij-text-secondary); border: 1px solid var(--ij-border-control);
+}
+.stage.completed { color: var(--ok); border-color: var(--ok); }
+.stage.running { background: var(--accent); color: var(--ij-button-default-fg); border-color: var(--accent); }
+.stage.error { color: var(--err); border-color: var(--err); }
+.stage.stopped { color: var(--warn); border-color: var(--warn); }
+/* The glyph carries the status as well as the colour does. */
+.stg-i { margin-right: var(--ij-space-1); font-style: normal; }
+.stg-t { margin-left: var(--ij-space-1); color: var(--ij-text-secondary); opacity: .8; }
+
+/* The kind glyph, in the gutter font so a row reads as a file list. */
+.glyph {
+	font: var(--ij-fs-1) var(--font-code); color: var(--dim); text-transform: uppercase;
+	border: 1px solid var(--border); padding: 0 var(--ij-space-1); flex: none; letter-spacing: .2px;
+	margin-right: var(--ij-space-1);
+}
+
+.head-row {
+	display: flex; align-items: baseline; gap: var(--ij-space-3); flex-wrap: wrap;
+	margin-bottom: var(--ij-space-3);
+}
+.head-row h2 { margin: 0; font-size: var(--ij-fs-8); font-weight: 600; }
+.head-row .dim { font: var(--ij-fs-4) var(--ij-font-mono); }

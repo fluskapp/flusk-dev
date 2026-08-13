@@ -1,0 +1,74 @@
+/* Shared control kit for the ported editor windows: the .act Button
+   (styles-widgets.ts), the balloon toast, and the editor inset the views
+   share (styles-chrome.ts). Ported 1:1 from the legacy token rules. */
+#runs, #run, #project {
+	padding: var(--ij-space-2) var(--ij-space-4) calc(var(--ij-space-4) * 2);
+}
+.view { min-height: 100%; }
+
+.act {
+	display: inline-flex; align-items: center; height: var(--ij-control-h);
+	padding: 0 var(--ij-space-3); color: var(--ij-text);
+	background: var(--ij-bg-panel);
+	border: 1px solid var(--ij-border-control);
+	border-radius: var(--ij-radius);
+	font: inherit; cursor: pointer; text-decoration: none;
+}
+.act:hover { background: var(--ij-hover); }
+.act:active { background: var(--ij-selection); }
+.act:focus-visible {
+	border-color: var(--ij-focus-ring);
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring); outline-offset: 0;
+}
+/* Disabled is its own colour, not the enabled control at half opacity. */
+.act[disabled], .act[disabled]:hover {
+	background: var(--ij-bg-panel); color: var(--ij-text-disabled);
+	border-color: var(--ij-separator); cursor: default;
+}
+.meta-actions { display: flex; gap: var(--ij-space); margin-left: auto; }
+
+/* Notification.background/.foreground: a plate that is DARK in the light
+   theme — the only thing that tells a balloon apart from the panel. */
+#toast {
+	position: fixed; bottom: calc(var(--ij-status-h) + var(--ij-space-2));
+	left: 50%; transform: translateX(-50%);
+	z-index: 20; padding: var(--ij-space) var(--ij-space-3); font-size: var(--ij-fs-5);
+	background: var(--ij-notification-bg); color: var(--ij-notification-fg);
+	border: 1px solid var(--ij-border-control);
+}
+
+.empty {
+	display: flex; height: 55%; align-items: center; justify-content: center;
+	color: var(--dim); text-align: center;
+}
+.empty.small {
+	display: block; height: auto; padding: var(--ij-space-3) var(--ij-space-2);
+}
+
+/* Counter tiles (styles-widgets.ts): one-pixel separators, nothing doubled. */
+.stats-row {
+	display: flex; flex-wrap: wrap; margin-bottom: var(--ij-space-4);
+	border-top: 1px solid var(--ij-separator);
+	border-left: 1px solid var(--ij-separator);
+}
+.stat {
+	flex: 1 1 110px; /* design-exempt: tile flex-basis, from styles-widgets.ts */
+	background: var(--ij-bg-inset);
+	padding: var(--ij-space) var(--ij-space-2);
+	border-right: 1px solid var(--ij-separator);
+	border-bottom: 1px solid var(--ij-separator);
+}
+/* A tile with nowhere to go stays inert: no cursor, no hover fill. */
+.stat[data-open] { cursor: pointer; }
+.stat[data-open]:hover { background: var(--ij-hover); }
+.stat[data-open]:active { background: var(--ij-selection); }
+/* No colour here: .stat-v.ev is what paints a tile that leads somewhere. */
+.stat-v { font: 600 var(--ij-fs-9)/var(--ij-lh-tight) var(--ij-font-ui); }
+.stat-l {
+	font-size: var(--ij-fs-3); text-transform: uppercase; letter-spacing: .5px;
+	color: var(--ij-text-secondary);
+}
+.stat-h {
+	font-size: var(--ij-fs-3); color: var(--ij-text-secondary);
+	margin-top: var(--ij-space-1);
+}

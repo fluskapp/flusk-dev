@@ -18,7 +18,7 @@ import { selectDiverse } from "./diverse.js";
 import { type RankOptions, search } from "./rank.js";
 import { ATTEMPT, attempts, CONVENTION_FLOOR, conventions } from "./sections.js";
 import { queryTerms } from "./tokenize.js";
-import type { CardKind, HistoryCard, HistoryIndex, SearchHit, Walkthrough } from "./types.js";
+import type { CardKind, HistoryCard, HistoryIndex, SearchHit, SearchQuery, Walkthrough } from "./types.js";
 
 export { refLabel, trapLine } from "./citation.js";
 export { HOUSE_RULE, isHouseRule } from "./sections.js";
@@ -39,6 +39,16 @@ export interface WalkthroughOptions {
 /** Either shape a caller might hold: the stored index, or a built one. */
 export type Searchable = Bm25Index | HistoryIndex;
 
+/**
+ * The native seam's shape (platform/native/history-search.ts), imported
+ * structurally rather than by module so this feature does not depend on the
+ * platform layer: anything that can search and show its cards qualifies.
+ */
+export interface SearcherLike {
+	cards: HistoryCard[];
+	search(query: SearchQuery, opts?: RankOptions): SearchHit[];
+}
+
 const DEFAULTS = { precedent: 3, attempts: 4, conventions: 4, traps: 6 };
 /** Candidates each section re-ranks; wide enough that filtering has choices. */
 const POOL = 60;
@@ -57,21 +67,25 @@ const WRITING: CardKind[] = ["doc", "skill"];
 const FLAT = { verified: 1, shipped: 1, unknown: 1, blocked: 1, failed: 1 };
 /** Inverted weights: ask the ranker for what it normally buries. */
 const TRAPS = { failed: 2.2, blocked: 2, unknown: 0.6, shipped: 0.4, verified: 0.3 };
-const asBm25 = (i: Searchable): Bm25Index => ("postings" in i ? i : buildIndex(i.cards));
+const asSearcher = (i: Searchable | SearcherLike): SearcherLike => {
+	if ("search" in i && typeof i.search === "function") return i as SearcherLike;
+	// `bm` by identity, never copied: fuzzy.ts caches its trigram index per
+	// index object, and the searches below must share that one build.
+	const bm = "postings" in i ? i : buildIndex(i.cards);
+	return { cards: bm.cards, search: (q, o = {}) => search(bm, q, o) };
+};
 
 export function buildWalkthrough(
-	index: Searchable,
+	index: Searchable | SearcherLike,
 	task: string,
 	opts: WalkthroughOptions = {},
 ): Walkthrough {
-	const bm = asBm25(index);
-	const paths = extractPaths(bm, task);
+	const searcher = asSearcher(index);
+	const paths = extractPaths(searcher, task);
 	const limits = { ...DEFAULTS, ...opts };
-	// `bm` by identity, never copied: fuzzy.ts caches its trigram index per
-	// index object, and the four searches below must share that one build.
 	const q = { text: task, paths, limit: POOL, project: opts.project };
 	const find = (kinds: CardKind[], w?: RankOptions["outcomeWeights"]): SearchHit[] =>
-		search(bm, { ...q, kinds }, { now: opts.now, outcomeWeights: w });
+		searcher.search({ ...q, kinds }, { now: opts.now, outcomeWeights: w });
 	const landed = (h: SearchHit): boolean =>
 		h.card.outcome === "verified" || h.card.outcome === "shipped";
 	const work = find(WORK);

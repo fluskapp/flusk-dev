@@ -12,17 +12,22 @@
  * discriminating. A full path, which the user typed in full, always counts.
  */
 import { basename } from "node:path";
-import type { Bm25Index } from "./bm25.js";
+import type { HistoryCard } from "./types.js";
+
+/** All this module needs: the cards. A Bm25Index and a HistorySearcher both fit. */
+export interface HasCards {
+	cards: HistoryCard[];
+}
 
 const PATHISH = /\b[\w.-]+(?:\/[\w.-]+)+\.[a-z][a-z0-9]{0,5}\b/g;
 const FILEISH = /\b[\w-]+\.[a-z][a-z0-9]{0,5}\b/g;
 /** Above both bars a basename is not a filter, it is a description of the corpus. */
 const COMMON = { share: 0.02, count: 20 };
 
-const nameCache = new WeakMap<Bm25Index, Map<string, number>>();
+const nameCache = new WeakMap<HasCards, Map<string, number>>();
 
 /** How many cards each basename appears in, built once per index. */
-function nameCounts(index: Bm25Index): Map<string, number> {
+function nameCounts(index: HasCards): Map<string, number> {
 	const cached = nameCache.get(index);
 	if (cached !== undefined) return cached;
 	const counts = new Map<string, number>();
@@ -40,7 +45,7 @@ function nameCounts(index: Bm25Index): Map<string, number> {
  * corpus actually has one — otherwise "e.g." and "v1.2" become path filters —
  * and only while it is rare enough to point somewhere.
  */
-export function extractPaths(index: Bm25Index, task: string): string[] {
+export function extractPaths(index: HasCards, task: string): string[] {
 	const out: string[] = [];
 	for (const m of task.matchAll(PATHISH)) if (!out.includes(m[0])) out.push(m[0]);
 	const counts = nameCounts(index);

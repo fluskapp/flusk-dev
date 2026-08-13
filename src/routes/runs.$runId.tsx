@@ -1,11 +1,91 @@
-/** One run: header immediate, transcript deferred — stub awaiting its port; the legacy client module is the spec. */
-import { createFileRoute } from "@tanstack/react-router";
+/**
+ * One run. Which view the ref gets is decided by its shape (client-run.ts):
+ * a session key lands in the transcript, a journal path renders as markdown.
+ * The header half is awaited; the transcript/body — the biggest payload in
+ * the app — is a DEFERRED promise behind Suspense + Await.
+ */
+import { Await, createFileRoute } from "@tanstack/react-router";
+import { Suspense } from "react";
+import {
+	getJournalBody,
+	getJournalMeta,
+	getRunHead,
+	getSessionRun,
+	type Journal,
+	type JournalBody,
+	type RunHead,
+	type SessionRun,
+} from "../features/projects/runs.functions.js";
+import { decodeRef, refKind } from "../ui/react/runs/format.js";
+import { JournalRun } from "../ui/react/runs/JournalRun.js";
+import { SessionBody } from "../ui/react/runs/SessionRun.js";
+
+type RunLoad =
+	| { kind: "session"; ref: string; head: RunHead; detail: Promise<SessionRun> }
+	| { kind: "journal"; ref: string; meta: Journal | null; body: Promise<JournalBody> };
 
 export const Route = createFileRoute("/runs/$runId")({
 	ssr: true,
-	component: Page,
+	loader: async ({ params }): Promise<RunLoad> => {
+		const ref = decodeRef(params.runId);
+		if (refKind(ref) === "session") {
+			return {
+				kind: "session",
+				ref,
+				head: (await getRunHead({ data: { key: ref } })) as RunHead,
+				detail: getSessionRun({ data: { key: ref } }) as Promise<SessionRun>,
+			};
+		}
+		return {
+			kind: "journal",
+			ref,
+			// One journal's frontmatter, not the whole index (content.router.ts).
+			meta: (await getJournalMeta({ data: { path: ref } })) as Journal | null,
+			body: getJournalBody({ data: { path: ref } }).catch(
+				(): JournalBody => ({ text: "", html: "" }),
+			) as Promise<JournalBody>,
+		};
+	},
+	component: RunPage,
 });
 
-function Page() {
-	return <div id="run" className="view" />;
+function RunPage() {
+	const load = Route.useLoaderData() as RunLoad;
+	if (load.kind === "session") {
+		const task = load.head.summary?.task ?? load.ref;
+		return (
+			<div id="run" className="view">
+				<div className="head-row">
+					<h2>{task}</h2>
+					<span className="dim">{load.head.path ?? load.ref}</span>
+				</div>
+				<Suspense fallback={<div className="running-note">loading transcript…</div>}>
+					<Await promise={load.detail}>
+						{(d: SessionRun) => <SessionBody d={d} keyRef={load.ref} />}
+					</Await>
+				</Suspense>
+			</div>
+		);
+	}
+	// The meta half is already here: the fallback shows the run's name while
+	// the body streams, so the header is immediate in both branches.
+	const fallbackTitle = load.meta?.title.replace(/^Run:\s*/, "") ?? load.ref;
+	return (
+		<div id="run" className="view">
+			<Suspense
+				fallback={
+					<>
+						<div className="head-row">
+							<h2>{fallbackTitle}</h2>
+						</div>
+						<div className="running-note">loading journal…</div>
+					</>
+				}
+			>
+				<Await promise={load.body}>
+					{(body: JournalBody) => <JournalRun meta={load.meta} path={load.ref} body={body} />}
+				</Await>
+			</Suspense>
+		</div>
+	);
 }

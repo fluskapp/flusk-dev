@@ -1,0 +1,114 @@
+/* The run transcript: IntelliJ's Run/Debug console, ported 1:1 from
+   styles-transcript.ts. A header strip under one hairline, console lines on
+   the editor background, tool calls as collapsible tree nodes. */
+#meta {
+	display: flex; flex-wrap: wrap; align-items: center;
+	gap: var(--ij-space-1) var(--ij-space-3); min-height: var(--ij-tw-header-h);
+	padding: 0 0 var(--ij-space-2); border-bottom: 1px solid var(--border);
+	font-size: var(--ij-fs-4);
+}
+#meta .meta-item { display: inline-flex; align-items: center; gap: var(--ij-space); }
+
+/* Badge.*: a filled plate in the status colour with the theme's own on-badge
+   foreground. An outline badge means something else in expUI. */
+.pill {
+	display: inline-block; padding: 0 var(--ij-space-2);
+	border-radius: var(--ij-radius-sm); letter-spacing: .04em;
+	font-size: var(--ij-fs-1); font-weight: 600; line-height: var(--ij-lh-loose);
+	color: var(--on-accent); background: var(--run); text-transform: uppercase;
+}
+.pill.completed { background: var(--ok); }
+.pill.error { background: var(--err); }
+/* blocked is MEDIUM in the attention rules; red would contradict that. */
+.pill.blocked, .pill.stopped { background: var(--warn); }
+.pill.running { background: var(--accent); color: var(--ij-button-default-fg); }
+
+/* The gutter the speaker tag sits in; derived from the spacing step. */
+#transcript {
+	--tx-gutter: calc(var(--ij-space-4) * 3);
+	padding: var(--ij-space-3) 0 var(--ij-space-4);
+}
+/* No align-items: a turn that is only tool calls has no first line box, and
+   baseline alignment would synthesise one from the bottom of the node list. */
+.msg { display: flex; gap: var(--ij-space-3); padding: var(--ij-space) 0; }
+.msg-tag {
+	flex: none; width: var(--tx-gutter); text-align: right; letter-spacing: .04em;
+	font-size: var(--ij-fs-1); font-weight: 700; text-transform: uppercase;
+	line-height: calc(var(--ij-fs-6) * var(--ij-lh)); color: var(--tag-flusk);
+}
+.msg.user .msg-tag { color: var(--tag-user); padding-top: var(--ij-space); }
+.msg-body { min-width: 0; flex: 1; }
+.pre { white-space: pre-wrap; overflow-wrap: break-word; }
+/* Table.stripeColor and a two-pixel rule: the console's way of banding a run
+   of lines. No card: no border, no radius, no shadow. */
+.msg.user .msg-body {
+	background: var(--code-bg); padding: var(--ij-space) var(--ij-space-2);
+	box-shadow: inset var(--ij-space-1) 0 0 var(--tag-user);
+}
+
+/* A collapsible node row: Tree.rowHeight tall, on one hairline, no frame. */
+.tool { border-bottom: 1px solid var(--border); border-left: var(--ij-space-1) solid transparent; }
+.tool.err { border-left-color: var(--err); }
+.tool > summary {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	min-height: var(--ij-row-h); padding: 0 var(--ij-space-2);
+	cursor: pointer; list-style: none; user-select: none;
+}
+.tool > summary::-webkit-details-marker { display: none; }
+.tool > summary::before { content: "▸"; color: var(--dim); font-size: var(--ij-fs-1); }
+.tool[open] > summary::before { content: "▾"; }
+.tool > summary:hover { background: var(--hover); }
+/* Expanded is NOT selected: only the row the keyboard is on is filled. */
+.tool > summary:focus { background: var(--ij-selection); outline: none; }
+.tool > summary:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(var(--ij-focus-ring-w) * -1);
+}
+/* A tool NAME is not a status, so it carries no colour and no plate. */
+.tool-chip { flex: none; font: 600 var(--ij-fs-3) var(--font-code); color: var(--text); }
+.tool-preview {
+	font: var(--ij-fs-4) var(--font-code); color: var(--dim); min-width: 0;
+	white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tool-flag { margin-left: auto; color: var(--err); font-size: var(--ij-fs-3); font-weight: 600; }
+.code {
+	margin: 0; padding: var(--ij-space) var(--ij-space-3); background: var(--code-bg);
+	border-top: 1px solid var(--border); overflow-x: auto;
+}
+/* The height cap belongs to the TRANSCRIPT, not to .code: tool output here is
+   an excerpt, but .code is also what the markdown renderer emits, and an
+   editor that can only ever show 19 lines is not an editor. */
+#transcript .code { max-height: calc(var(--ij-row-h) * 14); }
+.code.out { color: var(--text); }
+.pad { padding: var(--ij-space-1) var(--ij-space-3); }
+
+/* Label.errorForeground behind a marker: the token layer has no error FILL. */
+.error-line {
+	margin: var(--ij-space-1) 0; padding: var(--ij-space-1) var(--ij-space-2);
+	color: var(--err); font-size: var(--ij-fs-5);
+	box-shadow: inset var(--ij-space-1) 0 0 var(--err);
+}
+.compaction {
+	margin: var(--ij-space-3) 0 0; padding: var(--ij-space-1) 0; text-align: center;
+	font-size: var(--ij-fs-3); color: var(--dim); border-top: 1px solid var(--border);
+}
+.stats, .running-note {
+	margin: var(--ij-space-4) 0 0 calc(var(--tx-gutter) + var(--ij-space-3));
+	font-size: var(--ij-fs-5);
+}
+.stats { color: var(--dim); }
+.running-note { color: var(--accent); }
+
+/* Only a failing stage is a handle onto the journal, so only it is a row you
+   can select. The selection outlives :focus (`.on`), which is the whole point
+   of having an inactive selection colour. */
+.stage[data-stage], .error-line[data-stage] { cursor: pointer; }
+.stage[data-stage]:hover, .error-line[data-stage]:hover { background: var(--hover); }
+.stage.on, .error-line.on { background: var(--ij-selection-inactive); }
+.stage[data-stage]:focus, .error-line[data-stage]:focus {
+	background: var(--ij-selection); outline: none;
+}
+.stage[data-stage]:focus-visible, .error-line[data-stage]:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(var(--ij-focus-ring-w) * -1);
+}

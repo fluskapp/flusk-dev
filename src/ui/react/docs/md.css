@@ -1,0 +1,99 @@
+/* The document editor surface, ported 1:1 from styles-md.ts: a toolbar on
+   the editor background carrying the SegmentedButton, the split pane, and
+   the frontmatter property table. The peek gutter stayed with Find. */
+.ed-bar {
+	display: flex; align-items: center; gap: var(--ij-space-2); flex-wrap: wrap;
+	padding: var(--ij-space-1) var(--ij-space-3);
+	background: var(--ij-bg-editor); border-bottom: 1px solid var(--border);
+}
+.ed-bar .path {
+	font: var(--ij-fs-3)/var(--ij-lh) var(--font-code); color: var(--dim);
+	overflow: hidden; text-overflow: ellipsis;
+}
+
+/* One control, three segments, 1px separators — no gaps, no radius. The
+   selected fill is SegmentedButton.selectedButtonColor, and its focused
+   sibling once the control holds focus: two fills the theme names
+   separately, never one fill at two opacities. */
+.seg {
+	display: flex; align-items: stretch;
+	border: 1px solid var(--ij-border-control); background: var(--ij-bg-panel);
+}
+.seg button {
+	height: var(--ij-row-h); padding: 0 var(--ij-space-2);
+	font-size: var(--ij-fs-4); border-radius: 0; color: var(--dim);
+	background: none; border: none; cursor: pointer; font-family: inherit;
+	border-right: 1px solid var(--ij-border-control);
+}
+.seg button:last-child { border-right: none; }
+.seg button:hover { background: var(--hover); color: var(--text); }
+.seg button.on { background: var(--ij-seg-selected); color: var(--text); }
+.seg:focus-within button.on { background: var(--ij-seg-selected-focused); }
+.seg button:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(var(--ij-focus-ring-w) * -1);
+}
+/* Disabled is *.disabledText, not the enabled colour behind opacity. */
+.seg button[disabled] { color: var(--ij-text-disabled); cursor: default; }
+.seg button[disabled]:hover { background: none; color: var(--ij-text-disabled); }
+
+/* Split shares ONE page scroll: two independently scrolling panes inside a
+   scrolling editor is three scrollbars and no way to know which one moved. */
+.ed-body { display: flex; align-items: flex-start; min-height: 0; }
+.ed-body > .md, .ed-body > .raw {
+	flex: 1; min-width: 0;
+	padding: var(--ij-space-2) var(--ij-space-4) calc(var(--ij-space-4) * 2);
+}
+.ed-body.split > .raw { border-right: 1px solid var(--border); }
+.ed-body > .raw {
+	margin: 0; white-space: pre-wrap; overflow-wrap: anywhere;
+	background: var(--code-bg); border-top: none;
+}
+/* The run view is already padded, and its toolbar bleeds to the tab strip. */
+#run .ed-bar {
+	margin: calc(var(--ij-space-2) * -1) calc(var(--ij-space-4) * -1) var(--ij-space-2);
+}
+#run .ed-body > .md, #run .ed-body > .raw { padding: 0; }
+#run .ed-body.split > .raw { padding: 0 var(--ij-space-3) 0 0; }
+/* Where "jump to failing stage" landed. Nothing here holds the keyboard, so
+   it is the INACTIVE selection the theme names, not the focused one faded. */
+.md .hit-line {
+	background: var(--ij-selection-inactive);
+	box-shadow: inset var(--ij-space-1) 0 0 var(--accent);
+}
+
+/* Frontmatter as IntelliJ's property table: a row per key, the key column
+   striped, one hairline between rows (Table.gridColor is invisible in dark). */
+table.fm {
+	border-collapse: collapse; margin: 0 0 var(--ij-space-3);
+	font-size: var(--ij-fs-5); width: 100%; max-width: 620px; /* design-exempt: table measure */
+	border: 1px solid var(--border);
+}
+table.fm tr { height: var(--ij-row-h); }
+table.fm th.fm-k {
+	text-align: left; font-weight: 400; color: var(--dim);
+	padding: var(--ij-space-1) var(--ij-space-2); width: 34%;
+	background: var(--ij-bg-inset); border-bottom: 1px solid var(--border);
+	white-space: nowrap; vertical-align: top;
+}
+table.fm td.fm-v {
+	padding: var(--ij-space-1) var(--ij-space-2);
+	border-bottom: 1px solid var(--border); vertical-align: top;
+}
+
+/* The reading measure, applied to the things that are actually read as
+   prose. Tables, the pipeline diagram, the property grid and code blocks are
+   deliberately absent — they take the width they are given. */
+.md > p, .md > ul, .md > ol, .md > blockquote,
+.md > h1, .md > h2, .md > h3, .md > h4 {
+	max-width: 90ch; /* design-exempt: prose measure */
+}
+
+/* A drawn flowchart scrolls sideways inside its own box rather than widening
+   the document; the SVG keeps its intrinsic size so text stays sharp. */
+.mmd {
+	margin: var(--ij-space-3) 0; padding: var(--ij-space-2);
+	background: var(--code-bg); border: 1px solid var(--border);
+	border-radius: var(--ij-radius-sm); overflow-x: auto;
+}
+.mmd svg { display: block; }

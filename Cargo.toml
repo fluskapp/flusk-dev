@@ -1,0 +1,6 @@
+[workspace]
+members = ["crates/flusk-core", "crates/flusk-node"]
+resolver = "2"
+
+[profile.release]
+lto = true

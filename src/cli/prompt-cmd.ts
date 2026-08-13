@@ -13,7 +13,7 @@
  */
 import { spawnSync } from "node:child_process";
 import { basename, resolve } from "node:path";
-import { buildIndex } from "../features/history/bm25.js";
+import { createHistorySearcher } from "../platform/native/history-search.js";
 import { composePrompt } from "../features/history/compose.js";
 import { historyCards } from "../features/history/corpus.js";
 import { renderBlocks } from "../features/history/render-blocks.js";
@@ -104,7 +104,7 @@ export function promptCmd(task: string, args: PromptArgs = {}): number {
 	const widened = asked !== undefined && scoped.length === 0 && all.length > 0;
 	const project = widened ? undefined : asked;
 	const cards = widened ? all : scoped;
-	const walkthrough = buildWalkthrough(buildIndex(cards), task, {
+	const walkthrough = buildWalkthrough(createHistorySearcher(cards), task, {
 		...(project !== undefined ? { project } : {}),
 	});
 	const prompt = composePrompt(walkthrough, task, { budget });

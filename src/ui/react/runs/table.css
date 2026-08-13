@@ -1,0 +1,107 @@
+/* The dense tables every view is built from — JBTable in CSS, ported 1:1
+   from styles-table.ts. Every hairline is *.separatorColor (--ij-separator):
+   Table.gridColor is Gray1 in dark, which IS the editor background. */
+.sec { margin: 0 0 var(--ij-space-4); }
+.sec > h3 {
+	margin: 0 0 var(--ij-space-1); font-size: var(--ij-fs-3); text-transform: uppercase;
+	letter-spacing: .5px; color: var(--ij-text-secondary);
+	border-bottom: 1px solid var(--ij-separator); padding-bottom: var(--ij-space-1);
+}
+.sec > h3 .count { color: var(--ij-text-disabled); font-weight: 400; margin-left: var(--ij-space); }
+/* An empty state is one ROW tall, so a table with nothing in it takes exactly
+   the space one row of it would. */
+.line {
+	display: flex; align-items: center; min-height: var(--ij-row-h);
+	padding: 0 var(--ij-space-2); color: var(--ij-text-secondary); font-size: var(--ij-fs-6);
+}
+
+.tbl { width: 100%; border-collapse: collapse; font-size: var(--ij-fs-6); }
+.tbl thead th {
+	height: var(--ij-row-h); background: var(--ij-bg-panel); color: var(--ij-text-secondary);
+	font-weight: 400; font-size: var(--ij-fs-3); text-transform: uppercase; letter-spacing: .5px;
+	border-bottom: 1px solid var(--ij-separator);
+}
+.tbl tbody tr { height: var(--ij-row-h); border-bottom: 1px solid var(--ij-separator); }
+/* No cell wraps: a JBTable row is one line tall and truncates what does not
+   fit. The .grow cell absorbs the slack (width:100% + max-width:0). */
+.tbl td, .tbl th {
+	padding: 0 var(--ij-space-2); text-align: left; vertical-align: middle;
+	white-space: nowrap;
+}
+/* Only a row that actually opens something looks like it does. */
+.tbl tbody tr[data-open] { cursor: pointer; }
+.tbl tbody tr[data-open]:hover { background: var(--ij-hover); }
+/* Timestamps and counts: auto-layout would wrap "Aug 6, 02:25 PM" to three
+   lines and triple every row to show a value that was never the point. */
+.tbl td.num, .tbl th.num {
+	text-align: right; font: var(--ij-fs-4) var(--ij-font-mono); color: var(--ij-text-secondary);
+	white-space: nowrap;
+}
+/* Truncate rather than nowrap: journal filenames are long enough that
+   refusing to wrap would push the title column out of the table. */
+.tbl td.mono {
+	font: var(--ij-fs-4) var(--ij-font-mono); color: var(--ij-text-secondary);
+	max-width: 24ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tbl td.grow { width: 100%; max-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* An absent field has to read as absent rather than as data. */
+.off { color: var(--ij-text-disabled); }
+
+.sev {
+	width: var(--ij-space-2); height: var(--ij-space-2); border-radius: var(--ij-radius);
+	display: inline-block; background: var(--ij-status-warning);
+}
+.sev.high { background: var(--ij-status-error); }
+.attn-row td:first-child { width: var(--ij-row-h); }
+
+a.ev, .ev { color: var(--ij-link); cursor: pointer; }
+a.ev:hover, .ev:hover { text-decoration: underline; }
+a.ev:focus-visible, .ev:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(-1 * var(--ij-focus-ring-w));
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: var(--ij-space); }
+/* List.Tag — a filled tag, not an outlined box: the outline read as a control
+   you could press, and a tool name is not a control. */
+.chip {
+	display: inline-flex; align-items: center; height: var(--ij-space-4);
+	font: var(--ij-fs-4) var(--ij-font-mono); color: var(--ij-text-secondary);
+	background: var(--ij-separator); border-radius: var(--ij-radius-sm);
+	padding: 0 var(--ij-space-2);
+}
+/* A raw benchmark figure, not a verdict: 0.35 was as green as 0.90. */
+.score { font: var(--ij-fs-4) var(--ij-font-mono); color: var(--ij-text-secondary); }
+
+/* The prompt and config disclosures: a control-height bar on the panel
+   background with the body inset under it. Collapsed, each is one line. */
+.prompt-block, .config-block {
+	border: 1px solid var(--ij-separator); background: var(--ij-bg-panel);
+	margin-bottom: var(--ij-space-4);
+}
+.prompt-block > summary, .config-block > summary {
+	display: flex; align-items: center; gap: var(--ij-space-2); height: var(--ij-control-h);
+	padding: 0 var(--ij-space-3); font-size: var(--ij-fs-6); cursor: pointer; list-style: none;
+}
+.prompt-block > summary:hover, .config-block > summary:hover { background: var(--ij-hover); }
+.prompt-block > summary:focus-visible, .config-block > summary:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(-1 * var(--ij-focus-ring-w));
+}
+.prompt-block > summary::before, .config-block > summary::before {
+	content: "▸"; color: var(--ij-text-secondary); font-size: var(--ij-fs-1);
+}
+.prompt-block[open] > summary::before, .config-block[open] > summary::before { content: "▾"; }
+.prompt-text {
+	margin: 0; padding: var(--ij-space-2) var(--ij-space-3); background: var(--ij-bg-inset);
+	white-space: pre-wrap; border-top: 1px solid var(--ij-separator);
+	max-height: 460px; overflow: auto; /* design-exempt: prompt preview cap */
+}
+.head-row {
+	display: flex; align-items: baseline; gap: var(--ij-space-3); flex-wrap: wrap;
+	margin-bottom: var(--ij-space-3);
+}
+.head-row h2 { margin: 0; font-size: var(--ij-fs-8); font-weight: 600; }
+.head-row .dim { font: var(--ij-fs-4) var(--ij-font-mono); }
+.dim { color: var(--dim); }
+.small { font-size: var(--ij-fs-4); }

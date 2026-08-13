@@ -1,0 +1,79 @@
+/* Document list chips and the rendered-markdown reader, ported 1:1 from
+   styles-docs.ts. The filter is the same TextField the sidebar search is —
+   two search fields that do not match read as two different controls. */
+#docs {
+	padding: var(--ij-space-2) var(--ij-space-4) calc(var(--ij-space-4) * 2);
+	max-width: 1080px; /* design-exempt: the editor's reading measure */
+}
+#doc-search {
+	display: block; width: 100%; max-width: 340px; /* design-exempt: filter field measure */
+	margin: 0 0 var(--ij-space-2);
+	height: var(--ij-control-h); padding: 0 var(--ij-space-2);
+	font: var(--ij-fs-6)/var(--ij-lh) var(--font-ui); color: var(--text);
+	background: var(--ij-bg-editor); border: 1px solid var(--ij-border-control);
+	border-radius: var(--ij-radius); outline: none;
+}
+#doc-search:focus {
+	border-color: var(--ij-focus-ring);
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+}
+#doc-search::placeholder { color: var(--ij-text-disabled); }
+.kind {
+	font: var(--ij-fs-1) var(--font-code); text-transform: uppercase;
+	padding: 0 var(--ij-space); background: var(--hover); color: var(--dim);
+}
+/* Only "context" is tinted, and with the accent — a document KIND is not a
+   status, so plan must not read as a warning nor skill as a success. */
+.k-context { color: var(--ij-link); background: var(--accent-soft); }
+
+#doc, #docview { display: flex; flex-direction: column; min-height: 0; }
+
+/* No cap on the container: the measure lives on the prose elements themselves
+   (md.css). Capping here capped tables and grids along with the prose. */
+.md { line-height: var(--ij-lh-loose); }
+.md h1, .md h2, .md h3, .md h4 {
+	margin: var(--ij-space-4) 0 var(--ij-space); line-height: var(--ij-lh-tight);
+}
+.md h1 { font-size: var(--ij-fs-9); }
+.md h2 { font-size: var(--ij-fs-8); }
+.md h3 { font-size: var(--ij-fs-7); }
+.md p, .md ul, .md ol, .md blockquote { margin: var(--ij-space-2) 0; }
+.md ul, .md ol { padding-left: var(--ij-space-4); }
+.md code {
+	background: var(--code-bg); padding: 0 var(--ij-space-1); font-size: var(--ij-fs-5);
+}
+.md pre.code { padding: var(--ij-space-2); border: 1px solid var(--border); }
+.md pre.code code { background: none; padding: 0; }
+.md blockquote {
+	border-left: var(--ij-space-1) solid var(--border);
+	padding-left: var(--ij-space-2); color: var(--dim); margin-left: 0;
+}
+/* Real table layout at full width: display:block made a stage table sit at
+   half the editor's width while its detail column elided text it had room
+   for. The overflow case is handled by WRAPPING the long cell. */
+.md table {
+	border-collapse: collapse; font-size: var(--ij-fs-6);
+	width: 100%; table-layout: auto;
+}
+/* Auto layout already gives the widest column the slack; this only stops a
+   single unbroken token (a path, a URL) from forcing the grid wider. */
+.md td { overflow-wrap: anywhere; }
+.md th, .md td {
+	border: 1px solid var(--border);
+	padding: var(--ij-space-1) var(--ij-space-2); text-align: left;
+}
+.md th { background: var(--panel); }
+/* Link.activeForeground, the key for link TEXT — Button.default's Blue is a
+   fill colour and fails against the editor, the chat panel and white alike. */
+.md a { color: var(--ij-link); }
+.md hr { border: none; border-top: 1px solid var(--border); margin: var(--ij-space-3) 0; }
+/* Syntax colour (highlight.ts emits these): meaning only, never decoration. */
+.hl-kw { color: var(--accent); }
+.hl-str { color: var(--ok); }
+.hl-com { color: var(--dim); font-style: italic; }
+.hl-num { color: var(--warn); }
+.hl-fn { color: var(--tag-user); }
+.hl-punct { color: var(--dim); }
+.hl-add { color: var(--ok); }
+.hl-del { color: var(--err); }
+.hl-meta { color: var(--accent); }
