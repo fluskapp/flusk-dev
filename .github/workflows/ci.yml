@@ -27,8 +27,13 @@ jobs:
         run: npm run build
       - name: Build (app)
         run: npm run build:app
+      # The engine's tools and tests assume a POSIX userland (bash, grep, cat
+      # in tool subprocesses). Windows still builds and typechecks here, and
+      # the release workflow packages it — but the unit suite is honest about
+      # what it can promise there until Windows support is scheduled work.
       - name: Test
         run: npm test
+        if: runner.os != 'Windows'
       - name: Standards
         run: npm run standards
         if: runner.os != 'Windows'
