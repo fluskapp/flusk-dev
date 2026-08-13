@@ -11,7 +11,9 @@
 import { extname } from "node:path";
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { loadConfig } from "../../platform/config/config.js";
-import { highlightCode } from "../../ui/render/highlight.js";
+import { createRenderer } from "./native.repository.js";
+
+const renderer = createRenderer();
 import { engineFor } from "../docs/doc-engines.js";
 import { indexedFile } from "../docs/doc-util.js";
 import { MAX_OUTLINE_ITEMS, MAX_SOURCE_BYTES, type OutlineReply } from "../docs/doc.router.js";
@@ -59,7 +61,7 @@ export const getFileSource = createServerFn({ method: "POST" })
 		if (buf.subarray(0, SNIFF).includes(0)) return { ok: false, note: "binary file" };
 		const text = buf.toString("utf8");
 		const lang = extname(file).slice(1).toLowerCase();
-		return { ok: true, path: file, lang, text, html: highlightCode(text, lang), bytes: buf.length };
+		return { ok: true, path: file, lang, text, html: await renderer.highlight(text, lang), bytes: buf.length };
 	});
 
 /** The fallback body: truncating rather than refusing, for read-only display. */
@@ -81,7 +83,7 @@ export const getFileBody = createServerFn({ method: "POST" })
 			ok: true,
 			path: file,
 			text,
-			html: highlightCode(text, lang),
+			html: await renderer.highlight(text, lang),
 			bytes: buf.length,
 			truncated: buf.length > MAX_SOURCE_BYTES,
 		};

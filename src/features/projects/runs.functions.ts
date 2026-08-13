@@ -8,7 +8,9 @@
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { join, resolve } from "node:path";
 import { loadConfig } from "../../platform/config/config.js";
-import { renderMarkdown } from "../../ui/render/markdown.js";
+import { createRenderer } from "./native.repository.js";
+
+const renderer = createRenderer();
 import { scanArtifacts } from "./artifact-scan.repository.js";
 import { loadSessionDetail, type SessionDetail } from "./detail.js";
 import { readTextSync } from "./file-read.repository.js";
@@ -118,7 +120,7 @@ export const getJournalBody = createServerFn()
 		const found = indexedJournal(data.path);
 		if (found === null) throw new Error("not an indexed journal");
 		const text = readTextSync(found.path);
-		return { text, html: renderMarkdown(text) };
+		return { text, html: await renderer.markdown(text) };
 	});
 
 /**

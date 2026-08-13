@@ -16,7 +16,10 @@ import { buildOverview, type Overview } from "./overview.js";
 import { scanProjects } from "./project-scan.repository.js";
 import type { ProjectSummary } from "./projects.types.js";
 import { scanArtifacts } from "./artifact-scan.repository.js";
-import { scanSessions, type SessionSummary } from "./scan.repository.js";
+import { createSessionScanner } from "./native.repository.js";
+import type { SessionSummary } from "./scan.repository.js";
+
+const sessions = createSessionScanner();
 
 export type { Overview } from "./overview.js";
 export type { SessionSummary } from "./scan.repository.js";
@@ -47,7 +50,7 @@ export const getWorkbenchMeta = createServerFn().handler(async (): Promise<Workb
 export const getOverview = createServerFn().handler(async (): Promise<Overview> => {
 	const c = cfg();
 	return buildOverview(
-		scanSessions(),
+		await sessions.scan(),
 		scanJournals(c.ui.harnessDirs),
 		scanArtifacts(c.ui.projectDirs).length,
 	);
@@ -60,5 +63,5 @@ export const getProjects = createServerFn().handler(async (): Promise<ProjectSum
 
 /** Recorded sessions, newest first — the Runs list. */
 export const getSessions = createServerFn().handler(async (): Promise<SessionSummary[]> => {
-	return scanSessions();
+	return sessions.scan();
 });

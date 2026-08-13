@@ -8,7 +8,9 @@
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { resolve } from "node:path";
 import { loadConfig } from "../../platform/config/config.js";
-import { renderMarkdown } from "../../ui/render/markdown.js";
+import { createRenderer } from "./native.repository.js";
+
+const renderer = createRenderer();
 import { type Artifact, scanArtifacts } from "../projects/artifact-scan.repository.js";
 import { readTextSync } from "../projects/file-read.repository.js";
 import { expandHome } from "../projects/journal-scan.repository.js";
@@ -61,5 +63,5 @@ export const getDocBody = createServerFn()
 		const a = indexedArtifact(data.path);
 		if (a === null) throw new Error("not an indexed document");
 		const text = readTextSync(a.path);
-		return { text, html: renderMarkdown(text) };
+		return { text, html: await renderer.markdown(text) };
 	});
