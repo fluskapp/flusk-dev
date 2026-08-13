@@ -11,6 +11,8 @@ import { base, fmtTime } from "./format.js";
 import { PathActions } from "./run-actions.js";
 import { StageChip, StageErrors } from "./stages.js";
 import { Pill, useToast } from "./widgets.js";
+import "./table.css";
+import "./transcript.css";
 
 /**
  * Scroll the rendered journal to the first block that names this stage.

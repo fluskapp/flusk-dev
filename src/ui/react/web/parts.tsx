@@ -23,7 +23,7 @@ export function fmtAge(ms: number): string {
 
 export function webHost(url: string): string {
 	const m = /^https?:\/\/([^/]+)/i.exec(String(url || ""));
-	return m !== null ? m[1] : String(url || "");
+	return m?.[1] ?? String(url || "");
 }
 
 /** Where this text came from, and how old it is. Never omitted. */

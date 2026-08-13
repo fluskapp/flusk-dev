@@ -9,6 +9,7 @@
 import { useEffect, useState } from "react";
 import { MD_LABEL, MD_MODES, type MdMode, mdMode, setMdMode } from "./md-mode.js";
 import "./md.css";
+import "./docs.css";
 
 export interface MdSurfaceProps {
 	/** The localStorage identity of this tab, e.g. "doc:<path>", "run:<path>". */

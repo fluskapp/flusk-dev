@@ -41,7 +41,7 @@ export function ggSide(n: NeighbourNode, root: string): Side | null {
 	return { inbound: e.to === root, kind: e.kind, edge: e };
 }
 
-function Txt(p: { x: number; y: number; cls: string; anchor: string; size: number; s: string }) {
+function Txt(p: { x: number; y: number; cls: string; anchor: "start" | "middle" | "end"; size: number; s: string }) {
 	return (
 		<text x={p.x} y={p.y} className={p.cls} textAnchor={p.anchor} fontSize={p.size}>
 			{p.s}

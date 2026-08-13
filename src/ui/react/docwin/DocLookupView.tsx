@@ -38,7 +38,7 @@ export function DocLookupView({ path, sym }: { path?: string; sym?: string }) {
 		return () => {
 			alive = false;
 		};
-	}, [path, sym, show]);
+	}, [path, sym, show, wait]);
 
 	const doc = state.payload?.doc ?? null;
 	return (

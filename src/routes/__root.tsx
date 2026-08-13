@@ -13,6 +13,7 @@ import chromeCss from "../ui/react/workbench/chrome.css?url";
 import { ChatRail } from "../ui/react/chat/ChatRail.js";
 import { DocWindow } from "../ui/react/docwin/DocWindow.js";
 import { FindStrip } from "../ui/react/find/FindStrip.js";
+import { PaletteAndHelp } from "../ui/react/palette/Palette.js";
 import { ProjectsRail } from "../ui/react/projects/ProjectsRail.js";
 import { Grip } from "../ui/react/workbench/Grips.js";
 import { StatusBar } from "../ui/react/workbench/StatusBar.js";
@@ -75,6 +76,7 @@ function RootComponent() {
 			{doc ? <DocWindow /> : null}
 			{find ? <FindStrip /> : null}
 			<StatusBar home={meta.home} version={meta.version} />
+			<PaletteAndHelp />
 			<WorkbenchKeys />
 		</div>
 	);

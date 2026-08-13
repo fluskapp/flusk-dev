@@ -19,9 +19,28 @@ import { runFeed } from "./run-feed.js";
 import { scanSessions, sessionsRoot, type SessionSummary } from "./scan.repository.js";
 
 export type { RunRow } from "./projects.types.js";
-export type { SessionDetail, ToolView, TranscriptItem } from "./detail.js";
 export type { Journal, JournalStage } from "./journal-scan.repository.js";
 export type { SessionSummary } from "./scan.repository.js";
+
+/**
+ * The wire shape of a transcript. detail.ts types tool args as `unknown`,
+ * which the server-function serializer rightly refuses to promise about —
+ * but a session file holds JSON by construction, so the narrowing is a
+ * statement of fact, not a coercion.
+ */
+export type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
+export type ToolView = Omit<import("./detail.js").ToolView, "args"> & { args: Json };
+export type TranscriptItem =
+	| { kind: "user"; text: string }
+	| {
+			kind: "assistant";
+			text: string;
+			thinking: string;
+			stopReason: string;
+			errorMessage?: string;
+			tools: ToolView[];
+	  }
+	| { kind: "compaction"; summary: string };
 
 const cfg = createServerOnlyFn(() => loadConfig(process.cwd()));
 
@@ -67,7 +86,7 @@ export const getRunHead = createServerFn()
 		};
 	});
 
-export type SessionRun = SessionDetail & { path: string };
+export type SessionRun = Omit<SessionDetail, "items"> & { items: TranscriptItem[]; path: string };
 
 /** The heavy half: the whole transcript. Deferred by the route loader. */
 export const getSessionRun = createServerFn()
@@ -75,7 +94,7 @@ export const getSessionRun = createServerFn()
 	.handler(async ({ data }): Promise<SessionRun> => {
 		const path = keyToPath(data.key);
 		if (path === null) throw new Error("bad session key");
-		return { ...loadSessionDetail(path), path };
+		return { ...loadSessionDetail(path), path } as SessionRun;
 	});
 
 /** One journal's frontmatter — title, status, stages, PR — never the body. */

@@ -1,23 +1,24 @@
 /**
- * The three ranked lists of the Graph tool window: BLAST RADIUS, CO-CHANGE and
- * PROVENANCE. Ported from client-graph-rows.ts.
+ * The ranked lists of the Graph tool window: BLAST RADIUS and CO-CHANGE
+ * (PROVENANCE, the third, is provenance.tsx). Ported from
+ * client-graph-rows.ts.
  *
- * THE RULE THIS FILE IS WRITTEN AROUND: no row states a relationship without
- * the triples that produced it. Every row carries a why-cell derived from the
- * payload's own evidence; the `title` attribute carries the raw triples,
- * because the full chain does not fit in a cell and eliding it away would
- * elide the audit trail. Each empty section prints a SENTENCE rather than an
- * empty table: "no importers" and "history was never folded in" are different
- * facts with different remedies, and a blank box states neither.
+ * THE RULE THESE FILES ARE WRITTEN AROUND: no row states a relationship
+ * without the triples that produced it. Every row carries a why-cell derived
+ * from the payload's own evidence; the `title` attribute carries the raw
+ * triples, because the full chain does not fit in a cell and eliding it away
+ * would elide the audit trail. Each empty section prints a SENTENCE rather
+ * than an empty table: "no importers" and "history was never folded in" are
+ * different facts with different remedies, and a blank box states neither.
  */
 import type { ReactNode } from "react";
 import type { GraphReply } from "../../../features/graph/graph.functions.js";
-import { gClip, gPath, gShortRef, NodeCells, rowProps, TruncNote, WhyCell } from "./cells.js";
-import { fmtTime, Sec } from "../flows/vocab.js";
+import { gClip, gPath, NodeCells, rowProps, TruncNote, WhyCell } from "./cells.js";
+import { Sec } from "../flows/vocab.js";
 
 type Open = (id: string) => void;
 
-function Tbl({ head, children }: { head: string[]; children: ReactNode }) {
+export function Tbl({ head, children }: { head: string[]; children: ReactNode }) {
 	return (
 		<table className="tbl">
 			<thead>
@@ -107,46 +108,6 @@ export function CoChangeSection({ d, open }: { d: GraphReply; open: Open }) {
 				})}
 			</Tbl>
 			<TruncNote t={c.truncation} />
-		</Sec>
-	);
-}
-
-/** PROVENANCE: the commits, runs and docs that touched this, newest first. */
-export function ProvenanceSection({ d, open }: { d: GraphReply; open: Open }) {
-	const p = d.provenance;
-	if (p === null) return null;
-	if (!p.rows.length) {
-		return (
-			<Sec title="Provenance" count={0}>
-				<div className="gg-none">
-					No commit, run or document is attached to this yet. The history fold attaches them; a
-					file added since the last index has none.
-				</div>
-			</Sec>
-		);
-	}
-	return (
-		<Sec title="Provenance" count={p.rows.length}>
-			<Tbl head={["when", "touched by", "at", "evidence"]}>
-				{p.rows.map((r) => {
-					const why = `${r.relation} · ${r.edge.from} -${r.edge.kind}-> ${r.edge.to}`;
-					return (
-						<tr key={`${r.node.id}:${r.edge.kind}`} {...rowProps(r.node, r.ref, why, open)}>
-							<td className="mono">{r.at !== null ? fmtTime(r.at) : "—"}</td>
-							<NodeCells node={r.node} root={d.root} />
-							<WhyCell
-								text={`${r.relation}${r.ref !== null ? ` · ${gShortRef(r.ref)}` : " · no card matched"}`}
-							/>
-						</tr>
-					);
-				})}
-			</Tbl>
-			{p.ordered !== "history" ? (
-				<div className="gg-note">
-					Ordered by id, not by time: no history corpus was available to date these.
-				</div>
-			) : null}
-			<TruncNote t={p.truncation} />
 		</Sec>
 	);
 }
