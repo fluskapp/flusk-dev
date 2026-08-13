@@ -6,6 +6,10 @@
 //! the TS types. Building the index can exceed 1ms, so it runs as an
 //! AsyncTask — the Electron main process must never block on it.
 
+mod bindings_render;
+mod bindings_scan;
+mod bindings_store;
+
 use flusk_core::index::HistoryEngine;
 use napi::bindgen_prelude::*;
 use napi_derive::napi;

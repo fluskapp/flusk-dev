@@ -6,3 +6,6 @@
 //! contract, so a deviation here is a bug even when it is an improvement.
 
 pub mod index;
+pub mod render;
+pub mod scan;
+pub mod store;
