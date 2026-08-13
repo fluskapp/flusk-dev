@@ -36,8 +36,11 @@ fn golden_queries_all_return_hits() {
 fn search_is_deterministic() {
     let fx = fixture();
     let engine = HistoryEngine::new(serde_json::from_value(fx["cards"].clone()).unwrap());
+    // A pinned `now`: without it the two calls could straddle a millisecond
+    // boundary and disagree in the recency part — the flake this test had.
     let q = serde_json::to_string(&serde_json::json!({"text": "retry hook backoff", "limit": 10})).unwrap();
-    let a = engine.search_json(&q, "").unwrap();
-    let b = engine.search_json(&q, "").unwrap();
+    let o = serde_json::to_string(&serde_json::json!({"now": 1754870400000.0})).unwrap();
+    let a = engine.search_json(&q, &o).unwrap();
+    let b = engine.search_json(&q, &o).unwrap();
     assert_eq!(a, b);
 }

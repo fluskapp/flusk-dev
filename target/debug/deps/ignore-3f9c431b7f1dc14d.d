@@ -1,0 +1,13 @@
+/Users/ashb/projects/ah-ui/target/debug/deps/ignore-3f9c431b7f1dc14d.d: /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/lib.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/default_types.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/dir.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/gitignore.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/incremental.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/overrides.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/pathutil.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/types.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/walk.rs
+
+/Users/ashb/projects/ah-ui/target/debug/deps/libignore-3f9c431b7f1dc14d.rmeta: /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/lib.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/default_types.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/dir.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/gitignore.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/incremental.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/overrides.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/pathutil.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/types.rs /Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/walk.rs
+
+/Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/lib.rs:
+/Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/default_types.rs:
+/Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/dir.rs:
+/Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/gitignore.rs:
+/Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/incremental.rs:
+/Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/overrides.rs:
+/Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/pathutil.rs:
+/Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/types.rs:
+/Users/ashb/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ignore-0.4.33/src/walk.rs:
