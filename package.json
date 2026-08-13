@@ -29,7 +29,8 @@
 		"design": "bash scripts/check-design.sh",
 		"dev": "npm run tokens && vite dev",
 		"tokens": "npm run build && node scripts/gen-tokens.mjs",
-		"build:app": "npm run tokens && vite build"
+		"build:app": "npm run tokens && vite build",
+		"app": "npm run build:app && electron ."
 	},
 	"dependencies": {
 		"@earendil-works/pi-ai": "^0.84.1",
@@ -53,7 +54,12 @@
 		"@types/node": "^24.0.0",
 		"@types/react": "^19.2.18",
 		"@types/react-dom": "^19.2.4",
+		"electron": "^43.4.0",
 		"vitest": "^3.0.0"
 	},
-	"homepage": "https://flusk.dev"
+	"homepage": "https://flusk.dev",
+	"allowScripts": {
+		"electron@43.4.0": true
+	},
+	"main": "electron/main.mjs"
 }

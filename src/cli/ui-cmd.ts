@@ -1,25 +1,56 @@
+/**
+ * `flusk ui` — launch the desktop workbench.
+ *
+ * Electron is the only shipped UI surface: this verb finds the app (the
+ * packaged bundle when installed, `electron .` in a checkout) and hands off.
+ * `--server` keeps the old headless loopback server for debugging and tests;
+ * it is a developer door, not a product.
+ */
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { fluskHome } from "../platform/paths/paths.js";
 import { startUiServer } from "../ui/server.js";
 
 export interface UiCmdOpts {
 	port: number;
 	open: boolean;
+	/** Headless loopback server instead of the app (debugging/tests). */
+	server?: boolean;
 }
 
 /** Signals a terminal or a supervisor uses to ask for a clean stop. */
 const STOP_SIGNALS = ["SIGINT", "SIGTERM"] as const;
 
-/**
- * `flusk ui` — serve the dashboard until interrupted.
- *
- * The wait is a promise a signal resolves, not one that never settles: the
- * server can have streaming agent CLIs attached to it, and those are spawned
- * detached, so the tty's Ctrl-C reaches this process and nothing else. Closing
- * the server aborts them (src/ui/server.ts), which is the only thing that
- * stops a `claude -p` from billing on after the dashboard is gone.
- */
+/** The repo/package root: dist/cli/ui-cmd.js sits two levels below it. */
+const packageRoot = (): string => join(dirname(fileURLToPath(import.meta.url)), "..", "..");
+
 export async function uiCmd(opts: UiCmdOpts): Promise<void> {
+	if (opts.server !== true) {
+		const root = packageRoot();
+		const local = join(root, "node_modules", ".bin", "electron");
+		if (existsSync(local)) {
+			process.stdout.write(`flusk ui · launching the desktop app · sessions from ${fluskHome()}\n`);
+			const child = spawn(local, [root], { stdio: "inherit" });
+			await new Promise<void>((done) => child.once("exit", () => done()));
+			return;
+		}
+		process.stderr.write(
+			"flusk ui: the desktop app is not installed in this checkout (npm i); starting the headless server instead\n",
+		);
+	}
+	await serveHeadless(opts);
+}
+
+/**
+ * The old loopback server. The wait is a promise a signal resolves: the
+ * server can have streaming agent CLIs attached, spawned detached, so the
+ * tty's Ctrl-C reaches this process and nothing else. Closing the server
+ * aborts them (src/ui/server.ts) — the only thing that stops a `claude -p`
+ * from billing on after the dashboard is gone.
+ */
+async function serveHeadless(opts: UiCmdOpts): Promise<void> {
 	const ui = await startUiServer(opts.port);
 	process.stdout.write(`flusk ui · ${ui.url} · sessions from ${fluskHome()}\n`);
 	if (opts.open && process.platform === "darwin") {

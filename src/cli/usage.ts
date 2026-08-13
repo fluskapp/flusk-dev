@@ -28,5 +28,5 @@ export const USAGE = `Usage:
   flusk index [--repo <path>] [--json]  what this repo is, and what would help
   flusk runs [-n <count>]
   flusk watch [--repo <path>] [--once]
-  flusk ui [--port <n>] [--no-open]
+  flusk ui [--server] [--port <n>] [--no-open]
 `;

@@ -22,6 +22,7 @@ export const CLI_OPTIONS = {
 	steer: { type: "string" },
 	n: { type: "string", short: "n" },
 	port: { type: "string" },
+	server: { type: "boolean" }, // flusk ui --server: headless loopback, not the app
 	"no-open": { type: "boolean" },
 	once: { type: "boolean" },
 	project: { type: "string" },

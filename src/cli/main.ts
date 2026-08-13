@@ -48,7 +48,7 @@ async function main(): Promise<void> {
 		if (!Number.isInteger(port) || port < 0 || port > 65535) {
 			return fail("flusk: --port must be a valid port number\n");
 		}
-		await uiCmd({ port, open: v["no-open"] !== true });
+		await uiCmd({ port, open: v["no-open"] !== true, server: v.server === true });
 		return;
 	}
 	if (command === "watch") {
