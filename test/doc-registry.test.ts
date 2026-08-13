@@ -28,9 +28,12 @@ function registry(cfg: FluskConfig, root: string): DocRegistry {
 	return made;
 }
 
+// A name nothing installs: the "not on PATH" branch must fire on ANY machine.
+// (This used to be rust-analyzer, which GitHub's runner images actually ship,
+// so the test asserted an accident of the dev machine, not the behavior.)
 const rustServer: DocServerConfig = {
 	id: "rust-analyzer",
-	command: "rust-analyzer",
+	command: "flusk-test-absent-lsp-server",
 	extensions: [".rs"],
 };
 
