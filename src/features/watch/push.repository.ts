@@ -23,7 +23,7 @@ function run(
 }
 
 const BODY_NOTE =
-	"Opened by [flusk](https://github.com/adirbenyossef/flusk) running unattended. " +
+	"Opened by [flusk](https://github.com/fluskapp/flusk-dev) running unattended. " +
 	"Every commit is a per-turn checkpoint and the run passed its verification gate.";
 
 /** Push the branch and open a PR for it. Never throws; reports what happened. */
