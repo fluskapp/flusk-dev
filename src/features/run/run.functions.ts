@@ -7,6 +7,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { listLiveRuns, startFakeRun } from "./run-manager.repository.js";
 
+// The SSE route needs the live feed itself (a stream is not a serializable
+// server-function value); this re-export is the routes-facing seam for it.
+export { getLiveRun } from "./run-manager.repository.js";
+
 export interface StartedRun {
 	runId: string;
 	task: string;

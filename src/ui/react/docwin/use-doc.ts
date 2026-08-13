@@ -31,6 +31,8 @@ export interface DocApi {
 	state: DocState;
 	lookup: (file: string, line: number, col: number) => void;
 	show: (payload: DocPayload) => void;
+	/** A lookup is out somewhere else (the /doc route drives lookupSymbol itself). */
+	wait: (file: string) => void;
 }
 
 export function useDocLookup(): DocApi {
@@ -55,7 +57,11 @@ export function useDocLookup(): DocApi {
 		++seq.current;
 		setState({ payload, busy: "" });
 	}, []);
-	return { state, lookup, show };
+	const wait = useCallback((file: string) => {
+		++seq.current;
+		setState({ payload: null, busy: file });
+	}, []);
+	return { state, lookup, show, wait };
 }
 
 /**

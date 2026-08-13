@@ -1,0 +1,90 @@
+/* The project tool window, ported 1:1 from styles-tree.ts: an IntelliJ tree
+   — one Tree.rowHeight line per row, a twisty, and badges that only appear
+   when they mean something. Nothing animates except a live run. */
+#tree { padding-bottom: var(--ij-space-4); }
+.tree-row {
+	display: flex; align-items: center; gap: var(--ij-space-2); height: var(--row);
+	padding: 0 var(--ij-space-2) 0 var(--ij-space); cursor: pointer;
+	border-left: var(--ij-space-1) solid transparent; white-space: nowrap;
+}
+.tree-row:hover { background: var(--hover); }
+/* The selected project: the focused fill while the keyboard is in the tree,
+   *.selectionInactiveBackground while it is in the view. */
+.tree-row.active, .tree-row.active:hover {
+	background: var(--ij-selection-inactive); border-left-color: var(--accent);
+}
+body:not(.zone-view) .tree-row.active, body:not(.zone-view) .tree-row.active:hover {
+	background: var(--sel);
+}
+.tree-row.cursor {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(var(--ij-focus-ring-w) * -1);
+}
+.tree-row.child {
+	padding-left: calc(var(--ij-space-4) + var(--ij-space-2)); color: var(--text);
+}
+.twisty {
+	width: var(--ij-space-3); flex: none; text-align: center;
+	color: var(--dim); font-size: var(--ij-fs-1);
+}
+.node-name { overflow: hidden; text-overflow: ellipsis; }
+
+.kind-chip {
+	font: var(--ij-fs-1) var(--font-code); text-transform: uppercase; letter-spacing: .3px;
+	color: var(--dim); border: 1px solid var(--border); padding: 0 var(--ij-space);
+}
+.kind-chip.harness { color: var(--accent); border-color: var(--accent); }
+
+/* "a worktree of X" — no border, because it names a RELATIONSHIP rather than
+   classifying the row, and a second bordered chip beside the kind reads as a
+   second kind. */
+.wt-chip {
+	font: var(--ij-fs-2) var(--font-code); color: var(--dim);
+	white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+/* Where the projects that have never run anything begin. A label rather than
+   a bare rule: an unexplained divider is one more thing to work out. */
+.tree-sep {
+	margin: var(--ij-space-2) 0 var(--ij-space-1);
+	padding: 0 var(--ij-space-2); border-top: 1px solid var(--border);
+	font: var(--ij-fs-1) var(--font-code); color: var(--ij-text-disabled);
+	text-transform: uppercase; letter-spacing: .4px; line-height: var(--ij-row-h);
+}
+
+.tree-row .count {
+	margin-left: auto; color: var(--dim); font: var(--ij-fs-3) var(--font-code);
+}
+/* Filled with Button.default's Blue, so it takes that button's own white
+   foreground; --on-accent is the Badge pair. */
+.badge-live {
+	margin-left: auto; font: 600 var(--ij-fs-2) var(--font-code);
+	color: var(--ij-button-default-fg);
+	background: var(--accent); padding: 0 var(--ij-space);
+	animation: flusk-pulse 1.6s ease-in-out infinite;
+}
+.badge-attn {
+	font: 600 var(--ij-fs-2) var(--font-code); color: var(--on-accent);
+	background: var(--err); padding: 0 var(--ij-space);
+}
+.badge-live + .badge-attn { margin-left: var(--ij-space-2); }
+@keyframes flusk-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .badge-live { animation: none; } }
+
+/* The sidebar TextField (styles-widgets.ts), kept with the tree it filters. */
+#search {
+	display: block; width: calc(100% - var(--ij-space-4));
+	margin: var(--ij-space) var(--ij-space-2);
+	height: var(--ij-control-h); padding: 0 var(--ij-space-2);
+	font: var(--ij-fs-6)/var(--ij-lh) var(--ij-font-ui); color: var(--ij-text);
+	background: var(--ij-bg-editor);
+	border: 1px solid var(--ij-border-control);
+	border-radius: var(--ij-radius); outline: none;
+}
+/* The New UI draws the ring OUTSIDE the border, in *.focusColor. */
+#search:focus {
+	border-color: var(--ij-focus-ring);
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring); outline-offset: 0;
+}
+#search::placeholder { color: var(--ij-text-disabled); }
+#search::selection { background: var(--ij-selection); color: var(--ij-selection-text); }
+#search:not(:focus)::selection { background: var(--ij-selection-inactive); }

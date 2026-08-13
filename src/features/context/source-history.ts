@@ -31,7 +31,7 @@
  * item's `why` says so, so no delimiter is applied twice (L3).
  */
 import { basename, resolve } from "node:path";
-import { createHistorySearcher } from "../../platform/native/history-search.js";
+import { createHistorySearcher } from "../history/searcher.repository.js";
 import { loadIndex } from "../history/index-store.repository.js";
 import type { HistoryCard } from "../history/types.js";
 import { buildWalkthrough } from "../history/walkthrough.js";
