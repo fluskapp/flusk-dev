@@ -23,12 +23,12 @@ jobs:
         run: npm ci
       - name: Typecheck
         run: npm run check
-      - name: Test
-        run: npm test
       - name: Build (engine)
         run: npm run build
       - name: Build (app)
         run: npm run build:app
+      - name: Test
+        run: npm test
       - name: Standards
         run: npm run standards
         if: runner.os != 'Windows'

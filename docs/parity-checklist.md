@@ -18,13 +18,14 @@ tree, unshipped, until every box is ticked; then it is deleted in one commit.
 - [x] Code viewer — highlight, outline, ?line, peek
 
 ## Open items (what the one cut still waits on)
-- [ ] Toolbar `#count` ("N projects · M need attention · L live") — lives in
-      the chrome; needs a small root-loader poll.
+- [x] Toolbar `#count` — served from the root loader (projects · live).
 - [ ] Global toast node — currently per-component; decide whether the chrome
       owns one.
 - [ ] Tree/view cursor zones (Tab switching between tree and table).
-- [ ] Playwright smoke asserting SSR'd HTML per route + hydration
-      interactions (digits, palette, chat send) in CI.
+- [x] Per-route SSR content assertions in CI (test/app-ssr.test.ts, against
+      the built handler; skips honestly when dist-app is absent).
+- [ ] Browser-level hydration interactions (digits, palette, chat send) —
+      Playwright, still open.
 - [ ] Visual pass against the legacy page for spacing/typography drift.
 
 ## After the cut

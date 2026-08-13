@@ -28,7 +28,7 @@ export const PANELS: PanelButton[] = [
 	{ id: "ask-btn", n: "0", label: "Ask AI", title: "Ask AI about what is on screen (0 / ⌘0 / a)", to: "/ask" },
 ];
 
-export function Toolbar() {
+export function Toolbar({ projects, live }: { projects?: number; live?: number }) {
 	const search = useSearch({ strict: false });
 	const navigate = useNavigate();
 	const toggle = (key: "side" | "chat" | "find" | "doc") =>
@@ -56,6 +56,9 @@ export function Toolbar() {
 				),
 			)}
 			<div className="spacer" />
+			<span id="count" className="dim small">
+				{projects !== undefined ? `${projects} projects${live ? ` · ${live} live` : ""}` : ""}
+			</span>
 			<button id="help-btn" type="button" title="Shortcuts (?)">?</button>
 			<button
 				id="theme"

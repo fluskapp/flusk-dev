@@ -24,14 +24,23 @@ export type { ProjectSummary } from "./projects.types.js";
 
 const cfg = createServerOnlyFn(() => loadConfig(process.cwd()));
 
-/** What the chrome itself needs: the status bar's home path and version. */
+/** What the chrome itself needs: the status bar's home path and version,
+ * and the toolbar's count line ("N projects · M live"). */
 export interface WorkbenchMeta {
 	home: string;
 	version: string;
+	projects: number;
+	live: number;
 }
 
 export const getWorkbenchMeta = createServerFn().handler(async (): Promise<WorkbenchMeta> => {
-	return { home: fluskHome(), version: version() };
+	const all = scanProjects(cfg());
+	return {
+		home: fluskHome(),
+		version: version(),
+		projects: all.length,
+		live: all.reduce((n, p) => n + p.liveRuns, 0),
+	};
 });
 
 /** The Attention/Overview payload: stat tiles plus recent activity. */
