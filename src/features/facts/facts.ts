@@ -50,6 +50,8 @@ const VOCABULARY: Record<string, Record<string, Cardinality>> = {
 		failure_count: "functional",
 	},
 	Night: { run: "coexist" },
+	/** Doctor verdicts (features/setup): the current state of one check. */
+	Setup: { status: "functional" },
 };
 
 /**

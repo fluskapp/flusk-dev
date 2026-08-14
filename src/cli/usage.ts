@@ -32,5 +32,9 @@ export const USAGE = `Usage:
   flusk watch [--repo <path>] [--once]
   flusk run <task> --container   execute the run's bash inside the repo's container
   flusk container <up|status|down> [--repo <path>]
+  flusk doctor [--json]     is this installation healthy, and exactly what to type if not
+  flusk maintain [--json] [--schedule]
+                    the nightly tick: doctor, index refresh, store sweeps;
+                    --schedule prints the launchd/cron line that installs it
   flusk ui [--server] [--port <n>] [--no-open]
 `;

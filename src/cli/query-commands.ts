@@ -11,6 +11,7 @@
  */
 import { contextCmd } from "./context-cmd.js";
 import { findCmd } from "./find-cmd.js";
+import { doctorCmd, maintainCmd } from "./doctor-cmd.js";
 import { explainCmd } from "./explain-cmd.js";
 import { indexCmd } from "./index-cmd.js";
 import { promptCmd } from "./prompt-cmd.js";
@@ -36,6 +37,14 @@ export async function queryCommand(
 			repo: typeof v.repo === "string" ? v.repo : process.cwd(),
 			json: v.json === true,
 		});
+		return true;
+	}
+	if (command === "doctor") {
+		process.exitCode = await doctorCmd({ json: v.json === true });
+		return true;
+	}
+	if (command === "maintain") {
+		process.exitCode = await maintainCmd({ json: v.json === true, schedule: v.schedule === true });
 		return true;
 	}
 	if (command === "explain") {

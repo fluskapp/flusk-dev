@@ -5,15 +5,19 @@
  */
 import { createFileRoute } from "@tanstack/react-router";
 import { getOverview, type Overview } from "../features/projects/projects.functions.js";
+import { getSetupStatus, type SetupStatus } from "../features/setup/setup.functions.js";
 
 export const Route = createFileRoute("/")({
 	ssr: true,
-	loader: async (): Promise<Overview> => getOverview() as Promise<Overview>,
+	loader: async (): Promise<{ overview: Overview; setup: SetupStatus }> => ({
+		overview: (await getOverview()) as Overview,
+		setup: (await getSetupStatus()) as SetupStatus,
+	}),
 	component: OverviewPage,
 });
 
 function OverviewPage() {
-	const overview = Route.useLoaderData() as Overview;
+	const { overview, setup } = Route.useLoaderData() as { overview: Overview; setup: SetupStatus };
 	return (
 		<div id="overview" className="view">
 			<h2>Attention</h2>
@@ -25,6 +29,16 @@ function OverviewPage() {
 					</div>
 				))}
 			</div>
+			{setup.worst !== "ok" ? (
+				<p className="dim setup-line">
+					{setup.worst === "unknown"
+						? "setup: never checked — run flusk doctor"
+						: `setup: ${setup.worst} — ${Object.entries(setup.checks)
+								.filter(([, v]) => !v.startsWith("ok:"))
+								.map(([k]) => k)
+								.join(", ")} (flusk doctor)`}
+				</p>
+			) : null}
 			<h3>Recent activity</h3>
 			<ul className="activity">
 				{overview.activity.map((a) => (

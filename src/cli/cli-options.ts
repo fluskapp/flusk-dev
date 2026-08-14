@@ -23,7 +23,8 @@ export const CLI_OPTIONS = {
 	n: { type: "string", short: "n" },
 	port: { type: "string" },
 	server: { type: "boolean" },
-	container: { type: "boolean" }, // flusk run --container: bash executes in the repo's container // flusk ui --server: headless loopback, not the app
+	container: { type: "boolean" },
+	schedule: { type: "boolean" }, // flusk maintain --schedule: print the cron/launchd line // flusk run --container: bash executes in the repo's container // flusk ui --server: headless loopback, not the app
 	"no-open": { type: "boolean" },
 	once: { type: "boolean" },
 	project: { type: "string" },
