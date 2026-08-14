@@ -21,10 +21,33 @@ export const envKeyVar = (provider: string): string =>
 
 
 export async function pickModel(cfg: FluskConfig, kind: TaskKind, override?: string): Promise<ModelRef> {
-	if (override === undefined) return chooseModel(cfg, kind, await loadScores()).ref;
+	return (await pickModelWhy(cfg, kind, override)).ref;
+}
+
+/** The choice AND its provenance — what `flusk explain` reports later. */
+export async function pickModelWhy(
+	cfg: FluskConfig,
+	kind: TaskKind,
+	override?: string,
+): Promise<{ ref: ModelRef; source: "scores" | "config" | "override" }> {
+	if (override === undefined) {
+		const scores = await loadScores();
+		const picked = chooseModel(cfg, kind, scores);
+		const configured = cfg.models[kind];
+		// When the measured winner IS the configured model, "config" is reported:
+		// not strictly the router's reasoning, but the truthful substance — the
+		// configured model ran, and scores did not change the outcome.
+		const fromScores =
+			scores !== undefined &&
+			(picked.choice.provider !== configured.provider || picked.choice.id !== configured.id);
+		return { ref: picked.ref, source: fromScores ? "scores" : "config" };
+	}
 	const slash = override.indexOf("/");
 	if (slash <= 0 || slash === override.length - 1) {
 		throw new Error(`--model must look like "provider/id", got "${override}"`);
 	}
-	return resolveModelRef({ provider: override.slice(0, slash), id: override.slice(slash + 1) });
+	return {
+		ref: resolveModelRef({ provider: override.slice(0, slash), id: override.slice(slash + 1) }),
+		source: "override",
+	};
 }

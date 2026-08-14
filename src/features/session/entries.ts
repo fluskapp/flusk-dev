@@ -41,4 +41,43 @@ export interface StatsEntry {
 	reason?: RunEndReason;
 }
 
-export type SessionEntry = HeaderEntry | MessageEntry | CompactionEntry | StatsEntry;
+/**
+ * A decision the harness made about this run, written down when it was made.
+ * The workbench and `flusk explain` assemble these into the account a
+ * reviewer reads; every reader filters by type, so old files (and new entry
+ * kinds) are tolerated by construction.
+ */
+export interface DecisionEntry {
+	type: "decision";
+	id: number;
+	at: string;
+	decision: Decision;
+}
+
+export type Decision =
+	| {
+			kind: "model";
+			/** "provider/id" as resolved. */
+			ref: string;
+			taskKind: string;
+			/** Where the choice came from: measured scores, config, or a flag. */
+			source: "scores" | "config" | "override" | "fake";
+	  }
+	| {
+			kind: "context";
+			tokens: number;
+			budget: number;
+			included: number;
+			omitted: number;
+			/** Per-source: what it contributed, including the ones that found nothing. */
+			sources: Array<{ source: string; status: string; kept: number }>;
+			/** Present when assembly itself failed and the run went on without. */
+			error?: string;
+	  }
+	| {
+			kind: "isolation";
+			branch: string | null;
+			why: string;
+	  };
+
+export type SessionEntry = HeaderEntry | MessageEntry | CompactionEntry | StatsEntry | DecisionEntry;

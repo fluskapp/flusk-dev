@@ -4,6 +4,8 @@ import { join } from "node:path";
 import type { ModelRef, Msg, RunEndReason, RunStats } from "../run/run.types.js";
 import {
 	type CompactionEntry,
+	type Decision,
+	type DecisionEntry,
 	type HeaderEntry,
 	type MessageEntry,
 	SESSION_VERSION,
@@ -98,6 +100,10 @@ export class Session {
 		tokensBefore: number;
 	}): CompactionEntry {
 		return this.append<CompactionEntry>({ type: "compaction", id: this.nextId++, ...opts });
+	}
+
+	appendDecision(decision: Decision, at: string = new Date().toISOString()): DecisionEntry {
+		return this.append<DecisionEntry>({ type: "decision", id: this.nextId++, at, decision });
 	}
 
 	appendStats(stats: RunStats, reason?: RunEndReason): StatsEntry {

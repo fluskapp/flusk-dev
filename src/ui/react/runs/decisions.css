@@ -1,0 +1,13 @@
+/* The Decisions section: a property list in the run page's vocabulary. */
+.decisions { margin: var(--ij-space-2) 0; border: 1px solid var(--border); background: var(--panel); }
+.decisions > summary {
+	cursor: pointer; padding: var(--ij-space-1) var(--ij-space-2);
+	font-size: var(--ij-fs-4); font-weight: 600;
+}
+.decisions > p, .decisions > dl { margin: 0; padding: var(--ij-space-1) var(--ij-space-2) var(--ij-space-2); }
+.dec-list { display: grid; grid-template-columns: max-content 1fr; gap: var(--ij-space-1) var(--ij-space-3); }
+.dec-list dt { color: var(--dim); font: var(--ij-fs-3) var(--font-code); }
+.dec-list dd { margin: 0; font-size: var(--ij-fs-4); }
+.dec-sources { margin: var(--ij-space-1) 0 0; padding-left: var(--ij-space-4); }
+.dec-sources li { font-size: var(--ij-fs-3); }
+.dec-err { color: var(--err); }

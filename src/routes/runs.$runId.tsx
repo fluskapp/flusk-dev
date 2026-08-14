@@ -16,12 +16,20 @@ import {
 	type RunHead,
 	type SessionRun,
 } from "../features/projects/runs.functions.js";
+import { getDecisionLog, type DecisionLog } from "../features/run/run.functions.js";
 import { decodeRef, refKind } from "../ui/react/runs/format.js";
 import { JournalRun } from "../ui/react/runs/JournalRun.js";
+import { Decisions } from "../ui/react/runs/Decisions.js";
 import { SessionBody } from "../ui/react/runs/SessionRun.js";
 
 type RunLoad =
-	| { kind: "session"; ref: string; head: RunHead; detail: Promise<SessionRun> }
+	| {
+			kind: "session";
+			ref: string;
+			head: RunHead;
+			detail: Promise<SessionRun>;
+			decisions: Promise<DecisionLog | null>;
+	  }
 	| { kind: "journal"; ref: string; meta: Journal | null; body: Promise<JournalBody> };
 
 export const Route = createFileRoute("/runs/$runId")({
@@ -34,6 +42,7 @@ export const Route = createFileRoute("/runs/$runId")({
 				ref,
 				head: (await getRunHead({ data: { key: ref } })) as RunHead,
 				detail: getSessionRun({ data: { key: ref } }) as Promise<SessionRun>,
+				decisions: getDecisionLog({ data: { ref } }).catch(() => null) as Promise<DecisionLog | null>,
 			};
 		}
 		return {
@@ -59,6 +68,9 @@ function RunPage() {
 					<h2>{task}</h2>
 					<span className="dim">{load.head.path ?? load.ref}</span>
 				</div>
+				<Suspense fallback={null}>
+					<Await promise={load.decisions}>{(log: DecisionLog | null) => <Decisions log={log} />}</Await>
+				</Suspense>
 				<Suspense fallback={<div className="running-note">loading transcript…</div>}>
 					<Await promise={load.detail}>
 						{(d: SessionRun) => <SessionBody d={d} keyRef={load.ref} />}

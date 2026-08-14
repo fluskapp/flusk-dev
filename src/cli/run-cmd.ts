@@ -1,6 +1,10 @@
 import { randomUUID } from "node:crypto";
 import { createAgent } from "../features/run/agent.js";
-import { buildSystemPrompt } from "../features/run/system-prompt.js";
+import { recordStartDecisions } from "../features/run/decision-recorders.js";
+import { renderDryPlan } from "./run-dry.js";
+import type { RunCmdOpts } from "./run-opts.js";
+
+export type { RunCmdOpts } from "./run-opts.js";
 import { loadConfig, loadRepoConfig } from "../platform/config/config.js";
 import type { FluskConfig, RepoConfig, TaskKind } from "../platform/config/types.js";
 import { createEventBus, type EventBus } from "../platform/events/events.js";
@@ -14,40 +18,10 @@ import { createFactStore } from "../features/facts/facts.repository.js";
 import { toolbelt } from "./ext-tools.js";
 import { type CliOutcome, runWithGate } from "./gate-loop.js";
 import { attachRenderer } from "./render.js";
-import { demoScript, envKeyVar, fakeModel, loadFakeScript, pickModel } from "./run-support.js";
+import { demoScript, envKeyVar, fakeModel, loadFakeScript, pickModelWhy } from "./run-support.js";
 
 export { DEFAULT_TOOLS, envKeyVar, fakeModel, loadFakeScript } from "./run-support.js";
 
-export interface RunCmdOpts {
-	task: string;
-	repo: string;
-	/** Path to a JSON file with an array of ScriptedTurn entries. */
-	fake?: string;
-	/** Use the real provider. Without this and without `fake`, the demo script runs. */
-	real?: boolean;
-	/** "provider/id" override; skips the router. */
-	model?: string;
-	kind?: TaskKind;
-	maxCostUsd?: number;
-	deadlineMs?: number;
-	maxTurns?: number;
-	dry?: boolean;
-	noIsolation?: boolean;
-	allowDirty?: boolean;
-	/** Skip the verification gate (commands and claim check) entirely. */
-	noVerify?: boolean;
-	quiet?: boolean;
-	/** `--no-extensions`: run with the built-in toolbelt alone, for one command. */
-	noExtensions?: boolean;
-	out?: NodeJS.WritableStream;
-	/**
-	 * Config resolved by the caller, used INSTEAD of reading `<repo>/.flusk/config.json`.
-	 * Unattended mode passes this because its `repo` is a worktree of a branch
-	 * under review: a hostile `.flusk/config.json` there could otherwise disable the
-	 * command classifier, add a verify command to execute, or redirect memory.
-	 */
-	trustedConfig?: { cfg: FluskConfig; repoConfig: RepoConfig | undefined; namespace?: string };
-}
 
 /** DEFAULT_TOOLS plus whatever the extensions registered — the seam that makes
  * src/ext/ reachable at all (src/cli/ext-tools.ts). */
@@ -73,21 +47,14 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 	if (opts.maxTurns !== undefined) cfg.budgets.maxTurns = opts.maxTurns;
 	const isFake = opts.fake !== undefined || opts.real !== true;
 	const kind: TaskKind = opts.kind ?? classifyTask(opts.task);
-	const model = isFake ? fakeModel : await pickModel(cfg, kind, opts.model);
+	const picked = isFake ? undefined : await pickModelWhy(cfg, kind, opts.model);
+	const model = picked?.ref ?? fakeModel;
 	const inRepo = isGitRepo(opts.repo);
 
 	if (opts.dry === true) {
-		const plan = opts.noIsolation === true
-			? "off (--no-isolation)"
-			: inRepo
-				? `branch ${cfg.isolation.branchPrefix}<run-id>, checkpoint commit per mutating turn`
-				: "off (not a git repository)";
 		// The REAL toolbelt, extensions included: anything else answers a
 		// different question from the one --dry is asked.
-		const tools = [...(await belt(opts, cfg)).map((t) => t.name), "task"].join(", ");
-		const prompt = buildSystemPrompt({ repoRoot: opts.repo, cwd: opts.repo, model });
-		out.write(`kind: ${kind}\nmodel: ${model.provider}/${model.id}\ntools: ${tools}\n` +
-			`isolation: ${plan}\n--- system prompt ---\n${prompt}\n`);
+		out.write(renderDryPlan({ cfg, opts, inRepo, kind, model, tools: await belt(opts, cfg) }));
 		return "completed";
 	}
 	if (!isFake && !(await hasAuth(model.provider))) {
@@ -108,7 +75,7 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 	// runs, it just has nowhere to write the run's facts of record.
 	const ns = resolveNamespace(opts.repo, repoConfig);
 	const store = cfg.memory.enabled ? createFactStore() : null;
-	const events = createEventBus();
+	const events = opts.events ?? createEventBus();
 	if (opts.quiet !== true) attachRenderer(events, out);
 	const agent = createAgent({
 		provider,
@@ -122,6 +89,14 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 		taskKind: kind,
 		...(opts.deadlineMs !== undefined ? { limits: { maxTurns: cfg.budgets.maxTurns, deadlineMs: opts.deadlineMs } } : {}),
 		...(isolation !== undefined ? { isolation: { repoRoot: opts.repo, branch: isolation.branch } } : {}),
+	});
+	opts.onAgent?.(agent);
+	recordStartDecisions(agent.session, {
+		model,
+		taskKind: kind,
+		modelSource: picked?.source ?? "fake",
+		...(isolation !== undefined ? { isolation: { branch: isolation.branch } } : {}),
+		noIsolation: opts.noIsolation === true,
 	});
 	try {
 		const res = await runWithGate(agent, {

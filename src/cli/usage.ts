@@ -23,6 +23,8 @@ export const USAGE = `Usage:
   flusk prompt <task> [--repo <path> | --all] [--budget <n>] [--json] [--copy] [--refresh]
   flusk context <task> [--repo <path>] [--budget <n>] [--json]
                     what a run would be told before its first turn, and what was dropped
+  flusk explain <path-or-id> [--json]
+                    the run's account of itself: model, context, isolation, gate
   flusk feedback <good|bad>
   flusk workspace <init|show|path> [--project]
   flusk index [--repo <path>] [--json]  what this repo is, and what would help

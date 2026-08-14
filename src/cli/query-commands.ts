@@ -11,6 +11,7 @@
  */
 import { contextCmd } from "./context-cmd.js";
 import { findCmd } from "./find-cmd.js";
+import { explainCmd } from "./explain-cmd.js";
 import { indexCmd } from "./index-cmd.js";
 import { promptCmd } from "./prompt-cmd.js";
 import { runsCmd } from "./runs-cmd.js";
@@ -35,6 +36,11 @@ export async function queryCommand(
 			repo: typeof v.repo === "string" ? v.repo : process.cwd(),
 			json: v.json === true,
 		});
+		return true;
+	}
+	if (command === "explain") {
+		if (arg === undefined) return fail(USAGE);
+		process.exitCode = await explainCmd({ ref: arg, json: v.json === true });
 		return true;
 	}
 	if (command === "runs") {

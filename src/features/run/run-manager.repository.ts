@@ -9,8 +9,10 @@
  * scripts off disk and ultimately spawns tools.
  */
 import { randomUUID } from "node:crypto";
+import { Writable } from "node:stream";
 import { loadConfig } from "../../platform/config/config.js";
 import { createEventBus } from "../../platform/events/events.js";
+import { runCmd } from "../../cli/run-cmd.js";
 import { demoScript, loadFakeScript } from "../provider/fake-script.repository.js";
 import { DEFAULT_TOOLS } from "../tools/toolbelt.js";
 import { FakeProvider } from "../provider/fake.js";
@@ -22,6 +24,8 @@ export interface LiveRun {
 	task: string;
 	feed: RunEventFeed;
 	abort: () => void;
+	/** Mid-run user feedback, delivered before the next turn. */
+	steer?: (text: string) => void;
 	/** Resolves when the loop ends, however it ends. */
 	done: Promise<string>;
 }
@@ -64,7 +68,67 @@ export async function startFakeRun(task: string, fakeScript?: string): Promise<L
 			// only when the map grows unreasonably.
 			if (live.size > 32) live.delete(runId);
 		});
-	const run: LiveRun = { runId, task, feed, abort: () => agent.abort(), done };
+	const run: LiveRun = {
+		runId,
+		task,
+		feed,
+		abort: () => agent.abort(),
+		steer: (text) => agent.steer(text),
+		done,
+	};
+	live.set(runId, run);
+	return run;
+}
+
+/**
+ * A REAL run started from the workbench, under exactly the CLI's machinery:
+ * runCmd owns policy, isolation, the gate and the facts of record — the app
+ * only injects the event bus its feed watches and captures the text output.
+ * Refusing to reimplement any of that here is the point: a run started from
+ * a window must not be one drop weaker than a run started from a shell.
+ */
+export async function startRealRun(opts: {
+	task: string;
+	repoRoot: string;
+	kind?: string;
+}): Promise<LiveRun> {
+	const runId = randomUUID().slice(0, 8);
+	const events = createEventBus();
+	const feed = wireRunEvents(events, runId);
+	const lines: string[] = [];
+	const out = new Writable({
+		write(chunk: Buffer, _enc, cb) {
+			lines.push(chunk.toString("utf8"));
+			cb();
+		},
+	});
+	let controls: { steer(text: string): void; abort(): void } | undefined;
+	const done = runCmd({
+		task: opts.task,
+		repo: opts.repoRoot,
+		real: true,
+		...(opts.kind !== undefined ? { kind: opts.kind as "plan" | "code" | "review" | "summarize" } : {}),
+		quiet: true,
+		out,
+		events,
+		onAgent: (agent) => {
+			controls = agent;
+		},
+	})
+		.then((outcome) => outcome as string)
+		.catch((e) => `error: ${e instanceof Error ? e.message : String(e)}`)
+		.finally(() => {
+			feed.close();
+			if (live.size > 32) live.delete(runId);
+		});
+	const run: LiveRun = {
+		runId,
+		task: opts.task,
+		feed,
+		abort: () => controls?.abort(),
+		steer: (text) => controls?.steer(text),
+		done,
+	};
 	live.set(runId, run);
 	return run;
 }
