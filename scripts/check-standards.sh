@@ -88,6 +88,19 @@ if [ -d src/routes ]; then
 	fi
 fi
 
+# --- 6b. server functions stay strippable -------------------------------------
+# A bare value re-export in a *.functions.ts file survives the Start
+# compiler's server-fn stripping and drags node:* into the client bundle
+# (it broke the build once). Types are erased and fine; values go through a
+# *.router.ts seam instead.
+fn_reexports=$(grep -rEn '^export \{[^}]*\} from' src/features --include='*.functions.ts' 2>/dev/null |
+	grep -v 'export type' || true)
+if [ -n "$fn_reexports" ]; then
+	echo "FAIL: value re-export in a *.functions.ts (breaks client-bundle stripping):"
+	printf '  %s\n' "$fn_reexports"
+	fail=1
+fi
+
 # --- 7. services stay pure ----------------------------------------------------
 # *.service.ts is orchestration over repositories: no node:* imports at all.
 svc_leaks=$(grep -rlnE 'from "node:' src --include='*.service.ts' 2>/dev/null || true)

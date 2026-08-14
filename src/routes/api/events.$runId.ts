@@ -7,7 +7,7 @@
  * frame). Closing the tab cancels the stream; the run does not notice.
  */
 import { createFileRoute } from "@tanstack/react-router";
-import { getLiveRun } from "../../features/run/run.functions.js";
+import { getLiveRun } from "../../features/run/run.router.js";
 
 const POLL_MS = 150;
 

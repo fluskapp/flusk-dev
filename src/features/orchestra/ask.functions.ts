@@ -28,7 +28,6 @@ import { assembleContext } from "./ask-context.js";
 import { askPrompt } from "./ask-prompt.js";
 import type { Answerer, AskChunk, AskContext, AskRequest } from "./ask.types.js";
 
-export { ASK_ACTIONS } from "./ask-prompt.js";
 export type { Answerer, AskAction, AskBlock, AskChunk, AskContext } from "./ask.types.js";
 
 const cfg = createServerOnlyFn(() => loadConfig(process.cwd()));
