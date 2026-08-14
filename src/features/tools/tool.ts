@@ -15,6 +15,13 @@ export interface ToolContext {
 	events: EventBus;
 	/** Streaming partial output (long bash commands, subagents). */
 	onUpdate?: (partial: string) => void;
+	/**
+	 * Where bash commands execute: absent = /bin/sh on this machine; a
+	 * container runtime routes the SAME command through docker exec. The
+	 * classifier has already ruled by the time this is consulted — the route
+	 * changes the blast radius, never the decision.
+	 */
+	commandRoute?: (command: string, cwd: string) => { argv0: string; argv: string[] };
 	/** Undefined at the subagent depth cap — the task tool is then unregistered. */
 	spawnSubagent?: (task: string) => Promise<string>;
 }

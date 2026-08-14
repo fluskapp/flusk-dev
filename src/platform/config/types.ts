@@ -80,6 +80,16 @@ export interface FluskConfig {
 		retries: number;
 		evidenceLines: number;
 	};
+	containers: {
+		/**
+		 * Docker context runs are executed against when a run opts into a
+		 * container (`flusk run --container`). Absent = the local engine; an
+		 * ssh:// or cloud context is how the same run executes remotely.
+		 */
+		context?: string;
+		/** Image used when the repo carries no devcontainer.json. */
+		image: string;
+	};
 	ui: {
 		/** Globs (one `*` level) of harness journal directories to display. */
 		harnessDirs: string[];

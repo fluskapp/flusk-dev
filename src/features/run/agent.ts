@@ -72,6 +72,7 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 		signal: controller.signal,
 		policy,
 		events,
+		...(opts.commandRoute !== undefined ? { commandRoute: opts.commandRoute } : {}),
 	};
 	if (depth < MAX_SUBAGENT_DEPTH && policy.decide({ kind: "subagent", depth }).allow) {
 		wireDelegation({

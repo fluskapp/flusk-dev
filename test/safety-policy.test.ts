@@ -27,6 +27,7 @@ function config(onUnknownCommand: "deny" | "allow"): FluskConfig {
 		budgets: { maxTurns: 10, maxCostUsd: 5, deadlineMinutes: null },
 		unattended: { onUnknownCommand },
 		isolation: { requireGit: true, branchPrefix: "flusk/" },
+		containers: { image: "node:22-bookworm" },
 		compaction: { reserveTokens: 4000, keepRecentTokens: 8000 },
 		memory: { enabled: false },
 		context: { enabled: false, budgetTokens: 4000 },

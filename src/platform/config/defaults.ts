@@ -36,6 +36,11 @@ export const DEFAULT_CONFIG: FluskConfig = {
 		retries: 3,
 		evidenceLines: 40,
 	},
+	containers: {
+		// Debian keeps git and a shell in-box; runs needing more declare a
+		// devcontainer.json, which wins over this.
+		image: "node:22-bookworm",
+	},
 	ui: {
 		harnessDirs: ["~/projects/*/docs/runs", "~/projects/playground/*/docs/runs"],
 		projectDirs: ["~/projects/*", "~/projects/playground/*"],

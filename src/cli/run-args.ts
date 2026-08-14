@@ -53,6 +53,7 @@ export function parseRunArgs(task: string, v: Values, cwd: string): ParsedRunArg
 			...(maxCost !== undefined ? { maxCostUsd: maxCost } : {}),
 			...(deadlineMs !== undefined ? { deadlineMs } : {}),
 			...(maxTurns !== undefined ? { maxTurns } : {}),
+			...(v.container === true ? { container: true } : {}),
 			dry: v.dry === true,
 			noIsolation: v["no-isolation"] === true,
 			allowDirty: v["allow-dirty"] === true,

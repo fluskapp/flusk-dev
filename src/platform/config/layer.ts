@@ -17,6 +17,7 @@ export interface ConfigLayer {
 	memory?: Partial<FluskConfig["memory"]>;
 	context?: Partial<FluskConfig["context"]>;
 	verify?: Partial<FluskConfig["verify"]>;
+	containers?: Partial<FluskConfig["containers"]>;
 	ui?: Partial<FluskConfig["ui"]>;
 	chat?: Partial<FluskConfig["chat"]>;
 	doc?: Partial<FluskConfig["doc"]>;

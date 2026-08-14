@@ -76,6 +76,7 @@ function mergeLayer(base: FluskConfig, layer: ConfigLayer | null, trusted: boole
 		memory: { ...base.memory, ...layer.memory },
 		context: { ...base.context, ...layer.context },
 		verify: { ...base.verify, ...layer.verify },
+		containers: { ...base.containers, ...layer.containers },
 		ui: { ...base.ui, ...uiOf(layer, trusted) },
 		chat: { ...base.chat, ...chatOf(layer, trusted) },
 		doc: { ...base.doc, ...docOf(layer, trusted) },

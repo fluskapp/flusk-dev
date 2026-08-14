@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { parseArgs } from "node:util";
 import { describeMigration, migrateHome } from "../platform/paths/migrate.js";
+import { containerCmd } from "./container-cmd.js";
 import { CLI_OPTIONS } from "./cli-options.js";
 import { feedbackCmd } from "./feedback-cmd.js";
 import { parseFlowArgs } from "./flow-args.js";
@@ -95,6 +96,12 @@ async function main(): Promise<void> {
 			quiet: v.quiet === true,
 		});
 		process.exitCode = outcome === "completed" ? 0 : 1;
+		return;
+	}
+	if (command === "container") {
+		process.exitCode = await containerCmd(arg, {
+			repo: typeof v.repo === "string" ? v.repo : process.cwd(),
+		});
 		return;
 	}
 	if (command !== "run" || arg === undefined) return fail(USAGE);

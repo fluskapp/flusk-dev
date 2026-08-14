@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { createAgent } from "../features/run/agent.js";
 import { recordStartDecisions } from "../features/run/decision-recorders.js";
+import { startContainerRuntime } from "../features/containers/runtime.js";
 import { renderDryPlan } from "./run-dry.js";
 import type { RunCmdOpts } from "./run-opts.js";
 
@@ -77,6 +78,13 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 	const store = cfg.memory.enabled ? createFactStore() : null;
 	const events = opts.events ?? createEventBus();
 	if (opts.quiet !== true) attachRenderer(events, out);
+	// Container routing is resolved BEFORE the agent exists: a broken docker
+	// setup must fail the run at start, not at the first bash call.
+	const runtime = opts.container === true ? startContainerRuntime(opts.repo, cfg) : undefined;
+	if (runtime !== undefined && opts.quiet !== true) {
+		out.write(`container: ${runtime.status.name} · ${runtime.image} (${runtime.imageSource})` +
+			`${runtime.status.context !== undefined ? ` · context ${runtime.status.context}` : ""}\n`);
+	}
 	const agent = createAgent({
 		provider,
 		model,
@@ -89,6 +97,7 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 		taskKind: kind,
 		...(opts.deadlineMs !== undefined ? { limits: { maxTurns: cfg.budgets.maxTurns, deadlineMs: opts.deadlineMs } } : {}),
 		...(isolation !== undefined ? { isolation: { repoRoot: opts.repo, branch: isolation.branch } } : {}),
+		...(runtime !== undefined ? { commandRoute: runtime.router } : {}),
 	});
 	opts.onAgent?.(agent);
 	recordStartDecisions(agent.session, {

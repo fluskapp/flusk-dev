@@ -63,8 +63,11 @@ function makeCollector(maxChars: number) {
 function run(command: string, timeoutMs: number, ctx: ToolContext): Promise<ToolResult> {
 	return new Promise((resolve, reject) => {
 		// detached: the child leads its own process group, so kills reach
-		// grandchildren (pipelines, backgrounded commands) too.
-		const child = spawn("/bin/sh", ["-c", command], { cwd: ctx.cwd, detached: true });
+		// grandchildren (pipelines, backgrounded commands) too. A routed
+		// command (container runs) spawns the router's argv instead — for
+		// docker exec that child is the docker CLI, and the group kill ends it.
+		const route = ctx.commandRoute?.(command, ctx.cwd) ?? { argv0: "/bin/sh", argv: ["-c", command] };
+		const child = spawn(route.argv0, route.argv, { cwd: ctx.cwd, detached: true });
 		const collector = makeCollector(MAX_OUTPUT_CHARS);
 		let timedOut = false;
 		let settled = false;

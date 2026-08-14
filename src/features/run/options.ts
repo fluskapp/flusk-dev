@@ -46,6 +46,8 @@ export interface CreateAgentOpts {
 	isolation?: { repoRoot: string; branch: string };
 	/** Clock injection for deterministic deadline tests. */
 	now?: () => number;
+	/** Container (or other) command routing for the bash tool. */
+	commandRoute?: (command: string, cwd: string) => { argv0: string; argv: string[] };
 	/**
 	 * Sources for the run-start context block; defaults to the six registered
 	 * ones. Injected by tests, which need a source that misbehaves on purpose.

@@ -22,7 +22,8 @@ export const CLI_OPTIONS = {
 	steer: { type: "string" },
 	n: { type: "string", short: "n" },
 	port: { type: "string" },
-	server: { type: "boolean" }, // flusk ui --server: headless loopback, not the app
+	server: { type: "boolean" },
+	container: { type: "boolean" }, // flusk run --container: bash executes in the repo's container // flusk ui --server: headless loopback, not the app
 	"no-open": { type: "boolean" },
 	once: { type: "boolean" },
 	project: { type: "string" },

@@ -27,6 +27,9 @@ export interface RunCmdOpts {
 	quiet?: boolean;
 	/** `--no-extensions`: run with the built-in toolbelt alone, for one command. */
 	noExtensions?: boolean;
+	/** Execute bash inside the repo's container (devcontainer image, or
+	 * containers.image), against containers.context when set. */
+	container?: boolean;
 	out?: NodeJS.WritableStream;
 	/** App-injected bus: the workbench wires its ring-buffer feed to this. */
 	events?: EventBus;
