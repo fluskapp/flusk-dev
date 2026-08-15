@@ -29,9 +29,17 @@
 	display: flex; align-items: center; gap: var(--ij-space-2); height: var(--row); cursor: pointer;
 	padding-right: var(--ij-space-2); font-size: var(--ij-fs-6); white-space: nowrap;
 	overflow: hidden; text-overflow: ellipsis; border-left: 2px solid transparent;
+	/* Nesting depth (--co-depth, set per row) buys one spacing step each. */
+	padding-left: calc(var(--ij-space-2) + var(--co-depth, 0) * var(--ij-space-3));
 }
 .co-row:hover { background: var(--hover); }
 .co-row.on { background: var(--sel); border-left-color: var(--accent); }
+.co-row:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(var(--ij-focus-ring-w) * -1);
+}
+/* The kind stub is metadata beside the name: dim, code face, never bold. */
+.co-row .glyph { flex: none; color: var(--dim); font: var(--ij-fs-2) var(--font-code); }
 .co-empty { padding: var(--ij-space-2); color: var(--dim); font-size: var(--ij-fs-4); }
 /* Why part of a file is not clickable — said, rather than left to be noticed. */
 .code-note {
@@ -61,10 +69,16 @@
 	white-space: pre; font: var(--ij-fs-5)/var(--code-line) var(--font-code);
 }
 .code-body code { background: none; padding: 0; }
-/* Where a jump landed: a band the width of the view, behind the text. */
+/* Where a jump landed: a --sel flash that decays, settling to a hairline
+   accent marker — the eye is led there, then the band stops shouting. */
 .code-mark {
 	position: absolute; left: 0; right: 0; height: var(--code-line);
-	background: var(--sel); pointer-events: none;
+	background: transparent; box-shadow: inset var(--ij-space-1) 0 0 var(--accent);
+	pointer-events: none; animation: mark-flash 1.2s ease-out 1;
+}
+@keyframes mark-flash { 0%, 30% { background: var(--sel); } 100% { background: transparent; } }
+@media (prefers-reduced-motion: reduce) {
+	.code-mark { animation: none; background: var(--sel); }
 }
 /* Identifiers are click targets, and look like it only under the pointer —
    a page where every word is underlined reads as a page of links. */

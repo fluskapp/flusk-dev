@@ -1,0 +1,89 @@
+/* The live kit: run control strip, live badge, inline error banner.
+   Mirrors the .act control grammar (runs/widgets.css) rather than importing
+   it — the kits stay independently mountable. Tokens only. */
+
+.live-strip { display: flex; flex-direction: column; gap: var(--ij-space); }
+.live-row { display: flex; align-items: center; gap: var(--ij-space); flex-wrap: wrap; }
+
+.live-input {
+	flex: 1 1 auto; min-width: 0;
+	height: var(--ij-control-h);
+	padding: 0 var(--ij-space-2);
+	color: var(--text); background: var(--ij-bg-editor);
+	border: 1px solid var(--ij-border-control);
+	border-radius: var(--ij-radius);
+	font: inherit;
+}
+.live-input::placeholder { color: var(--dim); }
+/* TextField focus is the full accent border plus the ring, per the kit. */
+.live-input:focus-visible {
+	border-color: var(--ij-focus-ring);
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring); outline-offset: 0;
+}
+
+.live-btn {
+	display: inline-flex; align-items: center; height: var(--ij-control-h);
+	padding: 0 var(--ij-space-3); color: var(--text);
+	background: var(--panel);
+	border: 1px solid var(--ij-border-control);
+	border-radius: var(--ij-radius);
+	font: inherit; cursor: pointer;
+}
+.live-btn:hover { background: var(--hover); }
+.live-btn:active { background: var(--sel); }
+.live-btn:focus-visible {
+	border-color: var(--ij-focus-ring);
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring); outline-offset: 0;
+}
+/* Disabled is its own colour, never the enabled control dimmed. */
+.live-btn[disabled], .live-btn[disabled]:hover {
+	background: var(--panel); color: var(--ij-text-disabled);
+	border-color: var(--ij-separator); cursor: default;
+}
+
+.live-btn.primary {
+	background: var(--accent); color: var(--on-accent); border-color: var(--accent);
+}
+.live-btn.primary:hover { background: var(--ij-accent-hover); }
+.live-btn.primary[disabled] {
+	background: var(--panel); color: var(--ij-text-disabled); border-color: var(--ij-separator);
+}
+
+/* Stop only turns hostile once armed: the first press is a question. */
+.live-btn.danger.armed { color: var(--err); border-color: var(--err); }
+
+/* ---- badge: dot + turn + last event -------------------------------------- */
+.live-badge {
+	display: inline-flex; align-items: center; gap: var(--ij-space);
+	height: var(--row);
+	padding: 0 var(--ij-space-2);
+	background: var(--panel);
+	border: 1px solid var(--border);
+	border-radius: var(--ij-radius-sm);
+	font-size: var(--ij-fs-5); white-space: nowrap;
+}
+.live-dot {
+	width: var(--ij-space-2); height: var(--ij-space-2);
+	border-radius: 50%;
+	background: var(--dim); /* connecting */
+}
+.live-badge.is-open .live-dot { background: var(--ok); }
+.live-badge.is-lost .live-dot { background: var(--err); }
+.live-badge.is-ended .live-dot { background: var(--ij-text-disabled); }
+.live-turn { font-family: var(--font-code); }
+.live-last { color: var(--dim); font-family: var(--font-code); }
+.live-skip { color: var(--warn); }
+
+/* ---- inline error banner (EditorNotificationPanel idiom) ----------------- */
+.live-error {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	padding: var(--ij-space) var(--ij-space-2);
+	background: var(--panel); color: var(--text);
+	border: 1px solid var(--border);
+	border-left: var(--ij-space-1) solid var(--err);
+	border-radius: var(--ij-radius-sm);
+	font-size: var(--ij-fs-5);
+}
+.live-error-msg { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.live-error .live-btn { height: var(--ij-row-h); padding: 0 var(--ij-space-2); }
+.live-x { font-family: var(--font-ui); }

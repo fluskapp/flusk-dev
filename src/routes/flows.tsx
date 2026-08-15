@@ -36,9 +36,15 @@ export const Route = createFileRoute("/flows")({
 	loaderDeps: ({ search }) => search,
 	loader: async ({ deps }): Promise<FlowsLoad> => {
 		const run = (deps as { run?: string }).run;
+		// The library and the run list are independent reads: parallel, not
+		// a waterfall. The open run stays un-awaited (deferred) as before.
+		const [lib, runs] = await Promise.all([
+			getFlowLibrary() as Promise<FlowLibrary>,
+			getFlowRuns({ data: { limit: 40 } }) as Promise<FlowRunRow[]>,
+		]);
 		return {
-			lib: await (getFlowLibrary() as Promise<FlowLibrary>),
-			runs: await (getFlowRuns({ data: { limit: 40 } }) as Promise<FlowRunRow[]>),
+			lib,
+			runs,
 			run: run === undefined ? null : (getFlowRun({ data: { runId: run } }) as Promise<FlowRunRow | null>),
 		};
 	},

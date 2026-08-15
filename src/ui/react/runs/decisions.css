@@ -1,13 +1,45 @@
-/* The Decisions section: a property list in the run page's vocabulary. */
+/* The Decisions section: IntelliJ's property grid in the run page's
+   vocabulary — a fixed key column, identifiers in the code face, verdicts
+   as filled status pills. */
 .decisions { margin: var(--ij-space-2) 0; border: 1px solid var(--border); background: var(--panel); }
+/* The header is a tree-node row: same twisty, same hover, same inset ring
+   the transcript's tool nodes carry. */
 .decisions > summary {
-	cursor: pointer; padding: var(--ij-space-1) var(--ij-space-2);
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	min-height: var(--ij-row-h); padding: 0 var(--ij-space-2);
 	font-size: var(--ij-fs-4); font-weight: 600;
+	cursor: pointer; list-style: none; user-select: none;
+}
+.decisions > summary::-webkit-details-marker { display: none; }
+.decisions > summary::before { content: "▸"; color: var(--dim); font-size: var(--ij-fs-1); }
+.decisions[open] > summary::before { content: "▾"; }
+.decisions > summary:hover { background: var(--hover); }
+.decisions > summary:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(var(--ij-focus-ring-w) * -1);
 }
 .decisions > p, .decisions > dl { margin: 0; padding: var(--ij-space-1) var(--ij-space-2) var(--ij-space-2); }
-.dec-list { display: grid; grid-template-columns: max-content 1fr; gap: var(--ij-space-1) var(--ij-space-3); }
-.dec-list dt { color: var(--dim); font: var(--ij-fs-3) var(--font-code); }
+/* The dt column is FIXED, not max-content: a property grid keeps one key
+   edge however the value rows run. 10ch clears "isolation", the longest. */
+.dec-list { display: grid; grid-template-columns: 10ch 1fr; gap: var(--ij-space-1) var(--ij-space-3); }
+.dec-list dt { color: var(--dim); font: var(--ij-fs-3) var(--font-code); line-height: var(--ij-lh); }
 .dec-list dd { margin: 0; font-size: var(--ij-fs-4); }
+/* Identifiers — model refs, branches, verify commands — read in code face. */
+.dec-list code {
+	font-family: var(--font-code); font-size: var(--ij-fs-3);
+	background: var(--code-bg); padding: 0 var(--ij-space-1);
+}
 .dec-sources { margin: var(--ij-space-1) 0 0; padding-left: var(--ij-space-4); }
 .dec-sources li { font-size: var(--ij-fs-3); }
 .dec-err { color: var(--err); }
+/* Badge.* again (transcript.css .pill): a filled plate in the status colour.
+   An unmapped verdict stays dim rather than inventing a meaning. */
+.verdict {
+	display: inline-block; padding: 0 var(--ij-space-2);
+	border-radius: var(--ij-radius-sm); letter-spacing: .04em;
+	font-size: var(--ij-fs-1); font-weight: 600; line-height: var(--ij-lh-loose);
+	text-transform: uppercase; color: var(--on-accent); background: var(--dim);
+}
+.verdict.ok { background: var(--ok); }
+.verdict.warn { background: var(--warn); }
+.verdict.err { background: var(--err); }

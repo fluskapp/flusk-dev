@@ -9,24 +9,32 @@
 }
 .tree-row:hover { background: var(--hover); }
 /* The selected project: the focused fill while the keyboard is in the tree,
-   *.selectionInactiveBackground while it is in the view. */
+   *.selectionInactiveBackground once it left — the legacy zone-view rules,
+   with the container's own :focus-within standing in for the body class. */
 .tree-row.active, .tree-row.active:hover {
 	background: var(--ij-selection-inactive); border-left-color: var(--accent);
 }
-body:not(.zone-view) .tree-row.active, body:not(.zone-view) .tree-row.active:hover {
+#tree:focus-within .tree-row.active, #tree:focus-within .tree-row.active:hover {
 	background: var(--sel);
 }
-.tree-row.cursor {
+/* The keyboard cursor's ring only draws while the keyboard is here: a ring
+   left behind on blur reads as a second selection. */
+#tree:focus-within .tree-row.cursor {
 	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
 	outline-offset: calc(var(--ij-focus-ring-w) * -1);
 }
 .tree-row.child {
 	padding-left: calc(var(--ij-space-4) + var(--ij-space-2)); color: var(--text);
 }
+/* One glyph that rotates, never a character swap: the same chevron turned
+   90° is what keeps the toggle from flickering between two shapes. */
 .twisty {
 	width: var(--ij-space-3); flex: none; text-align: center;
 	color: var(--dim); font-size: var(--ij-fs-1);
+	transition: transform .12s ease;
 }
+.twisty.open { transform: rotate(90deg); }
+@media (prefers-reduced-motion: reduce) { .twisty { transition: none; } }
 .node-name { overflow: hidden; text-overflow: ellipsis; }
 
 .kind-chip {
@@ -39,7 +47,7 @@ body:not(.zone-view) .tree-row.active, body:not(.zone-view) .tree-row.active:hov
    classifying the row, and a second bordered chip beside the kind reads as a
    second kind. */
 .wt-chip {
-	font: var(--ij-fs-2) var(--font-code); color: var(--dim);
+	font: var(--ij-fs-1) var(--font-code); color: var(--dim);
 	white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
 }
 /* Where the projects that have never run anything begin. A label rather than

@@ -1,14 +1,13 @@
 /**
  * Transcript rendering for the run view — client-detail.ts as components:
- * the meta strip, turn-shaped items with tool calls as collapsible nodes,
- * and the stats line ("session in progress…" until a stats entry exists).
+ * the meta strip (sticky: the run's status stays while the log scrolls),
+ * the items (TranscriptItem.tsx), and the stats line ("session in
+ * progress…" until a stats entry exists).
  */
-import type {
-	SessionRun,
-	ToolView,
-	TranscriptItem,
-} from "../../../features/projects/runs.functions.js";
+import { useEffect, useRef } from "react";
+import type { SessionRun } from "../../../features/projects/runs.functions.js";
 import { base, fmtCost, fmtTime } from "./format.js";
+import { Item } from "./TranscriptItem.js";
 import { Pill } from "./widgets.js";
 import "./transcript.css";
 
@@ -36,57 +35,37 @@ export function Meta({ d, actions }: { d: SessionRun; actions: React.ReactNode }
 	);
 }
 
-function Tool({ t }: { t: ToolView }) {
-	let preview = "";
-	try {
-		preview = JSON.stringify(t.args) ?? "";
-	} catch {
-		preview = "";
-	}
-	if (preview.length > 90) preview = `${preview.slice(0, 90)}…`;
-	return (
-		<details className={`tool${t.isError ? " err" : ""}`}>
-			<summary>
-				<span className="tool-chip">{t.name}</span>
-				<span className="tool-preview">{preview}</span>
-				{t.isError ? <span className="tool-flag">failed</span> : null}
-			</summary>
-			<pre className="code">{JSON.stringify(t.args, null, 2)}</pre>
-			{t.output !== null ? (
-				<pre className="code out">{t.output}</pre>
-			) : (
-				<div className="dim small pad">no result recorded</div>
-			)}
-		</details>
-	);
+/** One row of slack still counts as "at the end"; the row is the token's. */
+function rowH(el: HTMLElement): number {
+	return Number.parseFloat(getComputedStyle(el).getPropertyValue("--ij-row-h")) || 24;
 }
 
-function Item({ it }: { it: TranscriptItem }) {
-	if (it.kind === "user") {
-		return (
-			<div className="msg user">
-				<div className="msg-tag">user</div>
-				<div className="msg-body pre">{it.text}</div>
-			</div>
-		);
-	}
-	if (it.kind === "compaction") {
-		return <div className="compaction">context compacted — {it.summary.slice(0, 120)}</div>;
-	}
-	return (
-		<div className="msg assistant">
-			<div className="msg-tag">flusk</div>
-			<div className="msg-body">
-				{it.text ? <div className="pre">{it.text}</div> : null}
-				{it.tools.map((t) => (
-					<Tool key={t.id} t={t} />
-				))}
-				{it.errorMessage !== undefined ? (
-					<div className="error-line">⚠ {it.errorMessage}</div>
-				) : null}
-			</div>
-		</div>
-	);
+/**
+ * The legacy client-run rule: follow the log ONLY when the reader is already
+ * at the end of it. A scrolled-up reader is reading — yanking the view to
+ * the newest turn on a refresh would take the log out of their hands.
+ */
+function usePinnedToBottom(dep: number) {
+	const ref = useRef<HTMLDivElement>(null);
+	const pinned = useRef(false);
+	useEffect(() => {
+		const scroller = ref.current?.closest("#main");
+		if (!(scroller instanceof HTMLElement)) return;
+		const onScroll = () => {
+			const slack = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight;
+			pinned.current = slack < rowH(scroller);
+		};
+		onScroll();
+		scroller.addEventListener("scroll", onScroll, { passive: true });
+		return () => scroller.removeEventListener("scroll", onScroll);
+	}, []);
+	useEffect(() => {
+		const scroller = ref.current?.closest("#main");
+		if (pinned.current && scroller instanceof HTMLElement) {
+			scroller.scrollTop = scroller.scrollHeight;
+		}
+	}, [dep]);
+	return ref;
 }
 
 function Stats({ s }: { s: SessionRun["stats"] }) {
@@ -100,8 +79,9 @@ function Stats({ s }: { s: SessionRun["stats"] }) {
 }
 
 export function Transcript({ d }: { d: SessionRun }) {
+	const ref = usePinnedToBottom(d.items.length);
 	return (
-		<div id="transcript">
+		<div id="transcript" ref={ref}>
 			{d.items.map((it, i) => (
 				// Transcript items are append-only, so the index is a stable key.
 				<Item key={i} it={it} />

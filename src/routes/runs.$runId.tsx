@@ -21,6 +21,7 @@ import { decodeRef, refKind } from "../ui/react/runs/format.js";
 import { JournalRun } from "../ui/react/runs/JournalRun.js";
 import { Decisions } from "../ui/react/runs/Decisions.js";
 import { SessionBody } from "../ui/react/runs/SessionRun.js";
+import { SkelText, SkelTranscript } from "../ui/react/runs/skeleton.js";
 
 type RunLoad =
 	| {
@@ -71,7 +72,7 @@ function RunPage() {
 				<Suspense fallback={null}>
 					<Await promise={load.decisions}>{(log: DecisionLog | null) => <Decisions log={log} />}</Await>
 				</Suspense>
-				<Suspense fallback={<div className="running-note">loading transcript…</div>}>
+				<Suspense fallback={<SkelTranscript />}>
 					<Await promise={load.detail}>
 						{(d: SessionRun) => <SessionBody d={d} keyRef={load.ref} />}
 					</Await>
@@ -90,7 +91,7 @@ function RunPage() {
 						<div className="head-row">
 							<h2>{fallbackTitle}</h2>
 						</div>
-						<div className="running-note">loading journal…</div>
+						<SkelText rows={7} />
 					</>
 				}
 			>

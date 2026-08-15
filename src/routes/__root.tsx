@@ -57,7 +57,7 @@ function RootComponent() {
 				...(search.cw !== undefined ? { ["--tw-right" as string]: `${search.cw}px` } : {}),
 			}}
 		>
-			<Toolbar projects={meta.projects} live={meta.live} />
+			<Toolbar />
 			{side ? (
 				<>
 					<ProjectsRail />
@@ -75,7 +75,7 @@ function RootComponent() {
 			) : null}
 			{doc ? <DocWindow /> : null}
 			{find ? <FindStrip /> : null}
-			<StatusBar home={meta.home} version={meta.version} />
+			<StatusBar home={meta.home} version={meta.version} projects={meta.projects} live={meta.live} />
 			<PaletteAndHelp />
 			<WorkbenchKeys />
 		</div>

@@ -16,6 +16,7 @@ import {
 	type OutlineReply,
 	type SourceReply,
 } from "../../../features/projects/files.functions.js";
+import { SkelCode } from "../runs/skeleton.js";
 import { CodeViewer } from "./CodeViewer.js";
 import { EdBar } from "./ed-bar.js";
 import { FilePeek, PeekBlock, useMarkLine } from "./FilePeek.js";
@@ -62,7 +63,7 @@ function FallbackBody({ path, line }: { path: string; line: number }) {
 	}, [path]);
 	useMarkLine([reply, line]);
 
-	if (reply === "loading") return <div className="empty small">opening …</div>;
+	if (reply === "loading") return <SkelCode rows={14} />;
 	if (!reply.ok) return <FilePeek path={path} line={line} />;
 	return (
 		<>

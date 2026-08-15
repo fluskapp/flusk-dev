@@ -1,109 +1,83 @@
 /**
- * The unified run feed (client-runs.ts): flusk sessions and harness journals
- * in one dense table, newest first, optionally narrowed to one project or
- * re-sorted by cost. Every row opens the run it stands for.
+ * The unified run feed (client-runs.ts): flusk sessions and harness
+ * journals in one dense table, newest first, narrowed to a project or
+ * re-sorted from the headers. The table is a keyboard surface: focus it,
+ * type to speed-search, j/k walk the rows, Enter opens the cursor row.
  */
 import { useNavigate } from "@tanstack/react-router";
 import type { RunRow } from "../../../features/projects/runs.functions.js";
+import { parseSort, type SortState, SortTh, sortRows } from "../kit/sort.js";
+import { Hi, NoMatch, SpeedFlag } from "../kit/speed-search.js";
+import { composeKeys, useListNav } from "../kit/use-list-nav.js";
+import { useSpeedSearch } from "../kit/use-speed-search.js";
 import { fmtCost, fmtTime } from "./format.js";
-import { Pill, Sec } from "./widgets.js";
+import { FilterBar, Line, Pill, ProjectCell, Sec, useOpenSearch } from "./widgets.js";
 import "./table.css";
 import "./widgets.css";
 import "./transcript.css";
 
 type Patch = Record<string, unknown>;
 
-function useOpenSearch() {
-	const navigate = useNavigate();
-	return (patch: Patch) =>
-		navigate({ to: "/runs", search: (prev: Patch) => ({ ...prev, ...patch }) });
-}
+const runVal = (r: RunRow, col: string): string | number | undefined =>
+	col === "cost" ? r.costUsd
+	: col === "when" ? r.at
+	: col === "run" ? r.title.toLowerCase()
+	: col === "project" ? r.project
+	: r.status;
 
-function FilterBar({ project, sort }: { project?: string; sort?: string }) {
-	const open = useOpenSearch();
-	if (sort === "cost") {
-		return (
-			<div className="head-row">
-				<h2>Runs by cost</h2>
-				<span className="ev" onClick={() => open({ sort: undefined })}>
-					show newest first
-				</span>
-			</div>
-		);
-	}
-	if (project === undefined) {
-		return (
-			<div className="head-row">
-				<h2>All runs</h2>
-				<span className="dim">every project · newest first</span>
-			</div>
-		);
-	}
-	return (
-		<div className="head-row">
-			<h2>{project} runs</h2>
-			<span className="ev" onClick={() => open({ project: undefined })}>
-				show all projects
-			</span>
-		</div>
-	);
-}
+const runText = (r: RunRow): string =>
+	`${r.title} ${r.project} ${r.status} ${r.progress ?? ""}`.toLowerCase();
 
-function Rows({ rows }: { rows: RunRow[] }) {
-	const navigate = useNavigate();
-	const open = useOpenSearch();
+function Rows({
+	rows,
+	base,
+	q,
+	cursor,
+	sort,
+	onSort,
+	onOpen,
+}: {
+	rows: RunRow[];
+	base: number;
+	q: string;
+	cursor: number;
+	sort: SortState | null;
+	onSort: (next: string | undefined) => void;
+	onOpen: (r: RunRow, at: number) => void;
+}) {
 	return (
 		<table className="tbl">
 			<thead>
 				<tr>
-					<th>status</th>
-					<th>run</th>
-					<th>project</th>
+					<SortTh col="status" sort={sort} onSort={onSort}>status</SortTh>
+					<SortTh col="run" sort={sort} onSort={onSort}>run</SortTh>
+					<SortTh col="project" sort={sort} onSort={onSort}>project</SortTh>
 					<th>progress</th>
-					{/* The cost header is the handle onto the cost sort. */}
-					<th className="num">
-						<span className="ev" onClick={() => open({ sort: "cost" })}>
-							cost
-						</span>
-					</th>
-					<th className="num">when</th>
+					<SortTh col="cost" sort={sort} onSort={onSort} className="num">cost</SortTh>
+					<SortTh col="when" sort={sort} onSort={onSort} className="num">when</SortTh>
 				</tr>
 			</thead>
 			<tbody>
-				{rows.map((r) => (
+				{rows.map((r, i) => (
 					<tr
 						key={r.ref}
 						data-open={`ref:${r.ref}`}
+						data-at={base + i}
+						className={base + i === cursor ? "cursor" : ""}
 						title={r.ref}
-						onClick={() =>
-							navigate({
-								to: "/runs/$runId",
-								params: { runId: encodeURIComponent(r.ref) },
-								search: (prev: Patch) => prev,
-							})
-						}
+						onClick={() => onOpen(r, base + i)}
 					>
 						<td>
 							<Pill status={r.status} />
 						</td>
-						<td className="grow">{r.title}</td>
-						<td>
-							<span
-								className="ev"
-								onClick={(e) => {
-									e.stopPropagation();
-									navigate({
-										to: "/projects/$project",
-										params: { project: r.project },
-										search: (prev: Patch) => prev,
-									});
-								}}
-							>
-								{r.project}
-							</span>
+						<td className="grow">
+							<Hi text={r.title} q={q} />
 						</td>
-						<td className="mono">{r.progress ?? (r.kind === "session" ? "session" : "journal")}</td>
-						<td className="num">{r.costUsd === undefined ? "" : fmtCost(r.costUsd)}</td>
+						<td>
+							<ProjectCell name={r.project} />
+						</td>
+						<td className="mono">{r.progress ?? r.kind}</td>
+						<td className="num">{r.costUsd === undefined ? <span className="off">—</span> : fmtCost(r.costUsd)}</td>
 						<td className="num">{fmtTime(r.at)}</td>
 					</tr>
 				))}
@@ -113,33 +87,63 @@ function Rows({ rows }: { rows: RunRow[] }) {
 }
 
 export function RunsView({ rows, project, sort }: { rows: RunRow[]; project?: string; sort?: string }) {
-	const shown = sort === "cost" ? [...rows].sort((a, b) => (b.costUsd ?? 0) - (a.costUsd ?? 0)) : rows;
-	if (shown.length === 0) {
-		return (
-			<>
-				<FilterBar project={project} sort={sort} />
+	const navigate = useNavigate();
+	const open = useOpenSearch();
+	const search = useSpeedSearch();
+	const q = search.query.toLowerCase();
+	const s = parseSort(sort);
+	const sorted = sortRows(q === "" ? rows : rows.filter((r) => runText(r).includes(q)), s, runVal);
+	const live = sorted.filter((r) => r.status === "running");
+	const rest = sorted.filter((r) => r.status !== "running");
+	const flat = [...live, ...rest];
+	const openRun = (r: RunRow) =>
+		navigate({
+			to: "/runs/$runId",
+			params: { runId: encodeURIComponent(r.ref) },
+			search: (prev: Patch) => prev,
+		});
+	const nav = useListNav(flat.length, (i) => {
+		const r = flat[i];
+		if (r !== undefined) openRun(r);
+	});
+	const shared = {
+		q: search.query,
+		cursor: nav.cursor,
+		sort: s,
+		onSort: (next: string | undefined) => open({ sort: next }),
+		onOpen: (r: RunRow, at: number) => {
+			nav.setCursor(at);
+			openRun(r);
+		},
+	};
+	/* biome-ignore lint/a11y/noNoninteractiveTabindex: the table is the keyboard surface */
+	return (
+		<div className="knav" tabIndex={0} ref={nav.ref} onKeyDown={composeKeys(nav, search)}>
+			<SpeedFlag q={search.query} shown={flat.length} total={rows.length} />
+			<FilterBar project={project} sort={sort} />
+			{rows.length === 0 ? (
 				<div className="empty small">
 					No runs yet.
 					<br />
 					Run <code>flusk run "task"</code>, or point <code>ui.harnessDirs</code> at a harness's{" "}
 					<code>docs/runs</code>.
 				</div>
-			</>
-		);
-	}
-	const live = shown.filter((r) => r.status === "running");
-	const rest = shown.filter((r) => r.status !== "running");
-	return (
-		<>
-			<FilterBar project={project} sort={sort} />
-			{live.length > 0 ? (
-				<Sec title="Live" count={live.length}>
-					<Rows rows={live} />
-				</Sec>
-			) : null}
-			<Sec title="Runs" count={rest.length}>
-				<Rows rows={rest} />
-			</Sec>
-		</>
+			) : flat.length === 0 ? (
+				<Line>
+					<NoMatch q={search.query} what="run" clear={search.clear} />
+				</Line>
+			) : (
+				<>
+					{live.length > 0 ? (
+						<Sec title="Live" count={live.length}>
+							<Rows rows={live} base={0} {...shared} />
+						</Sec>
+					) : null}
+					<Sec title="Runs" count={rest.length}>
+						<Rows rows={rest} base={live.length} {...shared} />
+					</Sec>
+				</>
+			)}
+		</div>
 	);
 }

@@ -1,0 +1,35 @@
+/* Shimmer bars for deferred payloads (skeleton.tsx). One bar is one line of
+   the content it stands in for: height tracks the type ramp, spacing tracks
+   the density of the surface. Dim by design — a placeholder must never
+   out-contrast the chrome around it. */
+.skel {
+	height: var(--ij-fs-4); border-radius: var(--ij-radius-sm);
+	background: var(--hover); animation: skel-pulse 1.4s ease-in-out infinite;
+}
+@keyframes skel-pulse { 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) { .skel { animation: none; } }
+.w4 { width: 40%; } .w5 { width: 52%; } .w6 { width: 61%; }
+.w7 { width: 73%; } .w8 { width: 82%; } .w9 { width: 94%; }
+
+.skel-block {
+	display: flex; flex-direction: column; gap: var(--ij-space-2);
+	padding: var(--ij-space-3) 0; max-width: 90ch; /* design-exempt: prose measure */
+}
+.skel-tx { display: flex; flex-direction: column; gap: var(--ij-space-4); padding: var(--ij-space-3) 0; }
+.skel-msg { display: flex; gap: var(--ij-space-3); }
+/* The transcript's --tx-gutter, restated: the skeleton renders where that
+   custom property (scoped to #transcript) is not visible. */
+.skel-tag {
+	flex: none; width: calc(var(--ij-space-4) * 3);
+	height: var(--ij-fs-1); margin-top: var(--ij-space-1);
+}
+.skel-body {
+	flex: 1; display: flex; flex-direction: column; gap: var(--ij-space-2);
+	max-width: 90ch; /* design-exempt: prose measure */
+}
+.skel-code { display: flex; flex-direction: column; gap: var(--ij-space-1); padding: var(--ij-space-2) var(--ij-space-3); }
+.skel-line { display: flex; gap: var(--ij-space-3); align-items: center; }
+.skel-line .skel { height: var(--ij-fs-2); }
+.skel-num { flex: none; width: calc(var(--ij-space-4) * 2); }
+.skel-outline { display: flex; flex-direction: column; gap: var(--ij-space-2); padding: var(--ij-space-2); }
+.skel-outline .skel { height: var(--ij-fs-2); }

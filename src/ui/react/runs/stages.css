@@ -2,6 +2,14 @@
    Ported 1:1 from styles-stages.ts — two surfaces draw it (the run view and
    a journal's frontmatter table), so it is its own file. */
 .stages { display: flex; flex-wrap: wrap; gap: var(--ij-space-1); margin: var(--ij-space-2) 0; }
+/* The journal's mini-header: the pipeline stays while the body scrolls. The
+   negative-offset shadow paints the view padding above the stuck row, so no
+   text peeks through that gap (same trick as the transcript's #meta). */
+#run .stages {
+	position: sticky; top: 0; z-index: 2; background: var(--bg);
+	padding: var(--ij-space-1) 0;
+	box-shadow: 0 calc(-1 * var(--ij-space-2)) 0 var(--bg);
+}
 .stage {
 	font: var(--ij-fs-2) var(--font-code);
 	line-height: calc(var(--ij-row-h) - var(--ij-space-2));

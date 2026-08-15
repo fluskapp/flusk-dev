@@ -2,9 +2,68 @@
  * The small HTML builders the legacy client-core.ts wrote every view in —
  * pill, section, empty line — as components, plus the shared toast.
  */
+import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useRef, useState } from "react";
 import { statusClass } from "./format.js";
 import "./widgets.css";
+
+type Patch = Record<string, unknown>;
+
+/** Patch the /runs search params in place — the feed's filter and sort
+ * live in the URL, so every narrowed view is a link. */
+export function useOpenSearch() {
+	const navigate = useNavigate();
+	return (patch: Patch) => navigate({ to: "/runs", search: (prev: Patch) => ({ ...prev, ...patch }) });
+}
+
+/** A project name that narrows to that project, without opening the row
+ * it sits in — the stopPropagation is the point. */
+export function ProjectCell({ name }: { name: string }) {
+	const navigate = useNavigate();
+	return (
+		<span
+			className="ev"
+			onClick={(e) => {
+				e.stopPropagation();
+				navigate({ to: "/projects/$project", params: { project: name }, search: (prev: Patch) => prev });
+			}}
+		>
+			{name}
+		</span>
+	);
+}
+
+/** The feed's masthead: which slice of the feed this is, and the one
+ * action that widens it again (client-runs.ts runFilterBar). */
+export function FilterBar({ project, sort }: { project?: string; sort?: string }) {
+	const open = useOpenSearch();
+	if (sort !== undefined) {
+		return (
+			<div className="head-row">
+				<h2>Runs by {sort.split(".")[0]}</h2>
+				<span className="ev" onClick={() => open({ sort: undefined })}>
+					show newest first
+				</span>
+			</div>
+		);
+	}
+	if (project === undefined) {
+		return (
+			<div className="head-row">
+				<h2>All runs</h2>
+				<span className="dim">every project · newest first</span>
+			</div>
+		);
+	}
+	return (
+		<div className="head-row">
+			<h2>{project} runs</h2>
+			<span className="ev" onClick={() => open({ project: undefined })}>
+				show all projects
+			</span>
+		</div>
+	);
+}
 
 /** Badge.*: a filled plate in the status colour (styles-transcript.ts). */
 export function Pill({ status }: { status?: string }) {

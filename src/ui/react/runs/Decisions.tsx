@@ -74,6 +74,18 @@ function Row({ name, children }: { name: string; children: React.ReactNode }) {
 	);
 }
 
+/** Gate verdicts as filled status pills: ALLOW/success are --ok, WARN is
+ * --warn, BLOCK/failure are --err — the attention rules' own mapping. */
+const VERDICT: Record<string, string> = {
+	allow: "ok", success: "ok", ok: "ok", pass: "ok", passed: "ok",
+	warn: "warn", blocked: "warn",
+	block: "err", failure: "err", failed: "err", error: "err",
+};
+
+function Verdict({ v }: { v: string }) {
+	return <span className={`verdict ${VERDICT[v.toLowerCase()] ?? ""}`}>{v}</span>;
+}
+
 function Gate({ log }: { log: DecisionLog }) {
 	if (log.gate === null) {
 		return <p className="dim">Gate: no facts of record (memory disabled or store unavailable).</p>;
@@ -81,7 +93,11 @@ function Gate({ log }: { log: DecisionLog }) {
 	const g = log.gate;
 	return (
 		<dl className="dec-list">
-			{g.outcome !== undefined ? <Row name="outcome">{g.outcome} (fact of record)</Row> : null}
+			{g.outcome !== undefined ? (
+				<Row name="outcome">
+					<Verdict v={g.outcome} /> <span className="dim">fact of record</span>
+				</Row>
+			) : null}
 			<Row name="verified">
 				{g.verifiedBy.length === 0 ? (
 					<span className="dim">nothing — no verify command passed or gate skipped</span>
@@ -90,7 +106,10 @@ function Gate({ log }: { log: DecisionLog }) {
 				)}
 			</Row>
 			{g.reportCheck !== undefined ? (
-				<Row name="report">{g.reportCheck} — closing report vs harness observations</Row>
+				<Row name="report">
+					<Verdict v={g.reportCheck} />{" "}
+					<span className="dim">closing report vs harness observations</span>
+				</Row>
 			) : null}
 		</dl>
 	);

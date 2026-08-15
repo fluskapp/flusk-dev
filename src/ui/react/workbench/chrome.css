@@ -1,7 +1,17 @@
-/* The workbench grid, cut from the legacy styles-chrome vocabulary: the same
-   tokens, the same regions, expressed once for the React shell. */
+/* The workbench frame, the legacy styles-chrome vocabulary expressed once for
+   the React shell: toolbar strip, numbered tool windows, one scrolling middle,
+   status bar. Every value is a token; the frame heights are tokens because the
+   grips have to start below the toolbar and stop above the status bar. */
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--text); font: var(--ij-fs-5) var(--font-ui); }
+
+/* ONE keyboard-focus treatment for the whole workbench: the IntelliJ ring.
+   :where keeps it at base specificity, so a tool window may still refine it. */
+:where(#app) :focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: var(--ij-focus-ring-w);
+}
+
 #app {
 	display: grid; height: 100vh;
 	grid-template:
@@ -9,41 +19,96 @@ body { margin: 0; background: var(--bg); color: var(--text); font: var(--ij-fs-5
 		"side main chat" minmax(0, 1fr)
 		"find find find" auto
 		"st st st" var(--ij-status-h)
-		/ var(--tw-left, 280px) minmax(0, 1fr) var(--tw-right, 340px);
+		/ var(--tw-left, 268px) minmax(0, 1fr) var(--tw-right, 340px);
 }
 #app[data-side="off"] { grid-template-columns: 0 minmax(0, 1fr) var(--tw-right, 340px); }
-#app[data-chat="off"] { grid-template-columns: var(--tw-left, 280px) minmax(0, 1fr) 0; }
+#app[data-chat="off"] { grid-template-columns: var(--tw-left, 268px) minmax(0, 1fr) 0; }
+#app[data-side="off"][data-chat="off"] { grid-template-columns: 0 minmax(0, 1fr) 0; }
+
+/* The toolbar is a WINDOW HEADER strip: icon-density buttons, no tall targets. */
 #toolbar {
-	grid-area: tb; display: flex; align-items: center; gap: var(--ij-space-2);
+	grid-area: tb; display: flex; align-items: center; gap: var(--ij-space);
 	padding: 0 var(--ij-space-2); background: var(--panel); border-bottom: 1px solid var(--border);
 }
-#toolbar .logo { font-weight: 700; }
+#toolbar .logo { font-weight: 700; padding: 0 var(--ij-space); }
 #toolbar a, #toolbar button {
-	display: inline-flex; align-items: center; gap: var(--ij-space-1);
-	background: none; border: none; color: var(--text); cursor: pointer;
-	font: inherit; text-decoration: none; padding: var(--ij-space-1) var(--ij-space-2);
+	display: inline-flex; align-items: center;
+	background: none; border: 1px solid transparent; border-radius: var(--ij-radius-sm);
+	color: var(--text); cursor: pointer; font: inherit; text-decoration: none;
+	padding: var(--ij-space-1) var(--ij-space-2);
 }
 #toolbar a:hover, #toolbar button:hover { background: var(--hover); }
-#toolbar .n { color: var(--dim); font-size: var(--ij-fs-1); }
-.spacer { flex: 1; }
-#side { grid-area: side; border-right: 1px solid var(--border); background: var(--panel); overflow: auto; }
-#main { grid-area: main; overflow: auto; }
-#chat { grid-area: chat; border-left: 1px solid var(--border); background: var(--panel); display: flex; flex-direction: column; }
+/* The active tool window's button stays pressed — the sync client-tabs.ts kept
+   and the React port lost. The transparent border above keeps it from jumping. */
+#toolbar a.on, #toolbar button.on { background: var(--sel); border-color: var(--border); }
+#toolbar .n { color: var(--dim); margin-right: var(--ij-space); font: var(--ij-fs-3) var(--font-code); }
+#toolbar .on .n { color: var(--accent); }
+#theme, #help-btn { font-size: var(--ij-fs-7); line-height: 1; }
+
+/* min-width/height 0 on the grid items: without them content, not the row,
+   sets the size and the inner panes never scroll. */
+#side { grid-area: side; border-right: 1px solid var(--border); background: var(--panel); overflow-y: auto; min-width: 0; min-height: 0; }
+#main { grid-area: main; overflow: auto; min-width: 0; min-height: 0; }
+#chat { grid-area: chat; border-left: 1px solid var(--border); background: var(--panel); display: flex; flex-direction: column; min-width: 0; min-height: 0; }
 #find { grid-area: find; border-top: 1px solid var(--border); background: var(--panel); }
-#docwin { position: fixed; right: 0; bottom: var(--ij-status-h); width: var(--tw-right, 340px); background: var(--panel); border: 1px solid var(--border); }
+#docwin {
+	position: fixed; right: 0; bottom: var(--ij-status-h); width: var(--tw-right, 340px);
+	background: var(--panel); border: 1px solid var(--border); z-index: 4;
+}
+
+/* ToolWindow.Header: one row of its own height, not padding that guesses. */
+.tw-head {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	height: var(--ij-tw-header-h); padding: 0 var(--ij-space-3);
+	font-size: var(--ij-fs-3); font-weight: 600;
+	text-transform: uppercase; letter-spacing: .5px; color: var(--dim);
+	position: sticky; top: 0; background: var(--ij-bg-tw-header); z-index: 1;
+	border-bottom: 1px solid var(--border);
+}
+/* Focus follows the workbench: the window holding the keyboard titles itself
+   in full text, the rest stay dim. */
+#side:focus-within .tw-head, #chat:focus-within .tw-head,
+#find:focus-within .tw-head, #docwin:focus-within .tw-head { color: var(--text); }
+/* The tool window's number, exactly where IntelliJ prints it. */
+.tw-num {
+	font: 600 var(--ij-fs-1) var(--font-code); color: var(--accent);
+	border: 1px solid var(--border); border-radius: var(--ij-radius-sm);
+	padding: 0 var(--ij-space); letter-spacing: 0;
+}
+/* Header actions sit past the .spacer, icon-sized, quiet until hovered. */
+.tw-head button { color: var(--dim); padding: 0 var(--ij-space-1); line-height: 1; }
+.tw-head button:hover { color: var(--text); background: var(--hover); }
+
+/* One hairline row of small widgets — StatusBar.Widget.foreground text. */
 #status {
 	grid-area: st; display: flex; align-items: center; gap: var(--ij-space-2);
 	padding: 0 var(--ij-space-2); background: var(--panel); border-top: 1px solid var(--border);
 	font-size: var(--ij-fs-3); color: var(--dim);
 }
-.grip { position: relative; width: 0; cursor: col-resize; }
+#status .st-path { font-family: var(--font-code); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#status-activity { color: var(--accent); }
+#status .st-live-on { color: var(--ok); }
+#status .st-ver { font-size: var(--ij-fs-2); }
+/* A hairline between widget groups, inset from the bar's own edges. */
+.st-sep { align-self: stretch; border-left: 1px solid var(--border); margin: var(--ij-space) 0; }
+/* Widgets that act take the hover the rest of the IDE has; spans do not. */
+#status button, #status a { color: inherit; text-decoration: none; padding: 0 var(--ij-space-1); border-radius: var(--ij-radius-sm); }
+#status button:hover, #status a:hover { background: var(--hover); color: var(--text); }
+
+/* The grips: a zero-width seam on the rail border. ::after is the pointer
+   target straddling the border; ::before is the visible affordance — an
+   accent hairline over the exact border being dragged. */
+.grip { position: relative; width: 0; cursor: col-resize; z-index: 2; }
 .grip::after { content: ""; position: absolute; top: 0; bottom: 0; width: var(--ij-space); cursor: col-resize; }
 .grip-left::after { left: calc(-1 * var(--ij-space-1)); }
 .grip-right::after { right: calc(-1 * var(--ij-space-1)); }
-.tw-head {
-	display: flex; align-items: center; gap: var(--ij-space-2);
-	height: var(--ij-toolbar-h); padding: 0 var(--ij-space-2);
-	border-bottom: 1px solid var(--border); font-weight: 600;
+.grip::before {
+	content: ""; position: absolute; top: 0; bottom: 0; z-index: 1;
+	width: 1px; /* design-exempt: the affordance hairline covers the 1px border it drags */
 }
-.tw-num { color: var(--dim); }
-.st-path { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.grip-left::before { left: calc(-1 * var(--ij-focus-ring-w)); }
+.grip-right::before { left: 0; }
+.grip:hover::before, .grip.dragging::before { background: var(--accent); }
+/* While a drag is live the whole window keeps the resize cursor and text
+   cannot be swept up by the pointer sweeping across it. */
+body.grip-drag { cursor: col-resize; user-select: none; }

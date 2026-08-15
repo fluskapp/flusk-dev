@@ -3,13 +3,19 @@
  * of attention, so the tree is projects — harnesses and repos — each
  * expanding to Runs / Docs / Config. The rail owns its own data: it polls
  * the project scan and only re-renders when the payload actually changed.
+ *
+ * The #search field is the visible face of the tree's speed search: typing
+ * with the tree focused and typing in the field feed the same query.
  */
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { getProjects, type ProjectSummary } from "../../../features/projects/projects.functions.js";
+import { NoMatch, SpeedFlag } from "../kit/speed-search.js";
+import { composeKeys, faceKeys, useListNav } from "../kit/use-list-nav.js";
+import { useSpeedSearch } from "../kit/use-speed-search.js";
 import { treeRows, type VisRow } from "./tree-model.js";
 import { TreeRowView } from "./TreeRows.js";
-import { useTreeKeys } from "./use-tree-keys.js";
+import { treeArrowKey, useTreeKeys } from "./use-tree-keys.js";
 import "./tree.css";
 
 const POLL_MS = 5000;
@@ -18,10 +24,9 @@ type Patch = Record<string, unknown>;
 export function ProjectsRail() {
 	const navigate = useNavigate();
 	const [projects, setProjects] = useState<ProjectSummary[]>([]);
-	const [query, setQuery] = useState("");
+	const [loaded, setLoaded] = useState(false);
 	const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 	const [active, setActive] = useState<string | null>(null);
-	const [cursor, setCursor] = useState(0);
 	const searchRef = useRef<HTMLInputElement>(null);
 	const lastJson = useRef("");
 
@@ -31,7 +36,9 @@ export function ProjectsRail() {
 			try {
 				const list = (await getProjects()) as ProjectSummary[];
 				const json = JSON.stringify(list);
-				if (!alive || json === lastJson.current) return;
+				if (!alive) return;
+				setLoaded(true);
+				if (json === lastJson.current) return;
 				lastJson.current = json;
 				setProjects(list);
 			} catch {
@@ -46,7 +53,8 @@ export function ProjectsRail() {
 		};
 	}, []);
 
-	const rows = treeRows(projects, query.toLowerCase(), expanded);
+	const search = useSpeedSearch();
+	const rows = treeRows(projects, search.query.toLowerCase(), expanded);
 	const toggle = (name: string) => setExpanded((e) => ({ ...e, [name]: e[name] !== true }));
 	const open = (row: VisRow) => {
 		if (row.kind === "project" || row.label === "Config") {
@@ -63,7 +71,16 @@ export function ProjectsRail() {
 			search: (prev: Patch) => ({ ...prev, project: row.parent }),
 		});
 	};
-	useTreeKeys(searchRef, rows, cursor, setCursor, open);
+	const nav = useListNav(rows.length, (i) => {
+		const row = rows[i];
+		if (row !== undefined) open(row);
+	});
+	useTreeKeys(searchRef, nav, search);
+	const onKeyDown = (e: React.KeyboardEvent) => {
+		if (treeArrowKey(rows, nav, toggle, e)) return;
+		composeKeys(nav, search)(e);
+	};
+	const shownProjects = rows.filter((r) => r.kind === "project").length;
 
 	return (
 		<aside id="side">
@@ -76,23 +93,31 @@ export function ProjectsRail() {
 				ref={searchRef}
 				placeholder="Search (/)  project, path, kind"
 				spellCheck={false}
-				value={query}
-				onChange={(e) => setQuery(e.target.value)}
+				value={search.query}
+				onChange={(e) => search.setQuery(e.target.value)}
+				onKeyDown={faceKeys(search, nav)}
 			/>
-			<div id="tree">
+			{/* biome-ignore lint/a11y/noNoninteractiveTabindex: the tree is the keyboard surface */}
+			<div id="tree" className="knav" role="tree" aria-label="Projects" tabIndex={0} ref={nav.ref} onKeyDown={onKeyDown}>
+				<SpeedFlag q={search.query} shown={shownProjects} total={projects.length} />
 				{rows.length > 0 ? (
 					rows.map((row, i) => (
 						<TreeRowView
 							key={row.kind === "project" ? row.p.name : `${row.parent}:${row.label}`}
 							row={row}
 							at={i}
-							cursor={cursor}
+							cursor={nav.cursor}
 							active={active}
+							q={search.query}
 							act={{ open, toggle }}
 						/>
 					))
-				) : query !== "" ? (
-					<div className="empty small">No project matches “{query}”</div>
+				) : !loaded ? (
+					<div className="empty small">Scanning projects…</div>
+				) : search.query !== "" ? (
+					<div className="empty small">
+						<NoMatch q={search.query} what="project" clear={search.clear} />
+					</div>
 				) : (
 					<div className="empty small">
 						No projects indexed.

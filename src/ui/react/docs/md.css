@@ -89,6 +89,34 @@ table.fm td.fm-v {
 	max-width: 90ch; /* design-exempt: prose measure */
 }
 
+/* Heading anchors (md-enhance.ts): present on hover or keyboard focus,
+   absent from the measure otherwise — a reader sees prose, a linker finds
+   the handle. */
+.md .h-anchor {
+	margin-left: var(--ij-space-1); color: var(--ij-link);
+	text-decoration: none; opacity: 0;
+}
+.md h1:hover .h-anchor, .md h2:hover .h-anchor, .md h3:hover .h-anchor,
+.md h4:hover .h-anchor, .md .h-anchor:focus-visible { opacity: 1; }
+.md .h-anchor:focus-visible { outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring); }
+/* Where an anchor landed: nothing here holds the keyboard, so it is the
+   inactive selection — the stage-jump marker's reasoning. */
+.md :target { background: var(--ij-selection-inactive); }
+
+/* The copy affordance rides ON the block (absolute), so its appearance
+   cannot reflow the code it copies. */
+.md pre.code { position: relative; }
+.code-copy {
+	position: absolute; top: var(--ij-space-1); right: var(--ij-space-1);
+	padding: 0 var(--ij-space-2); height: calc(var(--ij-row-h) - var(--ij-space-1));
+	font: var(--ij-fs-2) var(--font-code); color: var(--dim);
+	background: var(--panel); border: 1px solid var(--ij-border-control);
+	border-radius: var(--ij-radius-sm); cursor: pointer; opacity: 0;
+}
+.md pre.code:hover .code-copy, .code-copy:focus-visible { opacity: 1; }
+.code-copy:hover { background: var(--hover); color: var(--text); }
+.code-copy:focus-visible { outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring); }
+
 /* A drawn flowchart scrolls sideways inside its own box rather than widening
    the document; the SVG keeps its intrinsic size so text stays sharp. */
 .mmd {

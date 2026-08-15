@@ -6,7 +6,8 @@
  * security invariant, and a second implementation would be a second place to
  * get it wrong.
  */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useMdEnhance } from "./md-enhance.js";
 import { MD_LABEL, MD_MODES, type MdMode, mdMode, setMdMode } from "./md-mode.js";
 import "./md.css";
 import "./docs.css";
@@ -50,6 +51,9 @@ export function MdSurface({ id, title, path, html, text, head, actions }: MdSurf
 	});
 
 	const shown: MdMode = hasRaw ? mode : "preview";
+	// Heading anchors + code-copy buttons, re-wired when the island changes.
+	const bodyRef = useRef<HTMLDivElement>(null);
+	useMdEnhance(bodyRef, [html, shown]);
 	const raw = <pre className="raw code">{text}</pre>;
 	// eslint-disable-next-line react/no-danger -- server-rendered, escaped there
 	const md = <div className="md" dangerouslySetInnerHTML={{ __html: html }} />;
@@ -83,12 +87,14 @@ export function MdSurface({ id, title, path, html, text, head, actions }: MdSurf
 			{shown === "raw" ? (
 				<div className="ed-body">{raw}</div>
 			) : shown === "split" ? (
-				<div className="ed-body split">
+				<div className="ed-body split" ref={bodyRef}>
 					{raw}
 					{md}
 				</div>
 			) : (
-				<div className="ed-body">{md}</div>
+				<div className="ed-body" ref={bodyRef}>
+					{md}
+				</div>
 			)}
 		</>
 	);

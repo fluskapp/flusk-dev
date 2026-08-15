@@ -1,11 +1,17 @@
 /* The run transcript: IntelliJ's Run/Debug console, ported 1:1 from
    styles-transcript.ts. A header strip under one hairline, console lines on
    the editor background, tool calls as collapsible tree nodes. */
+/* The mini-header: status, branch and model stay put while the log scrolls —
+   WebStorm keeps the console's header strip, not the tab's title. The
+   negative-offset shadow paints the view padding above the stuck strip, so
+   no line peeks through that gap. */
 #meta {
 	display: flex; flex-wrap: wrap; align-items: center;
 	gap: var(--ij-space-1) var(--ij-space-3); min-height: var(--ij-tw-header-h);
 	padding: 0 0 var(--ij-space-2); border-bottom: 1px solid var(--border);
 	font-size: var(--ij-fs-4);
+	position: sticky; top: 0; z-index: 2; background: var(--bg);
+	box-shadow: 0 calc(-1 * var(--ij-space-2)) 0 var(--bg);
 }
 #meta .meta-item { display: inline-flex; align-items: center; gap: var(--ij-space); }
 
@@ -39,6 +45,9 @@
 .msg.user .msg-tag { color: var(--tag-user); padding-top: var(--ij-space); }
 .msg-body { min-width: 0; flex: 1; }
 .pre { white-space: pre-wrap; overflow-wrap: break-word; }
+/* Prose gets the reading measure; tool nodes and code keep the console's
+   full width — the same split styles-md.ts makes for documents. */
+.msg.assistant .msg-body > .pre { max-width: 90ch; /* design-exempt: prose measure */ }
 /* Table.stripeColor and a two-pixel rule: the console's way of banding a run
    of lines. No card: no border, no radius, no shadow. */
 .msg.user .msg-body {
@@ -71,6 +80,18 @@
 	white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .tool-flag { margin-left: auto; color: var(--err); font-size: var(--ij-fs-3); font-weight: 600; }
+/* The trailing badge when nothing failed: how much output came back. Dim —
+   it is a measurement, not a status. */
+.tool-len { margin-left: auto; color: var(--dim); font: var(--ij-fs-2) var(--font-code); }
+/* Reasoning: the same tree-node row, but dim throughout — deliberation, not
+   log — and never a code plate when expanded. */
+.tool.think > summary .tool-chip { color: var(--dim); font-weight: 400; }
+.tool.think > summary .tool-preview { font-style: italic; }
+.think-body {
+	padding: var(--ij-space) var(--ij-space-3); color: var(--dim);
+	font-size: var(--ij-fs-4); border-top: 1px solid var(--border);
+	max-height: calc(var(--ij-row-h) * 14); overflow: auto;
+}
 .code {
 	margin: 0; padding: var(--ij-space) var(--ij-space-3); background: var(--code-bg);
 	border-top: 1px solid var(--border); overflow-x: auto;

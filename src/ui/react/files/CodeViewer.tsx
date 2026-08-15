@@ -48,6 +48,11 @@ export function CodeViewer({ source, outline, line, sym }: Props) {
 		if (mark !== null) {
 			mark.style.top = `${gl.offsetTop}px`;
 			mark.hidden = false;
+			// Restart the landing flash: same node, new jump. Without the reflow
+			// between the two writes the animation never re-fires.
+			mark.style.animation = "none";
+			void mark.offsetHeight;
+			mark.style.animation = "";
 		}
 		gl.scrollIntoView({ block: "center" });
 	}, []);

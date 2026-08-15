@@ -2,8 +2,14 @@
  * The numbered tool-window keybindings, exactly the legacy digit gate:
  * 1-6, 8, 9, 0 and 7 for Flows — plain digit and ⌘digit — plus the letter
  * mnemonics. Digits never fire while typing in an input.
+ *
+ * Escape unwinds ONE layer per press, the client-keys.ts order: overlays
+ * first (the palette swallows its own Escape in the capture phase before this
+ * listener runs), then the find strip, then the doc window, then whatever
+ * still holds focus is blurred — back to the editor. An Escape inside a field
+ * that did not handle it itself just leaves the field.
  */
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect } from "react";
 
 const ROUTE_OF: Record<string, string> = {
@@ -16,10 +22,22 @@ const TOGGLE_OF: Record<string, "side" | "find" | "chat" | "doc"> = {
 
 export function WorkbenchKeys() {
 	const navigate = useNavigate();
+	const search = useSearch({ strict: false }) as Record<string, unknown>;
 	useEffect(() => {
 		const onKey = (e: KeyboardEvent) => {
 			const t = e.target as HTMLElement | null;
-			if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+			const typing = t !== null && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable);
+			if (e.key === "Escape" && !e.altKey && !e.ctrlKey && !e.metaKey) {
+				if (typing) { t.blur(); return; }
+				const layer = search.find === true ? "find" : search.doc === true ? "doc" : null;
+				if (layer !== null) {
+					navigate({ to: ".", search: (prev: Record<string, unknown>) => ({ ...prev, [layer]: false }) });
+				} else if (document.activeElement instanceof HTMLElement) {
+					document.activeElement.blur();
+				}
+				return;
+			}
+			if (typing) return;
 			if (e.altKey || (e.ctrlKey && !e.metaKey)) return;
 			const key = e.key;
 			const route = ROUTE_OF[key];
@@ -45,6 +63,6 @@ export function WorkbenchKeys() {
 		};
 		window.addEventListener("keydown", onKey);
 		return () => window.removeEventListener("keydown", onKey);
-	}, [navigate]);
+	}, [navigate, search]);
 	return null;
 }

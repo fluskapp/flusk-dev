@@ -14,6 +14,7 @@ import {
 } from "../features/docs/docs.functions.js";
 import { DocView } from "../ui/react/docs/DocView.js";
 import { decodeRef } from "../ui/react/runs/format.js";
+import { SkelText } from "../ui/react/runs/skeleton.js";
 
 interface DocLoad {
 	path: string;
@@ -50,9 +51,12 @@ function Page() {
 		<div id="docview" className="view">
 			<Suspense
 				fallback={
-					<div className="head-row">
-						<h2>{meta.title}</h2>
-					</div>
+					<>
+						<div className="head-row">
+							<h2>{meta.title}</h2>
+						</div>
+						<SkelText rows={8} />
+					</>
 				}
 			>
 				<Await promise={load.body}>

@@ -3,6 +3,10 @@
  * to the window, not its position — it is the key WorkbenchKeys binds, so a
  * window that leaves the toolbar takes its number with it. 7 belongs to
  * Flows; 0 is the tenth slot, IntelliJ-style.
+ *
+ * The active window's button is PRESSED (.on): route buttons via the router's
+ * own active match, toggle buttons from the root search params — the state
+ * sync client-tabs.ts kept and the first React port lost.
  */
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 
@@ -28,9 +32,11 @@ export const PANELS: PanelButton[] = [
 	{ id: "ask-btn", n: "0", label: "Ask AI", title: "Ask AI about what is on screen (0 / ⌘0 / a)", to: "/ask" },
 ];
 
-export function Toolbar({ projects, live }: { projects?: number; live?: number }) {
+export function Toolbar() {
 	const search = useSearch({ strict: false });
 	const navigate = useNavigate();
+	const open = (key: "side" | "chat" | "find" | "doc"): boolean =>
+		Boolean((search as Record<string, unknown>)[key] ?? (key === "side" || key === "chat"));
 	const toggle = (key: "side" | "chat" | "find" | "doc") =>
 		navigate({
 			to: ".",
@@ -39,27 +45,48 @@ export function Toolbar({ projects, live }: { projects?: number; live?: number }
 	return (
 		<header id="toolbar">
 			<div className="logo">flusk</div>
-			<Link id="overview-btn" to="/" search={search} title="What needs me (o)">
+			<Link
+				id="overview-btn"
+				to="/"
+				search={search}
+				title="What needs me (o)"
+				activeProps={{ className: "on" }}
+				activeOptions={{ exact: true }}
+			>
 				Attention
 			</Link>
 			{PANELS.map((p) =>
 				p.to !== undefined ? (
-					<Link key={p.id} id={p.id} to={p.to} search={search} title={p.title}>
+					<Link key={p.id} id={p.id} to={p.to} search={search} title={p.title} activeProps={{ className: "on" }}>
 						<span className="n">{p.n}</span>
 						{p.label}
 					</Link>
 				) : (
-					<button key={p.id} id={p.id} type="button" title={p.title} onClick={() => p.toggles && toggle(p.toggles)}>
+					<button
+						key={p.id}
+						id={p.id}
+						type="button"
+						title={p.title}
+						className={p.toggles !== undefined && open(p.toggles) ? "on" : undefined}
+						aria-pressed={p.toggles !== undefined && open(p.toggles)}
+						onClick={() => p.toggles && toggle(p.toggles)}
+					>
 						<span className="n">{p.n}</span>
 						{p.label}
 					</button>
 				),
 			)}
 			<div className="spacer" />
-			<span id="count" className="dim small">
-				{projects !== undefined ? `${projects} projects${live ? ` · ${live} live` : ""}` : ""}
-			</span>
-			<button id="help-btn" type="button" title="Shortcuts (?)">?</button>
+			<button
+				id="help-btn"
+				type="button"
+				title="Shortcuts (?)"
+				// The palette owns the help sheet and listens on document in the
+				// capture phase; the button speaks the same key it advertises.
+				onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }))}
+			>
+				?
+			</button>
 			<button
 				id="theme"
 				type="button"

@@ -9,10 +9,15 @@ import { getSetupStatus, type SetupStatus } from "../features/setup/setup.functi
 
 export const Route = createFileRoute("/")({
 	ssr: true,
-	loader: async (): Promise<{ overview: Overview; setup: SetupStatus }> => ({
-		overview: (await getOverview()) as Overview,
-		setup: (await getSetupStatus()) as SetupStatus,
-	}),
+	loader: async (): Promise<{ overview: Overview; setup: SetupStatus }> => {
+		// Independent reads — the session scan and the doctor cache share no
+		// state, so paying them serially was pure waterfall.
+		const [overview, setup] = await Promise.all([
+			getOverview() as Promise<Overview>,
+			getSetupStatus() as Promise<SetupStatus>,
+		]);
+		return { overview, setup };
+	},
 	component: OverviewPage,
 });
 

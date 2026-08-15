@@ -19,6 +19,7 @@ import {
 	type SourceReply,
 } from "../features/projects/files.functions.js";
 import { FileView } from "../ui/react/files/FileView.js";
+import { SkelCode } from "../ui/react/runs/skeleton.js";
 
 const Search = Type.Object({
 	line: Type.Optional(Type.Number()),
@@ -56,7 +57,7 @@ function Page() {
 	const search = Route.useSearch() as { line?: number; sym?: string };
 	return (
 		<div id="file" className="view">
-			<Suspense fallback={<div className="empty small">opening …</div>}>
+			<Suspense fallback={<SkelCode />}>
 				<Await promise={data.source}>
 					{(src: SourceReply) => (
 						<FileView
