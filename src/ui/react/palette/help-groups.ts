@@ -1,9 +1,9 @@
 /**
  * The shortcut sheet's CONTENT: every gesture the client binds, grouped the
- * way the workbench is — an exact port of client-help-groups.ts. A shortcut
- * that is not in this file is a shortcut nobody can find. The palette's own
- * rows are appended into the "Search" group below, the same rows the legacy
- * palette moved there at boot.
+ * way the workbench is — the numbers follow docs/experience.md's toolbar. A
+ * shortcut that is not in this file is a shortcut nobody can find. The
+ * palette's own rows are appended into the "Search" group below, the same
+ * rows the legacy palette moved there at boot.
  */
 export type HelpRow = [string, string];
 export type HelpGroup = { id: string; title: string; rows: HelpRow[] };
@@ -35,21 +35,37 @@ export const HELP_GROUPS: HelpGroup[] = [
 		title: "Tool windows",
 		rows: [
 			["1", "Projects (⌘1)"],
-			["2", "Runs (⌘2)"],
-			["3", "Docs (⌘3)"],
+			["2", "Specs (⌘2)"],
+			["3", "Runs (⌘3)"],
 			["4", "Find in Files (⌘4)"],
 			["5", "Chat (⌘5)"],
-			["6", "Documentation (⌘6)"],
-			["8", "Graph — what am I about to break (⌘8)"],
-			["9", "Web — read a URL (⌘9)"],
-			["0", "Ask AI — the tenth window (⌘0)"],
+			["6", "Docs (⌘6)"],
+			["7", "Graph (⌘7)"],
+			["8", "Web (⌘8)"],
+			["9", "Documentation (⌘9)"],
 			["o", "Attention"],
 			["r", "Runs"],
 			["d", "Docs"],
 			["g", "Graph"],
 			["u", "Web"],
-			["a", "Ask AI"],
 			["c", "Focus chat"],
+		],
+	},
+	{
+		// The IA of docs/experience.md: one sentence per window, or the
+		// window dies. Flows lives inside Runs now; Ask lives inside Chat.
+		id: "help-when",
+		title: "When to use what",
+		rows: [
+			["Projects", "What you have."],
+			["Specs", "What you intend — the driving surface of spec-driven work."],
+			["Runs", "What happened: sessions, harness journals and flow runs, one table."],
+			["Find", "Find text in your files."],
+			["Chat", "Talk — with your code, with a spec, with a run."],
+			["Docs", "Read your own indexed markdown."],
+			["Graph", "What am I about to break."],
+			["Web", "Read an external URL beside the code."],
+			["Documentation", "Symbol docs for the code on screen (LSP)."],
 		],
 	},
 	{
@@ -77,9 +93,9 @@ export const HELP_GROUPS: HelpGroup[] = [
 		rows: [
 			// Checked against browser defaults: ⌘B/Ctrl+B is unbound in Chrome and
 			// Safari; ⌥F7 is bound by no browser; DevTools is bare F12 or ⌘⌥I.
-			// 6 leads and F1 follows: macOS maps F1 to brightness-down unless the
+			// 9 leads and F1 follows: macOS maps F1 to brightness-down unless the
 			// "standard function keys" setting is on.
-			["6 / ⌘6", "Documentation tool window — look up, or show"],
+			["9 / ⌘9", "Documentation tool window — look up, or show"],
 			["F1", "The same, where the keyboard sends F1 at all"],
 			["⌘B", "Go to the definition of the selected symbol"],
 			["⌥F7", "Find usages — hands the symbol to Find in Files"],
@@ -90,18 +106,10 @@ export const HELP_GROUPS: HelpGroup[] = [
 		id: "help-web",
 		title: "Web",
 		rows: [
-			["9 / ⌘9", "Web tool window — fetch and read a URL"],
+			["8 / ⌘8", "Web tool window — fetch and read a URL"],
 			["u", "The same, without the modifier"],
 			["⏎", "Web: fetch the URL in the address box"],
 			["Refresh", "Web: fetch again instead of using the cached copy"],
-		],
-	},
-	{
-		id: "help-ask",
-		title: "Ask AI",
-		rows: [
-			["0 / a", "Ask AI about the file and symbol on screen"],
-			["⌘⏎", "Ask: send the question (a bare ⏎ is a newline)"],
 		],
 	},
 	{
@@ -109,7 +117,7 @@ export const HELP_GROUPS: HelpGroup[] = [
 		title: "Graph",
 		rows: [
 			["click", "Any identifier in a source file aims Graph and Documentation at it"],
-			["8 / ⌘8 / g", "Graph — blast radius, co-change, provenance"],
+			["7 / ⌘7 / g", "Graph — blast radius, co-change, provenance"],
 		],
 	},
 	{

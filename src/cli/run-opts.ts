@@ -16,6 +16,9 @@ export interface RunCmdOpts {
 	/** "provider/id" override; skips the router. */
 	model?: string;
 	kind?: TaskKind;
+	/** Run the named spec: `.flusk/specs/<name>.md` becomes the task, its mode
+	 * the kind (unless `kind` is set), and the run records which spec it served. */
+	spec?: string;
 	maxCostUsd?: number;
 	deadlineMs?: number;
 	maxTurns?: number;

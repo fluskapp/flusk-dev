@@ -1,16 +1,13 @@
-/**
- * The runs feature's typed server functions: the unified run feed, one
- * session's transcript, one journal's meta and rendered body, and "reveal in
- * Finder". Bodies delegate to the same modules the legacy HTTP handlers used
- * (run-feed.ts, detail.ts, journal-scan, sessions.router's validation rules),
- * so the two surfaces cannot drift while both exist.
- */
+/** The runs feature's typed server functions: the unified run feed, one
+ * session's transcript and summary, one journal's meta and rendered body, and
+ * "reveal in Finder". Bodies delegate to the modules the legacy HTTP handlers
+ * used, so the two surfaces cannot drift while both exist. */
 import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { join, resolve } from "node:path";
+import { resolveSessionPath } from "../../cli/resume-cmd.js";
 import { loadConfig } from "../../platform/config/config.js";
+import { summarizeSession, type RunSummary } from "../run/summary.js";
 import { createRenderer } from "./native.repository.js";
-
-const renderer = createRenderer();
 import { scanArtifacts } from "./artifact-scan.repository.js";
 import { loadSessionDetail, type SessionDetail } from "./detail.js";
 import { readTextSync } from "./file-read.repository.js";
@@ -23,13 +20,11 @@ import { scanSessions, sessionsRoot, type SessionSummary } from "./scan.reposito
 export type { RunRow } from "./projects.types.js";
 export type { Journal, JournalStage } from "./journal-scan.repository.js";
 export type { SessionSummary } from "./scan.repository.js";
+export type { RunSummary } from "../run/summary.js";
 
-/**
- * The wire shape of a transcript. detail.ts types tool args as `unknown`,
- * which the server-function serializer rightly refuses to promise about —
- * but a session file holds JSON by construction, so the narrowing is a
- * statement of fact, not a coercion.
- */
+/** The wire shape of a transcript. detail.ts types tool args as `unknown`; a
+ * session file holds JSON by construction, so the narrowing is a statement of
+ * fact, not a coercion. */
 export type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
 export type ToolView = Omit<import("./detail.js").ToolView, "args"> & { args: Json };
 export type TranscriptItem =
@@ -45,6 +40,7 @@ export type TranscriptItem =
 	| { kind: "compaction"; summary: string };
 
 const cfg = createServerOnlyFn(() => loadConfig(process.cwd()));
+const renderer = createRenderer();
 
 /** Same shape rule as sessions.router.ts: the key IS the path, so it is closed. */
 const KEY_RE = /^[a-z0-9-]+\/[A-Za-z0-9._-]+\.jsonl$/;
@@ -57,11 +53,9 @@ const keyToPath = createServerOnlyFn((key: string): string | null => {
 	return path.startsWith(`${root}/`) ? path : null;
 });
 
-/**
- * Identity against the scanner's index, not a prefix test — the exact
- * membership rule content.router.ts documents: a symlink under docs/runs that
- * resolves elsewhere still *starts with* the root, so prefix admits it.
- */
+/** Identity against the scanner's index, not a prefix test (the membership
+ * rule content.router.ts documents): a symlink under docs/runs that resolves
+ * elsewhere still *starts with* the root, so prefix admits it. */
 const indexedJournal = createServerOnlyFn((target: string): Journal | null => {
 	if (target === "") return null;
 	const path = resolve(expandHome(target));
@@ -81,12 +75,10 @@ export interface RunHead {
 
 export const getRunHead = createServerFn()
 	.inputValidator((data: { key: string }) => data)
-	.handler(async ({ data }): Promise<RunHead> => {
-		return {
-			summary: scanSessions().find((s) => s.key === data.key) ?? null,
-			path: keyToPath(data.key),
-		};
-	});
+	.handler(async ({ data }): Promise<RunHead> => ({
+		summary: scanSessions().find((s) => s.key === data.key) ?? null,
+		path: keyToPath(data.key),
+	}));
 
 export type SessionRun = Omit<SessionDetail, "items"> & { items: TranscriptItem[]; path: string };
 
@@ -99,6 +91,19 @@ export const getSessionRun = createServerFn()
 		return { ...loadSessionDetail(path), path } as SessionRun;
 	});
 
+/** The Summary block's facts — session entries + gate rows, every field
+ * harness-observed (summary.ts). Keys resolve under the sessions root, other
+ * refs through explain's resolver; null when no session is behind the ref. */
+export const getRunSummary = createServerFn()
+	.inputValidator((data: { ref: string }) => data)
+	.handler(async ({ data }): Promise<RunSummary | null> => {
+		try {
+			return await summarizeSession(keyToPath(data.ref) ?? resolveSessionPath(data.ref));
+		} catch {
+			return null;
+		}
+	});
+
 /** One journal's frontmatter — title, status, stages, PR — never the body. */
 export const getJournalMeta = createServerFn()
 	.inputValidator((data: { path: string }) => data)
@@ -109,11 +114,9 @@ export interface JournalBody {
 	html: string;
 }
 
-/**
- * The journal body, rendered on the server: escaping is the renderer's
- * security invariant and a second client-side implementation would be a
- * second place to get it wrong.
- */
+/** The journal body, rendered on the server: escaping is the renderer's
+ * security invariant; a second client-side implementation would be a second
+ * place to get it wrong. */
 export const getJournalBody = createServerFn()
 	.inputValidator((data: { path: string }) => data)
 	.handler(async ({ data }): Promise<JournalBody> => {
@@ -123,11 +126,9 @@ export const getJournalBody = createServerFn()
 		return { text, html: await renderer.markdown(text) };
 	});
 
-/**
- * Reveal spawns `open -R`, so the set of acceptable paths is CLOSED: a
+/** Reveal spawns `open -R`, so the set of acceptable paths is CLOSED: a
  * session key resolves under the sessions root, anything else must be a path
- * one of the scanners already indexed. Same rule as sessions.router.ts.
- */
+ * one of the scanners already indexed. Same rule as sessions.router.ts. */
 export const revealRef = createServerFn({ method: "POST" })
 	.inputValidator((data: { key?: string; path?: string }) => data)
 	.handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {

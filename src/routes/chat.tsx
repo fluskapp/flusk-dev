@@ -19,8 +19,10 @@ function Page() {
 		<div id="chatview" className="view">
 			<h2>Chat</h2>
 			<p className="dim">
-				The conversation lives in the Chat tool window (5), on the right rail. These are the
-				backends it can stream from — unavailable ones stay listed with their reason.
+				The conversation lives in the Chat tool window (5), on the right rail — talk with your
+				code, with a spec, with a run; context rides as visible attachments above the composer
+				(the old Ask, folded in). These are the backends it can stream from — unavailable ones
+				stay listed with their reason.
 			</p>
 			<table className="tbl">
 				<tbody>

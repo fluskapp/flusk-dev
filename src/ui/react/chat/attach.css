@@ -1,0 +1,92 @@
+/* The attachments strip and the merged-Ask additions to the chat rail: the
+   context card idiom from ask.css, fitted to a dock column. A switched-off
+   block stays visible and goes dim rather than disappearing. Every colour is
+   a token; every box metric rides --ij-row-h so no raw px is needed. */
+#chat-attach {
+	flex: none; max-height: 45%; overflow-y: auto;
+	border-top: 1px solid var(--border); background: var(--panel);
+}
+.att-head {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	padding: var(--ij-space) var(--ij-space-3);
+	font-size: var(--ij-fs-3); font-weight: 600; text-transform: uppercase;
+	letter-spacing: .5px; color: var(--dim);
+}
+.att-where {
+	font: var(--ij-fs-3) var(--font-code); color: var(--accent);
+	text-transform: none; letter-spacing: 0;
+	overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 46%;
+}
+.att-count { font-size: var(--ij-fs-2); color: var(--dim); text-transform: none; letter-spacing: 0; }
+
+.att-blk { border-top: 1px solid var(--border); }
+.att-blk-h {
+	display: flex; align-items: center; gap: var(--ij-space-2); min-height: var(--ij-row-h);
+	padding: 0 var(--ij-space-3); cursor: pointer;
+	font: var(--ij-fs-3) var(--font-code); color: var(--text);
+}
+.att-blk-h:hover { background: var(--hover); }
+/* The agent's own prompt: shown and counted like a block, but genuinely not
+   switchable, so it carries no checkbox and no pointer promising one. */
+.att-blk-fixed .att-blk-h { cursor: default; color: var(--accent); }
+.att-blk-fixed .att-blk-h:hover { background: transparent; }
+/* Off, not gone: "what did I exclude" must be answerable without a re-render. */
+.att-blk.off .att-blk-h { color: var(--dim); }
+.att-blk.off .att-blk-b { opacity: .45; }
+.att-blk-b {
+	margin: 0; padding: var(--ij-space) var(--ij-space-3);
+	max-height: calc(var(--ij-row-h) * 6); overflow: auto;
+	background: var(--code-bg); border-top: 1px solid var(--border);
+	font: var(--ij-fs-2)/1.5 var(--font-code); white-space: pre; color: var(--text);
+}
+.att-note {
+	padding: var(--ij-space) var(--ij-space-3);
+	font-size: var(--ij-fs-3); color: var(--dim); border-top: 1px solid var(--border);
+}
+
+/* The three sources, one row. Controls take the composer's control frame. */
+.att-add {
+	display: flex; gap: var(--ij-space-2);
+	padding: var(--ij-space-2) var(--ij-space-3); border-top: 1px solid var(--border);
+}
+.att-add button, .att-add select, .att-add input {
+	height: var(--ij-row-h); font-size: var(--ij-fs-3);
+	color: var(--text); background: var(--bg);
+	border: 1px solid var(--ij-border-control); border-radius: var(--ij-radius-sm);
+	padding: 0 var(--ij-space-2);
+}
+.att-add button { flex: none; }
+.att-add select, .att-add input { flex: 1; min-width: 0; }
+.att-add button:hover, .att-add select:hover { background: var(--hover); }
+.att-add input::placeholder { color: var(--ij-text-disabled); }
+.att-add button:focus-visible, .att-add select:focus, .att-add input:focus {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	border-color: var(--ij-focus-ring);
+}
+
+/* Long turns fold to their head (docs/experience.md: "Shorten a long
+   message"). The cap is rows, not px, so it breathes with the theme. */
+.turn .folded { max-height: calc(var(--ij-row-h) * 16); overflow: hidden; }
+.turn-fold {
+	display: block; padding: 0; margin-top: var(--ij-space);
+	font-size: var(--ij-fs-3); color: var(--accent);
+	background: none; border: none; cursor: pointer;
+}
+.turn-fold:hover { text-decoration: underline; }
+
+/* The user turn grew a column: the tinted block, its fold toggle, and the
+   receipt of the exact composed text the model received. */
+.turn.user .said-wrap {
+	max-width: 85%; min-width: 0;
+	display: flex; flex-direction: column; align-items: flex-end;
+}
+.turn.user .said-wrap .said { max-width: 100%; }
+.turn-sent { margin-top: var(--ij-space); max-width: 100%; }
+.turn-sent summary { cursor: pointer; font-size: var(--ij-fs-2); color: var(--dim); }
+.turn-sent pre {
+	margin: var(--ij-space) 0 0; padding: var(--ij-space) var(--ij-space-2);
+	max-height: calc(var(--ij-row-h) * 10); overflow: auto;
+	background: var(--code-bg); border: 1px solid var(--border);
+	font: var(--ij-fs-2)/1.5 var(--font-code); white-space: pre-wrap;
+	color: var(--text); text-align: left;
+}

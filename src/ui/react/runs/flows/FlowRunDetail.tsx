@@ -1,11 +1,15 @@
 /**
  * One flow run: its header, the pipeline, and each step with its output and
- * the SOURCES its prompt was composed from. Ported from client-flow.ts
- * (loadFlowRun, flowStepHtml).
+ * the SOURCES its prompt was composed from. Moved from ui/react/flows when
+ * the Flows window folded into Runs; it now speaks the runs vocabulary
+ * (widgets, format, stages) instead of carrying its own.
  */
-import type { FlowRunRow, FlowRunStep } from "../../../features/flows/flows.functions.js";
-import { Pipeline } from "./Pipeline.js";
-import { fmtCost, Pill, Sec } from "./vocab.js";
+import type { FlowRunRow, FlowRunStep } from "../../../../features/flows/flows.functions.js";
+import { flowStages } from "../feed-row.js";
+import { fmtCost } from "../format.js";
+import { StagePipeline } from "../stages.js";
+import { Pill, Sec } from "../widgets.js";
+import "./flow-detail.css";
 
 function FlowStep({ s }: { s: FlowRunStep }) {
 	const sources = s.sources ?? [];
@@ -50,10 +54,10 @@ export function FlowRunDetail({ run, onBack }: { run: FlowRunRow; onBack: () => 
 					{run.flow} · {run.runId}
 				</span>
 				<span className="ev" data-flow-back="1" onClick={onBack}>
-					back to flows
+					back to runs
 				</span>
 			</div>
-			<Pipeline steps={run.steps} />
+			<StagePipeline rows={flowStages(run.steps)} />
 			<Sec title="Steps" count={run.steps.length}>
 				{run.steps.map((s, i) => (
 					<FlowStep key={`${s.nodeId}:${i}`} s={s} />

@@ -31,6 +31,14 @@ export function Decisions({ log }: { log: DecisionLog | null }) {
 								</Row>
 							);
 						}
+						if (d.kind === "spec") {
+							return (
+								<Row key={`${at}-${i}`} name="spec">
+									<code>{d.name}</code> <span className="dim">({d.mode})</span>{" "}
+									<span className="dim">— {d.path}</span>
+								</Row>
+							);
+						}
 						if (d.kind === "isolation") {
 							return (
 								<Row key={`${at}-${i}`} name="isolation">

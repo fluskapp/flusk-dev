@@ -18,6 +18,8 @@ export const CLI_OPTIONS = {
 	"no-extensions": { type: "boolean" }, // src/ext/types.ts's escape hatch
 	list: { type: "boolean" },
 	flow: { type: "string" },
+	spec: { type: "string" }, // flusk run --spec <name>: the spec is the task
+	template: { type: "string" }, // flusk spec new --template <feature|bugfix|refactor>
 	quiet: { type: "boolean" },
 	steer: { type: "string" },
 	n: { type: "string", short: "n" },

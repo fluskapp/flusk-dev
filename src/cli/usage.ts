@@ -13,6 +13,10 @@ export const USAGE = `Usage:
   flusk goal <text> [--repo <path>] [--dry] [--fake <script.json>] [--no-verify]
                     [--no-extensions] [--quiet]
   flusk goal --list [--repo <path>]
+  flusk spec new <name> [--template <feature|bugfix|refactor>] [--repo <path>]
+  flusk spec list [--repo <path>] [--json]
+  flusk run <task> --spec <name>   the spec becomes the task: its mode picks the
+                    kind (--kind still overrides), acceptance rides into the prompt
   flusk flow run <task> [--flow <name>] [--project <p>] [--max-cost <usd>] [--dry] [--json]
                     [--no-isolation] [--allow-dirty]
   flusk flow list [--json]

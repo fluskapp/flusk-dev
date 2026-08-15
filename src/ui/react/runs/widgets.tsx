@@ -33,34 +33,40 @@ export function ProjectCell({ name }: { name: string }) {
 	);
 }
 
-/** The feed's masthead: which slice of the feed this is, and the one
- * action that widens it again (client-runs.ts runFilterBar). */
-export function FilterBar({ project, sort }: { project?: string; sort?: string }) {
+/** The feed's masthead: which slice of the feed this is, the one action
+ * that widens it again (client-runs.ts runFilterBar), and — as children —
+ * the kind segment, kept at the row's far edge by .head-seg. */
+export function FilterBar({
+	project,
+	sort,
+	children,
+}: {
+	project?: string;
+	sort?: string;
+	children?: React.ReactNode;
+}) {
 	const open = useOpenSearch();
-	if (sort !== undefined) {
-		return (
-			<div className="head-row">
-				<h2>Runs by {sort.split(".")[0]}</h2>
-				<span className="ev" onClick={() => open({ sort: undefined })}>
-					show newest first
-				</span>
-			</div>
-		);
-	}
-	if (project === undefined) {
-		return (
-			<div className="head-row">
-				<h2>All runs</h2>
-				<span className="dim">every project · newest first</span>
-			</div>
-		);
-	}
+	const [title, action] =
+		sort !== undefined
+			? [
+					`Runs by ${sort.split(".")[0]}`,
+					<span className="ev" onClick={() => open({ sort: undefined })}>
+						show newest first
+					</span>,
+				]
+			: project === undefined
+				? ["All runs", <span className="dim">every project · newest first</span>]
+				: [
+						`${project} runs`,
+						<span className="ev" onClick={() => open({ project: undefined })}>
+							show all projects
+						</span>,
+					];
 	return (
 		<div className="head-row">
-			<h2>{project} runs</h2>
-			<span className="ev" onClick={() => open({ project: undefined })}>
-				show all projects
-			</span>
+			<h2>{title}</h2>
+			{action}
+			{children}
 		</div>
 	);
 }

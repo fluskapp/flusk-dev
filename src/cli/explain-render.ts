@@ -17,6 +17,9 @@ function line(d: Decision): string[] {
 	if (d.kind === "model") {
 		return [`model      ${d.ref} — ${MODEL_SOURCE[d.source] ?? d.source} [${d.taskKind}]`];
 	}
+	if (d.kind === "spec") {
+		return [`spec       ${d.name} (${d.mode}) — ${d.path}`];
+	}
 	if (d.kind === "isolation") {
 		return [
 			d.branch !== null

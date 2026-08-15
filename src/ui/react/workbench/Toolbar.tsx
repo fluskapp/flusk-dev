@@ -1,8 +1,10 @@
 /**
- * The toolbar: Attention plus the numbered tool windows. The number belongs
- * to the window, not its position — it is the key WorkbenchKeys binds, so a
- * window that leaves the toolbar takes its number with it. 7 belongs to
- * Flows; 0 is the tenth slot, IntelliJ-style.
+ * The toolbar: Attention plus the numbered tool windows, the IA of
+ * docs/experience.md — each title is the window's one sentence. The number
+ * belongs to the window, not its position — it is the key WorkbenchKeys
+ * binds, so a window that leaves the toolbar takes its number with it.
+ * Flows and Ask left as windows (Runs and Chat absorbed them); 0 is the
+ * tenth slot, IntelliJ-style, unbound until a window earns it.
  *
  * The active window's button is PRESSED (.on): route buttons via the router's
  * own active match, toggle buttons from the root search params — the state
@@ -20,16 +22,15 @@ export interface PanelButton {
 }
 
 export const PANELS: PanelButton[] = [
-	{ id: "side-btn", n: "1", label: "Projects", title: "Project tool window (1 / ⌘1)", toggles: "side" },
-	{ id: "runs-btn", n: "2", label: "Runs", title: "Sessions and harness journals (2 / ⌘2)", to: "/runs" },
-	{ id: "docs-btn", n: "3", label: "Docs", title: "Indexed markdown (3 / ⌘3)", to: "/docs" },
-	{ id: "find-btn", n: "4", label: "Find", title: "Find in Files (4 / ⌘4 / ⌘⇧F)", toggles: "find" },
-	{ id: "chat-btn", n: "5", label: "Chat", title: "Chat tool window (5 / ⌘5 / c)", toggles: "chat" },
-	{ id: "doc-btn", n: "6", label: "Documentation", title: "Documentation tool window (6 / ⌘6)", toggles: "doc" },
-	{ id: "flows-btn", n: "7", label: "Flows", title: "Flow runs and their prompts (7 / ⌘7)", to: "/flows" },
-	{ id: "graph-btn", n: "8", label: "Graph", title: "What am I about to break (8 / ⌘8 / g)", to: "/graph" },
-	{ id: "web-btn", n: "9", label: "Web", title: "Read a URL beside the code (9 / ⌘9 / u)", to: "/web" },
-	{ id: "ask-btn", n: "0", label: "Ask AI", title: "Ask AI about what is on screen (0 / ⌘0 / a)", to: "/ask" },
+	{ id: "side-btn", n: "1", label: "Projects", title: "What you have (1 / ⌘1)", toggles: "side" },
+	{ id: "specs-btn", n: "2", label: "Specs", title: "What you intend — the driving surface of spec-driven work (2 / ⌘2)", to: "/specs" },
+	{ id: "runs-btn", n: "3", label: "Runs", title: "What happened: sessions, harness journals and flow runs, one table (3 / ⌘3)", to: "/runs" },
+	{ id: "find-btn", n: "4", label: "Find", title: "Find text in your files (4 / ⌘4 / ⌘⇧F)", toggles: "find" },
+	{ id: "chat-btn", n: "5", label: "Chat", title: "Talk — with your code, with a spec, with a run (5 / ⌘5 / c)", toggles: "chat" },
+	{ id: "docs-btn", n: "6", label: "Docs", title: "Read your own indexed markdown (6 / ⌘6 / d)", to: "/docs" },
+	{ id: "graph-btn", n: "7", label: "Graph", title: "What am I about to break (7 / ⌘7 / g)", to: "/graph" },
+	{ id: "web-btn", n: "8", label: "Web", title: "Read an external URL beside the code (8 / ⌘8 / u)", to: "/web" },
+	{ id: "doc-btn", n: "9", label: "Documentation", title: "Symbol docs for the code on screen (9 / ⌘9)", toggles: "doc" },
 ];
 
 export function Toolbar() {

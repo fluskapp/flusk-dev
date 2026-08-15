@@ -78,6 +78,14 @@ export type Decision =
 			kind: "isolation";
 			branch: string | null;
 			why: string;
+	  }
+	| {
+			/** `flusk run --spec <name>`: which authored intent this run served. */
+			kind: "spec";
+			name: string;
+			mode: string;
+			/** Repo-relative path of the spec file. */
+			path: string;
 	  };
 
 export type SessionEntry = HeaderEntry | MessageEntry | CompactionEntry | StatsEntry | DecisionEntry;

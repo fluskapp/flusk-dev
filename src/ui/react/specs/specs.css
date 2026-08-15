@@ -1,0 +1,49 @@
+/* The Specs window: the list reuses the runs table kit wholesale; this file
+   only adds what a spec needs a name for — the mode tag, the status stepper,
+   the body plate. Every value is a token. */
+#specs { padding: var(--ij-space-2) var(--ij-space-4) calc(var(--ij-space-4) * 2); }
+
+/* List.Tag in the mode's voice: a filled tag, the same plate as a tool chip —
+   an outline would read as a control, and a mode is a fact. */
+.spec-mode {
+	display: inline-flex; align-items: center; height: var(--ij-space-4);
+	font: var(--ij-fs-4) var(--ij-font-mono); color: var(--ij-text-secondary);
+	background: var(--ij-separator); border-radius: var(--ij-radius-sm);
+	padding: 0 var(--ij-space-2);
+}
+
+/* The stepper: five .act buttons walking the lifecycle. The current status
+   is a fact, not a control — pressed fill, inert cursor. */
+.spec-stepper {
+	display: flex; flex-wrap: wrap; gap: var(--ij-space);
+	margin: 0 0 var(--ij-space-3);
+}
+.spec-step.on, .spec-step.on:hover {
+	background: var(--sel); border-color: var(--accent); cursor: default;
+}
+
+/* The run and new-spec strips reuse the live kit's grammar; the selected
+   template is marked in the accent, not filled — Create keeps the fill. */
+.spec-run, .spec-new { margin: 0 0 var(--ij-space-3); }
+.spec-new .live-btn.on { color: var(--accent); border-color: var(--accent); }
+
+/* The repo picker: which configured project's .flusk/specs this window
+   reads — a control in the .act grammar, native select underneath. */
+.spec-repo {
+	height: var(--ij-control-h); padding: 0 var(--ij-space-2);
+	color: var(--text); background: var(--panel);
+	border: 1px solid var(--ij-border-control); border-radius: var(--ij-radius);
+	font: inherit;
+}
+
+/* The acceptance list: the gate's checklist, one quiet row per criterion. */
+.spec-accept { margin: 0; padding-left: var(--ij-space-4); }
+.spec-accept li { min-height: var(--row); font-size: var(--ij-fs-6); }
+
+/* The body verbatim — the author's half, preformatted on the inset plate. */
+.spec-body {
+	margin: 0; padding: var(--ij-space-3);
+	background: var(--ij-bg-inset); border: 1px solid var(--ij-separator);
+	font: var(--ij-fs-5)/var(--ij-lh-code) var(--font-code);
+	white-space: pre-wrap; overflow-wrap: anywhere;
+}

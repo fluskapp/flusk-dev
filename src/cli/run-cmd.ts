@@ -14,6 +14,7 @@ import { FakeProvider } from "../features/provider/fake.js";
 import { classifyTask } from "../features/provider/intent.js";
 import { hasAuth, PiAiProvider } from "../features/provider/pi-ai.js";
 import { createFluskPolicy } from "../features/safety/flusk-policy.js";
+import { markSpecStatus, resolveSpecRun } from "../features/specs/spec-run.js";
 import { ensureCleanTree, isGitRepo, startRunBranch, summarizeRun } from "../features/safety/git-isolation.repository.js";
 import { createFactStore } from "../features/facts/facts.repository.js";
 import { toolbelt } from "./ext-tools.js";
@@ -36,6 +37,9 @@ const belt = (o: RunCmdOpts, cfg: FluskConfig, events?: EventBus) =>
  * outcome ("blocked" = gate failure, exit 1). */
 export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 	const out = opts.out ?? process.stdout;
+	// --spec: the spec file IS the task; its mode routes unless --kind is given.
+	const specRun = opts.spec === undefined ? undefined : resolveSpecRun(opts.repo, opts.spec);
+	if (specRun !== undefined) opts = { ...opts, task: specRun.task };
 	const cfg = opts.trustedConfig?.cfg ?? loadConfig(opts.repo);
 	const repoConfig =
 		opts.trustedConfig !== undefined
@@ -47,7 +51,7 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 	if (opts.deadlineMs !== undefined) cfg.budgets.deadlineMinutes = opts.deadlineMs / 60_000;
 	if (opts.maxTurns !== undefined) cfg.budgets.maxTurns = opts.maxTurns;
 	const isFake = opts.fake !== undefined || opts.real !== true;
-	const kind: TaskKind = opts.kind ?? classifyTask(opts.task);
+	const kind: TaskKind = opts.kind ?? specRun?.kind ?? classifyTask(opts.task);
 	const picked = isFake ? undefined : await pickModelWhy(cfg, kind, opts.model);
 	const model = picked?.ref ?? fakeModel;
 	const inRepo = isGitRepo(opts.repo);
@@ -107,6 +111,11 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 		...(isolation !== undefined ? { isolation: { branch: isolation.branch } } : {}),
 		noIsolation: opts.noIsolation === true,
 	});
+	if (specRun !== undefined) {
+		const s = specRun.spec;
+		agent.session.appendDecision({ kind: "spec", name: s.name, mode: s.mode, path: s.path });
+		markSpecStatus(opts.repo, s.name, "building"); // best-effort: never kills the run
+	}
 	try {
 		const res = await runWithGate(agent, {
 			cfg,
@@ -124,6 +133,10 @@ export async function runCmd(opts: RunCmdOpts): Promise<CliOutcome> {
 		);
 		if (isolation !== undefined) {
 			out.write(`${summarizeRun(opts.repo, isolation.branch, isolation.originalRef)}\n`);
+		}
+		// Gate passed → the spec moves to human review; blocked stays "building".
+		if (specRun !== undefined && res.outcome === "completed") {
+			markSpecStatus(opts.repo, specRun.spec.name, "verifying");
 		}
 		return res.outcome;
 	} finally {

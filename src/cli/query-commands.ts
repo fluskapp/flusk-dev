@@ -17,6 +17,7 @@ import { indexCmd } from "./index-cmd.js";
 import { promptCmd } from "./prompt-cmd.js";
 import { runsCmd } from "./runs-cmd.js";
 import { searchCmd } from "./search-cmd.js";
+import { specCmd, specNameArg } from "./spec-cmd.js";
 import { USAGE } from "./usage.js";
 
 type Values = Record<string, unknown>;
@@ -66,6 +67,17 @@ export async function queryCommand(
 	if (command === "find") {
 		if (arg === undefined) return fail(USAGE);
 		process.exitCode = await findCmd(arg, v);
+		return true;
+	}
+	if (command === "spec") {
+		// Scoped to the current repo like `flusk run`: a spec lives in the repo
+		// whose work it describes. (`spec new` writes one file; still a query in
+		// the safety sense — it never runs anything.)
+		process.exitCode = specCmd(arg, specNameArg(), {
+			repo: typeof v.repo === "string" ? v.repo : process.cwd(),
+			...(typeof v.template === "string" ? { template: v.template } : {}),
+			json: v.json === true,
+		});
 		return true;
 	}
 	if (command === "context") {

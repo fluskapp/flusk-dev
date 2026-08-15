@@ -17,10 +17,10 @@ interface Handler {
 
 let handler: Handler | undefined;
 
-async function get(path: string): Promise<{ status: number; body: string }> {
+async function get(path: string): Promise<{ status: number; body: string; location: string }> {
 	if (handler === undefined) handler = (await import(DIST)).default as Handler;
 	const res = await handler.fetch(new Request(`http://127.0.0.1${path}`));
-	return { status: res.status, body: await res.text() };
+	return { status: res.status, body: await res.text(), location: res.headers.get("location") ?? "" };
 }
 
 /** Route → a marker that only the real (non-stub) page carries. */
@@ -30,9 +30,13 @@ const ROUTES: Array<[string, string]> = [
 	["/docs", 'id="docs"'],
 	["/graph", 'id="graph"'],
 	["/web", 'id="web"'],
-	["/ask", 'id="ask"'],
-	["/flows", 'id="flows"'],
 	["/chat", "chat"],
+];
+
+/** Gone as windows (docs/experience.md): their routes redirect, links survive. */
+const REDIRECTS: Array<[string, string]> = [
+	["/ask", "/chat"],
+	["/flows", "/runs"],
 ];
 
 describeApp("app SSR", () => {
@@ -55,6 +59,14 @@ describeApp("app SSR", () => {
 			const { status, body } = await get(path);
 			expect(status).toBe(200);
 			expect(body, `${path} missing ${marker}`).toContain(marker);
+		});
+	}
+
+	for (const [path, to] of REDIRECTS) {
+		it(`${path} redirects to ${to} — the window is gone, the link is not`, async () => {
+			const { status, location } = await get(path);
+			expect([301, 302, 307, 308], `${path} did not redirect`).toContain(status);
+			expect(location, `${path} points somewhere else`).toContain(to);
 		});
 	}
 

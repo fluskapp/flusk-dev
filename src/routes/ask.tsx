@@ -1,21 +1,13 @@
 /**
- * /ask — Ask AI about what is on screen (window 0). An editor tab, not a
- * rail: the attached context is source, and it needs the editor's width. The
- * panel itself lives in src/ui/react/ask; the snapshot state survives leaving
- * the tab (ask-store.ts), which is the semantics this route must not break.
+ * /ask — gone as a window (docs/experience.md): talking with your code is
+ * what Chat (5) is for, and Ask's visible context card became Chat's
+ * attachment strip. The route stays only to carry old links and muscle
+ * memory to /chat.
  */
-import { createFileRoute } from "@tanstack/react-router";
-import { AskPanel } from "../ui/react/ask/AskPanel.js";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/ask")({
-	ssr: true,
-	component: Page,
+	beforeLoad: () => {
+		throw redirect({ to: "/chat" });
+	},
 });
-
-function Page() {
-	return (
-		<div id="ask" className="view">
-			<AskPanel />
-		</div>
-	);
-}

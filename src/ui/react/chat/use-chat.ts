@@ -14,7 +14,8 @@ type Chunk = { type: "delta"; text: string } | { type: "error"; message: string 
 export interface ChatApi {
 	msgs: ChatMsg[];
 	busy: boolean;
-	send: (backendId: string, text: string, cwd?: string) => Promise<void>;
+	/** `sent` is the composed prompt when attachments rode along (chat-model.ts). */
+	send: (backendId: string, text: string, sent?: string, cwd?: string) => Promise<void>;
 	stop: () => void;
 }
 
@@ -71,10 +72,10 @@ export function useChat(): ChatApi {
 	);
 
 	const send = useCallback(
-		async (backendId: string, text: string, cwd?: string) => {
+		async (backendId: string, text: string, sent?: string, cwd?: string) => {
 			const msgs = msgsRef.current;
 			if (text === "" || abortRef.current !== null) return;
-			msgs.push({ role: "user", content: text, at: chatClock() });
+			msgs.push({ role: "user", content: text, at: chatClock(), ...(sent === undefined ? {} : { sent }) });
 			// Captured, so this call's teardown can tell whether it is still the one
 			// in flight: after Stop, a second send can start while the first is
 			// still unwinding, and the first one's tail must not null the second's

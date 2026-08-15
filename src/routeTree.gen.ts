@@ -18,6 +18,7 @@ import { Route as FindRouteImport } from './routes/find'
 import { Route as FlowsRouteImport } from './routes/flows'
 import { Route as GraphRouteImport } from './routes/graph'
 import { Route as RunsRouteImport } from './routes/runs'
+import { Route as SpecsRouteImport } from './routes/specs'
 import { Route as WebRouteImport } from './routes/web'
 import { Route as ApiAskRouteImport } from './routes/api/ask'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
@@ -72,6 +73,11 @@ const RunsRoute = RunsRouteImport.update({
   path: '/runs',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SpecsRoute = SpecsRouteImport.update({
+  id: '/specs',
+  path: '/specs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WebRoute = WebRouteImport.update({
   id: '/web',
   path: '/web',
@@ -123,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/flows': typeof FlowsRoute
   '/graph': typeof GraphRoute
   '/runs': typeof RunsRouteWithChildren
+  '/specs': typeof SpecsRoute
   '/web': typeof WebRoute
   '/api/ask': typeof ApiAskRoute
   '/api/chat': typeof ApiChatRoute
@@ -142,6 +149,7 @@ export interface FileRoutesByTo {
   '/flows': typeof FlowsRoute
   '/graph': typeof GraphRoute
   '/runs': typeof RunsRouteWithChildren
+  '/specs': typeof SpecsRoute
   '/web': typeof WebRoute
   '/api/ask': typeof ApiAskRoute
   '/api/chat': typeof ApiChatRoute
@@ -162,6 +170,7 @@ export interface FileRoutesById {
   '/flows': typeof FlowsRoute
   '/graph': typeof GraphRoute
   '/runs': typeof RunsRouteWithChildren
+  '/specs': typeof SpecsRoute
   '/web': typeof WebRoute
   '/api/ask': typeof ApiAskRoute
   '/api/chat': typeof ApiChatRoute
@@ -183,6 +192,7 @@ export interface FileRouteTypes {
     | '/flows'
     | '/graph'
     | '/runs'
+    | '/specs'
     | '/web'
     | '/api/ask'
     | '/api/chat'
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/flows'
     | '/graph'
     | '/runs'
+    | '/specs'
     | '/web'
     | '/api/ask'
     | '/api/chat'
@@ -221,6 +232,7 @@ export interface FileRouteTypes {
     | '/flows'
     | '/graph'
     | '/runs'
+    | '/specs'
     | '/web'
     | '/api/ask'
     | '/api/chat'
@@ -241,6 +253,7 @@ export interface RootRouteChildren {
   FlowsRoute: typeof FlowsRoute
   GraphRoute: typeof GraphRoute
   RunsRoute: typeof RunsRouteWithChildren
+  SpecsRoute: typeof SpecsRoute
   WebRoute: typeof WebRoute
   ApiAskRoute: typeof ApiAskRoute
   ApiChatRoute: typeof ApiChatRoute
@@ -312,6 +325,13 @@ declare module '@tanstack/react-router' {
       path: '/runs'
       fullPath: '/runs'
       preLoaderRoute: typeof RunsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/specs': {
+      id: '/specs'
+      path: '/specs'
+      fullPath: '/specs'
+      preLoaderRoute: typeof SpecsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/web': {
@@ -403,6 +423,7 @@ const rootRouteChildren: RootRouteChildren = {
   FlowsRoute: FlowsRoute,
   GraphRoute: GraphRoute,
   RunsRoute: RunsRouteWithChildren,
+  SpecsRoute: SpecsRoute,
   WebRoute: WebRoute,
   ApiAskRoute: ApiAskRoute,
   ApiChatRoute: ApiChatRoute,

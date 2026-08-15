@@ -1,0 +1,28 @@
+/* The SegmentedButton, as docs/md.css draws it: one control, four segments,
+   1px separators — no gaps, no radius. The selected fill is
+   SegmentedButton.selectedButtonColor, and its focused sibling once the
+   control holds focus: two fills the theme names separately, never one fill
+   at two opacities. Same rules, second surface — hoist to kit/ the moment a
+   third window needs them. */
+.seg {
+	display: flex; align-items: stretch;
+	border: 1px solid var(--ij-border-control); background: var(--ij-bg-panel);
+}
+.seg button {
+	height: var(--ij-row-h); padding: 0 var(--ij-space-2);
+	font-size: var(--ij-fs-4); border-radius: 0; color: var(--dim);
+	background: none; border: none; cursor: pointer; font-family: inherit;
+	border-right: 1px solid var(--ij-border-control);
+}
+.seg button:last-child { border-right: none; }
+.seg button:hover { background: var(--hover); color: var(--text); }
+.seg button.on { background: var(--ij-seg-selected); color: var(--text); }
+.seg:focus-within button.on { background: var(--ij-seg-selected-focused); }
+.seg button:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(var(--ij-focus-ring-w) * -1);
+}
+
+/* In the feed's masthead the segment sits at the far edge, off the baseline
+   the title and its action share. */
+.head-seg { margin-left: auto; align-self: center; }

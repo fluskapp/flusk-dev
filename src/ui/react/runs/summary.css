@@ -1,0 +1,21 @@
+/* The Summary block: the run's conclusion sentence over one row of dense
+   stat chips — the meta strip's plate-and-pill vocabulary (transcript.css),
+   at the property grid's density (decisions.css). */
+.run-summary {
+	display: flex; flex-direction: column; gap: var(--ij-space-1);
+	margin: var(--ij-space-2) 0; padding: var(--ij-space-1) var(--ij-space-2);
+	border: 1px solid var(--border); background: var(--panel);
+}
+.rs-conclusion { margin: 0; font-size: var(--ij-fs-4); }
+.rs-chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ij-space-2); }
+.rs-chip { display: inline-flex; align-items: baseline; gap: var(--ij-space-1); }
+/* Keys dim and small-caps, values in the code face on a plate — the same
+   key/value contrast the decisions grid draws. */
+.rs-k {
+	color: var(--dim); font-size: var(--ij-fs-1);
+	text-transform: uppercase; letter-spacing: .04em;
+}
+.rs-v {
+	font-family: var(--font-code); font-size: var(--ij-fs-3);
+	background: var(--code-bg); padding: 0 var(--ij-space-1);
+}

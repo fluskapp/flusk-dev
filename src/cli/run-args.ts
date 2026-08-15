@@ -42,6 +42,7 @@ export function parseRunArgs(task: string, v: Values, cwd: string): ParsedRunArg
 	}
 	const fake = str(v.fake);
 	const model = str(v.model);
+	const spec = str(v.spec);
 	return {
 		ok: true,
 		opts: {
@@ -50,6 +51,7 @@ export function parseRunArgs(task: string, v: Values, cwd: string): ParsedRunArg
 			...(fake !== undefined ? { fake } : { real: true }),
 			...(model !== undefined ? { model } : {}),
 			...(kind !== undefined ? { kind: kind as TaskKind } : {}),
+			...(spec !== undefined ? { spec } : {}),
 			...(maxCost !== undefined ? { maxCostUsd: maxCost } : {}),
 			...(deadlineMs !== undefined ? { deadlineMs } : {}),
 			...(maxTurns !== undefined ? { maxTurns } : {}),

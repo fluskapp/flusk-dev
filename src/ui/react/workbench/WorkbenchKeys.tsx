@@ -1,7 +1,8 @@
 /**
- * The numbered tool-window keybindings, exactly the legacy digit gate:
- * 1-6, 8, 9, 0 and 7 for Flows — plain digit and ⌘digit — plus the letter
- * mnemonics. Digits never fire while typing in an input.
+ * The numbered tool-window keybindings, the digit map of docs/experience.md:
+ * 1-9 — plain digit and ⌘digit — plus the letter mnemonics; 0 is unbound
+ * (Ask is gone — talking with your code is Chat's, so `a` went with it).
+ * Digits never fire while typing in an input.
  *
  * Escape unwinds ONE layer per press, the client-keys.ts order: overlays
  * first (the palette swallows its own Escape in the capture phase before this
@@ -13,11 +14,11 @@ import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect } from "react";
 
 const ROUTE_OF: Record<string, string> = {
-	"2": "/runs", "3": "/docs", "7": "/flows", "8": "/graph", "9": "/web", "0": "/ask",
-	o: "/", r: "/runs", d: "/docs", g: "/graph", u: "/web", a: "/ask",
+	"2": "/specs", "3": "/runs", "6": "/docs", "7": "/graph", "8": "/web",
+	o: "/", r: "/runs", d: "/docs", g: "/graph", u: "/web",
 };
 const TOGGLE_OF: Record<string, "side" | "find" | "chat" | "doc"> = {
-	"1": "side", "4": "find", "5": "chat", "6": "doc", c: "chat",
+	"1": "side", "4": "find", "5": "chat", "9": "doc", c: "chat",
 };
 
 export function WorkbenchKeys() {

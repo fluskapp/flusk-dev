@@ -1,30 +1,38 @@
 /**
- * Tool window 5: Chat — a quiet transcript, a one-row composer. Ported from
- * client-chat.ts / client-shell.ts CHAT_HTML; the wire lives in use-chat.ts.
+ * Tool window 5: Chat — talk with your code, with a spec, with a run. One
+ * quiet transcript, an attachments strip, a one-row composer. Ask folded in
+ * here (docs/experience.md): its context card is the strip, its answerer
+ * picker is the header combo, and the outgoing prompt is composed by the same
+ * ask-prompt machinery. The wire stays /api/chat, in use-chat.ts.
  *
  * The rail's width and visibility belong to the workbench (root search params
  * and the shared Grip), so this file owns only what is inside the panel.
  */
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
-import { useBackends } from "./use-backends.js";
-import { useChat } from "./use-chat.js";
+import { useEffect, useReducer, useRef } from "react";
+import { AttachStrip } from "./AttachStrip.js";
+import { ChatComposer } from "./ChatComposer.js";
 import { ChatTurn } from "./ChatTurn.js";
+import { ChatWho } from "./ChatWho.js";
+import { cwdPath, loadAnswerers, onBlocks, preambleText } from "./attach-logic.js";
+import { AT, subscribe } from "./attach-store.js";
+import { whoRow } from "./attach-who.js";
+import { composeOutgoing } from "./chat-model.js";
+import { useChat } from "./use-chat.js";
 import "./chat.css";
-
-/** Grows with the text up to the stylesheet's max-height cap (five control heights). */
-function autogrow(el: HTMLTextAreaElement): void {
-	const cap = Number.parseFloat(getComputedStyle(el).maxHeight);
-	el.style.height = "auto";
-	el.style.height = `${cap > 0 ? Math.min(el.scrollHeight, cap) : el.scrollHeight}px`;
-}
+import "./attach.css";
 
 export function ChatRail() {
 	const navigate = useNavigate();
-	const { backends, failed, backendId, pick, note } = useBackends();
+	const [, tick] = useReducer((c: number) => c + 1, 0);
+	useEffect(() => subscribe(tick), []);
+	// Mounting does NOT re-capture code context (the snapshot rule); it only
+	// refreshes who can answer, which is this machine's state, not a choice.
+	useEffect(() => {
+		void loadAnswerers();
+	}, []);
 	const { msgs, busy, send, stop } = useChat();
 	const logRef = useRef<HTMLDivElement>(null);
-	const inputRef = useRef<HTMLTextAreaElement>(null);
 
 	// The transcript follows the newest text, streaming or rendered.
 	useEffect(() => {
@@ -32,15 +40,14 @@ export function ChatRail() {
 		if (log !== null) log.scrollTop = log.scrollHeight;
 	});
 
-	const sendNow = (): void => {
-		const input = inputRef.current;
-		if (input === null) return;
-		const text = input.value.trim();
-		if (text === "" || busy) return;
-		if (backendId === "") return; // no backend available; the note says so
-		input.value = "";
-		autogrow(input);
-		void send(backendId, text);
+	/** Compose exactly what the strip discloses, then hand it to the wire. */
+	const sendNow = (text: string): boolean => {
+		const who = whoRow();
+		if (who === null || !who.available || who.backendId === null) return false;
+		const composed = composeOutgoing(text, onBlocks(), preambleText());
+		const cwd = cwdPath();
+		void send(who.backendId, text, composed === text ? undefined : composed, cwd === "" ? undefined : cwd);
+		return true;
 	};
 
 	const hide = (): void => {
@@ -50,69 +57,30 @@ export function ChatRail() {
 		});
 	};
 
+	const usable = AT.answerers.some((a) => a.available);
+	const note = AT.whoErr !== "" ? AT.whoErr : AT.answerers.length > 0 && !usable ? "no answerer available" : "";
 	const last = msgs.length - 1;
 	return (
 		<aside id="chat">
 			<div className="tw-head chat-head">
 				<span className="tw-num">5</span>
 				<span>Chat</span>
-				<select id="chat-backend" title="Backend" value={backendId} onChange={(e) => pick(e.target.value)}>
-					{backends === null ? (
-						<option value="">loading…</option>
-					) : failed ? (
-						<option value="">backends unavailable</option>
-					) : backends.length === 0 ? (
-						<option value="">no backends configured</option>
-					) : (
-						backends.map((b) => (
-							<option key={b.id} value={b.id} disabled={!b.available}>
-								{b.label + (b.available ? "" : ` — ${b.note ?? "unavailable"}`)}
-							</option>
-						))
-					)}
-				</select>
+				<ChatWho />
 				<button id="chat-hide" type="button" title="Hide chat (⌘6)" onClick={hide}>
 					✕
 				</button>
 			</div>
 			<div id="chat-log" tabIndex={-1} ref={logRef}>
 				{msgs.length === 0 ? (
-					<div className="empty small">Ask the model about the selected project.</div>
+					<div className="empty small">Talk — with your code, with a spec, with a run. Attach below.</div>
 				) : (
 					msgs.map((m, i) => (
 						<ChatTurn key={i} m={m} streaming={busy && i === last && m.role === "assistant" && m.err !== true} />
 					))
 				)}
 			</div>
-			<div id="chat-compose">
-				<textarea
-					id="chat-input"
-					rows={2}
-					placeholder="Message (Enter sends, Shift+Enter newline)"
-					spellCheck={false}
-					ref={inputRef}
-					onInput={(e) => autogrow(e.currentTarget)}
-					onKeyDown={(e) => {
-						if (e.key === "Enter" && !e.shiftKey) {
-							e.preventDefault();
-							sendNow();
-						}
-					}}
-				/>
-				<div className="chat-actions">
-					<span id="chat-cwd" title="Working directory">
-						cwd: no project selected
-					</span>
-					<span id="chat-note">{note}</span>
-					{/* Stop stands in for Send while a reply streams. */}
-					<button id="chat-stop" type="button" hidden={!busy} onClick={stop}>
-						Stop
-					</button>
-					<button id="chat-send" type="button" hidden={busy} onClick={sendNow}>
-						Send
-					</button>
-				</div>
-			</div>
+			<AttachStrip />
+			<ChatComposer busy={busy} note={note} onSend={sendNow} onStop={stop} />
 		</aside>
 	);
 }

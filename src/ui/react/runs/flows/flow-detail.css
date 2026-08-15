@@ -1,11 +1,8 @@
-/* The Flows view — ported from styles-flow.ts. Only what the shared
-   vocabulary (vocab.css) does not already cover: stage chips, tables, pills,
-   sections and code blocks are reused as they are, so a flow run looks like
-   every other run in the workbench. */
-
-/* The editor's own inset, the one every sibling editor-tab view carries
-   (styles-chrome.ts). */
-#flows { padding: var(--ij-space-2) var(--ij-space-4) calc(var(--ij-space-4) * 2); }
+/* One flow run's step cards — moved from ui/react/flows/flows.css when the
+   Flows window folded into Runs. Only what the runs vocabulary does not
+   already cover: stage chips, tables, pills, sections and code blocks are
+   reused as they are, so a flow run looks like every other run. The view
+   inset comes from #runs (widgets.css), not from here. */
 
 .flow-step {
 	border: 1px solid var(--border); border-radius: var(--ij-radius); background: var(--panel);
@@ -25,5 +22,3 @@
 	background: var(--code-bg); white-space: pre-wrap; overflow-wrap: anywhere;
 	max-height: 320px; overflow: auto; /* design-exempt: one-off scroll cap for a step output block */
 }
-#flows .stages { margin: var(--ij-space) 0; }
-#flows .tbl td .stages { margin: 0; }

@@ -70,6 +70,10 @@ a.ev:focus-visible, .ev:focus-visible {
 	background: var(--ij-separator); border-radius: var(--ij-radius-sm);
 	padding: 0 var(--ij-space-2);
 }
+/* A flow row's kind chip rides inline in the title cell, ahead of the task;
+   the arrow shape trails it, dim and mono, and truncates with the cell. */
+.tbl td.grow .chip.kind { margin-right: var(--ij-space); vertical-align: middle; }
+.tbl td.grow .shape { font: var(--ij-fs-4) var(--ij-font-mono); }
 /* A raw benchmark figure, not a verdict: 0.35 was as green as 0.90. */
 .score { font: var(--ij-fs-4) var(--ij-font-mono); color: var(--ij-text-secondary); }
 
