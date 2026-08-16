@@ -17,7 +17,9 @@ import { PaletteAndHelp } from "../ui/react/palette/Palette.js";
 import { ProjectsRail } from "../ui/react/projects/ProjectsRail.js";
 import { Grip } from "../ui/react/workbench/Grips.js";
 import { StatusBar } from "../ui/react/workbench/StatusBar.js";
-import { Toolbar } from "../ui/react/workbench/Toolbar.js";
+import { MainToolbar } from "../ui/react/workbench/MainToolbar.js";
+import { Rail } from "../ui/react/workbench/Rail.js";
+import { EditorTabs } from "../ui/react/workbench/Tabs.js";
 import { WorkbenchKeys } from "../ui/react/workbench/WorkbenchKeys.js";
 import { ROOT_DEFAULTS, validateRootSearch } from "../ui/react/workbench/root-search.js";
 import { getWorkbenchMeta, type WorkbenchMeta } from "../features/projects/projects.functions.js";
@@ -57,7 +59,8 @@ function RootComponent() {
 				...(search.cw !== undefined ? { ["--tw-right" as string]: `${search.cw}px` } : {}),
 			}}
 		>
-			<Toolbar />
+			<MainToolbar projects={meta.projects} live={meta.live} home={meta.home} />
+			<Rail search={search as Record<string, unknown>} />
 			{side ? (
 				<>
 					<ProjectsRail />
@@ -65,6 +68,7 @@ function RootComponent() {
 				</>
 			) : null}
 			<main id="main">
+				<EditorTabs />
 				<Outlet />
 			</main>
 			{chat ? (

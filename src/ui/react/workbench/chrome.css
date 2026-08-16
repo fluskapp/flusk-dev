@@ -17,15 +17,15 @@ body { margin: 0; background: var(--bg); color: var(--text); font: var(--ij-fs-5
 #app {
 	display: grid; height: 100vh;
 	grid-template:
-		"tb tb tb" var(--ij-toolbar-h)
-		"side main chat" minmax(0, 1fr)
-		"find find find" auto
-		"st st st" var(--ij-status-h)
-		/ var(--tw-left, 268px) minmax(0, 1fr) var(--tw-right, 340px);
+		"tb tb tb tb" var(--ij-toolbar-h)
+		"rail side main chat" minmax(0, 1fr)
+		"rail find find find" auto
+		"st st st st" var(--ij-status-h)
+		/ var(--ij-toolbar-h) var(--tw-left, 268px) minmax(0, 1fr) var(--tw-right, 340px);
 }
-#app[data-side="off"] { grid-template-columns: 0 minmax(0, 1fr) var(--tw-right, 340px); }
-#app[data-chat="off"] { grid-template-columns: var(--tw-left, 268px) minmax(0, 1fr) 0; }
-#app[data-side="off"][data-chat="off"] { grid-template-columns: 0 minmax(0, 1fr) 0; }
+#app[data-side="off"] { grid-template-columns: var(--ij-toolbar-h) 0 minmax(0, 1fr) var(--tw-right, 340px); }
+#app[data-chat="off"] { grid-template-columns: var(--ij-toolbar-h) var(--tw-left, 268px) minmax(0, 1fr) 0; }
+#app[data-side="off"][data-chat="off"] { grid-template-columns: var(--ij-toolbar-h) 0 minmax(0, 1fr) 0; }
 
 /* The toolbar is a WINDOW HEADER strip: icon-density buttons, no tall targets. */
 #toolbar {
@@ -114,3 +114,64 @@ body { margin: 0; background: var(--bg); color: var(--text); font: var(--ij-fs-5
 /* While a drag is live the whole window keeps the resize cursor and text
    cannot be swept up by the pointer sweeping across it. */
 body.grip-drag { cursor: col-resize; user-select: none; }
+
+/* --- the rail: WebStorm's left edge ----------------------------------- */
+#rail {
+	grid-area: rail; display: flex; flex-direction: column; align-items: center;
+	justify-content: space-between; padding: var(--ij-space-1) 0;
+	background: var(--panel); border-right: 1px solid var(--border);
+}
+.rail-group { display: flex; flex-direction: column; gap: var(--ij-space-1); align-items: center; }
+.rail-btn {
+	display: flex; align-items: center; justify-content: center;
+	width: 26px; height: 26px; /* design-exempt: the New UI rail button metric */
+	border: none; border-radius: var(--ij-radius-sm); background: none;
+	color: var(--dim); cursor: pointer; font: var(--ij-fs-5) var(--font-ui);
+	text-decoration: none;
+}
+.rail-btn:hover { background: var(--hover); color: var(--text); }
+.rail-btn.on { background: var(--sel); color: var(--text); }
+
+/* --- toolbar chips (project / live) ----------------------------------- */
+.tb-chip {
+	display: inline-flex; align-items: center; gap: var(--ij-space-1);
+	padding: 0 var(--ij-space-2); height: 22px; /* design-exempt: New UI control height */
+	border-radius: var(--ij-radius-sm); color: var(--text); text-decoration: none;
+	font: var(--ij-fs-3) var(--font-ui);
+}
+.tb-chip:hover { background: var(--hover); }
+.tb-chip.live { color: var(--ok); }
+.tb-caret { color: var(--dim); font-size: var(--ij-fs-1); }
+#toolbar .logo { display: inline-flex; align-items: center; gap: var(--ij-space-1); }
+
+/* --- editor tabs ------------------------------------------------------- */
+#tabs {
+	display: flex; align-items: stretch; gap: 0; overflow-x: auto;
+	background: var(--panel); border-bottom: 1px solid var(--border);
+	min-height: calc(var(--ij-toolbar-h) - var(--ij-space-1));
+}
+.tab {
+	display: inline-flex; align-items: center; gap: var(--ij-space-1);
+	padding: 0 var(--ij-space-1) 0 var(--ij-space-2);
+	border-right: 1px solid var(--border); position: relative; max-width: 28ch;
+}
+.tab .tab-link {
+	display: inline-flex; align-items: center; gap: var(--ij-space-1);
+	color: var(--dim); text-decoration: none; font: var(--ij-fs-3) var(--font-ui); min-width: 0;
+}
+.tab:hover .tab-link { color: var(--text); }
+.tab.on .tab-link { color: var(--text); }
+.tab.on::after {
+	content: ""; position: absolute; left: 0; right: 0; bottom: 0;
+	height: 2px; /* design-exempt: EditorTabs.underlineHeight from the New UI */
+	background: var(--accent);
+}
+.tab-x {
+	border: none; background: none; color: var(--dim); cursor: pointer;
+	font: var(--ij-fs-5) var(--font-ui); padding: 0 var(--ij-space-1); border-radius: var(--ij-radius-sm);
+	visibility: hidden;
+}
+.tab:hover .tab-x, .tab.on .tab-x { visibility: visible; }
+.tab-x:hover { background: var(--hover); color: var(--text); }
+#main { display: flex; flex-direction: column; }
+#main > .view { flex: 1; min-height: 0; overflow-y: auto; }
