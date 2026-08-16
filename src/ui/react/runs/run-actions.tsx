@@ -6,6 +6,7 @@
  */
 import { revealRef } from "../../../features/projects/runs.functions.js";
 import { copyText } from "./widgets.js";
+import { Ic } from "../system/Icon.js";
 
 /** `nvim "path"`. The legacy tab system could carry a line (+N); the routed
  * workbench has no tab state, so the command names the file alone. */
@@ -30,18 +31,24 @@ export function PathActions({ path, revealKey, toast }: PathActionsProps) {
 	};
 	return (
 		<>
-			<button type="button" className="act" onClick={() => copyText(path, toast, "Path copied")}>
-				Copy path
+			<button
+				type="button"
+				className="sys-btn icon"
+				title="Copy path"
+				onClick={() => copyText(path, toast, "Path copied")}
+			>
+				<Ic name="copy" size={14} />
 			</button>
 			<button
 				type="button"
-				className="act"
+				className="sys-btn icon"
+				title="Copy nvim command"
 				onClick={() => copyText(nvimCmd(path), toast, "Command copied")}
 			>
-				Copy nvim command
+				<Ic name="terminal" size={14} />
 			</button>
-			<button type="button" className="act" onClick={reveal}>
-				Reveal in Finder
+			<button type="button" className="sys-btn icon" title="Reveal in Finder" onClick={reveal}>
+				<Ic name="folder" size={14} />
 			</button>
 		</>
 	);

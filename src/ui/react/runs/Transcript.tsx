@@ -6,6 +6,7 @@
  */
 import { useEffect, useRef } from "react";
 import type { SessionRun } from "../../../features/projects/runs.functions.js";
+import { Ic } from "../system/Icon.js";
 import { base, fmtCost, fmtTime } from "./format.js";
 import { Item } from "./TranscriptItem.js";
 import { Pill } from "./widgets.js";
@@ -19,17 +20,24 @@ export function Meta({ d, actions }: { d: SessionRun; actions: React.ReactNode }
 				<Pill status={d.status} />
 			</span>
 			<span className="meta-item">
+				<Ic name="project" size={14} />
 				<b>{base(h.repoRoot)}</b>
-				{h.gitBranch ? (
-					<>
-						{" "}
-						<span className="dim">on</span> {h.gitBranch}
-					</>
-				) : null}
 			</span>
-			<span className="meta-item dim">{`${h.model.provider}/${h.model.id}`}</span>
+			{h.gitBranch ? (
+				<span className="meta-item dim">
+					<Ic name="branch" size={14} />
+					<span className="sys-chip mono">{h.gitBranch}</span>
+				</span>
+			) : null}
+			<span className="meta-item dim">
+				<Ic name="chip" size={14} />
+				{`${h.model.provider}/${h.model.id}`}
+			</span>
+			<span className="meta-item dim">
+				<Ic name="clock" size={14} />
+				{fmtTime(h.createdAt)}
+			</span>
 			<span className="meta-item dim">#{h.id}</span>
-			<span className="meta-item dim">{fmtTime(h.createdAt)}</span>
 			<span className="meta-actions">{actions}</span>
 		</div>
 	);

@@ -68,12 +68,13 @@ export const Route = createFileRoute("/runs_/$runId")({
 function RunPage() {
 	const load = Route.useLoaderData() as RunLoad;
 	if (load.kind === "session") {
-		const task = load.head.summary?.task ?? load.ref;
+		// A task can be a whole spec; the TITLE is its first line and nothing
+		// more — the full text already opens the transcript as the user turn.
+		const task = (load.head.summary?.task ?? load.ref).split("\n", 1)[0] ?? load.ref;
 		return (
 			<div id="run" className="view">
 				<div className="head-row">
-					<h2>{task}</h2>
-					<span className="dim">{load.head.path ?? load.ref}</span>
+					<h2 className="sys-ellipsis" title={load.head.summary?.task ?? undefined}>{task}</h2>
 				</div>
 				<Suspense fallback={null}>
 					<Await promise={load.decisions}>{(log: DecisionLog | null) => <Decisions log={log} />}</Await>

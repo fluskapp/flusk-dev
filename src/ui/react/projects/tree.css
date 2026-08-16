@@ -96,3 +96,8 @@
 #search::placeholder { color: var(--ij-text-disabled); }
 #search::selection { background: var(--ij-selection); color: var(--ij-selection-text); }
 #search:not(:focus)::selection { background: var(--ij-selection-inactive); }
+
+/* --- system pass: rows lead with a glyph ------------------------------ */
+.node .ic { color: var(--dim); flex: none; }
+.node.cursor .ic, #tree:focus-within .node.active .ic { color: var(--text); }
+.badge-live { display: inline-flex; align-items: center; gap: var(--ij-space-1); color: var(--ok); font: 600 var(--ij-fs-1) var(--font-code); }

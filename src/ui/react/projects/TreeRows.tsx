@@ -5,6 +5,7 @@
  * ROTATES on expand — swapping characters made the toggle flicker.
  */
 import { Hi } from "../kit/speed-search.js";
+import { Ic } from "../system/Icon.js";
 import type { VisRow } from "./tree-model.js";
 
 export interface RowActions {
@@ -63,17 +64,19 @@ export function TreeRowView({
 				>
 					▸
 				</span>
+				<Ic name={p.kind === "harness" ? "harness" : "repo"} size={14} />
 				<span className="node-name">
 					<Hi text={p.name} q={q} />
 				</span>
-				<span className={`kind-chip ${p.kind}`}>{p.kind}</span>
 				{p.worktreeOf !== undefined ? (
 					<span className="wt-chip" title={`a git worktree of ${p.worktreeOf}`}>
 						⤷ {p.worktreeOf}
 					</span>
 				) : null}
 				{p.liveRuns > 0 ? (
-					<span className="badge-live">{p.liveRuns} live</span>
+					<span className="badge-live">
+						<span className="sys-live" /> {p.liveRuns}
+					</span>
 				) : (
 					<span className="count">{p.runs}</span>
 				)}

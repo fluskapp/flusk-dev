@@ -11,8 +11,10 @@
  * sync client-tabs.ts kept and the first React port lost.
  */
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { Ic } from "../system/Icon.js";
 
 export interface PanelButton {
+	icon: string;
 	id: string;
 	n: string;
 	label: string;
@@ -22,15 +24,15 @@ export interface PanelButton {
 }
 
 export const PANELS: PanelButton[] = [
-	{ id: "side-btn", n: "1", label: "Projects", title: "What you have (1 / ⌘1)", toggles: "side" },
-	{ id: "specs-btn", n: "2", label: "Specs", title: "What you intend — the driving surface of spec-driven work (2 / ⌘2)", to: "/specs" },
-	{ id: "runs-btn", n: "3", label: "Runs", title: "What happened: sessions, harness journals and flow runs, one table (3 / ⌘3)", to: "/runs" },
-	{ id: "find-btn", n: "4", label: "Find", title: "Find text in your files (4 / ⌘4 / ⌘⇧F)", toggles: "find" },
-	{ id: "chat-btn", n: "5", label: "Chat", title: "Talk — with your code, with a spec, with a run (5 / ⌘5 / c)", toggles: "chat" },
-	{ id: "docs-btn", n: "6", label: "Docs", title: "Read your own indexed markdown (6 / ⌘6 / d)", to: "/docs" },
-	{ id: "graph-btn", n: "7", label: "Graph", title: "What am I about to break (7 / ⌘7 / g)", to: "/graph" },
-	{ id: "web-btn", n: "8", label: "Web", title: "Read an external URL beside the code (8 / ⌘8 / u)", to: "/web" },
-	{ id: "doc-btn", n: "9", label: "Documentation", title: "Symbol docs for the code on screen (9 / ⌘9)", toggles: "doc" },
+	{ id: "side-btn", icon: "project", n: "1", label: "Projects", title: "What you have (1 / ⌘1)", toggles: "side" },
+	{ id: "specs-btn", icon: "spec", n: "2", label: "Specs", title: "What you intend — the driving surface of spec-driven work (2 / ⌘2)", to: "/specs" },
+	{ id: "runs-btn", icon: "run", n: "3", label: "Runs", title: "What happened: sessions, harness journals and flow runs, one table (3 / ⌘3)", to: "/runs" },
+	{ id: "find-btn", icon: "find", n: "4", label: "Find", title: "Find text in your files (4 / ⌘4 / ⌘⇧F)", toggles: "find" },
+	{ id: "chat-btn", icon: "chat", n: "5", label: "Chat", title: "Talk — with your code, with a spec, with a run (5 / ⌘5 / c)", toggles: "chat" },
+	{ id: "docs-btn", icon: "book", n: "6", label: "Docs", title: "Read your own indexed markdown (6 / ⌘6 / d)", to: "/docs" },
+	{ id: "graph-btn", icon: "graph", n: "7", label: "Graph", title: "What am I about to break (7 / ⌘7 / g)", to: "/graph" },
+	{ id: "web-btn", icon: "globe", n: "8", label: "Web", title: "Read an external URL beside the code (8 / ⌘8 / u)", to: "/web" },
+	{ id: "doc-btn", icon: "book", n: "9", label: "Documentation", title: "Symbol docs for the code on screen (9 / ⌘9)", toggles: "doc" },
 ];
 
 export function Toolbar() {
@@ -59,8 +61,9 @@ export function Toolbar() {
 			{PANELS.map((p) =>
 				p.to !== undefined ? (
 					<Link key={p.id} id={p.id} to={p.to} search={search} title={p.title} activeProps={{ className: "on" }}>
-						<span className="n">{p.n}</span>
+						<Ic name={p.icon} size={14} />
 						{p.label}
+						<span className="n">{p.n}</span>
 					</Link>
 				) : (
 					<button
@@ -72,8 +75,9 @@ export function Toolbar() {
 						aria-pressed={p.toggles !== undefined && open(p.toggles)}
 						onClick={() => p.toggles && toggle(p.toggles)}
 					>
-						<span className="n">{p.n}</span>
+						<Ic name={p.icon} size={14} />
 						{p.label}
+						<span className="n">{p.n}</span>
 					</button>
 				),
 			)}

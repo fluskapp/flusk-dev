@@ -133,3 +133,16 @@
 	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
 	outline-offset: var(--ij-focus-ring-w);
 }
+
+/* --- system pass ------------------------------------------------------ */
+#chat select {
+	max-width: 14ch; background: var(--panel); color: var(--text);
+	border: 1px solid var(--border); border-radius: var(--ij-radius-sm);
+	font: var(--ij-fs-3) var(--font-ui); height: 22px; /* design-exempt: New UI control height */
+}
+#chat-composer textarea {
+	background: var(--bg); border: 1px solid var(--border); border-radius: var(--ij-radius-sm);
+	color: var(--text); font: var(--ij-fs-4)/1.5 var(--font-ui); resize: none;
+}
+#chat-composer textarea:focus { outline: none; border-color: var(--accent); }
+.attach-head { display: flex; align-items: center; gap: var(--ij-space-1); }

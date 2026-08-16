@@ -5,18 +5,31 @@
  * Thinking ships collapsed and dim: it is deliberation, not the log.
  */
 import type { ToolView, TranscriptItem } from "../../../features/projects/runs.functions.js";
+import { Ic } from "../system/Icon.js";
+import { TOOL_ICON } from "../system/icons.js";
 
-/** First line of the packed args, capped so the summary row never wraps. */
-function argsPreview(args: unknown): string {
+/**
+ * What a collapsed tool row says: the THING, not its JSON. A write/edit/read
+ * leads with its file path, bash with the command, grep/glob with the
+ * pattern — raw serialized args are what the expansion is for.
+ */
+function argsPreview(name: string, args: unknown): { path?: string; text: string } {
+	const a = (typeof args === "object" && args !== null ? args : {}) as Record<string, unknown>;
+	const str = (k: string) => (typeof a[k] === "string" ? (a[k] as string) : undefined);
+	const path = str("file_path");
+	if (path !== undefined) return { path, text: "" };
+	const lead = str("command") ?? str("pattern") ?? str("query") ?? str("task");
+	if (lead !== undefined) {
+		const one = lead.split("\n", 1)[0] ?? "";
+		return { text: one.length > 80 ? `${one.slice(0, 80)}…` : one };
+	}
 	let s = "";
 	try {
 		s = JSON.stringify(args) ?? "";
 	} catch {
 		s = "";
 	}
-	const nl = s.indexOf("\n");
-	if (nl !== -1) s = s.slice(0, nl);
-	return s.length > 90 ? `${s.slice(0, 90)}…` : s;
+	return { text: s.length > 80 ? `${s.slice(0, 80)}…` : s };
 }
 
 /** Escape collapses the node it happened in and hands focus back to its row. */
@@ -29,11 +42,17 @@ function closeOnEscape(e: React.KeyboardEvent<HTMLDetailsElement>) {
 
 function Tool({ t }: { t: ToolView }) {
 	const lines = t.output === null ? 0 : t.output.split("\n").length;
+	const preview = argsPreview(t.name, t.args);
 	return (
 		<details className={`tool${t.isError ? " err" : ""}`} onKeyDown={closeOnEscape}>
 			<summary>
+				<Ic name={TOOL_ICON[t.name] ?? "file"} size={14} />
 				<span className="tool-chip">{t.name}</span>
-				<span className="tool-preview">{argsPreview(t.args)}</span>
+				{preview.path !== undefined ? (
+					<span className="tool-path sys-chip mono">{preview.path}</span>
+				) : (
+					<span className="tool-preview">{preview.text}</span>
+				)}
 				{/* The session file records no durations, so the trailing badge is
 				    what it CAN prove: failure, or how much output came back. */}
 				{t.isError ? (
@@ -59,6 +78,7 @@ function Thinking({ text }: { text: string }) {
 	return (
 		<details className="tool think" onKeyDown={closeOnEscape}>
 			<summary>
+				<Ic name="think" size={14} />
 				<span className="tool-chip">thinking</span>
 				<span className="tool-preview">{first}</span>
 			</summary>
@@ -69,10 +89,27 @@ function Thinking({ text }: { text: string }) {
 
 export function Item({ it }: { it: TranscriptItem }) {
 	if (it.kind === "user") {
+		// A long task (a whole spec) folds to its first lines; the card keeps
+		// the reader oriented without owning the viewport.
+		const lines = it.text.split("\n");
+		const long = lines.length > 14;
+		const body = <div className="msg-body pre">{it.text}</div>;
 		return (
 			<div className="msg user">
-				<div className="msg-tag">user</div>
-				<div className="msg-body pre">{it.text}</div>
+				<div className="msg-tag">
+					<Ic name="user" size={14} />
+				</div>
+				{long ? (
+					<details className="user-fold">
+						<summary>
+							<span className="sys-ellipsis">{lines[0]}</span>
+							<span className="dim"> — {lines.length} lines</span>
+						</summary>
+						{body}
+					</details>
+				) : (
+					body
+				)}
 			</div>
 		);
 	}
@@ -81,7 +118,9 @@ export function Item({ it }: { it: TranscriptItem }) {
 	}
 	return (
 		<div className="msg assistant">
-			<div className="msg-tag">flusk</div>
+			<div className="msg-tag">
+				<Ic name="bot" size={14} />
+			</div>
 			<div className="msg-body">
 				{it.thinking !== "" ? <Thinking text={it.thinking} /> : null}
 				{it.text ? <div className="pre">{it.text}</div> : null}

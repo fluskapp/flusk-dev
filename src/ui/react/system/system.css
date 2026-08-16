@@ -1,0 +1,76 @@
+/* ================================================================== */
+/* The flusk design system — docs/design-system.md is the contract.   */
+/* Three surfaces, one control vocabulary, icons everywhere. Every    */
+/* value is a token; the layering IS the design:                      */
+/*   editor  --bg      (gray-1 dark)  the content you read            */
+/*   panel   --panel   (gray-2 dark)  rails, cards, headers, bars     */
+/*   line    --border  (gray-3 dark)  every hairline                  */
+/* ================================================================== */
+
+/* --- scrollbars: the IDE's thin, quiet kind ----------------------- */
+* { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+*::-webkit-scrollbar { width: var(--ij-space-2); height: var(--ij-space-2); }
+*::-webkit-scrollbar-thumb { background: var(--border); border-radius: var(--ij-radius-sm); }
+*::-webkit-scrollbar-thumb:hover { background: var(--dim); }
+*::-webkit-scrollbar-corner { background: transparent; }
+
+/* --- icons -------------------------------------------------------- */
+.ic { flex: none; vertical-align: -3px; /* design-exempt: optical baseline for a 16px glyph beside 13px text */ }
+
+/* --- buttons: the 22px IntelliJ control --------------------------- */
+.sys-btn {
+	display: inline-flex; align-items: center; gap: var(--ij-space-1);
+	height: 22px; /* design-exempt: Button height from the New UI spec, not a spacing step */
+	padding: 0 var(--ij-space-2);
+	background: var(--panel); color: var(--text);
+	border: 1px solid var(--border); border-radius: var(--ij-radius-sm);
+	font: var(--ij-fs-3) var(--font-ui); cursor: pointer; white-space: nowrap;
+}
+.sys-btn:hover { background: var(--hover); border-color: var(--dim); }
+.sys-btn:active { background: var(--sel); }
+.sys-btn:disabled { opacity: .5; cursor: default; }
+.sys-btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+.sys-btn.icon { width: 22px; /* design-exempt: square control, same New UI button metric */ padding: 0; justify-content: center; color: var(--dim); }
+.sys-btn.icon:hover { color: var(--text); }
+.sys-btn.bare { border-color: transparent; background: transparent; }
+.sys-btn.bare:hover { background: var(--hover); }
+
+/* --- chips & pills ------------------------------------------------ */
+.sys-chip {
+	display: inline-flex; align-items: center; gap: var(--ij-space-1);
+	padding: 0 var(--ij-space-1); border-radius: var(--ij-radius-sm);
+	background: var(--hover); color: var(--dim);
+	font: var(--ij-fs-1) var(--font-code); text-transform: none;
+}
+.sys-chip.mono { font-family: var(--font-code); }
+.sys-pill {
+	display: inline-flex; align-items: center; gap: var(--ij-space-1);
+	padding: 0 var(--ij-space-2); border-radius: var(--ij-radius-sm);
+	font: 600 var(--ij-fs-1) var(--font-ui); text-transform: uppercase; letter-spacing: .4px;
+	height: 18px; /* design-exempt: pill height between the 16/20 steps, from the New UI badge */
+}
+.sys-pill.ok { color: var(--ok); background: color-mix(in srgb, var(--ok) 15%, transparent); }
+.sys-pill.err { color: var(--err); background: color-mix(in srgb, var(--err) 15%, transparent); }
+.sys-pill.warn { color: var(--warn); background: color-mix(in srgb, var(--warn) 15%, transparent); }
+.sys-pill.run { color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); }
+.sys-pill.dim { color: var(--dim); background: var(--hover); }
+
+/* live dot: the quiet pulse that says "now" */
+.sys-live { display: inline-block; width: 6px; height: 6px; /* design-exempt: dot, not a box metric */
+	border-radius: 50%; background: var(--ok); }
+@keyframes sys-pulse { 50% { opacity: .35; } }
+.sys-live { animation: sys-pulse 2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .sys-live { animation: none; } }
+
+/* --- cards: content blocks on the editor surface ------------------ */
+.sys-card { background: var(--panel); border: 1px solid var(--border); border-radius: var(--ij-radius-sm); }
+.sys-card > .sys-card-head {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	padding: var(--ij-space-1) var(--ij-space-2);
+	border-bottom: 1px solid var(--border);
+	font: 600 var(--ij-fs-2) var(--font-ui); color: var(--dim);
+	text-transform: uppercase; letter-spacing: .5px;
+}
+
+/* --- one-line truncation, the rule titles obey -------------------- */
+.sys-ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }

@@ -133,3 +133,17 @@
 	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
 	outline-offset: calc(var(--ij-focus-ring-w) * -1);
 }
+
+/* --- the design-system pass: icons in rows, honest previews ---------- */
+.tool > summary { display: flex; align-items: center; gap: var(--ij-space-2); }
+.tool > summary .ic { color: var(--dim); }
+.tool.err > summary .ic { color: var(--err); }
+.tool-path { max-width: 60ch; overflow: hidden; text-overflow: ellipsis; }
+.msg-tag { display: flex; align-items: center; justify-content: center; color: var(--dim); }
+.msg.user .msg-tag { color: var(--accent); }
+.user-fold > summary {
+	cursor: pointer; display: flex; gap: var(--ij-space-1); align-items: baseline;
+	font-weight: 600; min-width: 0;
+}
+.user-fold > summary::-webkit-details-marker { display: none; }
+.user-fold[open] > summary { margin-bottom: var(--ij-space-2); }
