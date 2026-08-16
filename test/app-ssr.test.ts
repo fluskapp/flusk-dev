@@ -70,6 +70,15 @@ describeApp("app SSR", () => {
 		});
 	}
 
+	it("a run DETAIL url renders the detail shell, never the list (the nested-route bug)", async () => {
+		// runs.$runId once nested under /runs with no Outlet: the detail URL
+		// silently drew the list. The ref here is fake — what matters is WHICH
+		// route answers.
+		const { status, body } = await get("/runs/no-such-slug%2Fno-such-file.jsonl");
+		expect(status).toBe(200);
+		expect(body).not.toContain("All runs");
+	});
+
 	it("an unknown route is not a crash", async () => {
 		const { status } = await get("/no-such-window");
 		expect([200, 404]).toContain(status);

@@ -33,7 +33,7 @@ type RunLoad =
 	  }
 	| { kind: "journal"; ref: string; meta: Journal | null; body: Promise<JournalBody> };
 
-export const Route = createFileRoute("/runs/$runId")({
+export const Route = createFileRoute("/runs_/$runId")({
 	ssr: true,
 	loader: async ({ params }): Promise<RunLoad> => {
 		const ref = decodeRef(params.runId);

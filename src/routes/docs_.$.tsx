@@ -22,7 +22,7 @@ interface DocLoad {
 	body: Promise<DocBody>;
 }
 
-export const Route = createFileRoute("/docs/$")({
+export const Route = createFileRoute("/docs_/$")({
 	ssr: true,
 	loader: async ({ params }): Promise<DocLoad> => {
 		const path = `/${decodeRef((params as { _splat?: string })._splat ?? "")}`;

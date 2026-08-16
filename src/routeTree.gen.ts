@@ -22,10 +22,10 @@ import { Route as SpecsRouteImport } from './routes/specs'
 import { Route as WebRouteImport } from './routes/web'
 import { Route as ApiAskRouteImport } from './routes/api/ask'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
-import { Route as DocsSplatRouteImport } from './routes/docs.$'
+import { Route as DocsSplatRouteImport } from './routes/docs_.$'
 import { Route as FilesSplatRouteImport } from './routes/files.$'
 import { Route as ProjectsProjectRouteImport } from './routes/projects.$project'
-import { Route as RunsRunIdRouteImport } from './routes/runs.$runId'
+import { Route as RunsRunIdRouteImport } from './routes/runs_.$runId'
 import { Route as ApiEventsRunIdRouteImport } from './routes/api/events.$runId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -94,9 +94,9 @@ const ApiChatRoute = ApiChatRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsSplatRoute = DocsSplatRouteImport.update({
-  id: '/$',
-  path: '/$',
-  getParentRoute: () => DocsRoute,
+  id: '/docs_/$',
+  path: '/docs/$',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const FilesSplatRoute = FilesSplatRouteImport.update({
   id: '/files/$',
@@ -109,9 +109,9 @@ const ProjectsProjectRoute = ProjectsProjectRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const RunsRunIdRoute = RunsRunIdRouteImport.update({
-  id: '/$runId',
-  path: '/$runId',
-  getParentRoute: () => RunsRoute,
+  id: '/runs_/$runId',
+  path: '/runs/$runId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiEventsRunIdRoute = ApiEventsRunIdRouteImport.update({
   id: '/api/events/$runId',
@@ -124,11 +124,11 @@ export interface FileRoutesByFullPath {
   '/ask': typeof AskRoute
   '/chat': typeof ChatRoute
   '/doc': typeof DocRoute
-  '/docs': typeof DocsRouteWithChildren
+  '/docs': typeof DocsRoute
   '/find': typeof FindRoute
   '/flows': typeof FlowsRoute
   '/graph': typeof GraphRoute
-  '/runs': typeof RunsRouteWithChildren
+  '/runs': typeof RunsRoute
   '/specs': typeof SpecsRoute
   '/web': typeof WebRoute
   '/api/ask': typeof ApiAskRoute
@@ -144,11 +144,11 @@ export interface FileRoutesByTo {
   '/ask': typeof AskRoute
   '/chat': typeof ChatRoute
   '/doc': typeof DocRoute
-  '/docs': typeof DocsRouteWithChildren
+  '/docs': typeof DocsRoute
   '/find': typeof FindRoute
   '/flows': typeof FlowsRoute
   '/graph': typeof GraphRoute
-  '/runs': typeof RunsRouteWithChildren
+  '/runs': typeof RunsRoute
   '/specs': typeof SpecsRoute
   '/web': typeof WebRoute
   '/api/ask': typeof ApiAskRoute
@@ -165,19 +165,19 @@ export interface FileRoutesById {
   '/ask': typeof AskRoute
   '/chat': typeof ChatRoute
   '/doc': typeof DocRoute
-  '/docs': typeof DocsRouteWithChildren
+  '/docs': typeof DocsRoute
   '/find': typeof FindRoute
   '/flows': typeof FlowsRoute
   '/graph': typeof GraphRoute
-  '/runs': typeof RunsRouteWithChildren
+  '/runs': typeof RunsRoute
   '/specs': typeof SpecsRoute
   '/web': typeof WebRoute
   '/api/ask': typeof ApiAskRoute
   '/api/chat': typeof ApiChatRoute
-  '/docs/$': typeof DocsSplatRoute
+  '/docs_/$': typeof DocsSplatRoute
   '/files/$': typeof FilesSplatRoute
   '/projects/$project': typeof ProjectsProjectRoute
-  '/runs/$runId': typeof RunsRunIdRoute
+  '/runs_/$runId': typeof RunsRunIdRoute
   '/api/events/$runId': typeof ApiEventsRunIdRoute
 }
 export interface FileRouteTypes {
@@ -236,10 +236,10 @@ export interface FileRouteTypes {
     | '/web'
     | '/api/ask'
     | '/api/chat'
-    | '/docs/$'
+    | '/docs_/$'
     | '/files/$'
     | '/projects/$project'
-    | '/runs/$runId'
+    | '/runs_/$runId'
     | '/api/events/$runId'
   fileRoutesById: FileRoutesById
 }
@@ -248,17 +248,19 @@ export interface RootRouteChildren {
   AskRoute: typeof AskRoute
   ChatRoute: typeof ChatRoute
   DocRoute: typeof DocRoute
-  DocsRoute: typeof DocsRouteWithChildren
+  DocsRoute: typeof DocsRoute
   FindRoute: typeof FindRoute
   FlowsRoute: typeof FlowsRoute
   GraphRoute: typeof GraphRoute
-  RunsRoute: typeof RunsRouteWithChildren
+  RunsRoute: typeof RunsRoute
   SpecsRoute: typeof SpecsRoute
   WebRoute: typeof WebRoute
   ApiAskRoute: typeof ApiAskRoute
   ApiChatRoute: typeof ApiChatRoute
+  DocsSplatRoute: typeof DocsSplatRoute
   FilesSplatRoute: typeof FilesSplatRoute
   ProjectsProjectRoute: typeof ProjectsProjectRoute
+  RunsRunIdRoute: typeof RunsRunIdRoute
   ApiEventsRunIdRoute: typeof ApiEventsRunIdRoute
 }
 
@@ -355,12 +357,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/docs/$': {
-      id: '/docs/$'
-      path: '/$'
+    '/docs_/$': {
+      id: '/docs_/$'
+      path: '/docs/$'
       fullPath: '/docs/$'
       preLoaderRoute: typeof DocsSplatRouteImport
-      parentRoute: typeof DocsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/files/$': {
       id: '/files/$'
@@ -376,12 +378,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectsProjectRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/runs/$runId': {
-      id: '/runs/$runId'
-      path: '/$runId'
+    '/runs_/$runId': {
+      id: '/runs_/$runId'
+      path: '/runs/$runId'
       fullPath: '/runs/$runId'
       preLoaderRoute: typeof RunsRunIdRouteImport
-      parentRoute: typeof RunsRoute
+      parentRoute: typeof rootRouteImport
     }
     '/api/events/$runId': {
       id: '/api/events/$runId'
@@ -393,42 +395,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface DocsRouteChildren {
-  DocsSplatRoute: typeof DocsSplatRoute
-}
-
-const DocsRouteChildren: DocsRouteChildren = {
-  DocsSplatRoute: DocsSplatRoute,
-}
-
-const DocsRouteWithChildren = DocsRoute._addFileChildren(DocsRouteChildren)
-
-interface RunsRouteChildren {
-  RunsRunIdRoute: typeof RunsRunIdRoute
-}
-
-const RunsRouteChildren: RunsRouteChildren = {
-  RunsRunIdRoute: RunsRunIdRoute,
-}
-
-const RunsRouteWithChildren = RunsRoute._addFileChildren(RunsRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AskRoute: AskRoute,
   ChatRoute: ChatRoute,
   DocRoute: DocRoute,
-  DocsRoute: DocsRouteWithChildren,
+  DocsRoute: DocsRoute,
   FindRoute: FindRoute,
   FlowsRoute: FlowsRoute,
   GraphRoute: GraphRoute,
-  RunsRoute: RunsRouteWithChildren,
+  RunsRoute: RunsRoute,
   SpecsRoute: SpecsRoute,
   WebRoute: WebRoute,
   ApiAskRoute: ApiAskRoute,
   ApiChatRoute: ApiChatRoute,
+  DocsSplatRoute: DocsSplatRoute,
   FilesSplatRoute: FilesSplatRoute,
   ProjectsProjectRoute: ProjectsProjectRoute,
+  RunsRunIdRoute: RunsRunIdRoute,
   ApiEventsRunIdRoute: ApiEventsRunIdRoute,
 }
 export const routeTree = rootRouteImport
