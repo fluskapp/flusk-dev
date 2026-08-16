@@ -23,6 +23,14 @@ export function Decisions({ log }: { log: DecisionLog | null }) {
 			) : (
 				<dl className="dec-list">
 					{log.decisions.map(({ at, decision: d }, i) => {
+						if (d.kind === "run") {
+							return (
+								<Row key={`${at}-${i}`} name="loop">
+									<code>{d.runId}</code>{" "}
+									<span className="dim">— the gate's facts are keyed by this id</span>
+								</Row>
+							);
+						}
 						if (d.kind === "model") {
 							return (
 								<Row key={`${at}-${i}`} name="model">

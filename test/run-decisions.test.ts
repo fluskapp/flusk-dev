@@ -71,6 +71,21 @@ it("explain renders prose with every section, and --json emits the object", asyn
 	expect(parsed.decisions.length).toBeGreaterThanOrEqual(3);
 });
 
+it("gate facts join by the LOOP's run id, not the session id (the bug the linof proof caught)", async () => {
+	const { writeFile, mkdir } = await import("node:fs/promises");
+	await mkdir(join(repo, ".flusk"), { recursive: true });
+	await writeFile(join(repo, ".flusk", "config.json"), JSON.stringify({ verify: ["true"] }));
+	const path = await fakeRun();
+	const log = await explainSession(path);
+	// The session recorded which loop run served it…
+	const runDecision = log.decisions.find((d) => d.decision.kind === "run");
+	expect(runDecision).toBeDefined();
+	// …and the gate's ledger is reachable through it.
+	expect(log.gate).not.toBeNull();
+	expect(log.gate?.verifiedBy).toContain("true");
+	expect(log.gate?.outcome).toBe("completed");
+});
+
 it("a missing ref fails cleanly, not with a stack", async () => {
 	const { out, text } = capture();
 	expect(await explainCmd({ ref: "nope-nope", out })).toBe(1);

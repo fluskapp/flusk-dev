@@ -55,19 +55,34 @@ export function assembleFromSession(header: HeaderLike, entries: SessionEntry[])
 	};
 }
 
-/** The gate's rows for this run, read from the store's facts of record. */
+/** Every loop-run id this session recorded. The session id is NOT one of
+ * them — the gate's ledger is keyed by run, and joining on the session id is
+ * the bug this function exists to prevent recurring. */
+export function runIdsOf(entries: SessionEntry[]): string[] {
+	const ids: string[] = [];
+	for (const e of entries) {
+		if (e.type === "decision" && e.decision.kind === "run") ids.push(e.decision.runId);
+	}
+	return ids;
+}
+
+/** The gate's rows across this session's runs, merged: verified accumulates,
+ * outcome/report take the LAST run's word — the retry that finally passed. */
 export async function gateEvidence(
 	store: FactStore,
 	ns: string,
-	runId: string,
+	runIds: string[],
 ): Promise<GateEvidence> {
-	const rows: Fact[] = await store.query(ns, { subject: `Run:${runId}` });
-	const verifiedBy = rows.filter((f) => f.predicate === "verified_by").map((f) => f.object);
-	const outcome = rows.find((f) => f.predicate === "outcome")?.object;
-	const reportCheck = rows.find((f) => f.predicate === "report_check")?.object;
-	return {
-		verifiedBy,
-		...(outcome !== undefined ? { outcome } : {}),
-		...(reportCheck !== undefined ? { reportCheck } : {}),
-	};
+	const out: GateEvidence = { verifiedBy: [] };
+	for (const runId of runIds) {
+		const rows: Fact[] = await store.query(ns, { subject: `Run:${runId}` });
+		for (const f of rows) {
+			if (f.predicate === "verified_by" && !out.verifiedBy.includes(f.object)) {
+				out.verifiedBy.push(f.object);
+			}
+			if (f.predicate === "outcome") out.outcome = f.object;
+			if (f.predicate === "report_check") out.reportCheck = f.object;
+		}
+	}
+	return out;
 }

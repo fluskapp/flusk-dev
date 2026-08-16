@@ -11,7 +11,7 @@ import { createFactStore } from "../facts/facts.repository.js";
 import { resolveNamespace } from "../facts/namespaces.js";
 import type { SessionEntry } from "../session/entries.js";
 import { SessionStore } from "../session/session.repository.js";
-import { gateEvidence, type GateEvidence } from "./decisions.js";
+import { gateEvidence, type GateEvidence, runIdsOf } from "./decisions.js";
 
 export interface RunSummary {
 	/** Why the run ended (stats entry); null while it is still running. */
@@ -115,5 +115,5 @@ export async function summarizeSession(path: string): Promise<RunSummary> {
 	if (header?.type !== "header") throw new Error(`not a session file: ${path}`);
 	if (!loadConfig(header.repoRoot).memory.enabled) return assembleRunSummary(entries, null);
 	const ns = resolveNamespace(header.repoRoot, loadRepoConfig(header.repoRoot));
-	return assembleRunSummary(entries, await gateEvidence(createFactStore(), ns, header.id));
+	return assembleRunSummary(entries, await gateEvidence(createFactStore(), ns, runIdsOf(entries)));
 }

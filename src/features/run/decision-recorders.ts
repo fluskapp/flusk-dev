@@ -8,6 +8,14 @@ import type { EventBus } from "../../platform/events/events.js";
 import type { Session } from "../session/session-file.repository.js";
 import type { ModelRef } from "./run.types.js";
 
+/** Ties the session to the gate's ledger: facts land under Run:<runId>, and
+ * without this entry an explain could never find them again (it happened). */
+export function recordRunIds(events: EventBus, session: Session): () => void {
+	return events.on("run:start", (e) => {
+		session.appendDecision({ kind: "run", runId: e.runId });
+	});
+}
+
 /** The context report becomes a decision entry the moment it is announced. */
 export function recordContextDecisions(events: EventBus, session: Session): () => void {
 	return events.on("context:built", (e) => {

@@ -13,7 +13,7 @@ import { ToolRegistry } from "../tools/registry.js";
 import { wireDelegation } from "./delegation.js";
 import type { ToolContext } from "../tools/tool.js";
 import { checkpointMutatingTurns } from "./checkpoints.js";
-import { recordContextDecisions } from "./decision-recorders.js";
+import { recordContextDecisions, recordRunIds } from "./decision-recorders.js";
 import type { Agent, CreateAgentOpts } from "./options.js";
 import { prepareRun, type RunPrompt } from "./run-context.js";
 
@@ -94,6 +94,7 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 	// The context report is written down the moment it is announced — the same
 	// event the renderer shows becomes an entry `flusk explain` reads back.
 	recordContextDecisions(events, session);
+	recordRunIds(events, session);
 	const prepare = (resume: boolean): RunPrompt =>
 		prepareRun({
 			repoRoot: opts.repoRoot,

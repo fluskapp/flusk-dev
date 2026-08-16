@@ -6,7 +6,7 @@
  * decision entry written when the decision was made, or a fact of record.
  */
 import { SessionStore } from "../features/session/session.repository.js";
-import { assembleFromSession, type DecisionLog, gateEvidence } from "../features/run/decisions.js";
+import { assembleFromSession, type DecisionLog, gateEvidence, runIdsOf } from "../features/run/decisions.js";
 import { createFactStore } from "../features/facts/facts.repository.js";
 import { resolveNamespace } from "../features/facts/namespaces.js";
 import { loadConfig, loadRepoConfig } from "../platform/config/config.js";
@@ -39,7 +39,7 @@ export async function explainSession(path: string): Promise<DecisionLog> {
 	const cfg = loadConfig(header.repoRoot);
 	if (!cfg.memory.enabled) return log;
 	const ns = resolveNamespace(header.repoRoot, loadRepoConfig(header.repoRoot));
-	return { ...log, gate: await gateEvidence(createFactStore(), ns, header.id) };
+	return { ...log, gate: await gateEvidence(createFactStore(), ns, runIdsOf(entries)) };
 }
 
 export async function explainCmd(opts: ExplainCmdOpts): Promise<number> {

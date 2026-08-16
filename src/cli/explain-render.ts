@@ -14,6 +14,9 @@ const MODEL_SOURCE: Record<string, string> = {
 };
 
 function line(d: Decision): string[] {
+	if (d.kind === "run") {
+		return [`loop       run ${d.runId} — the gate's facts are keyed by this id`];
+	}
 	if (d.kind === "model") {
 		return [`model      ${d.ref} — ${MODEL_SOURCE[d.source] ?? d.source} [${d.taskKind}]`];
 	}

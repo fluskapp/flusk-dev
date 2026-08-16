@@ -56,6 +56,12 @@ export interface DecisionEntry {
 
 export type Decision =
 	| {
+			/** The loop's run id — the subject the gate's facts are recorded under.
+			 * A session outlives its runs (resume, retry), so several may append. */
+			kind: "run";
+			runId: string;
+	  }
+	| {
 			kind: "model";
 			/** "provider/id" as resolved. */
 			ref: string;
