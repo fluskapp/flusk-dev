@@ -42,7 +42,13 @@ export const Route = createFileRoute("/runs_/$runId")({
 				kind: "session",
 				ref,
 				head: (await getRunHead({ data: { key: ref } })) as RunHead,
-				detail: getSessionRun({ data: { key: ref } }) as Promise<SessionRun>,
+				// A missing/torn file must degrade to the error note, never reject
+				// the SSR stream: an unhandled deferred rejection kills the whole
+				// page render (it did, in CI, on exactly this line).
+				detail: getSessionRun({ data: { key: ref } }).catch(
+					(): SessionRun =>
+						({ header: null, status: "error", stats: null, reason: null, items: [], path: ref }) as unknown as SessionRun,
+				) as Promise<SessionRun>,
 				decisions: getDecisionLog({ data: { ref } }).catch(() => null) as Promise<DecisionLog | null>,
 			};
 		}
