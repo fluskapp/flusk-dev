@@ -62,7 +62,7 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 	if (opts.isolation !== undefined) checkpointMutatingTurns(events, opts.isolation.repoRoot);
 
 	const controller = new AbortController();
-	// A parent's abort must reach this agent (subagents run on their own controller).
+	// A parent's abort must reach this agent (subagents own their controller).
 	if (opts.parentSignal?.aborted === true) controller.abort();
 	else opts.parentSignal?.addEventListener("abort", () => controller.abort(), { once: true });
 	const steering = new SteeringQueue();
@@ -91,8 +91,7 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 	 * (L6), and the prompt drops whatever the block already quotes. Built again
 	 * on resume, when the tree and the run's own journal have moved.
 	 */
-	// The context report is written down the moment it is announced — the same
-	// event the renderer shows becomes an entry `flusk explain` reads back.
+	// Announced context and loop run ids become entries flusk explain reads back.
 	recordContextDecisions(events, session);
 	recordRunIds(events, session);
 	const prepare = (resume: boolean): RunPrompt =>
