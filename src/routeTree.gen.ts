@@ -22,9 +22,9 @@ import { Route as SpecsRouteImport } from './routes/specs'
 import { Route as WebRouteImport } from './routes/web'
 import { Route as ApiAskRouteImport } from './routes/api/ask'
 import { Route as ApiChatRouteImport } from './routes/api/chat'
-import { Route as DocsSplatRouteImport } from './routes/docs_.$'
 import { Route as FilesSplatRouteImport } from './routes/files.$'
 import { Route as ProjectsProjectRouteImport } from './routes/projects.$project'
+import { Route as ReadSplatRouteImport } from './routes/read.$'
 import { Route as RunsRunIdRouteImport } from './routes/runs_.$runId'
 import { Route as ApiEventsRunIdRouteImport } from './routes/api/events.$runId'
 
@@ -93,11 +93,6 @@ const ApiChatRoute = ApiChatRouteImport.update({
   path: '/api/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DocsSplatRoute = DocsSplatRouteImport.update({
-  id: '/docs_/$',
-  path: '/docs/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const FilesSplatRoute = FilesSplatRouteImport.update({
   id: '/files/$',
   path: '/files/$',
@@ -106,6 +101,11 @@ const FilesSplatRoute = FilesSplatRouteImport.update({
 const ProjectsProjectRoute = ProjectsProjectRouteImport.update({
   id: '/projects/$project',
   path: '/projects/$project',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReadSplatRoute = ReadSplatRouteImport.update({
+  id: '/read/$',
+  path: '/read/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RunsRunIdRoute = RunsRunIdRouteImport.update({
@@ -133,9 +133,9 @@ export interface FileRoutesByFullPath {
   '/web': typeof WebRoute
   '/api/ask': typeof ApiAskRoute
   '/api/chat': typeof ApiChatRoute
-  '/docs/$': typeof DocsSplatRoute
   '/files/$': typeof FilesSplatRoute
   '/projects/$project': typeof ProjectsProjectRoute
+  '/read/$': typeof ReadSplatRoute
   '/runs/$runId': typeof RunsRunIdRoute
   '/api/events/$runId': typeof ApiEventsRunIdRoute
 }
@@ -153,9 +153,9 @@ export interface FileRoutesByTo {
   '/web': typeof WebRoute
   '/api/ask': typeof ApiAskRoute
   '/api/chat': typeof ApiChatRoute
-  '/docs/$': typeof DocsSplatRoute
   '/files/$': typeof FilesSplatRoute
   '/projects/$project': typeof ProjectsProjectRoute
+  '/read/$': typeof ReadSplatRoute
   '/runs/$runId': typeof RunsRunIdRoute
   '/api/events/$runId': typeof ApiEventsRunIdRoute
 }
@@ -174,9 +174,9 @@ export interface FileRoutesById {
   '/web': typeof WebRoute
   '/api/ask': typeof ApiAskRoute
   '/api/chat': typeof ApiChatRoute
-  '/docs_/$': typeof DocsSplatRoute
   '/files/$': typeof FilesSplatRoute
   '/projects/$project': typeof ProjectsProjectRoute
+  '/read/$': typeof ReadSplatRoute
   '/runs_/$runId': typeof RunsRunIdRoute
   '/api/events/$runId': typeof ApiEventsRunIdRoute
 }
@@ -196,9 +196,9 @@ export interface FileRouteTypes {
     | '/web'
     | '/api/ask'
     | '/api/chat'
-    | '/docs/$'
     | '/files/$'
     | '/projects/$project'
+    | '/read/$'
     | '/runs/$runId'
     | '/api/events/$runId'
   fileRoutesByTo: FileRoutesByTo
@@ -216,9 +216,9 @@ export interface FileRouteTypes {
     | '/web'
     | '/api/ask'
     | '/api/chat'
-    | '/docs/$'
     | '/files/$'
     | '/projects/$project'
+    | '/read/$'
     | '/runs/$runId'
     | '/api/events/$runId'
   id:
@@ -236,9 +236,9 @@ export interface FileRouteTypes {
     | '/web'
     | '/api/ask'
     | '/api/chat'
-    | '/docs_/$'
     | '/files/$'
     | '/projects/$project'
+    | '/read/$'
     | '/runs_/$runId'
     | '/api/events/$runId'
   fileRoutesById: FileRoutesById
@@ -257,9 +257,9 @@ export interface RootRouteChildren {
   WebRoute: typeof WebRoute
   ApiAskRoute: typeof ApiAskRoute
   ApiChatRoute: typeof ApiChatRoute
-  DocsSplatRoute: typeof DocsSplatRoute
   FilesSplatRoute: typeof FilesSplatRoute
   ProjectsProjectRoute: typeof ProjectsProjectRoute
+  ReadSplatRoute: typeof ReadSplatRoute
   RunsRunIdRoute: typeof RunsRunIdRoute
   ApiEventsRunIdRoute: typeof ApiEventsRunIdRoute
 }
@@ -357,13 +357,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/docs_/$': {
-      id: '/docs_/$'
-      path: '/docs/$'
-      fullPath: '/docs/$'
-      preLoaderRoute: typeof DocsSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/files/$': {
       id: '/files/$'
       path: '/files/$'
@@ -376,6 +369,13 @@ declare module '@tanstack/react-router' {
       path: '/projects/$project'
       fullPath: '/projects/$project'
       preLoaderRoute: typeof ProjectsProjectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/read/$': {
+      id: '/read/$'
+      path: '/read/$'
+      fullPath: '/read/$'
+      preLoaderRoute: typeof ReadSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/runs_/$runId': {
@@ -409,9 +409,9 @@ const rootRouteChildren: RootRouteChildren = {
   WebRoute: WebRoute,
   ApiAskRoute: ApiAskRoute,
   ApiChatRoute: ApiChatRoute,
-  DocsSplatRoute: DocsSplatRoute,
   FilesSplatRoute: FilesSplatRoute,
   ProjectsProjectRoute: ProjectsProjectRoute,
+  ReadSplatRoute: ReadSplatRoute,
   RunsRunIdRoute: RunsRunIdRoute,
   ApiEventsRunIdRoute: ApiEventsRunIdRoute,
 }

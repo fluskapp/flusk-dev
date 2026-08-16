@@ -73,7 +73,7 @@ export function DocsView({ docs, filter }: { docs: Artifact[]; filter: DocsFilte
 	const flat = kinds.flatMap((k) => groups.get(k) ?? []);
 	const openDoc = (a: Artifact) =>
 		navigate({
-			to: "/docs/$",
+			to: "/read/$",
 			params: { _splat: a.path.replace(/^\//, "") },
 			search: (prev: Patch) => prev,
 		});

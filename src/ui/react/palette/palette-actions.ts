@@ -34,9 +34,9 @@ export function usePaletteActions(p: ReturnType<typeof usePalette>) {
 	/** Session key, journal or doc — routed by ref shape, as openRef did. */
 	const openHistory = (h: HistoryHit) => {
 		close();
-		const to = refKind(h.card.ref) === "doc" ? "/docs/$" : "/runs/$runId";
+		const to = refKind(h.card.ref) === "doc" ? "/read/$" : "/runs/$runId";
 		void navigate(
-			to === "/docs/$"
+			to === "/read/$"
 				? ({ to, params: { _splat: h.card.ref } } as never)
 				: ({ to, params: { runId: h.card.ref } } as never),
 		);

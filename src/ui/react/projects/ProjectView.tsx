@@ -19,7 +19,7 @@ type Nav = ReturnType<typeof useNavigate>;
 function openRef(navigate: Nav, ref: string): void {
 	if (refKind(ref) === "doc") {
 		navigate({
-			to: "/docs/$",
+			to: "/read/$",
 			params: { _splat: ref.replace(/^\//, "") },
 			search: (prev: Patch) => prev,
 		});
