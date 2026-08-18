@@ -102,7 +102,7 @@ beforeAll(() => {
 	doc = put(join(root, "docs/panel.md"), `# Panel\n\nthe panel calls ${SYMBOL} once\n`);
 	cfg = {
 		...structuredClone(DEFAULT_CONFIG),
-		ui: { harnessDirs: [], projectDirs: [join(work, "*")] },
+		ui: { harnessDirs: [], projectDirs: [join(work, "*")], liveTailEvents: 400 },
 	};
 });
 

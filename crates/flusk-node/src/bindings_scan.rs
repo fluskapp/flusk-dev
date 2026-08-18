@@ -32,6 +32,14 @@ pub fn scan_sessions_json(root_dir: String) -> AsyncTask<ScanSessionsTask> {
     AsyncTask::new(ScanSessionsTask { root_dir })
 }
 
+/// Scan-stage contract version. 2 = the D2 gate fold (a blocked gate decision
+/// entry yields status "blocked"). A prebuilt lacking this export, or
+/// answering lower, predates the fold and must not answer session scans.
+#[napi]
+pub fn scan_contract_version() -> u32 {
+    2
+}
+
 pub struct GitLogTask {
     repo_root: String,
     opts_json: String,

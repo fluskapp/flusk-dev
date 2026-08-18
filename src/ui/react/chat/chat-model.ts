@@ -22,6 +22,22 @@ export interface ChatMsg {
 	 * request carries this. Absent = the two are the same text.
 	 */
 	sent?: string;
+	/** The reply's mechanics — rendered as ChatTurnRun's collapsed expander. */
+	run?: ChatRun;
+}
+
+/** What produced an assistant turn: the spawned command and its receipt. */
+export interface ChatRun {
+	/** Full command line, prompt elided as "<prompt>". */
+	cmd?: string;
+	cwd?: string;
+	/** Every tool invocation, oldest first — not capped like the live view. */
+	tools: string[];
+	costUsd?: number;
+	durationMs?: number;
+	turns?: number;
+	/** The failure text when the turn errored. */
+	stderr?: string;
 }
 
 /** Turns past this fold to their head with a "show all" toggle. */
@@ -37,8 +53,8 @@ export function composeOutgoing(text: string, blocks: AskBlock[], preamble: stri
 	return blocks.length > 0 || preamble !== "" ? askPrompt(text, blocks, preamble) : text;
 }
 
-export function chatClock(): string {
-	return new Date().toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
+export function chatClock(d = new Date()): string {
+	return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
 }
 
 /**
@@ -50,12 +66,14 @@ export function chatBody(
 	backendId: string,
 	msgs: ChatMsg[],
 	cwd: string | undefined,
-): { backendId: string; messages: ChatMessage[]; cwd?: string } {
+	conversationId?: string,
+): { backendId: string; messages: ChatMessage[]; cwd?: string; conversationId?: string } {
 	return {
 		backendId,
 		// `sent` over `content`: the wire carries the composed prompt the strip
 		// disclosed, while the screen keeps showing what was typed.
 		messages: msgs.filter((m) => m.err !== true).map((m) => ({ role: m.role, content: m.sent ?? m.content })),
 		...(cwd !== undefined && cwd !== "" ? { cwd } : {}),
+		...(conversationId === undefined ? {} : { conversationId }),
 	};
 }

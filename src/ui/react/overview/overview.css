@@ -1,0 +1,28 @@
+/* Overview: stat tiles are the shared kit grid (kit/tile.css), activity is
+   openable rows. Every value is a token (docs/design-system.md). */
+.ov-act { list-style: none; margin: 0; padding: 0; }
+.ov-act li {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	min-height: var(--ij-row-h); padding: 0 var(--ij-space-2);
+	border-radius: var(--ij-radius-sm); cursor: pointer;
+}
+.ov-act li:hover { background: var(--hover); }
+/* Rows are focusable: the same inset ring the decisions header draws. */
+.ov-act li:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(var(--ij-focus-ring-w) * -1);
+}
+.ov-act .title { flex: 1 1 auto; }
+.ov-act .when { font: var(--ij-fs-4) var(--font-code); color: var(--dim); white-space: nowrap; }
+/* The one next action, visible on approach — hover OR keyboard focus;
+   never moves layout. */
+.ov-act .go { font-size: var(--ij-fs-3); color: var(--ij-link); visibility: hidden; white-space: nowrap; }
+.ov-act li:hover .go,
+.ov-act li:focus-within .go { visibility: visible; }
+/* Setup problems read as an ACTION, not as prose: a status pill, the failing
+   checks as chips, and the command to run — copyable in one click. */
+.setup-card {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	padding: var(--ij-space-2) var(--ij-space-3); margin: 0 0 var(--ij-space-4);
+}
+.setup-msg { display: inline-flex; align-items: center; gap: var(--ij-space-1); flex: 1 1 auto; }

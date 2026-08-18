@@ -15,7 +15,13 @@ import { nativeModule } from "./native.repository.js";
 /** Scan-stage exports the prebuilt MAY carry; a stale binary lacks them. */
 interface ScanNative {
 	scanSessionsJson?(rootDir: string): Promise<string>;
+	/** Status-grammar version; 2 = the D2 gate fold ("blocked"). Absent on
+	 * pre-D2 prebuilts, which would answer with wrong statuses. */
+	scanContractVersion?(): number;
 }
+
+/** The scan contract this build of the TS side requires of a prebuilt. */
+const SCAN_CONTRACT = 2;
 
 export interface SessionScanner {
 	scan(): Promise<SessionSummary[]>;
@@ -29,7 +35,13 @@ export interface SessionScanner {
  */
 export function createSessionScanner(root: string = sessionsRoot()): SessionScanner {
 	const native = nativeModule() as ScanNative | null;
-	if (native === null || typeof native.scanSessionsJson !== "function") {
+	if (
+		native === null ||
+		typeof native.scanSessionsJson !== "function" ||
+		typeof native.scanContractVersion !== "function" ||
+		native.scanContractVersion() < SCAN_CONTRACT
+	) {
+		// A stale prebuilt is treated as absent, never allowed to answer wrongly.
 		return { impl: "ts", scan: async () => scanSessions() };
 	}
 	const scanNative = native.scanSessionsJson.bind(native);

@@ -7,6 +7,7 @@
  */
 import type { FlowRunRow, FlowRunStep } from "../../../features/flows/flows.functions.js";
 import type { RunRow } from "../../../features/projects/runs.functions.js";
+import { statusToVerdict, type Verdict } from "../../../features/run/verdict.types.js";
 import type { StageView } from "./stages.js";
 
 /** The segment control's positions. "all" is what an absent ?kind= means. */
@@ -34,6 +35,9 @@ export interface FeedRow {
 	/** Session key or journal path. A flow run without a journal has none. */
 	ref: string;
 	costUsd?: number;
+	/** Unified verdict (D1); sort and speed-search index it. */
+	verdict?: Verdict;
+	filesTouched?: number;
 	/** Journals only: stage progress, e.g. "8/13 · gate". */
 	progress?: string;
 	/** Flow rows only: which flow ran, its arrow chain, and the steps. */
@@ -59,6 +63,7 @@ export const flowToRow = (r: FlowRunRow): FeedRow => ({
 	at: r.at,
 	ref: r.ref ?? "",
 	costUsd: r.costUsd,
+	verdict: statusToVerdict(r.status),
 	flow: r.flow,
 	shape: shapeLine(r.steps),
 	steps: r.steps,
@@ -80,11 +85,12 @@ export const flowStages = (steps: FlowRunStep[]): StageView[] =>
 	}));
 
 export const rowVal = (r: FeedRow, col: string): string | number | undefined =>
-	col === "cost" ? r.costUsd
+	col === "verdict" ? r.verdict
+	: col === "cost" ? r.costUsd
 	: col === "when" ? r.at
 	: col === "run" ? r.title.toLowerCase()
 	: col === "project" ? r.project
 	: r.status;
 
 export const rowText = (r: FeedRow): string =>
-	`${r.title} ${r.project} ${r.status} ${r.progress ?? ""} ${r.kind} ${r.flow ?? ""} ${r.shape ?? ""}`.toLowerCase();
+	`${r.title} ${r.project} ${r.status} ${r.progress ?? ""} ${r.kind} ${r.flow ?? ""} ${r.shape ?? ""} ${r.verdict ?? ""}`.toLowerCase();

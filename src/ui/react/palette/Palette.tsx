@@ -7,6 +7,7 @@
  */
 import { useEffect, useRef, useState } from "react";
 import "./palette.css";
+import { CommandRows } from "../runconfig/palette-commands.js";
 import { HelpSheet } from "./HelpSheet.js";
 import { usePaletteActions } from "./palette-actions.js";
 import { FilesList, HistoryList } from "./palette-rows.js";
@@ -102,7 +103,10 @@ export function PaletteAndHelp() {
 					) : st.mode === "files" ? (
 						<FilesList hits={st.files} q={st.q.replace(/^\//, "").trim()} cur={st.cur} onPick={a.pick} />
 					) : (
-						<HistoryList hits={st.hits} q={st.q.trim()} cur={st.cur} onPick={a.pick} />
+						<>
+							<CommandRows q={st.q} onClose={a.close} />
+							<HistoryList hits={st.hits} q={st.q.trim()} cur={st.cur} onPick={a.pick} />
+						</>
 					)}
 				</div>
 				<div className="pal-foot">

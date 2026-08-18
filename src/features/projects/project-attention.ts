@@ -14,14 +14,15 @@
  * Every rule lives in `computeAttention` on purpose: they are meant to be
  * read, argued with and tuned in one place, and tested one at a time.
  */
+/** STALL_MS is shared with the liveness rule that DIMS a stale row: one
+ * number, or the badge and the attention item disagree about the same run. */
+import { STALL_MS } from "../run/liveness.js";
 import type { Attention } from "./projects.types.js";
 import { lastWriteMs, oldestLive, priciestSession } from "./attention-evidence.js";
 import type { Journal } from "./journal-scan.repository.js";
 import type { SessionSummary } from "./scan.repository.js";
 
 const MINUTE_MS = 60_000;
-/** A run still "running" this long after its last write is stalled, not busy. */
-const STALL_MS = 60 * MINUTE_MS;
 /** Past this, a finished-badly run is history rather than something to do. */
 const RECENT_MS = 48 * 60 * MINUTE_MS;
 export const STALE_MS = 14 * 24 * 60 * MINUTE_MS;

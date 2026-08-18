@@ -1,8 +1,8 @@
 /**
  * The numbered tool-window keybindings, the digit map of docs/experience.md:
- * 1-9 — plain digit and ⌘digit — plus the letter mnemonics; 0 is unbound
- * (Ask is gone — talking with your code is Chat's, so `a` went with it).
- * Digits never fire while typing in an input.
+ * 0-9 — plain digit and ⌘digit — plus the letter mnemonics; 0 is Harness,
+ * the tenth slot (Ask is gone — talking with your code is Chat's, so `a`
+ * went with it). Digits never fire while typing in an input.
  *
  * Escape unwinds ONE layer per press, the client-keys.ts order: overlays
  * first (the palette swallows its own Escape in the capture phase before this
@@ -12,9 +12,10 @@
  */
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { toggleTheme } from "./theme.js";
 
 const ROUTE_OF: Record<string, string> = {
-	"2": "/specs", "3": "/runs", "6": "/docs", "7": "/graph", "8": "/web",
+	"0": "/harness", "2": "/specs", "3": "/runs", "6": "/docs", "7": "/graph", "8": "/web",
 	o: "/", r: "/runs", d: "/docs", g: "/graph", u: "/web",
 };
 const TOGGLE_OF: Record<string, "side" | "find" | "chat" | "doc"> = {
@@ -56,10 +57,9 @@ export function WorkbenchKeys() {
 					}),
 				});
 			} else if (key === "t" && !e.metaKey) {
-				const el = document.documentElement;
-				const next = el.getAttribute("data-theme") === "dark" ? "light" : "dark";
-				el.setAttribute("data-theme", next);
-				localStorage.setItem("flusk-theme", next);
+				// The rail button's own resolution: an unset data-theme means the OS
+				// is choosing, so the first press must flip from what is on screen.
+				toggleTheme();
 			}
 		};
 		window.addEventListener("keydown", onKey);

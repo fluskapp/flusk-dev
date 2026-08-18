@@ -3,22 +3,23 @@
  * Every endpoint's body lives in an api-*.ts module beside this one.
  */
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
-import { fluskHome } from "../platform/paths/paths.js";
-import { handleAsk } from "../features/orchestra/ask.router.js";
-import { handleAskStream } from "../features/orchestra/ask-stream.router.js";
 import { handleChat, liveChats } from "../features/chat/chat.router.js";
 import { handleContent } from "../features/docs/content.router.js";
 import { disposeDocRegistries, handleDoc } from "../features/docs/doc.router.js";
-import { handleFileBody } from "../features/projects/file.router.js";
-import { handleFind } from "../features/search/find.router.js";
+import { handleRender } from "../features/docs/render.router.js";
 import { handleFlows } from "../features/flows/flow.router.js";
 import { handleGraph } from "../features/graph/graph.router.js";
-import { denyReason, PAGE_HEADERS } from "./api-guard.js";
 import { handleHistory } from "../features/history/history.router.js";
+import { handleAsk } from "../features/orchestra/ask.router.js";
+import { handleAskStream } from "../features/orchestra/ask-stream.router.js";
+import { handleFileBody } from "../features/projects/file.router.js";
 import { handleProjects } from "../features/projects/projects.router.js";
-import { handleRender } from "../features/docs/render.router.js";
 import { handleSessions } from "../features/projects/sessions.router.js";
+import { handleFind } from "../features/search/find.router.js";
 import { handleWeb } from "../features/web/web.router.js";
+import { fluskHome } from "../platform/paths/paths.js";
+import { denyReason, PAGE_HEADERS } from "./api-guard.js";
+import { loadAppHandler, serveApp } from "./app-serve.js";
 import { renderPage } from "./page.js";
 
 export interface UiServer {
@@ -32,7 +33,7 @@ function json(res: ServerResponse, status: number, body: unknown): void {
 	res.end(JSON.stringify(body));
 }
 
-function handle(req: IncomingMessage, res: ServerResponse, port: number): void {
+async function handle(req: IncomingMessage, res: ServerResponse, port: number): Promise<void> {
 	// Host/Origin first: nothing below should run for a request that is not
 	// this machine's own browser talking to this server (see api-guard.ts).
 	const deny = denyReason(req, port);
@@ -44,11 +45,6 @@ function handle(req: IncomingMessage, res: ServerResponse, port: number): void {
 	const method = req.method ?? "GET";
 	const path = url.pathname;
 	const repo = url.searchParams.get("repo");
-	if (method === "GET" && path === "/") {
-		res.writeHead(200, PAGE_HEADERS);
-		res.end(renderPage(fluskHome()));
-		return;
-	}
 	if (handleFind(method, path, url.searchParams, res)) return;
 	if (handleFileBody(method, path, repo, res)) return;
 	if (handleHistory(method, path, url.searchParams, res)) return;
@@ -63,6 +59,23 @@ function handle(req: IncomingMessage, res: ServerResponse, port: number): void {
 	if (handleAsk(method, path, url.searchParams, res)) return;
 	if (handleAskStream(method, path, req, res)) return;
 	if (handleSessions(method, path, url.searchParams.get("k"), repo, res)) return;
+	// Everything the API routers did not claim is the app's: static assets and
+	// SSR from dist-app, the same shape as electron/server.mjs — so the
+	// headless door shows the desktop product and a deep link renders. One
+	// carve-out: an unclaimed /api/* path stays a JSON 404 (the app's document
+	// catch-all must not dress a missing endpoint as a page), except the live
+	// events stream, the API route only the app itself implements.
+	const app = await loadAppHandler();
+	if (app !== null && (!path.startsWith("/api/") || path.startsWith("/api/events/"))) {
+		await serveApp(app, req, res, port);
+		return;
+	}
+	// The pre-React fallback page, only for a checkout with no built app.
+	if (method === "GET" && path === "/") {
+		res.writeHead(200, PAGE_HEADERS);
+		res.end(renderPage(fluskHome()));
+		return;
+	}
 	json(res, 404, { error: "not found" });
 }
 
@@ -72,11 +85,10 @@ export function startUiServer(port: number): Promise<UiServer> {
 	// is only known once listen() calls back — hence the mutable capture.
 	let bound = port;
 	const server = createServer((req, res) => {
-		try {
-			handle(req, res, bound);
-		} catch (e) {
-			json(res, 500, { error: e instanceof Error ? e.message : String(e) });
-		}
+		handle(req, res, bound).catch((e: unknown) => {
+			if (res.headersSent) res.end();
+			else json(res, 500, { error: e instanceof Error ? e.message : String(e) });
+		});
 	});
 	return new Promise((resolveP, reject) => {
 		server.once("error", reject);

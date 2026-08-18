@@ -15,6 +15,7 @@ import type {
 	SearchHit,
 	Walkthrough,
 } from "../src/features/history/types.js";
+import { renderPage } from "../src/ui/page.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 
 let home: string;
@@ -92,7 +93,8 @@ it("rejects an unknown kind and honours a project scope, as the CLI does", async
 });
 
 it("ships the palette markup, its help row and its endpoints in the page", async () => {
-	const page = await (await fetch(`${ui.url}/`)).text();
+	// the legacy fallback page, direct: "/" itself serves the React app now
+	const page = renderPage(home);
 	const markers = [
 		'id="palette"',
 		'id="pal-q"',

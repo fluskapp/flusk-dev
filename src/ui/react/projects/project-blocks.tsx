@@ -5,19 +5,29 @@
  */
 import type { ModelRef, ProjectDetail } from "../../../features/projects/detail.functions.js";
 import { Line, Sec } from "../runs/widgets.js";
+import { ConfigResolved } from "./ConfigResolved.js";
+import { DotFluskTree } from "./DotFluskTree.js";
 
 function ModelRow({ m }: { m: ModelRef }) {
 	return (
 		<tr>
 			<td className="mono">{m.id}</td>
 			<td>{m.role !== undefined ? m.role : <span className="off">—</span>}</td>
-			<td className="num">{m.score === undefined ? "" : <span className="score">{m.score}</span>}</td>
+			<td className="num">
+				{m.score === undefined ? "" : <span className="score">{m.score}</span>}
+			</td>
 		</tr>
 	);
 }
 
 export function Models({ models }: { models: ModelRef[] }) {
-	if (models.length === 0) return <Line>No models declared.</Line>;
+	if (models.length === 0)
+		return (
+			<Line>
+				No models declared — list them as <code>models[]</code> in this project's{" "}
+				<code>config.json</code>.
+			</Line>
+		);
 	return (
 		<table className="tbl">
 			<thead>
@@ -37,7 +47,13 @@ export function Models({ models }: { models: ModelRef[] }) {
 }
 
 export function Tools({ tools }: { tools: string[] }) {
-	if (tools.length === 0) return <Line>No tools declared.</Line>;
+	if (tools.length === 0)
+		return (
+			<Line>
+				No tools declared — list them as <code>capabilities[]</code> in <code>config.json</code>, or
+				run once so the stages record themselves.
+			</Line>
+		);
 	return (
 		<div className="chips">
 			{tools.map((t) => (
@@ -65,29 +81,19 @@ export function Verify({ verify }: { verify: string[] }) {
 }
 
 export function PromptBlock({ p }: { p: ProjectDetail["systemPrompt"] }) {
-	if (p === undefined) return <Line>No system prompt found for this project.</Line>;
+	if (p === undefined)
+		return (
+			<Line>
+				No system prompt found — add <code>prompts/*.md</code>, <code>AGENTS.md</code> or{" "}
+				<code>CLAUDE.md</code> at the project root.
+			</Line>
+		);
 	return (
 		<details className="prompt-block">
 			<summary>
 				System prompt <span className="dim">{p.source}</span>
 			</summary>
 			<pre className="prompt-text code">{p.text}</pre>
-		</details>
-	);
-}
-
-export function ConfigBlock({ cfg }: { cfg: Record<string, unknown> }) {
-	const keys = Object.keys(cfg);
-	if (keys.length === 0) return <Line>No declarative config found.</Line>;
-	return (
-		<details className="config-block">
-			<summary>
-				Config{" "}
-				<span className="dim">
-					{keys.length} key{keys.length === 1 ? "" : "s"}
-				</span>
-			</summary>
-			<pre className="code out">{JSON.stringify(cfg, null, 2)}</pre>
 		</details>
 	);
 }
@@ -106,7 +112,8 @@ export function lowerHalf(d: ProjectDetail) {
 				<Verify verify={d.verify} />
 			</Sec>
 			<PromptBlock p={d.systemPrompt} />
-			<ConfigBlock cfg={d.config} />
+			<ConfigResolved name={d.name} />
+			<DotFluskTree name={d.name} />
 		</>
 	);
 }

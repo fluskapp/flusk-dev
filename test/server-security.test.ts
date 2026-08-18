@@ -107,7 +107,9 @@ it("serves a same-origin request, including a chat in a known project", async ()
 		{ origin },
 	);
 	expect(chat.status).toBe(200);
-	expect(sseChunks(chat.body)).toEqual([
+	const frames = sseChunks(chat.body);
+	expect(frames[0]).toMatchObject({ type: "meta" });
+	expect(frames.slice(1)).toEqual([
 		{ type: "error", message: "unknown chat backend: no-such-backend" },
 		{ type: "done" },
 	]);

@@ -1,0 +1,29 @@
+/* Counter tiles — the ONE visual language for stats (Overview and the
+   project page alike): a flat separator grid, hairlines only, no radius,
+   ui-font numbers. One-pixel separators, nothing doubled. */
+.stats-row {
+	display: flex; flex-wrap: wrap; margin-bottom: var(--ij-space-4);
+	border-top: 1px solid var(--ij-separator);
+	border-left: 1px solid var(--ij-separator);
+}
+.stat {
+	flex: 1 1 110px; /* design-exempt: tile flex-basis, from styles-widgets.ts */
+	background: var(--ij-bg-inset);
+	padding: var(--ij-space) var(--ij-space-2);
+	border-right: 1px solid var(--ij-separator);
+	border-bottom: 1px solid var(--ij-separator);
+}
+/* A tile with nowhere to go stays inert: no cursor, no hover fill. */
+.stat[data-open] { cursor: pointer; }
+.stat[data-open]:hover { background: var(--ij-hover); }
+.stat[data-open]:active { background: var(--ij-selection); }
+/* No colour here: .stat-v.ev is what paints a tile that leads somewhere. */
+.stat-v { font: 600 var(--ij-fs-9)/var(--ij-lh-tight) var(--ij-font-ui); }
+.stat-l {
+	font-size: var(--ij-fs-3); text-transform: uppercase; letter-spacing: .5px;
+	color: var(--ij-text-secondary);
+}
+.stat-h {
+	font-size: var(--ij-fs-3); color: var(--ij-text-secondary);
+	margin-top: var(--ij-space-1);
+}

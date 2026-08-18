@@ -114,13 +114,7 @@
 }
 .peek-gap .text { color: var(--dim); }
 
-.empty {
-	display: flex; height: 55%; align-items: center; justify-content: center;
-	color: var(--dim); text-align: center;
-}
-.empty.small {
-	display: block; height: auto; padding: var(--ij-space-3) var(--ij-space-2);
-}
+/* Empty states come from system.css (.sys-empty; .empty is its alias). */
 
 /* Fallback body: read-only highlighted source, no gutter, no click targets. */
 .file-plain { overflow: auto; flex: 1; min-height: 0; padding: var(--ij-space-2) var(--ij-space-3); }

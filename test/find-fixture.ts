@@ -62,7 +62,7 @@ export function findTree(): FindTree {
 	const outsideFile = put(outside, "secret.txt", "needle secret\n");
 	const cfg: FluskConfig = {
 		...structuredClone(DEFAULT_CONFIG),
-		ui: { harnessDirs: [], projectDirs: [join(work, "*")] },
+		ui: { harnessDirs: [], projectDirs: [join(work, "*")], liveTailEvents: 400 },
 	};
 	writeFileSync(join(home, "config.json"), JSON.stringify({ ui: cfg.ui }));
 	return {

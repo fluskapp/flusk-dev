@@ -2,10 +2,11 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
-import { Session } from "../src/features/session/session-file.repository.js";
-import { repoSlug } from "../src/platform/paths/paths.js";
 import type { SessionDetail } from "../src/features/projects/detail.js";
 import { scanSessions } from "../src/features/projects/scan.repository.js";
+import { Session } from "../src/features/session/session-file.repository.js";
+import { repoSlug } from "../src/platform/paths/paths.js";
+import { renderPage } from "../src/ui/page.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 
 let home: string;
@@ -21,13 +22,17 @@ beforeAll(async () => {
 	s.appendMessage({ role: "user", content: "polish the dashboard" });
 	s.appendMessage({
 		role: "assistant",
-		content: [
-			{ type: "toolCall", id: "t1", name: "bash", args: { command: "ls" } },
-		],
+		content: [{ type: "toolCall", id: "t1", name: "bash", args: { command: "ls" } }],
 		stopReason: "toolUse",
 		usage: { input: 10, output: 5, cacheRead: 0, costUsd: 0.001 },
 	});
-	s.appendMessage({ role: "toolResult", callId: "t1", name: "bash", output: "README.md", isError: false });
+	s.appendMessage({
+		role: "toolResult",
+		callId: "t1",
+		name: "bash",
+		output: "README.md",
+		isError: false,
+	});
 	s.appendMessage({
 		role: "assistant",
 		content: [{ type: "text", text: "All done." }],
@@ -63,7 +68,8 @@ it("scan finds the session with derived status and stats", () => {
 });
 
 it("serves the IntelliJ-styled page and the sessions API", async () => {
-	const page = await (await fetch(`${ui.url}/`)).text();
+	// the legacy fallback page, direct: "/" itself serves the React app now
+	const page = renderPage(home);
 	expect(page).toContain("<title>flusk</title>");
 	expect(page).toContain("JetBrains Mono");
 	expect(page).toContain("data-theme");
@@ -101,7 +107,8 @@ it("reveal validates keys and method", async () => {
 });
 
 it("page ships search, help overlay, and keyboard client", async () => {
-	const page = await (await fetch(`${ui.url}/`)).text();
+	// the legacy fallback page, direct: "/" itself serves the React app now
+	const page = renderPage(home);
 	for (const marker of ['id="search"', 'id="help"', 'id="toast"', "<kbd>j</kbd>", "copy-nvim"]) {
 		expect(page).toContain(marker);
 	}

@@ -18,7 +18,7 @@ import type { ChatBackend } from "./types.js";
 
 /** Agent CLIs probed by default, with the flag that makes each one-shot. */
 const DEFAULT_CLIS: ReadonlyArray<{ id: string; label: string; args: string[] }> = [
-	{ id: "claude", label: "Claude Code", args: ["-p"] },
+	{ id: "claude", label: "Claude Code", args: ["-p", "--output-format", "stream-json", "--include-partial-messages", "--verbose"] },
 	{ id: "codex", label: "Codex", args: ["exec"] },
 	{ id: "kimi", label: "Kimi", args: ["-p"] },
 ];

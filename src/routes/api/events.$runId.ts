@@ -10,6 +10,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { getLiveRun } from "../../features/run/run.router.js";
 
 const POLL_MS = 150;
+/** 15 s of silence gets a comment heartbeat, so idle proxies keep the pipe. */
+const HEARTBEAT_MS = 15_000;
 
 export const Route = createFileRoute("/api/events/$runId")({
 	server: {
@@ -25,20 +27,30 @@ export const Route = createFileRoute("/api/events/$runId")({
 				const encoder = new TextEncoder();
 				let cursor = 0;
 				let timer: ReturnType<typeof setInterval> | undefined;
+				let heartbeat: ReturnType<typeof setInterval> | undefined;
+				const stopTimers = (): void => {
+					if (timer !== undefined) clearInterval(timer);
+					if (heartbeat !== undefined) clearInterval(heartbeat);
+				};
 				const stream = new ReadableStream<Uint8Array>({
 					start(controller) {
+						let lastWrite = Date.now();
+						const send = (frame: string): void => {
+							controller.enqueue(encoder.encode(frame));
+							lastWrite = Date.now();
+						};
+						// Reconnect fast on drops rather than the browser's default backoff.
+						send("retry: 3000\n\n");
 						const pump = (): void => {
 							const read = run.feed.readSince(cursor);
 							cursor = read.cursor;
 							if (read.dropped > 0) {
-								controller.enqueue(
-									encoder.encode(`event: dropped\ndata: ${read.dropped}\n\n`),
-								);
+								send(`event: dropped\ndata: ${read.dropped}\n\n`);
 							}
 							for (const e of read.events) {
-								controller.enqueue(encoder.encode(`data: ${JSON.stringify(e.event)}\n\n`));
+								send(`data: ${JSON.stringify(e.event)}\n\n`);
 								if (e.event.type === "run:end") {
-									if (timer !== undefined) clearInterval(timer);
+									stopTimers();
 									controller.close();
 									return;
 								}
@@ -46,9 +58,12 @@ export const Route = createFileRoute("/api/events/$runId")({
 						};
 						pump();
 						timer = setInterval(pump, POLL_MS);
+						heartbeat = setInterval(() => {
+							if (Date.now() - lastWrite >= HEARTBEAT_MS) send(": hb\n\n");
+						}, HEARTBEAT_MS);
 					},
 					cancel() {
-						if (timer !== undefined) clearInterval(timer);
+						stopTimers();
 					},
 				});
 				return new Response(stream, {

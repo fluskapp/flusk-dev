@@ -1,9 +1,8 @@
 /**
- * The workbench shell. These assertions pin the page's structure — the
- * numbered tool windows, the tab strip and its breadcrumb, the Find in Files
- * panel, the markdown preview control, the status bar, the grouped shortcut
- * sheet — and the one rule renderPage must never break: the only value it
- * interpolates is escaped.
+ * The workbench shell. These assertions pin the page's structure — numbered
+ * tool windows, tab strip and breadcrumb, Find in Files, markdown preview,
+ * status bar, shortcut sheet — and the one rule renderPage must never break:
+ * the only value it interpolates is escaped.
  */
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -24,7 +23,9 @@ beforeAll(async () => {
 	home = mkdtempSync(join(tmpdir(), "flusk-page-home-"));
 	process.env.FLUSK_HOME = home;
 	ui = await startUiServer(0);
-	served = await (await fetch(`${ui.url}/`)).text();
+	// "/" serves the built React app now (server-app-door.test.ts); the markup
+	// pinned here is the legacy fallback page, so it comes from renderPage.
+	served = renderPage(home);
 });
 
 afterAll(async () => {
@@ -136,9 +137,8 @@ it("ships a client script that parses", () => {
 });
 
 /**
- * Regression: the Find tool window opened without taking focus, so the first
- * thing typed after pressing 5 / clicking Find landed in the chat composer.
- * IntelliJ always puts the caret in the query field.
+ * Regression: Find opened without taking focus, so the first thing typed
+ * landed in the chat composer. IntelliJ puts the caret in the query field.
  */
 it("focuses the find query when the panel opens, not when it closes", () => {
 	const page = renderPage("/tmp/flusk-home");

@@ -9,6 +9,7 @@
  */
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { Ic } from "../system/Icon.js";
 import { DocBody } from "./DocBody.js";
 import { useDocLookup } from "./use-doc.js";
 import "./doc.css";
@@ -27,7 +28,11 @@ export function DocWindow() {
 		const onSymbol = (e: Event): void => {
 			const d = (e as CustomEvent<SymbolDetail | null>).detail;
 			if (d === null || d === undefined || typeof d.file !== "string" || d.file === "") return;
-			lookup(d.file, typeof d.line === "number" ? d.line : 1, typeof d.col === "number" ? d.col : 1);
+			lookup(
+				d.file,
+				typeof d.line === "number" ? d.line : 1,
+				typeof d.col === "number" ? d.col : 1,
+			);
 		};
 		document.addEventListener("flusk:symbol", onSymbol);
 		return () => document.removeEventListener("flusk:symbol", onSymbol);
@@ -48,11 +53,15 @@ export function DocWindow() {
 				<span>Documentation</span>
 				<span className="spacer" />
 				{/* Which engine answered — the reason a thin panel is thin. */}
-				<span id="doc-provider" className={doc !== null ? "dw-badge on" : "dw-badge"} title="Which engine answered">
+				<span
+					id="doc-provider"
+					className={doc !== null ? "dw-badge on" : "dw-badge"}
+					title="Which engine answered"
+				>
 					{doc !== null ? doc.provider : "none"}
 				</span>
 				<button id="doc-hide" type="button" title="Hide Documentation (F1 / ⌘7)" onClick={hide}>
-					✕
+					<Ic name="close" size={14} />
 				</button>
 			</div>
 			<div id="doc-sym" className="dw-sym">

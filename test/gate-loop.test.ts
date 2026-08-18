@@ -5,6 +5,7 @@ import { afterEach, beforeEach, expect, test } from "vitest";
 import { runCmd } from "../src/cli/run-cmd.js";
 import { assistantText, assistantToolCalls } from "../src/features/provider/fake.js";
 import { Session } from "../src/features/session/session-file.repository.js";
+import { SessionStore } from "../src/features/session/session.repository.js";
 import { capture, SLOW } from "./cli2-helpers.js";
 import { setupTestHome, teardownTestHome } from "./helpers.js";
 
@@ -39,6 +40,18 @@ async function onlySessionContext() {
 	const context = session.buildContext();
 	session.close();
 	return context;
+}
+
+/** The single session's LAST gate decision entry, read raw off the JSONL. */
+async function onlySessionGate() {
+	const root = join(process.env.FLUSK_HOME as string, "sessions");
+	const names = (await readdir(root, { recursive: true })) as string[];
+	const files = names.filter((n) => n.endsWith(".jsonl"));
+	expect(files).toHaveLength(1);
+	const entries = SessionStore.read(join(root, files[0] as string));
+	for (const e of entries.reverse())
+		if (e.type === "decision" && e.decision.kind === "gate") return e.decision;
+	return undefined;
 }
 
 test("gate failure steers the SAME session; the retry attempt fixes it and passes", async () => {
@@ -107,6 +120,12 @@ test("no verify commands detected → the gate is a pass-through no-op", async (
 	const outcome = await runCmd({ task: "plain", repo, fake: script, quiet: true, out: cap.out });
 	expect(outcome).toBe("completed");
 	expect(cap.text()).toMatch(/^completed · 1 turns/);
+	// The "completed but unverified" record: judged on record even with no commands.
+	const gate = await onlySessionGate();
+	expect(gate?.outcome).toBe("completed");
+	expect(gate?.retries).toBe(0);
+	expect(gate?.verified).toEqual([]);
+	expect(gate?.attempts).toBeUndefined();
 }, SLOW);
 
 test("non-completed runs never enter the gate", async () => {
@@ -118,4 +137,5 @@ test("non-completed runs never enter the gate", async () => {
 	const outcome = await runCmd({ task: "fails", repo, fake: script, quiet: true, out: cap.out });
 	expect(outcome).toBe("error");
 	expect(cap.text()).not.toContain("blocked");
+	expect(await onlySessionGate()).toBeUndefined();
 }, SLOW);

@@ -11,10 +11,10 @@ import { base } from "./cells.js";
 
 export function GraphEmpty(props: { title: string; note: string; action?: ReactNode }) {
 	return (
-		<div className="gg-empty">
-			<h3>{props.title}</h3>
-			<p>{props.note}</p>
-			{props.action !== undefined ? <p>{props.action}</p> : null}
+		<div className="sys-empty">
+			<span className="gg-empty-title">{props.title}</span>
+			<span className="dim gg-empty-note">{props.note}</span>
+			{props.action !== undefined ? <span>{props.action}</span> : null}
 		</div>
 	);
 }

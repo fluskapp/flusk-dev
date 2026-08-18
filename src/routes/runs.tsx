@@ -11,6 +11,7 @@ import {
 	getFlowRun,
 	getFlowRuns,
 	type FlowLibrary,
+	type FlowRunReply,
 	type FlowRunRow,
 } from "../features/flows/flows.functions.js";
 import { getRunFeed, type RunRow } from "../features/projects/runs.functions.js";
@@ -42,7 +43,7 @@ interface RunsLoad {
 	lib: FlowLibrary | null;
 	/** Un-awaited on purpose (the old /flows idiom): the open flow run's
 	 * heavy half — per-step outputs and sources — streams in. */
-	run: Promise<FlowRunRow | null> | null;
+	run: Promise<FlowRunReply> | null;
 }
 
 export const Route = createFileRoute("/runs")({
@@ -74,7 +75,7 @@ export const Route = createFileRoute("/runs")({
 			run:
 				deps.flow === undefined
 					? null
-					: (getFlowRun({ data: { runId: deps.flow } }) as Promise<FlowRunRow | null>),
+					: (getFlowRun({ data: { runId: deps.flow } }) as Promise<FlowRunReply>),
 		};
 	},
 	component: RunsPage,
@@ -89,13 +90,19 @@ function RunsPage() {
 			void navigate({ to: ".", search: (prev: RunsSearch) => ({ ...prev, flow: undefined }) });
 		return (
 			<div id="runs" className="view">
-				<Suspense fallback={<div className="empty small">reading that run …</div>}>
+				<Suspense fallback={<div className="empty small">reading flow run {flow} …</div>}>
 					<Await promise={load.run}>
-						{(run) =>
-							run === null ? (
-								<div className="empty small">could not read that run</div>
+						{(reply) =>
+							reply.run === null ? (
+								<div className="empty small">
+									Couldn't read flow run {flow} — {reply.reason}. It may never have started, or
+									its checkpoint was pruned.{" "}
+									<button type="button" className="sys-btn" onClick={back}>
+										Back to runs
+									</button>
+								</div>
 							) : (
-								<FlowRunDetail run={run} onBack={back} />
+								<FlowRunDetail run={reply.run} />
 							)
 						}
 					</Await>
@@ -104,10 +111,18 @@ function RunsPage() {
 		);
 	}
 	const k = feedKind(kind);
-	const shown = load.rows
+	const matches = load.rows
 		.filter((r) => (k === "all" ? true : r.kind === k))
-		.filter((r) => (status === undefined ? true : r.status === status))
-		.slice(0, n ?? 120);
+		.filter((r) => (status === undefined ? true : r.status === status));
+	// Live rows ride ahead of the display cap, the same rule runFeed applies:
+	// mergeRows re-sorted by date, which would cut an old running row again.
+	// The population is RunsView's Live section exactly — sessions and journals
+	// still being written — so the hoist and the section cannot disagree.
+	const isLive = (r: FeedRow) => r.status === "running" && r.kind !== "flow";
+	const shown = [...matches.filter(isLive), ...matches.filter((r) => !isLive(r))].slice(
+		0,
+		n ?? 120,
+	);
 	return (
 		<div id="runs" className="view">
 			<RunsView

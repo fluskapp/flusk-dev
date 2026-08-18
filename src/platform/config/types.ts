@@ -95,6 +95,8 @@ export interface FluskConfig {
 		harnessDirs: string[];
 		/** Globs (one `*` level) of project roots whose markdown is indexed. */
 		projectDirs: string[];
+		/** Client-side live-run tail ring size (events kept before "skipped N"). */
+		liveTailEvents: number;
 	};
 	chat: {
 		/** Backends offered in the dashboard's chat. Empty = auto-detect CLIs. */

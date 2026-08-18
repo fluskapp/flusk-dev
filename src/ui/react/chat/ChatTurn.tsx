@@ -9,6 +9,7 @@
  * would take the reply out of the reader's hands.
  */
 import { useState } from "react";
+import { ChatTurnRun } from "./ChatTurnRun.js";
 import { FOLD_LINES, type ChatMsg } from "./chat-model.js";
 
 const lineCount = (s: string): number => s.split("\n").length;
@@ -33,7 +34,15 @@ function FoldToggle({ lines, open, flip }: { lines: number; open: boolean; flip:
 
 export function ChatTurn({ m, streaming }: { m: ChatMsg; streaming: boolean }) {
 	const [open, setOpen] = useState(false);
-	if (m.err === true) return <div className="turn-err">{m.content}</div>;
+	if (m.err === true) {
+		// A failed reply still shows its mechanics — the expander names what ran.
+		return (
+			<>
+				<div className="turn-err">{m.content}</div>
+				<ChatTurnRun run={m.run} />
+			</>
+		);
+	}
 	const lines = lineCount(m.content);
 	const foldable = lines > FOLD_LINES && !streaming;
 	const folded = foldable && !open;
@@ -68,6 +77,7 @@ export function ChatTurn({ m, streaming }: { m: ChatMsg; streaming: boolean }) {
 		<div className="turn model">
 			{body}
 			{foldable ? <FoldToggle lines={lines} open={open} flip={() => setOpen(!open)} /> : null}
+			<ChatTurnRun run={m.run} />
 			{when}
 		</div>
 	);

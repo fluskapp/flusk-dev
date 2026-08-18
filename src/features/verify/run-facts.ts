@@ -22,4 +22,8 @@ export const runFact = {
 	 * it to `outcome` would supersede the run's real outcome. */
 	reportCheck: (runId: string, verdict: string): FactInput =>
 		fact(`Run:${runId}`, "report_check", verdict),
+	/** One coexisting "why it blocked" row per reason — the cross-session
+	 * answer to "what went wrong", readable without replaying the session. */
+	failedBecause: (runId: string, reason: string): FactInput =>
+		fact(`Run:${runId}`, "failed_because", reason),
 };

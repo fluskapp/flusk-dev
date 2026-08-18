@@ -17,6 +17,7 @@ import { Route as DocsRouteImport } from './routes/docs'
 import { Route as FindRouteImport } from './routes/find'
 import { Route as FlowsRouteImport } from './routes/flows'
 import { Route as GraphRouteImport } from './routes/graph'
+import { Route as HarnessRouteImport } from './routes/harness'
 import { Route as RunsRouteImport } from './routes/runs'
 import { Route as SpecsRouteImport } from './routes/specs'
 import { Route as WebRouteImport } from './routes/web'
@@ -66,6 +67,11 @@ const FlowsRoute = FlowsRouteImport.update({
 const GraphRoute = GraphRouteImport.update({
   id: '/graph',
   path: '/graph',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HarnessRoute = HarnessRouteImport.update({
+  id: '/harness',
+  path: '/harness',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RunsRoute = RunsRouteImport.update({
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/find': typeof FindRoute
   '/flows': typeof FlowsRoute
   '/graph': typeof GraphRoute
+  '/harness': typeof HarnessRoute
   '/runs': typeof RunsRoute
   '/specs': typeof SpecsRoute
   '/web': typeof WebRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/find': typeof FindRoute
   '/flows': typeof FlowsRoute
   '/graph': typeof GraphRoute
+  '/harness': typeof HarnessRoute
   '/runs': typeof RunsRoute
   '/specs': typeof SpecsRoute
   '/web': typeof WebRoute
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/find': typeof FindRoute
   '/flows': typeof FlowsRoute
   '/graph': typeof GraphRoute
+  '/harness': typeof HarnessRoute
   '/runs': typeof RunsRoute
   '/specs': typeof SpecsRoute
   '/web': typeof WebRoute
@@ -191,6 +200,7 @@ export interface FileRouteTypes {
     | '/find'
     | '/flows'
     | '/graph'
+    | '/harness'
     | '/runs'
     | '/specs'
     | '/web'
@@ -211,6 +221,7 @@ export interface FileRouteTypes {
     | '/find'
     | '/flows'
     | '/graph'
+    | '/harness'
     | '/runs'
     | '/specs'
     | '/web'
@@ -231,6 +242,7 @@ export interface FileRouteTypes {
     | '/find'
     | '/flows'
     | '/graph'
+    | '/harness'
     | '/runs'
     | '/specs'
     | '/web'
@@ -252,6 +264,7 @@ export interface RootRouteChildren {
   FindRoute: typeof FindRoute
   FlowsRoute: typeof FlowsRoute
   GraphRoute: typeof GraphRoute
+  HarnessRoute: typeof HarnessRoute
   RunsRoute: typeof RunsRoute
   SpecsRoute: typeof SpecsRoute
   WebRoute: typeof WebRoute
@@ -320,6 +333,13 @@ declare module '@tanstack/react-router' {
       path: '/graph'
       fullPath: '/graph'
       preLoaderRoute: typeof GraphRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/harness': {
+      id: '/harness'
+      path: '/harness'
+      fullPath: '/harness'
+      preLoaderRoute: typeof HarnessRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/runs': {
@@ -404,6 +424,7 @@ const rootRouteChildren: RootRouteChildren = {
   FindRoute: FindRoute,
   FlowsRoute: FlowsRoute,
   GraphRoute: GraphRoute,
+  HarnessRoute: HarnessRoute,
   RunsRoute: RunsRoute,
   SpecsRoute: SpecsRoute,
   WebRoute: WebRoute,

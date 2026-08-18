@@ -8,6 +8,7 @@ import { request } from "node:http";
 import { join } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { afterAll, beforeAll, expect, it } from "vitest";
+import { readConversation } from "../src/features/chat/chat-log.repository.js";
 import type { ChatBackend } from "../src/features/chat/types.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 import { type ChatStub, startChatStub } from "./api-chat-stub.js";
@@ -62,17 +63,35 @@ it("lists configured backends alongside the auto-detected CLIs", async () => {
 	});
 });
 
-it("streams one SSE frame per chunk and ends after done", async () => {
+it("streams meta first, one frame per chunk, and persists the conversation", async () => {
 	const res = await post(ui.url, "/api/chat", {
 		backendId: "stub",
 		messages: [{ role: "user", content: "hi" }],
 	});
 	expect(res.status).toBe(200);
-	expect(sseChunks(res.body)).toEqual([
+	const frames = sseChunks(res.body);
+	expect(frames[0]).toMatchObject({ type: "meta" });
+	expect(frames.slice(1)).toEqual([
 		{ type: "delta", text: "hello " },
 		{ type: "delta", text: "world" },
 		{ type: "done" },
 	]);
+	// The SSE transcript and the file on disk tell the same story.
+	const id = (frames[0] as { conversationId: string }).conversationId;
+	expect(readConversation(id).turns.map((t) => [t.role, t.content])).toEqual([
+		["user", "hi"],
+		["assistant", "hello world"],
+	]);
+});
+
+it("rejects a conversationId that is not a server-issued id", async () => {
+	const res = await post(ui.url, "/api/chat", {
+		backendId: "stub",
+		messages: [{ role: "user", content: "hi" }],
+		conversationId: "../x",
+	});
+	expect(res.status).toBe(400);
+	expect(JSON.parse(res.body)).toEqual({ error: "conversationId must be a server-issued id" });
 });
 
 it("reports an unknown backend as an error chunk, not an HTTP failure", async () => {
@@ -81,7 +100,9 @@ it("reports an unknown backend as an error chunk, not an HTTP failure", async ()
 		messages: [{ role: "user", content: "hi" }],
 	});
 	expect(res.status).toBe(200);
-	expect(sseChunks(res.body)).toEqual([
+	const frames = sseChunks(res.body);
+	expect(frames[0]).toMatchObject({ type: "meta" });
+	expect(frames.slice(1)).toEqual([
 		{ type: "error", message: "unknown chat backend: ghost" },
 		{ type: "done" },
 	]);

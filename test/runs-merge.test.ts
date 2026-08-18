@@ -87,6 +87,14 @@ describe("feed-row", () => {
 		expect(rowVal(journal, "run")).toBe("run: fix the gate");
 	});
 
+	it("verdict rides the row: sort and speed-search see it, legacy status sort survives", () => {
+		expect(flowToRow(flow).verdict).toBe("ok"); // flow status "done"
+		const r = flowToRow(flow);
+		expect(rowVal(r, "verdict")).toBe("ok");
+		expect(rowVal(journal, "status")).toBe("done"); // old ?sort=status URLs keep working
+		expect(rowText({ ...journal, verdict: "warn" })).toContain("warn");
+	});
+
 	it("an unrecognized ?kind= is the whole feed, not a crash", () => {
 		expect(feedKind(undefined)).toBe("all");
 		expect(feedKind("flows")).toBe("all");

@@ -13,6 +13,7 @@ import type { FactStore } from "../features/facts/types.js";
 import { detectVerifyCommands } from "../features/verify/detect.repository.js";
 import { formatEvidence, runVerify, type VerifyCommandResult } from "../features/verify/gate.repository.js";
 import { claimCheck, finalReport } from "./gate-report.js";
+import { failingAttempts, type GateAttempt, passingCmds, recordGate } from "./gate-record.js";
 
 /** What the CLI exits on: a run end reason, or gate-blocked (exit 1). */
 export type CliOutcome = RunEndReason | "blocked";
@@ -64,15 +65,25 @@ export async function runWithGate(
 		if (reason !== "completed" || opts.noVerify === true) return { outcome: reason, reason, stats };
 		const commands = detectVerifyCommands(opts.repoRoot, opts.repoConfig);
 		let results: VerifyCommandResult[] = [];
+		const attempts: GateAttempt[] = [];
+		let retries = 0;
 		if (commands.length > 0) {
 			let verdict = runVerify(commands, opts.repoRoot, opts.cfg.verify.evidenceLines);
 			for (let retry = 0; !verdict.passed; retry++) {
+				attempts.push(...failingAttempts(retry, verdict.results));
 				if (retry >= opts.cfg.verify.retries) {
 					const f = failure(verdict.results);
 					opts.out.write(`blocked: verification failing after ${retry} retries\n`);
 					if (f !== undefined) opts.out.write(`${f.cmd} exited ${f.exitCode}\n${f.tail}\n`);
+					await recordGate(agent, opts, track.snapshot().runId, {
+						outcome: "blocked",
+						retries: retry,
+						verified: passingCmds(verdict.results),
+						attempts,
+					});
 					return { outcome: "blocked", reason, stats };
 				}
+				retries = retry + 1;
 				({ reason, stats } = await agent.continueRun(formatEvidence(verdict.results)));
 				if (reason !== "completed") return { outcome: reason, reason, stats };
 				verdict = runVerify(commands, opts.repoRoot, opts.cfg.verify.evidenceLines);
@@ -81,7 +92,7 @@ export async function runWithGate(
 		}
 		const rec = track.snapshot();
 		const report = finalReport(agent);
-		const outcome = await claimCheck(opts.store, opts, {
+		const check = await claimCheck(opts.store, opts, {
 			runId: rec.runId,
 			sessionId: agent.session.id,
 			repoPath: opts.repoRoot,
@@ -92,7 +103,15 @@ export async function runWithGate(
 			transcriptTail: [],
 			stats,
 		}, results, report);
-		return { outcome, reason, stats };
+		await recordGate(agent, opts, rec.runId, {
+			outcome: check.outcome,
+			retries,
+			verified: passingCmds(results),
+			...(attempts.length > 0 ? { attempts } : {}),
+			reportCheck: check.reportCheck,
+			...(check.reasons.length > 0 ? { reasons: check.reasons } : {}),
+		});
+		return { outcome: check.outcome, reason, stats };
 	} finally {
 		track.stop();
 	}

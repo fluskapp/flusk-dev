@@ -9,7 +9,9 @@ import "./skeleton.css";
 const W = ["w6", "w9", "w8", "w5", "w7", "w4"];
 
 const bars = (n: number, from = 0) =>
-	Array.from({ length: n }, (_, i) => <div key={i} className={`skel ${W[(from + i) % W.length]}`} />);
+	Array.from({ length: n }, (_, i) => (
+		<div key={i} className={`skel ${W[(from + i) % W.length]}`} />
+	));
 
 /** Prose density: a journal or document body on its way. */
 export function SkelText({ rows = 6 }: { rows?: number }) {
@@ -53,6 +55,17 @@ export function SkelOutline({ rows = 7 }: { rows?: number }) {
 	return (
 		<div className="skel-outline" aria-hidden="true">
 			{bars(rows, 3)}
+		</div>
+	);
+}
+
+/** Find density: the query field's control row over result-pitch rows —
+ * what /find ships before its ssr-off panel hydrates. */
+export function SkelFind({ rows = 8 }: { rows?: number }) {
+	return (
+		<div className="skel-find" aria-hidden="true">
+			<div className="skel skel-field" />
+			{bars(rows, 1)}
 		</div>
 	);
 }

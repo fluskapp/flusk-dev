@@ -7,6 +7,8 @@
  */
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Ic } from "../system/Icon.js";
+import { ROOT_DEFAULTS } from "./root-search.js";
+import { toggleTheme } from "./theme.js";
 
 interface RailItem {
 	id: string;
@@ -22,21 +24,38 @@ const TOP: RailItem[] = [
 	{ id: "r-specs", icon: "spec", title: "Specs — what you intend", n: "2", to: "/specs" },
 	{ id: "r-runs", icon: "run", title: "Runs — what happened", n: "3", to: "/runs" },
 	{ id: "r-find", icon: "find", title: "Find in Files", n: "4", toggles: "find" },
-	{ id: "r-chat", icon: "chat", title: "Chat — talk with code, spec or run", n: "5", toggles: "chat" },
+	{
+		id: "r-chat",
+		icon: "chat",
+		title: "Chat — talk with code, spec or run",
+		n: "5",
+		toggles: "chat",
+	},
 	{ id: "r-docs", icon: "book", title: "Docs — your own markdown", n: "6", to: "/docs" },
 	{ id: "r-graph", icon: "graph", title: "Graph — what am I about to break", n: "7", to: "/graph" },
 	{ id: "r-web", icon: "globe", title: "Web — read a URL", n: "8", to: "/web" },
 	{ id: "r-doc", icon: "file", title: "Documentation — symbol docs", n: "9", toggles: "doc" },
+	{
+		id: "r-harness",
+		icon: "harness",
+		title: "Harness — what runs your code",
+		n: "0",
+		to: "/harness",
+	},
 ];
 
 export function Rail({ search }: { search: Record<string, unknown> }) {
 	const navigate = useNavigate();
+	// The stripe rule: an OPEN tool window's button is highlighted, and the
+	// defaulted params are open too — undefined must read as the default.
+	const isOpen = (key: "side" | "chat" | "find" | "doc"): boolean =>
+		(search[key] ?? ROOT_DEFAULTS[key]) === true;
 	const toggle = (key: "side" | "chat" | "find" | "doc") =>
 		navigate({
 			to: ".",
 			search: (prev: Record<string, unknown>) => ({
 				...prev,
-				[key]: !(prev[key] ?? (key === "side" || key === "chat")),
+				[key]: !((prev[key] ?? ROOT_DEFAULTS[key]) === true),
 			}),
 		});
 	return (
@@ -51,20 +70,20 @@ export function Rail({ search }: { search: Record<string, unknown> }) {
 							search={search}
 							className="rail-btn"
 							title={`${it.title} (${it.n} / ⌘${it.n})`}
-							activeProps={{ className: "rail-btn on" }}
+							activeProps={{ className: "on" }}
 						>
-							<Ic name={it.icon} />
+							<Ic name={it.icon} size={20} />
 						</Link>
 					) : (
 						<button
 							key={it.id}
 							id={it.id}
 							type="button"
-							className={`rail-btn${search[it.toggles as string] === true ? " on" : ""}`}
+							className={`rail-btn${it.toggles !== undefined && isOpen(it.toggles) ? " on" : ""}`}
 							title={`${it.title} (${it.n} / ⌘${it.n})`}
 							onClick={() => it.toggles && toggle(it.toggles)}
 						>
-							<Ic name={it.icon} />
+							<Ic name={it.icon} size={20} />
 						</button>
 					),
 				)}
@@ -75,14 +94,9 @@ export function Rail({ search }: { search: Record<string, unknown> }) {
 					type="button"
 					className="rail-btn"
 					title="Toggle light/dark (t)"
-					onClick={() => {
-						const el = document.documentElement;
-						const next = el.getAttribute("data-theme") === "dark" ? "light" : "dark";
-						el.setAttribute("data-theme", next);
-						localStorage.setItem("flusk-theme", next);
-					}}
+					onClick={() => void toggleTheme()}
 				>
-					◑
+					<Ic name="theme" size={20} />
 				</button>
 				<button
 					id="help-btn"
@@ -91,7 +105,7 @@ export function Rail({ search }: { search: Record<string, unknown> }) {
 					title="Shortcuts (?)"
 					onClick={() => document.dispatchEvent(new KeyboardEvent("keydown", { key: "?" }))}
 				>
-					?
+					<Ic name="help" size={20} />
 				</button>
 			</div>
 		</nav>

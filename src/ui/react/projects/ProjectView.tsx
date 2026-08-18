@@ -5,6 +5,7 @@
  */
 import { useNavigate } from "@tanstack/react-router";
 import type { Attention, ProjectDetail } from "../../../features/projects/detail.functions.js";
+import { Tile } from "../kit/Tile.js";
 import { base, fmtCost, refKind } from "../runs/format.js";
 import { Line, Sec } from "../runs/widgets.js";
 import { lowerHalf } from "./project-blocks.js";
@@ -26,32 +27,10 @@ function openRef(navigate: Nav, ref: string): void {
 	} else {
 		navigate({
 			to: "/runs/$runId",
-			params: { runId: encodeURIComponent(ref) },
+			params: { runId: ref }, // raw — the router does the one URI encoding
 			search: (prev: Patch) => prev,
 		});
 	}
-}
-
-function Tile({
-	value,
-	label,
-	hint,
-	open,
-}: {
-	value: string;
-	label: string;
-	hint?: string;
-	open?: () => void;
-}) {
-	// The accent styling is the promise that a tile leads somewhere; a tile
-	// with no "open" gets neither, so nothing looks clickable and inert.
-	return (
-		<div className="stat" {...(open !== undefined ? { "data-open": "1", onClick: open } : {})}>
-			<div className={`stat-v${open !== undefined ? " ev" : ""}`}>{value}</div>
-			<div className="stat-l">{label}</div>
-			{hint !== undefined ? <div className="stat-h">{hint}</div> : null}
-		</div>
-	);
 }
 
 function AttentionRows({ d, navigate }: { d: ProjectDetail; navigate: Nav }) {

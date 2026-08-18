@@ -17,6 +17,8 @@ export interface RunStream {
 	skipped: number;
 	/** Highest turn number seen. */
 	turns: number;
+	/** Dollars accumulated from turn:end frames (deduped by turn on replay). */
+	costUsd: number;
 	last: FluskEvent["type"] | null;
 	status: "connecting" | "open" | "ended" | "lost";
 }
@@ -28,17 +30,21 @@ const RETRY_MS = 2000;
 export function openRunStream(
 	runId: string,
 	onChange: (s: RunStream) => void,
+	/** Tail ring size; ui.liveTailEvents where a view carries the preference. */
+	keep = KEEP,
 ): () => void {
 	let events: FluskEvent[] = [];
 	let skipped = 0;
 	let turns = 0;
+	let costUsd = 0;
+	let costTurn = 0;
 	let last: FluskEvent["type"] | null = null;
 	let status: RunStream["status"] = "connecting";
 	let es: EventSource | null = null;
 	let timer: ReturnType<typeof setTimeout> | undefined;
 	let closed = false;
 
-	const publish = () => onChange({ events, skipped, turns, last, status });
+	const publish = () => onChange({ events, skipped, turns, costUsd, last, status });
 
 	const connect = () => {
 		es = new EventSource(`/api/events/${encodeURIComponent(runId)}`);
@@ -53,8 +59,12 @@ export function openRunStream(
 			} catch {
 				return; // a torn frame is the server's bug, not a reason to die
 			}
-			events = events.length >= KEEP ? [...events.slice(1 - KEEP), e] : [...events, e];
+			events = events.length >= keep ? [...events.slice(1 - keep), e] : [...events, e];
 			if (e.type === "turn:start" && e.turn > turns) turns = e.turn;
+			if (e.type === "turn:end" && e.turn > costTurn) {
+				costTurn = e.turn;
+				costUsd += e.message.usage.costUsd;
+			}
 			last = e.type;
 			if (e.type === "run:end") {
 				status = "ended";

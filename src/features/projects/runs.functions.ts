@@ -9,35 +9,23 @@ import { loadConfig } from "../../platform/config/config.js";
 import { summarizeSession, type RunSummary } from "../run/summary.js";
 import { createRenderer } from "./native.repository.js";
 import { scanArtifacts } from "./artifact-scan.repository.js";
-import { loadSessionDetail, type SessionDetail } from "./detail.js";
+import { loadSessionDetail } from "./detail.js";
 import { readTextSync } from "./file-read.repository.js";
-import { expandHome, type Journal, scanJournals } from "./journal-scan.repository.js";
+import { journalAt } from "./journal-lookup.repository.js";
+import { expandHome, type Journal } from "./journal-scan.repository.js";
 import type { RunRow } from "./projects.types.js";
 import { revealInFinder } from "./reveal.repository.js";
 import { runFeed } from "./run-feed.js";
-import { scanSessions, sessionsRoot, type SessionSummary } from "./scan.repository.js";
+import type { JournalBody, RunHead, SessionRun } from "./runs.types.js";
+import { lastGate } from "../session/gate-fold.js";
+import { SessionStore } from "../session/session.repository.js";
+import { scanSessions, sessionsRoot } from "./scan.repository.js";
 
 export type { RunRow } from "./projects.types.js";
 export type { Journal, JournalStage } from "./journal-scan.repository.js";
 export type { SessionSummary } from "./scan.repository.js";
 export type { RunSummary } from "../run/summary.js";
-
-/** The wire shape of a transcript. detail.ts types tool args as `unknown`; a
- * session file holds JSON by construction, so the narrowing is a statement of
- * fact, not a coercion. */
-export type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
-export type ToolView = Omit<import("./detail.js").ToolView, "args"> & { args: Json };
-export type TranscriptItem =
-	| { kind: "user"; text: string }
-	| {
-			kind: "assistant";
-			text: string;
-			thinking: string;
-			stopReason: string;
-			errorMessage?: string;
-			tools: ToolView[];
-	  }
-	| { kind: "compaction"; summary: string };
+export type { Json, JournalBody, RunHead, SessionRun, ToolView, TranscriptItem } from "./runs.types.js";
 
 const cfg = createServerOnlyFn(() => loadConfig(process.cwd()));
 const renderer = createRenderer();
@@ -53,14 +41,13 @@ const keyToPath = createServerOnlyFn((key: string): string | null => {
 	return path.startsWith(`${root}/`) ? path : null;
 });
 
-/** Identity against the scanner's index, not a prefix test (the membership
- * rule content.router.ts documents): a symlink under docs/runs that resolves
- * elsewhere still *starts with* the root, so prefix admits it. */
-const indexedJournal = createServerOnlyFn((target: string): Journal | null => {
-	if (target === "") return null;
-	const path = resolve(expandHome(target));
-	return scanJournals(cfg().ui.harnessDirs).find((j) => j.path === path) ?? null;
-});
+/** Directory containment, not index membership: journalAt realpaths the
+ * target and requires its parent to be a configured journal dir's realpath —
+ * a symlink under docs/runs that resolves elsewhere is still refused, and a
+ * journal past the feed's per-dir cap still renders. */
+const journalRef = createServerOnlyFn((target: string): Journal | null =>
+	journalAt(cfg().ui.harnessDirs, target),
+);
 
 /** The unified feed: flusk sessions and harness journals, newest first. */
 export const getRunFeed = createServerFn()
@@ -68,11 +55,6 @@ export const getRunFeed = createServerFn()
 	.handler(async ({ data }): Promise<RunRow[]> => runFeed(cfg(), data));
 
 /** The light half of a session run: enough for the header, no transcript. */
-export interface RunHead {
-	summary: SessionSummary | null;
-	path: string | null;
-}
-
 export const getRunHead = createServerFn()
 	.inputValidator((data: { key: string }) => data)
 	.handler(async ({ data }): Promise<RunHead> => ({
@@ -80,15 +62,18 @@ export const getRunHead = createServerFn()
 		path: keyToPath(data.key),
 	}));
 
-export type SessionRun = Omit<SessionDetail, "items"> & { items: TranscriptItem[]; path: string };
-
-/** The heavy half: the whole transcript. Deferred by the route loader. */
+/** The heavy half: the whole transcript. Deferred by the route loader.
+ * `harnessVerified` (additive, external-harness sessions only): the last gate
+ * decision passed at least one verify command — the trust chip's fact. */
 export const getSessionRun = createServerFn()
 	.inputValidator((data: { key: string }) => data)
-	.handler(async ({ data }): Promise<SessionRun> => {
+	.handler(async ({ data }): Promise<SessionRun & { harnessVerified?: boolean }> => {
 		const path = keyToPath(data.key);
 		if (path === null) throw new Error("bad session key");
-		return { ...loadSessionDetail(path), path } as SessionRun;
+		const detail = { ...loadSessionDetail(path), path } as SessionRun;
+		if (detail.header.harness === undefined) return detail;
+		const gate = lastGate(SessionStore.read(path));
+		return { ...detail, harnessVerified: gate !== null && gate.verified.length > 0 };
 	});
 
 /** The Summary block's facts — session entries + gate rows, every field
@@ -107,12 +92,7 @@ export const getRunSummary = createServerFn()
 /** One journal's frontmatter — title, status, stages, PR — never the body. */
 export const getJournalMeta = createServerFn()
 	.inputValidator((data: { path: string }) => data)
-	.handler(async ({ data }): Promise<Journal | null> => indexedJournal(data.path));
-
-export interface JournalBody {
-	text: string;
-	html: string;
-}
+	.handler(async ({ data }): Promise<Journal | null> => journalRef(data.path));
 
 /** The journal body, rendered on the server: escaping is the renderer's
  * security invariant; a second client-side implementation would be a second
@@ -120,15 +100,16 @@ export interface JournalBody {
 export const getJournalBody = createServerFn()
 	.inputValidator((data: { path: string }) => data)
 	.handler(async ({ data }): Promise<JournalBody> => {
-		const found = indexedJournal(data.path);
-		if (found === null) throw new Error("not an indexed journal");
+		const found = journalRef(data.path);
+		if (found === null) throw new Error("not a journal in a configured harness directory");
 		const text = readTextSync(found.path);
 		return { text, html: await renderer.markdown(text) };
 	});
 
 /** Reveal spawns `open -R`, so the set of acceptable paths is CLOSED: a
- * session key resolves under the sessions root, anything else must be a path
- * one of the scanners already indexed. Same rule as sessions.router.ts. */
+ * session key resolves under the sessions root, a journal must sit in a
+ * configured journal directory (containment — the cap must not make a real
+ * journal unrevealable), and anything else must be an indexed artifact. */
 export const revealRef = createServerFn({ method: "POST" })
 	.inputValidator((data: { key?: string; path?: string }) => data)
 	.handler(async ({ data }): Promise<{ ok: boolean; error?: string }> => {
@@ -137,11 +118,10 @@ export const revealRef = createServerFn({ method: "POST" })
 		else if (data.path !== undefined && data.path !== "") {
 			const target = resolve(expandHome(data.path));
 			const c = cfg();
-			const indexed = [
-				...scanJournals(c.ui.harnessDirs).map((j) => j.path),
-				...scanArtifacts(c.ui.projectDirs).map((a) => a.path),
-			];
-			path = indexed.includes(target) ? target : null;
+			const allowed =
+				journalAt(c.ui.harnessDirs, target) !== null ||
+				scanArtifacts(c.ui.projectDirs).some((a) => a.path === target);
+			path = allowed ? target : null;
 		}
 		if (path === null) return { ok: false, error: "not a revealable file" };
 		if (process.platform !== "darwin") return { ok: false, error: "reveal is macOS-only" };

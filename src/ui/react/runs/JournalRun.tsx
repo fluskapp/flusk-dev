@@ -113,16 +113,31 @@ export function JournalRun({
 			toast(`“${name}” is not named in this journal`);
 		}
 	};
-	const html =
-		body.html !== ""
-			? body.html
-			: '<div class="empty small">could not render this journal</div>';
+	// The editor-banner idiom: name the file, name the reason, offer the fix
+	// (PathActions carries copy / open-in-nvim / Reveal in Finder).
+	if (body.html === "") {
+		return (
+			<div ref={host}>
+				<JournalHead meta={meta} path={path} pick={{ selected, onPick }} />
+				<div className="sys-empty">
+					<span>
+						Couldn't load this run's journal — {body.error ?? "the file rendered to nothing"}.
+					</span>
+					<span className="sys-chip mono">{path}</span>
+					<span className="meta-actions">
+						<PathActions path={path} toast={toast} />
+					</span>
+				</div>
+				{toastNode}
+			</div>
+		);
+	}
 	return (
 		<div ref={host}>
 			<MdSurface
 				id={`run:${path}`}
 				path={path}
-				html={html}
+				html={body.html}
 				text={body.text}
 				head={<JournalHead meta={meta} path={path} pick={{ selected, onPick }} />}
 				actions={<PathActions path={path} toast={toast} />}

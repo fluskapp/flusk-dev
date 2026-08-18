@@ -21,6 +21,8 @@ export interface CreateSessionOpts {
 	model: ModelRef;
 	parentSession?: string;
 	taskKind?: string;
+	/** External harness id (foreign adapter sessions); lands in the header. */
+	harness?: string;
 	now?: Date;
 }
 
@@ -64,6 +66,7 @@ export class Session {
 			createdAt: now.toISOString(),
 			...(opts.parentSession !== undefined ? { parentSession: opts.parentSession } : {}),
 			...(opts.taskKind !== undefined ? { taskKind: opts.taskKind } : {}),
+			...(opts.harness !== undefined ? { harness: opts.harness } : {}),
 		};
 		const store = SessionStore.open(newSessionPath(opts.repoRoot, id, now));
 		store.appendEntry(header);

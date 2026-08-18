@@ -33,6 +33,11 @@ export const ICONS: Record<string, React.ReactNode> = {
 	stop: <rect x="4" y="4" width="8" height="8" rx="1" />,
 	attach: <path d="M13 7.5 8.2 12.3a3.2 3.2 0 0 1-4.5-4.5L8.9 2.6a2.1 2.1 0 0 1 3 3L7.1 10.4a1 1 0 0 1-1.5-1.5l4.3-4.3" />,
 	think: <><path d="M5.5 10.5a4 4 0 1 1 5 0v1.5h-5v-1.5Z" /><path d="M6.5 14h3" /></>,
+	close: <path d="m4.5 4.5 7 7M11.5 4.5l-7 7" />,
+	plus: <path d="M8 3.5v9M3.5 8h9" />,
+	theme: <><circle cx="8" cy="8" r="5.5" /><path d="M8 2.5a5.5 5.5 0 0 1 0 11Z" fill="currentColor" stroke="none" /></>,
+	help: <><circle cx="8" cy="8" r="5.5" /><path d="M6.3 6.4A1.8 1.8 0 1 1 8 8.3v.9M8 11.4v.1" /></>,
+	chevron: <path d="m4.5 6.5 3.5 3.5 3.5-3.5" />,
 };
 
 /** Tool-name → glyph, so a transcript leads with what HAPPENED. */

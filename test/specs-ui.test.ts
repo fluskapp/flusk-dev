@@ -39,11 +39,12 @@ describe("toolbar IA", () => {
 			"7": "Graph",
 			"8": "Web",
 			"9": "Documentation",
+			"0": "Harness",
 		});
 	});
-	it("has no Flows or Ask button and leaves 0 unbound", () => {
+	it("has no Flows or Ask button and binds 0 to Harness", () => {
 		expect(PANELS.some((p) => /flow|ask/i.test(p.label))).toBe(false);
-		expect(PANELS.some((p) => p.n === "0")).toBe(false);
+		expect(PANELS.find((p) => p.n === "0")?.to).toBe("/harness");
 	});
 	it("routes 2 to /specs and keeps the doc window a toggle on 9", () => {
 		expect(PANELS.find((p) => p.n === "2")?.to).toBe("/specs");

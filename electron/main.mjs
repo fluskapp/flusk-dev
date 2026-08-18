@@ -54,6 +54,12 @@ async function createWindow() {
 		height: 900,
 		show: false,
 		backgroundColor: "#1e1f22",
+		// Own the chrome, the JetBrains way: no stock (theme-mismatched) macOS
+		// title bar — the traffic lights float over the app's own toolbar
+		// (--ij-toolbar-h is 34px, so x/y 10 centers them on it). The toolbar
+		// is the drag region (chrome.css) and insets past the lights.
+		titleBarStyle: "hiddenInset",
+		trafficLightPosition: { x: 10, y: 10 },
 		webPreferences: {
 			contextIsolation: true,
 			sandbox: true,

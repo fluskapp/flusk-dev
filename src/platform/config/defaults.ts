@@ -44,6 +44,8 @@ export const DEFAULT_CONFIG: FluskConfig = {
 	ui: {
 		harnessDirs: ["~/projects/*/docs/runs", "~/projects/playground/*/docs/runs"],
 		projectDirs: ["~/projects/*", "~/projects/playground/*"],
+		// live-stream.ts KEEP, now a preference: long investigations raise it
+		liveTailEvents: 400,
 	},
 	chat: {
 		backends: [],

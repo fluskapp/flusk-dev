@@ -12,7 +12,7 @@ import { mainRepoName } from "../profile/worktree.repository.js";
 
 export function summarize(p: ProjectParts, nowMs: number, median?: number): ProjectSummary {
 	const at = lastActivity(p);
-	const live = liveRuns(p);
+	const live = liveRuns(p, nowMs);
 	const costUsd = Number(projectSpend(p).toFixed(6));
 	const input = {
 		journals: p.journals,
@@ -21,14 +21,15 @@ export function summarize(p: ProjectParts, nowMs: number, median?: number): Proj
 		costUsd,
 		...(at !== undefined ? { lastActivity: at } : {}),
 	};
-	// One stat + one small read per project, not two.
-	const parent = mainRepoName(p.path);
+	// One stat + one small read per project, not two. The project-less group
+	// has no root to ask git about — "" would resolve against the cwd.
+	const parent = p.path === "" ? null : mainRepoName(p.path);
 	return {
 		name: p.name,
 		...(parent === null ? {} : { worktreeOf: parent }),
 		path: p.path,
 		kind: p.kind,
-		runs: p.journals.length + p.sessions.length,
+		runs: p.journalCount + p.sessions.length,
 		liveRuns: live,
 		sessions: p.sessions.length,
 		docs: p.docs.length,

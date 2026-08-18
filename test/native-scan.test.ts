@@ -1,7 +1,8 @@
 /**
  * Differential harness for the scan stage: the TypeScript scanner and the
  * Rust port walk the SAME temp sessions tree and must produce deeply equal
- * summaries — same order, same statuses, same mtime floats — including the
+ * summaries — same order, same statuses, same mtime floats (minus the two
+ * TS-only derived fields, verdict/filesTouched) — including the
  * torn-tail, foreign-file and empty-root cases. Skips when the prebuilt is
  * absent (fresh checkout, foreign platform) rather than lie.
  */
@@ -46,6 +47,16 @@ beforeAll(() => {
 	session({ repoRoot: repo, task: "killed", reason: "aborted", atSec: 1_786_000_300 });
 	session({ repoRoot: repo, task: "ran out", reason: "budget", atSec: 1_786_000_400 });
 	session({ repoRoot: repo, task: "still going", open: true, atSec: 1_786_000_500 });
+	// D2: the gate's blocked judgment overrides stats.reason "completed" — the
+	// exact fold the Rust port must share, or the Overview paints blocked green.
+	session({
+		repoRoot: repo,
+		task: "gated",
+		reason: "completed",
+		gate: "blocked",
+		files: ["src/x.ts"],
+		atSec: 1_786_000_600,
+	});
 	raw("torn.jsonl", `${header("t1", "2026-08-02T00:00:00.000Z")}\n${ASSISTANT}\n{"type":"sta`, 1_786_001_100);
 	raw("derived.jsonl", `${header("d1", "2026-08-03T00:00:00.000Z")}\n${ASSISTANT}\n${stats("")}\n`, 1_786_001_200);
 	raw("silent.jsonl", `${header("s1", "2026-08-04T00:00:00.000Z")}\n${stats("")}\n`, 1_786_001_300);
@@ -72,13 +83,23 @@ describeNative("native session scan ≡ TypeScript reference", () => {
 	it("agrees with the TypeScript scanner, order and floats included", async () => {
 		const rs = await createSessionScanner().scan();
 		const ts = scanSessions();
-		expect(rs).toEqual(ts);
-		expect(rs).toHaveLength(10); // 5 real + 5 raw survivors
+		// verdict/filesTouched are TS-only derivations (D3): native rows omit
+		// them and consumers fall back to statusToVerdict over a status the
+		// Rust side derives identically — gate fold included.
+		const gated = ts.find((r) => r.task === "gated");
+		expect(gated?.verdict).toBe("warn"); // blocked is attention, not failure
+		expect(gated?.filesTouched).toBe(1);
+		expect(ts.find((r) => r.task === "broke")?.verdict).toBe("err");
+		expect(ts.find((r) => r.task === "ship it")?.filesTouched).toBe(0);
+		const stripped = ts.map(({ verdict: _v, filesTouched: _f, ...rest }) => rest);
+		expect(rs).toEqual(stripped);
+		expect(rs).toHaveLength(11); // 6 real + 5 raw survivors
 	});
 
 	it("agrees on every derived status and the torn tail", async () => {
 		const rs = await createSessionScanner().scan();
 		const by = (s: string) => rs.find((x) => x.key.endsWith(s));
+		expect(rs.find((x) => x.task === "gated")?.status).toBe("blocked"); // D2 fold
 		expect(by("torn.jsonl")?.status).toBe("running"); // torn stats never counted
 		expect(by("derived.jsonl")?.status).toBe("completed"); // from stopReason
 		expect(by("silent.jsonl")?.status).toBe("stopped"); // stats, no assistant

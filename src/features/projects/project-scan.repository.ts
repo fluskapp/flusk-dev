@@ -11,8 +11,10 @@ import { summarize } from "./project-summary.js";
 export { summarize } from "./project-summary.js";
 import { basename, join, resolve } from "node:path";
 import type { FluskConfig } from "../../platform/config/types.js";
+import { isLive } from "../run/liveness.js";
 import type { ProjectKind, ProjectSummary } from "./projects.types.js";
 import { type Artifact, dropNested, resolveProjectRoots, scanArtifacts } from "./artifact-scan.repository.js";
+import { countJournals } from "./journal-lookup.repository.js";
 import { type Journal, scanJournals } from "./journal-scan.repository.js";
 import { computeAttention, medianSpend } from "./project-attention.js";
 import { type SessionSummary, scanSessions } from "./scan.repository.js";
@@ -27,6 +29,10 @@ const JOURNALS_PER_PROJECT = 400;
 const DOCS_PER_PROJECT = 2000;
 /** No global truncation: counts must be true before they are displayed. */
 const UNCAPPED = Number.POSITIVE_INFINITY;
+/** The project-less group: work whose root the config does not list. Dropping
+ * it made three surfaces disagree about "what is running now" — the Overview
+ * counted these sessions while the feed and the toolbar never saw them. */
+export const NO_PROJECT = "(no project)";
 
 /** One project's raw inputs, before they are counted into a summary. */
 export interface ProjectParts {
@@ -34,6 +40,8 @@ export interface ProjectParts {
 	path: string;
 	kind: ProjectKind;
 	journals: Journal[];
+	/** True on-disk journal count — `journals` is the capped display slice. */
+	journalCount: number;
 	sessions: SessionSummary[];
 	docs: Artifact[];
 }
@@ -75,16 +83,33 @@ export function projectRoots(cfg: FluskConfig): string[] {
  */
 export function collectParts(cfg: FluskConfig): ProjectParts[] {
 	const journals = scanJournals(cfg.ui.harnessDirs);
+	const journalCounts = countJournals(cfg.ui.harnessDirs);
 	const sessions = scanSessions();
 	const docs = scanArtifacts(cfg.ui.projectDirs, UNCAPPED);
-	return projectRoots(cfg).map((path) => ({
+	const roots = projectRoots(cfg);
+	const known = new Set(roots);
+	const parts: ProjectParts[] = roots.map((path) => ({
 		name: basename(path) || path,
 		path,
 		kind: classifyProject(path),
 		journals: journals.filter((j) => j.harnessRoot === path).slice(0, JOURNALS_PER_PROJECT),
+		journalCount: journalCounts.get(path) ?? 0,
 		sessions: sessions.filter((s) => resolve(s.repoRoot) === path),
 		docs: docs.filter((d) => d.root === path).slice(0, DOCS_PER_PROJECT),
 	}));
+	const strayJournals = journals.filter((j) => !known.has(j.harnessRoot));
+	const straySessions = sessions.filter((s) => !known.has(resolve(s.repoRoot)));
+	if (strayJournals.length + straySessions.length > 0)
+		parts.push({
+			name: NO_PROJECT,
+			path: "",
+			kind: "repo",
+			journals: strayJournals.slice(0, JOURNALS_PER_PROJECT),
+			journalCount: strayJournals.length,
+			sessions: straySessions,
+			docs: [],
+		});
+	return parts;
 }
 
 /**
@@ -97,9 +122,11 @@ export const projectSpend = (p: ProjectParts): number =>
 	p.sessions.reduce((sum, s) => sum + s.costUsd, 0) +
 	p.journals.reduce((sum, j) => sum + (j.costUsd ?? 0), 0);
 
-export const liveRuns = (p: ProjectParts): number =>
-	p.journals.filter((j) => j.status === "running").length +
-	p.sessions.filter((s) => s.status === "running").length;
+/** In flight means WRITTEN to recently, never merely "never closed": a crashed
+ * run keeps its status forever and kept the badge pulsing (run/liveness.ts). */
+export const liveRuns = (p: ProjectParts, nowMs: number = Date.now()): number =>
+	p.journals.filter((j) => isLive(j.status, j.mtimeMs, nowMs)).length +
+	p.sessions.filter((s) => isLive(s.status, s.updatedAtMs, nowMs)).length;
 
 /** Newest timestamp across journals, sessions and documents. */
 export function lastActivity(p: ProjectParts): string | undefined {

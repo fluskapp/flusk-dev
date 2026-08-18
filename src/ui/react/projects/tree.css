@@ -97,6 +97,23 @@
 #search::selection { background: var(--ij-selection); color: var(--ij-selection-text); }
 #search:not(:focus)::selection { background: var(--ij-selection-inactive); }
 
+/* --- Config window: layer strip + provenance chips -------------------- */
+.cfg-layers { margin: 0 0 var(--ij-space-4); }
+.cfg-layer {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	min-height: var(--ij-row-h); padding: 0 var(--ij-space-2);
+	font-size: var(--ij-fs-6);
+}
+/* Amber is the "needs a look" tone: absent/malformed layers and notes. */
+.cfg-layer.warn, .cfg-layer.warn .dim { color: var(--warn); }
+.cfg-layer .cfg-path { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cfg-hint { margin-left: var(--ij-space-2); }
+/* Origin chips: which layer won the key. Color is state, not decoration. */
+.chip.prov { text-transform: uppercase; font-size: var(--ij-fs-1); letter-spacing: .3px; }
+.chip.prov.home { color: var(--accent); }
+.chip.prov.project { color: var(--ok); }
+.chip.prov.stripped { color: var(--warn); }
+
 /* --- system pass: rows lead with a glyph ------------------------------ */
 .node .ic { color: var(--dim); flex: none; }
 .node.cursor .ic, #tree:focus-within .node.active .ic { color: var(--text); }

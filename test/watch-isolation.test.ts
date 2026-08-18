@@ -16,6 +16,8 @@ let repo: string;
 const git = (args: string[], cwd = repo): string =>
 	execFileSync("git", args, { cwd, encoding: "utf8" });
 
+// Git setup is fast alone, but worker contention under the full suite can push
+// it past the default 10s hook timeout.
 beforeEach(() => {
 	repo = mkdtempSync(join(tmpdir(), "flusk-wt-repo-"));
 	git(["init", "-q", "-b", "main"]);
@@ -24,7 +26,7 @@ beforeEach(() => {
 	writeFileSync(join(repo, "seed.txt"), "seed");
 	git(["add", "-A"]);
 	git(["commit", "-qm", "init"]);
-});
+}, 60_000);
 
 it("sanitizes item keys into legal branch names", () => {
 	expect(branchFor("flusk/", "gh-prs-7")).toBe("flusk/gh-prs-7");

@@ -5,6 +5,7 @@
  * The organising idea is that a *project* is the unit of attention — a
  * harness or a repo — not a session. Everything else hangs off it.
  */
+import type { Verdict } from "../run/verdict.types.js";
 
 export type ProjectKind = "harness" | "repo";
 
@@ -66,6 +67,10 @@ export interface RunRow {
 	/** Session key or journal path — the handle for fetching detail. */
 	ref: string;
 	costUsd?: number;
+	/** Unified verdict, server-derived (D1). Absent when there is no basis. */
+	verdict?: Verdict;
+	/** Distinct files written/edited (sessions only; journals have no transcript). */
+	filesTouched?: number;
 	/** Journals only: stage progress, e.g. "8/13 · gate". */
 	progress?: string;
 }

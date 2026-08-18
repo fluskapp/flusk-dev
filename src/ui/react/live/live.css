@@ -87,3 +87,12 @@
 .live-error-msg { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .live-error .live-btn { height: var(--ij-row-h); padding: 0 var(--ij-space-2); }
 .live-x { font-family: var(--font-ui); }
+
+/* ---- the live tail: a run's events, printed as they arrive --------------- */
+.live-tail {
+	padding: var(--ij-space-3) var(--ij-space-2);
+	font: var(--ij-fs-5)/var(--ij-lh-code) var(--font-code);
+}
+.live-tail .tail-say { white-space: pre-wrap; overflow-wrap: anywhere; }
+.live-tail .tail-note { color: var(--dim); margin: var(--ij-space-1) 0; }
+.live-tail .tail-tool { color: var(--dim); }

@@ -18,6 +18,7 @@ its sentence gets merged.
 | 7 | Graph | What am I about to break. |
 | 8 | Web | Read an external URL beside the code (fetched text is data, loudly). |
 | 9 | Documentation | Symbol docs for the code on screen (LSP). |
+| 0 | Harness | What runs your code: the loop, its tools, and what it has learned. |
 
 Gone as windows: **Flows** (a flow run IS a run — it is a segment of Runs
 now) and **Ask** (talking with your code is what Chat is for; Ask's visible
@@ -60,7 +61,8 @@ The body is yours: context, constraints, sketches. The harness's contract:
 | Talk with your code | Chat (5) with a code attachment — the old Ask, kept whole |
 | Talk with spec | Chat (5) with a spec attachment |
 | Plan / architecture / refactor mode | A spec's `mode:`, honored by `flusk run --spec` and the Specs window |
-| Graph and loops | Graph (7) for impact; flow runs in Runs (3) for loops |
+| Graph and loops | Graph (7) for impact; Harness (0) for the loop's anatomy; flow runs in Runs (3) |
+| Harness anatomy | Harness (0) |
 | Harness building | `flusk spec new` + verify detection + `docs/harness-plan.md` |
 | Observers | `flusk watch` queues; live runs stream over SSE into the workbench |
 | Factories | Spec templates (`--template feature|bugfix|refactor`) |

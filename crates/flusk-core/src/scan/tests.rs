@@ -12,6 +12,8 @@ use super::walk::scan_sessions;
 const HEADER: &str = r#"{"type":"header","version":1,"id":"a1","task":"t","repoRoot":"/r","gitBranch":null,"model":{"provider":"fake","id":"fake-1","contextWindow":200000},"createdAt":"2026-08-01T00:00:00.000Z"}"#;
 const ASSISTANT: &str = r#"{"type":"message","id":2,"msg":{"role":"assistant","content":[],"stopReason":"end","usage":{"input":1,"output":1,"cacheRead":0,"costUsd":0.1}}}"#;
 const STATS: &str = r#"{"type":"stats","id":3,"stats":{"turns":2,"usage":{"input":1,"output":1,"cacheRead":0,"costUsd":0.5},"startedAt":"2026-08-01T00:00:00.000Z"},"reason":"completed"}"#;
+const GATE_BLOCKED: &str = r#"{"type":"decision","id":4,"at":"2026-08-01T00:00:01.000Z","decision":{"kind":"gate","outcome":"blocked","retries":2,"verified":[]}}"#;
+const GATE_OK: &str = r#"{"type":"decision","id":5,"at":"2026-08-01T00:00:02.000Z","decision":{"kind":"gate","outcome":"completed","retries":1,"verified":["npm test"]}}"#;
 
 fn tree(files: &[(&str, &str)]) -> tempfile::TempDir {
     let dir = tempfile::tempdir().unwrap();
@@ -41,6 +43,20 @@ fn statuses_derive_like_the_reference() {
     assert_eq!(by("c.jsonl").status, "completed");
     assert_eq!(by("a.jsonl").turns, serde_json::json!(2));
     assert_eq!(by("b.jsonl").turns, serde_json::json!(1)); // counted, not recorded
+}
+
+#[test]
+fn last_gate_entry_outranks_stats_reason() {
+    let dir = tree(&[
+        // Gate blocked: stats says "completed", the gate's judgment wins (D2).
+        ("repo-1/blocked.jsonl", &format!("{HEADER}\n{ASSISTANT}\n{GATE_BLOCKED}\n{STATS}\n")),
+        // A retry that finally passed appends a later completed entry: it wins.
+        ("repo-1/retried.jsonl", &format!("{HEADER}\n{ASSISTANT}\n{GATE_BLOCKED}\n{GATE_OK}\n{STATS}\n")),
+    ]);
+    let out = scan_sessions(dir.path());
+    let by = |suffix: &str| out.iter().find(|s| s.key.ends_with(suffix)).unwrap();
+    assert_eq!(by("blocked.jsonl").status, "blocked");
+    assert_eq!(by("retried.jsonl").status, "completed");
 }
 
 #[test]

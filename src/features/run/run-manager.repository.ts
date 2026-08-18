@@ -13,6 +13,8 @@ import { Writable } from "node:stream";
 import { loadConfig } from "../../platform/config/config.js";
 import { createEventBus } from "../../platform/events/events.js";
 import { runCmd } from "../../cli/run-cmd.js";
+import type { RunCmdOpts } from "../../cli/run-opts.js";
+import type { TaskKind } from "../../platform/config/types.js";
 import { demoScript, loadFakeScript } from "../provider/fake-script.repository.js";
 import { DEFAULT_TOOLS } from "../tools/toolbelt.js";
 import { FakeProvider } from "../provider/fake.js";
@@ -34,6 +36,12 @@ const live = new Map<string, LiveRun>();
 
 export const getLiveRun = (runId: string): LiveRun | undefined => live.get(runId);
 export const listLiveRuns = (): LiveRun[] => [...live.values()];
+
+/** Register an externally-constructed run (harness adapters) in the live map. */
+export function registerLiveRun(run: LiveRun): void {
+	live.set(run.runId, run);
+	void run.done.finally(() => { if (live.size > 32) live.delete(run.runId); });
+}
 
 /**
  * Starts an offline (fake-scripted) run and returns its id immediately; the
@@ -87,11 +95,16 @@ export async function startFakeRun(task: string, fakeScript?: string): Promise<L
  * Refusing to reimplement any of that here is the point: a run started from
  * a window must not be one drop weaker than a run started from a shell.
  */
-export async function startRealRun(opts: {
-	task: string;
-	repoRoot: string;
-	kind?: string;
-}): Promise<LiveRun> {
+/** What the app may pass through to runCmd — the flags a run configuration
+ * can set, a strict subset of RunCmdOpts. Pure pass-through: runCmd keeps
+ * sole ownership of policy, keys, isolation and the gate. */
+export type RealRunOpts = { task: string; repoRoot: string; kind?: string } & Pick<
+	RunCmdOpts,
+	| "spec" | "model" | "maxCostUsd" | "deadlineMs" | "maxTurns"
+	| "noVerify" | "noIsolation" | "allowDirty" | "container" | "fake"
+>;
+
+export async function startRealRun(opts: RealRunOpts): Promise<LiveRun> {
 	const runId = randomUUID().slice(0, 8);
 	const events = createEventBus();
 	const feed = wireRunEvents(events, runId);
@@ -103,11 +116,13 @@ export async function startRealRun(opts: {
 		},
 	});
 	let controls: { steer(text: string): void; abort(): void } | undefined;
+	const { task, repoRoot, kind, ...extras } = opts;
 	const done = runCmd({
-		task: opts.task,
-		repo: opts.repoRoot,
+		...extras,
+		task,
+		repo: repoRoot,
 		real: true,
-		...(opts.kind !== undefined ? { kind: opts.kind as "plan" | "code" | "review" | "summarize" } : {}),
+		...(kind !== undefined ? { kind: kind as TaskKind } : {}),
 		quiet: true,
 		out,
 		events,

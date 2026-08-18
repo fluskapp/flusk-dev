@@ -7,7 +7,7 @@
 import { useEffect, useRef } from "react";
 import type { SessionRun } from "../../../features/projects/runs.functions.js";
 import { Ic } from "../system/Icon.js";
-import { base, fmtCost, fmtTime } from "./format.js";
+import { base, cumulativeCosts, fmtCost, fmtTime } from "./format.js";
 import { Item } from "./TranscriptItem.js";
 import { Pill } from "./widgets.js";
 import "./transcript.css";
@@ -37,6 +37,9 @@ export function Meta({ d, actions }: { d: SessionRun; actions: React.ReactNode }
 				<Ic name="clock" size={14} />
 				{fmtTime(h.createdAt)}
 			</span>
+			{d.stats !== null ? (
+				<span className="meta-item dim">{fmtCost(d.stats.usage.costUsd)}</span>
+			) : null}
 			<span className="meta-item dim">#{h.id}</span>
 			<span className="meta-actions">{actions}</span>
 		</div>
@@ -88,11 +91,12 @@ function Stats({ s }: { s: SessionRun["stats"] }) {
 
 export function Transcript({ d }: { d: SessionRun }) {
 	const ref = usePinnedToBottom(d.items.length);
+	const cums = cumulativeCosts(d.items);
 	return (
 		<div id="transcript" ref={ref}>
 			{d.items.map((it, i) => (
 				// Transcript items are append-only, so the index is a stable key.
-				<Item key={i} it={it} />
+				<Item key={i} it={it} cum={cums[i]} />
 			))}
 			<Stats s={d.stats} />
 		</div>

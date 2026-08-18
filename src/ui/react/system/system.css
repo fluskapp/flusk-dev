@@ -74,3 +74,23 @@
 
 /* --- one-line truncation, the rule titles obey -------------------- */
 .sys-ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+
+/* --- row links ---------------------------------------------------- */
+/* An openable row's title is a real <a> — middle-click, ⌘-click and
+   "copy link address" work — but it dresses as the row it sits in. */
+.sys-rowlink { color: inherit; text-decoration: none; font: inherit; }
+
+/* --- empty states: centered, dim, and they name the fix ----------- */
+/* One definition (the design-system rule) instead of three per-kit
+   copies whose winner depended on stylesheet load order. `.empty` is a
+   temporary alias until every caller says .sys-empty. */
+.sys-empty, .empty {
+	display: flex; flex-direction: column; gap: var(--ij-space-1);
+	height: 55%; /* design-exempt: optical centering above the fold, the legacy value */
+	align-items: center; justify-content: center;
+	color: var(--dim); font-size: var(--ij-fs-4); text-align: center;
+}
+.sys-empty a, .empty a { color: var(--ij-link); }
+.sys-empty.small, .empty.small {
+	display: block; height: auto; padding: var(--ij-space-3) var(--ij-space-2);
+}

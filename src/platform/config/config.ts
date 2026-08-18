@@ -5,7 +5,7 @@
  *
  * The two layers are NOT equally trusted. `~/.flusk/config.json` is the user's
  * own file; `<repo>/.flusk/config.json` ships inside whatever repository happens
- * to be on disk, so a cloned repo authors it. Three sections are therefore
+ * to be on disk, so a cloned repo authors it. Four sections are therefore
  * refused from the repo layer entirely:
  *
  *  - `chat.backends`. `flusk ui` loads config from its own cwd and spawns what
@@ -18,6 +18,8 @@
  *    history indexer reads, serves over /api/history/search and embeds into
  *    composed prompts, so a repo could otherwise choose whose files leave the
  *    machine.
+ *  - `watch`. The whole section: it drives unattended spend and `push`, so a
+ *    cloned repo must not raise its own caps or turn publishing on.
  *
  * Everything else (budgets, models, verify, isolation…) stays per-repo: those
  * only steer a run the user has already asked for in that repo.
@@ -65,6 +67,17 @@ function docOf(layer: ConfigLayer, trusted: boolean): Partial<FluskConfig["doc"]
 	return rest;
 }
 
+/** The `watch` section a layer may contribute — never from a repo: it drives
+ * unattended spend and `push`, so a cloned repo must not raise its own caps. */
+function watchOf(layer: ConfigLayer, trusted: boolean): Partial<FluskConfig["watch"]> {
+	return trusted ? (layer.watch ?? {}) : {};
+}
+
+/** Dotted section/key paths refused from the untrusted repo layer. */
+export const REPO_STRIPPED = [
+	"chat.backends", "doc.servers", "ui.projectDirs", "ui.harnessDirs", "watch",
+] as const;
+
 function mergeLayer(base: FluskConfig, layer: ConfigLayer | null, trusted: boolean): FluskConfig {
 	if (!layer) return base;
 	return {
@@ -80,7 +93,7 @@ function mergeLayer(base: FluskConfig, layer: ConfigLayer | null, trusted: boole
 		ui: { ...base.ui, ...uiOf(layer, trusted) },
 		chat: { ...base.chat, ...chatOf(layer, trusted) },
 		doc: { ...base.doc, ...docOf(layer, trusted) },
-		watch: { ...base.watch, ...layer.watch },
+		watch: { ...base.watch, ...watchOf(layer, trusted) },
 	};
 }
 

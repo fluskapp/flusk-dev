@@ -22,7 +22,13 @@ afterEach(() => teardownTestHome());
 
 async function fakeRun(): Promise<string> {
 	const { out } = capture();
-	const outcome = await runCmd({ task: "decide things", repo, out, quiet: true, noIsolation: true });
+	const outcome = await runCmd({
+		task: "decide things",
+		repo,
+		out,
+		quiet: true,
+		noIsolation: true,
+	});
 	expect(outcome).toBe("completed");
 	// The session path is discoverable via the home; explain resolves bare ids,
 	// but here we scan for the one file the run just wrote.
@@ -55,6 +61,12 @@ it("a run writes its decisions down and explain assembles them in order", async 
 	expect(ctx.sources.length).toBeGreaterThan(0);
 	// The gate ran (default verify detection finds nothing here — recorded honestly).
 	expect(log.endReason).toBe("completed");
+	const turns = log.decisions.filter((d) => d.decision.kind === "turn").map((d) => d.decision);
+	expect(turns.length).toBeGreaterThan(0);
+	const t0 = turns[0];
+	if (t0?.kind !== "turn") throw new Error("no turn decision");
+	expect(t0.turn).toBe(1);
+	expect(typeof t0.costUsd).toBe("number");
 });
 
 it("explain renders prose with every section, and --json emits the object", async () => {
@@ -65,6 +77,7 @@ it("explain renders prose with every section, and --json emits the object", asyn
 	expect(prose).toContain("model      fake/fake-1");
 	expect(prose).toContain("isolation  none");
 	expect(prose).toContain("context    ");
+	expect(prose).toContain("turn       1");
 	const { out: jsonOut, text: jsonText } = capture();
 	expect(await explainCmd({ ref: path, json: true, out: jsonOut })).toBe(0);
 	const parsed = JSON.parse(jsonText());

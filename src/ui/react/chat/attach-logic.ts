@@ -78,6 +78,7 @@ export async function loadAnswerers(): Promise<void> {
 		AT.answerers = [];
 		AT.whoErr = `answerer list unavailable: ${e instanceof Error ? e.message : String(e)}`;
 	}
+	AT.whoLoaded = true; // resolved either way — the empty state is now a fact
 	pickWho();
 	repaint();
 }

@@ -4,27 +4,66 @@
  * the "flow" kind chip and arrow shape beside the title, its steps as stage
  * chips in progress — never in its behaviour.
  */
+import { Link } from "@tanstack/react-router";
 import { type SortState, SortTh } from "../kit/sort.js";
 import { Hi } from "../kit/speed-search.js";
 import { type FeedRow, flowStages } from "./feed-row.js";
 import { fmtCost, fmtTime } from "./format.js";
 import { StagePipeline } from "./stages.js";
-import { Pill, ProjectCell } from "./widgets.js";
+import { ProjectCell, VerdictPill } from "./widgets.js";
+
+type Patch = Record<string, unknown>;
 
 function TitleCell({ r, q }: { r: FeedRow; q: string }) {
+	// The title is a real <a> to the row's own address — middle-click, ⌘-click
+	// and "copy link address" work in a browser (Tabs.tsx tab-link precedent).
+	// A plain click is the Link's navigation; stopPropagation keeps the row's
+	// onClick from firing the same one again.
+	const body = (
+		<>
+			<Hi text={r.title} q={q} />
+			{r.shape !== undefined && r.shape !== "" ? (
+				<span className="dim shape"> {r.shape}</span>
+			) : null}
+		</>
+	);
 	return (
 		<td className="grow">
 			{r.kind === "flow" ? <span className="chip kind">flow</span> : null}
-			<Hi text={r.title} q={q} />
-			{r.shape !== undefined && r.shape !== "" ? <span className="dim shape"> {r.shape}</span> : null}
+			{r.kind === "flow" ? (
+				<Link
+					to="/runs"
+					search={(prev: Patch) => ({ ...prev, flow: r.id })}
+					className="sys-rowlink"
+					onClick={(e: React.MouseEvent) => e.stopPropagation()}
+				>
+					{body}
+				</Link>
+			) : (
+				<Link
+					to="/runs/$runId"
+					params={{ runId: r.ref }}
+					search={(prev: Patch) => prev}
+					className="sys-rowlink"
+					onClick={(e: React.MouseEvent) => e.stopPropagation()}
+				>
+					{body}
+				</Link>
+			)}
 		</td>
 	);
 }
 
-/** Journals carry packed text; a flow row carries the chips themselves. */
+/** Journals carry packed text; a flow row carries the chips themselves. A run
+ * that recorded no step has no progress to draw — the column's own em-dash,
+ * the same honest absence the files and cost columns print. */
 function ProgressCell({ r }: { r: FeedRow }) {
 	if (r.steps !== undefined)
-		return (
+		return r.steps.length === 0 ? (
+			<td className="mono">
+				<span className="off">—</span>
+			</td>
+		) : (
 			<td>
 				<StagePipeline rows={flowStages(r.steps)} />
 			</td>
@@ -53,12 +92,23 @@ export function RunRows({
 		<table className="tbl">
 			<thead>
 				<tr>
-					<SortTh col="status" sort={sort} onSort={onSort}>status</SortTh>
-					<SortTh col="run" sort={sort} onSort={onSort}>run</SortTh>
-					<SortTh col="project" sort={sort} onSort={onSort}>project</SortTh>
+					<SortTh col="verdict" sort={sort} onSort={onSort}>
+						verdict
+					</SortTh>
+					<SortTh col="run" sort={sort} onSort={onSort}>
+						run
+					</SortTh>
+					<SortTh col="project" sort={sort} onSort={onSort}>
+						project
+					</SortTh>
 					<th>progress</th>
-					<SortTh col="cost" sort={sort} onSort={onSort} className="num">cost</SortTh>
-					<SortTh col="when" sort={sort} onSort={onSort} className="num">when</SortTh>
+					<th className="num">files</th>
+					<SortTh col="cost" sort={sort} onSort={onSort} className="num">
+						cost
+					</SortTh>
+					<SortTh col="when" sort={sort} onSort={onSort} className="num">
+						when
+					</SortTh>
 				</tr>
 			</thead>
 			<tbody>
@@ -72,14 +122,19 @@ export function RunRows({
 						onClick={() => onOpen(r, base + i)}
 					>
 						<td>
-							<Pill status={r.status} />
+							<VerdictPill verdict={r.verdict} status={r.status} />
 						</td>
 						<TitleCell r={r} q={q} />
 						<td>
 							<ProjectCell name={r.project} />
 						</td>
 						<ProgressCell r={r} />
-						<td className="num">{r.costUsd === undefined ? <span className="off">—</span> : fmtCost(r.costUsd)}</td>
+						<td className="num">
+							{r.filesTouched === undefined ? <span className="off">—</span> : r.filesTouched}
+						</td>
+						<td className="num">
+							{r.costUsd === undefined ? <span className="off">—</span> : fmtCost(r.costUsd)}
+						</td>
 						<td className="num">{fmtTime(r.at)}</td>
 					</tr>
 				))}

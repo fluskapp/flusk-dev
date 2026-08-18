@@ -8,6 +8,7 @@
  * (root-search.ts), so the address bar names the whole workbench.
  */
 import { createRootRoute, HeadContent, Outlet, Scripts } from "@tanstack/react-router";
+import { useEffect } from "react";
 import tokensCss from "../ui/react/tokens.css?url";
 import chromeCss from "../ui/react/workbench/chrome.css?url";
 import { ChatRail } from "../ui/react/chat/ChatRail.js";
@@ -15,6 +16,7 @@ import { DocWindow } from "../ui/react/docwin/DocWindow.js";
 import { FindStrip } from "../ui/react/find/FindStrip.js";
 import { PaletteAndHelp } from "../ui/react/palette/Palette.js";
 import { ProjectsRail } from "../ui/react/projects/ProjectsRail.js";
+import { RunConfigDialog } from "../ui/react/runconfig/RunConfigDialog.js";
 import { Grip } from "../ui/react/workbench/Grips.js";
 import { StatusBar } from "../ui/react/workbench/StatusBar.js";
 import { MainToolbar } from "../ui/react/workbench/MainToolbar.js";
@@ -22,6 +24,7 @@ import { Rail } from "../ui/react/workbench/Rail.js";
 import { EditorTabs } from "../ui/react/workbench/Tabs.js";
 import { WorkbenchKeys } from "../ui/react/workbench/WorkbenchKeys.js";
 import { ROOT_DEFAULTS, validateRootSearch } from "../ui/react/workbench/root-search.js";
+import { THEME_BOOT } from "../ui/react/workbench/theme-boot.js";
 import { getWorkbenchMeta, type WorkbenchMeta } from "../features/projects/projects.functions.js";
 
 export const Route = createRootRoute({
@@ -45,6 +48,12 @@ export const Route = createRootRoute({
 function RootComponent() {
 	const meta = Route.useLoaderData() as WorkbenchMeta;
 	const search = Route.useSearch();
+	// Electron/macOS only (the preload defines window.flusk): the toolbar is
+	// the title bar, so it insets past the traffic lights via body.darwin.
+	useEffect(() => {
+		const bridge = (window as { flusk?: { platform?: string } }).flusk;
+		if (bridge?.platform === "darwin") document.body.classList.add("darwin");
+	}, []);
 	const side = search.side ?? ROOT_DEFAULTS.side;
 	const chat = search.chat ?? ROOT_DEFAULTS.chat;
 	const find = search.find ?? ROOT_DEFAULTS.find;
@@ -59,11 +68,11 @@ function RootComponent() {
 				...(search.cw !== undefined ? { ["--tw-right" as string]: `${search.cw}px` } : {}),
 			}}
 		>
-			<MainToolbar projects={meta.projects} live={meta.live} home={meta.home} />
+			<MainToolbar home={meta.home} />
 			<Rail search={search as Record<string, unknown>} />
 			{side ? (
 				<>
-					<ProjectsRail />
+					<ProjectsRail initial={meta.list} />
 					<Grip side="left" />
 				</>
 			) : null}
@@ -78,6 +87,7 @@ function RootComponent() {
 				</>
 			) : null}
 			{doc ? <DocWindow /> : null}
+			{search.rc !== undefined ? <RunConfigDialog rc={search.rc} /> : null}
 			{find ? <FindStrip /> : null}
 			<StatusBar home={meta.home} version={meta.version} projects={meta.projects} live={meta.live} />
 			<PaletteAndHelp />
@@ -90,6 +100,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en">
 			<head>
+				{/* Restore the remembered theme BEFORE first paint (theme-boot.ts):
+				    inline, so the page never flashes the wrong palette. */}
+				{/* eslint-disable-next-line react/no-danger -- constant module string */}
+				<script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
 				<HeadContent />
 			</head>
 			<body>

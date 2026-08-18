@@ -1,26 +1,26 @@
 import { randomUUID } from "node:crypto";
 import { DEFAULT_CONFIG } from "../../platform/config/defaults.js";
 import { createEventBus } from "../../platform/events/events.js";
-import { runLoop } from "./loop.js";
-import { SteeringQueue } from "./steering.js";
-import type { Limits } from "./stop.js";
-import type { Msg } from "./run.types.js";
 import { BudgetTracker } from "../safety/budget.js";
 import { allowAllPolicy } from "../safety/policy.js";
 import { prepareResumeContext } from "../session/repair.js";
 import { Session } from "../session/session-file.repository.js";
 import { ToolRegistry } from "../tools/registry.js";
-import { wireDelegation } from "./delegation.js";
 import type { ToolContext } from "../tools/tool.js";
 import { checkpointMutatingTurns } from "./checkpoints.js";
-import { recordContextDecisions, recordRunIds } from "./decision-recorders.js";
+import { recordContextDecisions, recordRunIds, recordTurnDecisions } from "./decision-recorders.js";
+import { wireDelegation } from "./delegation.js";
+import { runLoop } from "./loop.js";
 import type { Agent, CreateAgentOpts } from "./options.js";
+import type { Msg } from "./run.types.js";
 import { prepareRun, type RunPrompt } from "./run-context.js";
+import { SteeringQueue } from "./steering.js";
+import type { Limits } from "./stop.js";
 
 export type { Agent, CreateAgentOpts } from "./options.js";
 
 /** Levels 0 and 1 may spawn subagents; level 2 has no task tool. */
-const MAX_SUBAGENT_DEPTH = 2;
+export const MAX_SUBAGENT_DEPTH = 2;
 
 export function createAgent(opts: CreateAgentOpts): Agent {
 	const policy = opts.policy ?? allowAllPolicy;
@@ -59,7 +59,10 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 		initialContext.push(taskMsg);
 	}
 
-	if (opts.isolation !== undefined) checkpointMutatingTurns(events, opts.isolation.repoRoot);
+	const committed = new Set<number>();
+	events.on("run:start", () => committed.clear()); // continueRun restarts turn numbering at 1
+	if (opts.isolation !== undefined)
+		checkpointMutatingTurns(events, opts.isolation.repoRoot, (t) => committed.add(t));
 
 	const controller = new AbortController();
 	// A parent's abort must reach this agent (subagents own their controller).
@@ -85,15 +88,12 @@ export function createAgent(opts: CreateAgentOpts): Agent {
 			toolCtx,
 		});
 	}
-	/**
-	 * The system prompt and the run-context block are ONE per-run product: the
-	 * block is built here and frozen into the prompt for every turn of that run
-	 * (L6), and the prompt drops whatever the block already quotes. Built again
-	 * on resume, when the tree and the run's own journal have moved.
-	 */
-	// Announced context and loop run ids become entries flusk explain reads back.
+	// The system prompt and the run-context block are ONE per-run product: built
+	// here, frozen into the prompt for every turn (L6), built again on resume.
+	// Announced context, loop run ids and per-turn records become explain entries.
 	recordContextDecisions(events, session);
 	recordRunIds(events, session);
+	recordTurnDecisions(events, session, committed);
 	const prepare = (resume: boolean): RunPrompt =>
 		prepareRun({
 			repoRoot: opts.repoRoot,

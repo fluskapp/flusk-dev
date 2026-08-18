@@ -19,3 +19,21 @@
 	font-family: var(--font-code); font-size: var(--ij-fs-3);
 	background: var(--code-bg); padding: 0 var(--ij-space-1);
 }
+/* The trust line: the verdict pill, then the gate's synthesis in one breath.
+   ok/warn/err pill colours come from decisions.css; the two run-level
+   treatments only the trust line shows (D1: live=running, none=dim) here. */
+.rs-trust .verdict.run { background: var(--accent); }
+.rs-trust .verdict.dim { background: var(--dim); }
+.rs-trust {
+	margin: 0; font-size: var(--ij-fs-3);
+	display: flex; align-items: baseline; gap: var(--ij-space-1);
+}
+.rs-reasons {
+	margin: 0; padding-left: var(--ij-space-4);
+	font-size: var(--ij-fs-3); color: var(--dim);
+}
+.rs-files > summary { cursor: pointer; list-style: none; }
+.rs-files ul {
+	margin: var(--ij-space-1) 0 0; padding-left: var(--ij-space-4);
+	font-size: var(--ij-fs-2);
+}

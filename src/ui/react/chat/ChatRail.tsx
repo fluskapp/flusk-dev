@@ -8,15 +8,18 @@
  * The rail's width and visibility belong to the workbench (root search params
  * and the shared Grip), so this file owns only what is inside the panel.
  */
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useReducer, useRef } from "react";
+import { Ic } from "../system/Icon.js";
 import { AttachStrip } from "./AttachStrip.js";
+import { loadAnswerers, onBlocks, preambleText } from "./attach-logic.js";
+import { AT, subscribe } from "./attach-store.js";
+import { whoEmptyLabel, whoRow } from "./attach-who.js";
 import { ChatComposer } from "./ChatComposer.js";
+import { ChatStatus } from "./ChatStatus.js";
 import { ChatTurn } from "./ChatTurn.js";
 import { ChatWho } from "./ChatWho.js";
-import { cwdPath, loadAnswerers, onBlocks, preambleText } from "./attach-logic.js";
-import { AT, subscribe } from "./attach-store.js";
-import { whoRow } from "./attach-who.js";
+import { effectiveCwd, routeProject } from "./chat-cwd.js";
 import { composeOutgoing } from "./chat-model.js";
 import { useChat } from "./use-chat.js";
 import "./chat.css";
@@ -31,7 +34,13 @@ export function ChatRail() {
 	useEffect(() => {
 		void loadAnswerers();
 	}, []);
-	const { msgs, busy, send, stop } = useChat();
+	const { msgs, busy, live, send, stop, loadLatest, reset } = useChat();
+	// Mounting restores the newest conversation (guarded no-op inside).
+	useEffect(() => {
+		void loadLatest();
+	}, [loadLatest]);
+	const rp = useRouterState({ select: (s) => routeProject(s) });
+	const cwd = effectiveCwd(rp);
 	const logRef = useRef<HTMLDivElement>(null);
 
 	// The transcript follows the newest text, streaming or rendered.
@@ -45,8 +54,12 @@ export function ChatRail() {
 		const who = whoRow();
 		if (who === null || !who.available || who.backendId === null) return false;
 		const composed = composeOutgoing(text, onBlocks(), preambleText());
-		const cwd = cwdPath();
-		void send(who.backendId, text, composed === text ? undefined : composed, cwd === "" ? undefined : cwd);
+		void send(
+			who.backendId,
+			text,
+			composed === text ? undefined : composed,
+			cwd === "" ? undefined : cwd,
+		);
 		return true;
 	};
 
@@ -58,7 +71,16 @@ export function ChatRail() {
 	};
 
 	const usable = AT.answerers.some((a) => a.available);
-	const note = AT.whoErr !== "" ? AT.whoErr : AT.answerers.length > 0 && !usable ? "no answerer available" : "";
+	// Same conflation guard as ChatWho: a roster that has not loaded yet says
+	// nothing here — the header combo already shows "detecting backends…".
+	const note =
+		AT.whoErr !== ""
+			? AT.whoErr
+			: AT.whoLoaded && AT.answerers.length === 0
+				? whoEmptyLabel(true, "")
+				: AT.answerers.length > 0 && !usable
+					? "no answerer available"
+					: "";
 	const last = msgs.length - 1;
 	return (
 		<aside id="chat">
@@ -66,21 +88,31 @@ export function ChatRail() {
 				<span className="tw-num">5</span>
 				<span>Chat</span>
 				<ChatWho />
+				<button id="chat-new" type="button" title="New conversation" onClick={reset}>
+					<Ic name="plus" size={14} />
+				</button>
 				<button id="chat-hide" type="button" title="Hide chat (⌘6)" onClick={hide}>
-					✕
+					<Ic name="close" size={14} />
 				</button>
 			</div>
 			<div id="chat-log" tabIndex={-1} ref={logRef}>
 				{msgs.length === 0 ? (
-					<div className="empty small">Talk — with your code, with a spec, with a run. Attach below.</div>
+					<div className="empty small">
+						Talk — with your code, with a spec, with a run. Attach below.
+					</div>
 				) : (
 					msgs.map((m, i) => (
-						<ChatTurn key={i} m={m} streaming={busy && i === last && m.role === "assistant" && m.err !== true} />
+						<ChatTurn
+							key={i}
+							m={m}
+							streaming={busy && i === last && m.role === "assistant" && m.err !== true}
+						/>
 					))
 				)}
+				<ChatStatus live={live} />
 			</div>
 			<AttachStrip />
-			<ChatComposer busy={busy} note={note} onSend={sendNow} onStop={stop} />
+			<ChatComposer busy={busy} note={note} cwd={cwd} onSend={sendNow} onStop={stop} />
 		</aside>
 	);
 }

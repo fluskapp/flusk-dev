@@ -51,8 +51,10 @@ function opts(store: FactStore | null, out: NodeJS.WritableStream): GateOpts {
 
 it("says so when the run could not be recorded, and still reports the verdict", async () => {
 	const cap = capture();
-	const verdict = await claimCheck(refusing, opts(refusing, cap.out), run, [], "I edited src/a.ts");
-	expect(verdict).toBe("completed");
+	const check = await claimCheck(refusing, opts(refusing, cap.out), run, [], "I edited src/a.ts");
+	expect(check.outcome).toBe("completed");
+	expect(check.reportCheck).toBe("ALLOW");
+	expect(check.reasons).toEqual([]);
 	expect(cap.text()).toContain("warning: this run was not recorded");
 	expect(cap.text()).toContain("EACCES");
 });
@@ -60,7 +62,9 @@ it("says so when the run could not be recorded, and still reports the verdict", 
 it("says nothing extra when the record was written", async () => {
 	const cap = capture();
 	const { store } = accepting();
-	const verdict = await claimCheck(store, opts(store, cap.out), run, [], "I edited src/a.ts");
-	expect(verdict).toBe("completed");
+	const check = await claimCheck(store, opts(store, cap.out), run, [], "I edited src/a.ts");
+	expect(check.outcome).toBe("completed");
+	expect(check.reportCheck).toBe("ALLOW");
+	expect(check.reasons).toEqual([]);
 	expect(cap.text()).not.toContain("warning");
 });

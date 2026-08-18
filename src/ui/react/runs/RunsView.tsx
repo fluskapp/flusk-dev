@@ -60,17 +60,25 @@ export function RunsView({
 	const q = search.query.toLowerCase();
 	const s = parseSort(sort);
 	const sorted = sortRows(q === "" ? rows : rows.filter((r) => rowText(r).includes(q)), s, rowVal);
-	const live = sorted.filter((r) => r.status === "running");
-	const rest = sorted.filter((r) => r.status !== "running");
+	// ONE live population, every surface: the Live section holds exactly what
+	// the toolbar chip and the tree badges count — sessions and journals whose
+	// files are still being written (features/run/liveness.ts). A flow run is
+	// not in that total, so it keeps its place by date instead of making the
+	// count that LINKS here disagree with the list it lands on.
+	const isLiveRow = (r: FeedRow) => r.status === "running" && r.kind !== "flow";
+	const live = sorted.filter(isLiveRow);
+	const rest = sorted.filter((r) => !isLiveRow(r));
 	const flat = [...live, ...rest];
 	// A session or journal has its own page; a flow run opens in place, the
-	// way the old Flows window kept the open run in the address bar.
+	// way the old Flows window kept the open run in the address bar. The RAW
+	// ref goes in: the router does the one encoding — pre-encoding here put
+	// %252F in the address bar and broke the tab title downstream.
 	const openRow = (r: FeedRow) =>
 		r.kind === "flow"
 			? navigate({ to: "/runs", search: (prev: Patch) => ({ ...prev, flow: r.id }) })
 			: navigate({
 					to: "/runs/$runId",
-					params: { runId: encodeURIComponent(r.ref) },
+					params: { runId: r.ref },
 					search: (prev: Patch) => prev,
 				});
 	const nav = useListNav(flat.length, (i) => {

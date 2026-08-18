@@ -21,14 +21,16 @@ import "./tree.css";
 const POLL_MS = 5000;
 type Patch = Record<string, unknown>;
 
-export function ProjectsRail() {
+/** `initial` is the root loader's already-scanned rows: the tree paints
+ * populated in the SSR HTML, and the poll below is a refresh, not the fill. */
+export function ProjectsRail({ initial }: { initial?: ProjectSummary[] }) {
 	const navigate = useNavigate();
-	const [projects, setProjects] = useState<ProjectSummary[]>([]);
-	const [loaded, setLoaded] = useState(false);
+	const [projects, setProjects] = useState<ProjectSummary[]>(initial ?? []);
+	const [loaded, setLoaded] = useState(initial !== undefined);
 	const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 	const [active, setActive] = useState<string | null>(null);
 	const searchRef = useRef<HTMLInputElement>(null);
-	const lastJson = useRef("");
+	const lastJson = useRef(initial === undefined ? "" : JSON.stringify(initial));
 
 	useEffect(() => {
 		let alive = true;

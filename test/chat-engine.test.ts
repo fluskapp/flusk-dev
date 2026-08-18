@@ -14,9 +14,10 @@ const cfg = (backends: ChatBackendConfig[]): FluskConfig => ({
 	...DEFAULT_CONFIG,
 	chat: { backends },
 });
-const ask = (backendId: string): ChatRequest => ({
+const ask = (backendId: string, cwd?: string): ChatRequest => ({
 	backendId,
 	messages: [{ role: "user", content: "hi" }],
+	...(cwd === undefined ? {} : { cwd }),
 });
 
 async function run(
@@ -43,7 +44,7 @@ beforeAll(() => {
 	process.env.PATH = bin;
 	script("mycli", `printf 'answer to: %s' "$2"\n`);
 	script("badcli", `echo 'no auth' >&2\nexit 7\n`);
-	script("slowcli", `printf 'start'\nsleep 5\n`);
+	script("slowcli", `printf 'start\\n'\nsleep 5\n`);
 });
 
 afterAll(() => {
@@ -65,12 +66,20 @@ it("list() merges detected CLIs with configured backends", async () => {
 it("streams a CLI backend and ends with exactly one done", async () => {
 	const chunks = await run(
 		[{ id: "mine", kind: "cli", command: "mycli", args: ["-p"] }],
-		ask("mine"),
+		ask("mine", bin),
 	);
 	expect(chunks.map((c) => (c.type === "delta" ? c.text : "")).join("")).toBe(
 		"answer to: User: hi",
 	);
 	expect(dones(chunks)).toBe(1);
+	expect(chunks.at(-1)).toEqual({ type: "done" });
+});
+
+it("refuses a CLI backend without a cwd, naming the remedy, then one done", async () => {
+	const chunks = await run([{ id: "mine", kind: "cli", command: "mycli" }], ask("mine"));
+	expect(chunks).toHaveLength(2);
+	expect(chunks[0]?.type).toBe("error");
+	expect((chunks[0] as { message: string }).message).toContain("working directory");
 	expect(chunks.at(-1)).toEqual({ type: "done" });
 });
 
@@ -91,10 +100,11 @@ it("an unavailable backend reports its note instead of failing obscurely", async
 });
 
 it("a failing CLI still ends with exactly one done", async () => {
-	const chunks = await run([{ id: "bad", kind: "cli", command: "badcli" }], ask("bad"));
+	const chunks = await run([{ id: "bad", kind: "cli", command: "badcli" }], ask("bad", bin));
 	expect(dones(chunks)).toBe(1);
-	expect(chunks[0]?.type).toBe("error");
-	expect((chunks[0] as { message: string }).message).toContain("no auth");
+	// The cmd receipt still leads — even a failed spawn shows what was tried.
+	expect(chunks.map((c) => c.type)).toEqual(["cmd", "error", "done"]);
+	expect((chunks[1] as { message: string }).message).toContain("no auth");
 });
 
 it("pi-ai backends are reported, not silently ignored", async () => {
@@ -109,11 +119,11 @@ it("abort mid-stream still terminates with one done", async () => {
 	const ac = new AbortController();
 	const chunks: ChatChunk[] = [];
 	const engine = createChatEngine(cfg([{ id: "slow", kind: "cli", command: "slowcli" }]));
-	for await (const c of engine.stream(ask("slow"), ac.signal)) {
+	for await (const c of engine.stream(ask("slow", bin), ac.signal)) {
 		chunks.push(c);
 		if (c.type === "delta") ac.abort();
 	}
-	expect(chunks.map((c) => (c.type === "delta" ? c.text : "")).join("")).toBe("start");
+	expect(chunks.map((c) => (c.type === "delta" ? c.text : "")).join("")).toBe("start\n");
 	expect(dones(chunks)).toBe(1);
 	expect(chunks.at(-1)).toEqual({ type: "done" });
 });

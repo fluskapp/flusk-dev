@@ -4,6 +4,8 @@
  * entries says so plainly — older sessions predate the recording.
  */
 import type { DecisionLog } from "../../../features/run/run.functions.js";
+import { fmtCost } from "./format.js";
+import { Gate, GateDecision, Row } from "./GateSection.js";
 import "./decisions.css";
 
 const MODEL_SOURCE: Record<string, string> = {
@@ -55,6 +57,24 @@ export function Decisions({ log }: { log: DecisionLog | null }) {
 								</Row>
 							);
 						}
+						if (d.kind === "turn") {
+							return (
+								<Row key={`${at}-${i}`} name={`turn ${d.turn}`}>
+									{d.tools.length > 0 ? (
+										d.tools.map((t, j) => <code key={`${t}-${j}`}>{t} </code>)
+									) : (
+										<span className="dim">no tools</span>
+									)}{" "}
+									<span className="dim">
+										· {fmtCost(d.costUsd)} · {d.stop}
+										{d.checkpointed === true ? " · checkpointed" : ""}
+									</span>
+								</Row>
+							);
+						}
+						if (d.kind === "gate") {
+							return <GateDecision key={`${at}-${i}`} d={d} />;
+						}
 						return (
 							<Row key={`${at}-${i}`} name="context">
 								{d.error !== undefined ? (
@@ -78,55 +98,5 @@ export function Decisions({ log }: { log: DecisionLog | null }) {
 			)}
 			<Gate log={log} />
 		</details>
-	);
-}
-
-function Row({ name, children }: { name: string; children: React.ReactNode }) {
-	return (
-		<>
-			<dt>{name}</dt>
-			<dd>{children}</dd>
-		</>
-	);
-}
-
-/** Gate verdicts as filled status pills: ALLOW/success are --ok, WARN is
- * --warn, BLOCK/failure are --err — the attention rules' own mapping. */
-const VERDICT: Record<string, string> = {
-	allow: "ok", success: "ok", ok: "ok", pass: "ok", passed: "ok",
-	warn: "warn", blocked: "warn",
-	block: "err", failure: "err", failed: "err", error: "err",
-};
-
-function Verdict({ v }: { v: string }) {
-	return <span className={`verdict ${VERDICT[v.toLowerCase()] ?? ""}`}>{v}</span>;
-}
-
-function Gate({ log }: { log: DecisionLog }) {
-	if (log.gate === null) {
-		return <p className="dim">Gate: no facts of record (memory disabled or store unavailable).</p>;
-	}
-	const g = log.gate;
-	return (
-		<dl className="dec-list">
-			{g.outcome !== undefined ? (
-				<Row name="outcome">
-					<Verdict v={g.outcome} /> <span className="dim">fact of record</span>
-				</Row>
-			) : null}
-			<Row name="verified">
-				{g.verifiedBy.length === 0 ? (
-					<span className="dim">nothing — no verify command passed or gate skipped</span>
-				) : (
-					g.verifiedBy.map((c) => <code key={c}>{c} </code>)
-				)}
-			</Row>
-			{g.reportCheck !== undefined ? (
-				<Row name="report">
-					<Verdict v={g.reportCheck} />{" "}
-					<span className="dim">closing report vs harness observations</span>
-				</Row>
-			) : null}
-		</dl>
 	);
 }

@@ -64,11 +64,21 @@ pub fn summarize(path: &Path, key: &str, updated_at_ms: f64) -> Option<SessionSu
     }
     let mut stats: Option<&Value> = None;
     let mut last_assistant: Option<&Value> = None;
+    let mut gate: Option<&Value> = None;
     let mut counted: u64 = 0;
     for e in &entries {
         let t = e.get("type").and_then(Value::as_str);
         if t == Some("stats") {
             stats = Some(e); // the LAST stats entry wins, like the reference loop
+        }
+        if t == Some("decision") {
+            let d = e.get("decision")?; // `.kind` on a missing decision throws
+            if d.is_null() {
+                return None;
+            }
+            if d.get("kind").and_then(Value::as_str) == Some("gate") {
+                gate = Some(d); // the LAST gate entry wins (scan-derive lastGate)
+            }
         }
         if t == Some("message") {
             let msg = e.get("msg")?; // `.role` on a missing/null msg throws
@@ -107,6 +117,13 @@ pub fn summarize(path: &Path, key: &str, updated_at_ms: f64) -> Option<SessionSu
             (status, turns, cost)
         }
         None => (derive_status(false, last_assistant), json!(counted), json!(0)),
+    };
+    // D2 gate fold, mirroring the reference: a blocked outcome in the last
+    // gate decision entry overrides whatever stats.reason/stopReason derived.
+    let status = if gate.and_then(|g| g.get("outcome")).and_then(Value::as_str) == Some("blocked") {
+        "blocked"
+    } else {
+        status
     };
     // A header without a string createdAt would crash the reference's final
     // sort; such a foreign file is skipped here instead.

@@ -41,7 +41,7 @@ it("drops a container root instead of publishing it as a phantom project", () =>
 	// The shipped defaults expand to BOTH ~/projects/* and
 	// ~/projects/playground/*, which makes ~/projects/playground a container:
 	// keeping it adds a bogus row and indexes its children's markdown twice.
-	const cfg = { ...t.cfg, ui: { harnessDirs: [], projectDirs: [t.work, join(t.work, "*")] } };
+	const cfg = { ...t.cfg, ui: { harnessDirs: [], projectDirs: [t.work, join(t.work, "*")], liveTailEvents: 400 } };
 	const list = scanProjects(cfg, NOW);
 	expect(list.map((p) => p.name).sort()).toEqual(["gadget", "linof", "plain"]);
 	expect(list.reduce((n, p) => n + p.docs, 0)).toBe(3); // no document counted twice
@@ -62,6 +62,7 @@ it("joins on the root path, so two projects sharing a name stay apart", () => {
 		ui: {
 			harnessDirs: [join(t.work, "*", "docs", "runs"), join(nested, "*", "docs", "runs")],
 			projectDirs: [join(t.work, "*"), join(nested, "*")],
+			liveTailEvents: 400,
 		},
 	};
 	const both = scanProjects(cfg, NOW).filter((p) => p.name === "linof");

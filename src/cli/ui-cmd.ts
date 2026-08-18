@@ -3,8 +3,9 @@
  *
  * Electron is the only shipped UI surface: this verb finds the app (the
  * packaged bundle when installed, `electron .` in a checkout) and hands off.
- * `--server` keeps the old headless loopback server for debugging and tests;
- * it is a developer door, not a product.
+ * `--server` (and the automatic fallback when Electron is not installed) is
+ * the headless loopback door: the SAME built app over plain HTTP when
+ * dist-app exists (src/ui/app-serve.ts), the legacy page only without it.
  */
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";

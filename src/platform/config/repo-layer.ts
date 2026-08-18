@@ -9,7 +9,7 @@
  *
  * The fallback changes WHERE the layer is read from and nothing else. It is
  * still the repo layer, so it is still untrusted: config.ts strips the same
- * three sections from it either way. A compatibility path that quietly gained
+ * refused sections from it either way. A compatibility path that quietly gained
  * trust would be a far worse bug than the one it was added to avoid.
  */
 import { join } from "node:path";

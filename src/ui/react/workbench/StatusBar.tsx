@@ -33,8 +33,13 @@ export function StatusBar({
 			<span id="status-activity" />
 			<span aria-hidden className="st-sep" />
 			<span className="st-path" title="flusk home">{home ?? ""}</span>
-			<span aria-hidden className="st-sep" />
-			<span className="st-ver">flusk v{version ?? ""}</span>
+			{/* An unknown version omits the widget — "v0.0.0" is a lie in chrome. */}
+			{version !== undefined && version !== "" ? (
+				<>
+					<span aria-hidden className="st-sep" />
+					<span className="st-ver">flusk v{version}</span>
+				</>
+			) : null}
 		</footer>
 	);
 }

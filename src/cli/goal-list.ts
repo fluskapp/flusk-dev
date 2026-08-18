@@ -1,47 +1,21 @@
 /**
  * Goal-graph read helpers for the goal command: the --list rendering and the
- * small per-task queries the execution loop needs. Reads are namespace-scoped
+ * small per-task queries the execution loop needs. The graph itself is loaded
+ * by the goals feature (read.repository.ts) — the CLI renders that one shape,
+ * so the UI and this command cannot drift apart. Reads are namespace-scoped
  * store queries and nothing else — no goal is ever read across namespaces.
  */
-import type { Fact, FactStore } from "../features/facts/types.js";
+import { loadGoalGraph } from "../features/goals/read.repository.js";
+import type { FactStore } from "../features/facts/types.js";
 import { NO_LIMIT } from "../features/facts/visibility.js";
-
-interface GraphView {
-	statusOf: Map<string, string>;
-	descOf: Map<string, string>;
-	tasksOf: Map<string, string[]>;
-	titles: Fact[];
-}
-
-async function loadGraph(store: FactStore, ns: string): Promise<GraphView> {
-	// Uncapped: a truncated page renders a real task as "unknown", which reads
-	// as a graph the harness has lost track of rather than as a short answer.
-	const [titles, statuses, edges, descs] = await Promise.all([
-		store.query(ns, { predicate: "title", limit: NO_LIMIT }),
-		store.query(ns, { predicate: "status", limit: NO_LIMIT }),
-		store.query(ns, { predicate: "has_task", limit: NO_LIMIT }),
-		store.query(ns, { predicate: "description", limit: NO_LIMIT }),
-	]);
-	const tasksOf = new Map<string, string[]>();
-	for (const e of edges) tasksOf.set(e.subject, [...(tasksOf.get(e.subject) ?? []), e.object]);
-	return {
-		titles,
-		tasksOf,
-		statusOf: new Map(statuses.map((f) => [f.subject, f.object])),
-		descOf: new Map(descs.map((f) => [f.subject, f.object])),
-	};
-}
 
 /** `flusk goal --list`: goals with title/status plus per-task status lines. */
 export async function renderGoalList(store: FactStore, ns: string): Promise<string> {
-	const g = await loadGraph(store, ns);
-	if (g.titles.length === 0) return "no goals\n";
-	const lines = g.titles.flatMap((t) => [
-		`${t.subject} ${t.object} — ${g.statusOf.get(t.subject) ?? "unknown"}`,
-		...(g.tasksOf.get(t.subject) ?? []).map(
-			(task) =>
-				`  ${task} ${g.descOf.get(task) ?? ""} — ${g.statusOf.get(task) ?? "unknown"}`,
-		),
+	const goals = await loadGoalGraph(store, ns);
+	if (goals.length === 0) return "no goals\n";
+	const lines = goals.flatMap((g) => [
+		`${g.id} ${g.title} — ${g.status}`,
+		...g.tasks.map((t) => `  ${t.id} ${t.description} — ${t.status}`),
 	]);
 	return `${lines.join("\n")}\n`;
 }

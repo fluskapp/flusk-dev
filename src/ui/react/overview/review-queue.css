@@ -1,0 +1,20 @@
+/* Review queue: verdict-first cards on the panel surface. Every value is a
+   token (docs/design-system.md); no raw px, no hex. */
+.rq { list-style: none; margin: 0 0 var(--ij-space-4); padding: 0; display: grid; gap: var(--ij-space-2); }
+.rq-row {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	padding: var(--ij-space-2) var(--ij-space-3); cursor: pointer;
+}
+.rq-row:hover { border-color: var(--dim); }
+.rq-row .title { flex: 1 1 auto; }
+.rq-row .rq-meta { font: var(--ij-fs-4) var(--font-code); color: var(--dim); white-space: nowrap; }
+/* Rows are focusable: the same inset ring the decisions header draws. */
+.rq-row:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: calc(var(--ij-focus-ring-w) * -1);
+}
+/* Actions appear on approach — hover OR keyboard focus; never moves layout.
+   Tab reaches the row first, revealing the buttons, which Tab then enters. */
+.rq-actions { display: inline-flex; gap: var(--ij-space-1); visibility: hidden; }
+.rq-row:hover .rq-actions,
+.rq-row:focus-within .rq-actions { visibility: visible; }

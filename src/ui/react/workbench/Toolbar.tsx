@@ -4,7 +4,8 @@
  * belongs to the window, not its position — it is the key WorkbenchKeys
  * binds, so a window that leaves the toolbar takes its number with it.
  * Flows and Ask left as windows (Runs and Chat absorbed them); 0 is the
- * tenth slot, IntelliJ-style, unbound until a window earns it.
+ * tenth slot, IntelliJ-style — Harness earned it: the standing anatomy of
+ * the loop, distinct from Runs (3), which is what happened.
  *
  * The active window's button is PRESSED (.on): route buttons via the router's
  * own active match, toggle buttons from the root search params — the state
@@ -12,6 +13,7 @@
  */
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { Ic } from "../system/Icon.js";
+import { toggleTheme } from "./theme.js";
 
 export interface PanelButton {
 	icon: string;
@@ -33,6 +35,7 @@ export const PANELS: PanelButton[] = [
 	{ id: "graph-btn", icon: "graph", n: "7", label: "Graph", title: "What am I about to break (7 / ⌘7 / g)", to: "/graph" },
 	{ id: "web-btn", icon: "globe", n: "8", label: "Web", title: "Read an external URL beside the code (8 / ⌘8 / u)", to: "/web" },
 	{ id: "doc-btn", icon: "book", n: "9", label: "Documentation", title: "Symbol docs for the code on screen (9 / ⌘9)", toggles: "doc" },
+	{ id: "harness-btn", icon: "harness", n: "0", label: "Harness", title: "What runs your code: the loop, its tools, and what it has learned (0 / ⌘0)", to: "/harness" },
 ];
 
 export function Toolbar() {
@@ -96,12 +99,7 @@ export function Toolbar() {
 				id="theme"
 				type="button"
 				title="Toggle light/dark (t)"
-				onClick={() => {
-					const el = document.documentElement;
-					const next = el.getAttribute("data-theme") === "dark" ? "light" : "dark";
-					el.setAttribute("data-theme", next);
-					localStorage.setItem("flusk-theme", next);
-				}}
+				onClick={() => void toggleTheme()}
 			>
 				◑
 			</button>

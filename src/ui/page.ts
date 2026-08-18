@@ -73,6 +73,12 @@ const CODE_JS = CLIENT_JS.includes("function codePositions(")
 	: CLIENT_CODE_JS + CLIENT_CODE_OUTLINE_JS;
 const VIEWER_CSS = ALL_CSS.includes(".code-body") ? "" : CODE_CSS;
 
+/** An unresolvable version omits the widget — "flusk v0.0.0" is a lie in
+ * chrome the user never dismisses (StatusBar.tsx keeps the same rule). */
+const VERSION_HTML = ((v) => (v === undefined ? "" : `<span>flusk v${escapeHtml(v)}</span>`))(
+	version(),
+);
+
 export function renderPage(home: string): string {
 	const panels = PANELS.map(
 		([id, n, label, title]) =>
@@ -129,7 +135,7 @@ export function renderPage(home: string): string {
         <div class="spacer"></div>
         <span id="status-activity"></span>
         <span class="st-path">${escapeHtml(home)}</span>
-        <span>flusk v${escapeHtml(version())}</span>
+        ${VERSION_HTML}
     </footer>
 </div>
 <div id="toast" role="status" aria-live="polite" hidden></div>

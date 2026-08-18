@@ -13,6 +13,8 @@ import type { Fact, FactStore } from "../facts/types.js";
 export interface GateEvidence {
 	/** verified_by rows: the commands that passed. */
 	verifiedBy: string[];
+	/** failed_because rows: why the gate warned or blocked, when recorded. */
+	reasons: string[];
 	/** The run's recorded outcome fact, when one was written. */
 	outcome?: string;
 	/** report_check verdict (ALLOW/WARN/BLOCK), when recorded. */
@@ -73,12 +75,15 @@ export async function gateEvidence(
 	ns: string,
 	runIds: string[],
 ): Promise<GateEvidence> {
-	const out: GateEvidence = { verifiedBy: [] };
+	const out: GateEvidence = { verifiedBy: [], reasons: [] };
 	for (const runId of runIds) {
 		const rows: Fact[] = await store.query(ns, { subject: `Run:${runId}` });
 		for (const f of rows) {
 			if (f.predicate === "verified_by" && !out.verifiedBy.includes(f.object)) {
 				out.verifiedBy.push(f.object);
+			}
+			if (f.predicate === "failed_because" && !out.reasons.includes(f.object)) {
+				out.reasons.push(f.object);
 			}
 			if (f.predicate === "outcome") out.outcome = f.object;
 			if (f.predicate === "report_check") out.reportCheck = f.object;

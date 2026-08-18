@@ -38,6 +38,15 @@ export function whoViaText(): string {
 	return where !== "" && via !== "" ? `${where} · ${via}` : where !== "" ? where : via;
 }
 
+/** The empty roster's honest line: a real failure keeps its message, a list
+ * that has not arrived yet says so, and only a RESOLVED empty list claims no
+ * backend exists — and then it names the fix. */
+export function whoEmptyLabel(loaded: boolean, err: string): string {
+	if (err !== "") return err;
+	if (!loaded) return "detecting backends…";
+	return "No chat backend found — install claude or codex, or add chat.backends in ~/.flusk/config.json";
+}
+
 /** One picker row's visible label, unavailable reasons included. */
 export function whoOptionLabel(a: Answerer): string {
 	const where = scopeText(a);

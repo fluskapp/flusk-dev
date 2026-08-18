@@ -76,7 +76,9 @@ it("aggregates journals, sessions, docs and spend onto the project", () => {
 	expect(linof?.kind).toBe("harness");
 	expect(linof?.runs).toBe(4); // 3 journals + 1 session
 	expect(linof?.sessions).toBe(1);
-	expect(linof?.liveRuns).toBe(1);
+	// The "still going" journal was last written 15h before NOW: claimed
+	// running, verifiably not — a badge that pulses for it is a lie.
+	expect(linof?.liveRuns).toBe(0);
 	expect(linof?.docs).toBe(1);
 	// 1.50 from the flusk session plus the 0.75 the journal declares: a harness
 	// project used to read $0 however much it had spent.
@@ -86,7 +88,7 @@ it("aggregates journals, sessions, docs and spend onto the project", () => {
 	expect(plain?.kind).toBe("repo");
 	expect(plain?.runs).toBe(2);
 	expect(plain?.docs).toBe(2);
-	expect(plain?.liveRuns).toBe(1); // the session with no stats entry
+	expect(plain?.liveRuns).toBe(0); // the open session, but idle for 5h
 	expect(plain?.costUsd).toBeCloseTo(0.25);
 
 	const gadget = find(list, "gadget");
@@ -114,7 +116,14 @@ it("sorts by last activity, newest first, and surfaces attention", () => {
 	]);
 });
 
-it("survives a config that points nowhere", () => {
-	const cfg = { ...t.cfg, ui: { harnessDirs: [], projectDirs: [join(t.work, "nope", "*")] } };
-	expect(scanProjects(cfg, NOW)).toEqual([]);
+it("a config that points nowhere still surfaces the work, as (no project)", () => {
+	const cfg = { ...t.cfg, ui: { harnessDirs: [], projectDirs: [join(t.work, "nope", "*")], liveTailEvents: 400 } };
+	const list = scanProjects(cfg, NOW);
+	// The sessions exist whether or not the config lists their repos; dropping
+	// them made the Overview and the feed disagree about what is running.
+	expect(list.map((p) => p.name)).toEqual(["(no project)"]);
+	expect(list[0]?.path).toBe("");
+	expect(list[0]?.sessions).toBe(3);
+	expect(list[0]?.liveRuns).toBe(0); // the open session is stalled, not live
 });
+

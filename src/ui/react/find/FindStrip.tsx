@@ -6,6 +6,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback } from "react";
 import { useOpenFile, useProjectName } from "../files/open-file.js";
+import { Ic } from "../system/Icon.js";
 import { FindPanel } from "./FindPanel.js";
 
 export function FindStrip() {
@@ -28,7 +29,7 @@ export function FindStrip() {
 				<span>Find in Files</span>
 				<span className="spacer" />
 				<button id="find-hide" title="Hide Find (⌘4)" onClick={close}>
-					✕
+					<Ic name="close" size={14} />
 				</button>
 			</div>
 			<FindPanel

@@ -11,6 +11,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterAll, beforeAll, expect, it } from "vitest";
+import { renderPage } from "../src/ui/page.js";
 import { startUiServer, type UiServer } from "../src/ui/server.js";
 
 let home: string;
@@ -25,7 +26,9 @@ beforeAll(async () => {
 	home = mkdtempSync(join(tmpdir(), "flusk-webpanel-"));
 	process.env.FLUSK_HOME = home;
 	ui = await startUiServer(0);
-	served = await (await fetch(`${ui.url}/`)).text();
+	// "/" serves the built React app now (server-app-door.test.ts); the markup
+	// pinned here is the legacy fallback page, so it comes from renderPage.
+	served = renderPage(home);
 });
 
 afterAll(async () => {

@@ -37,38 +37,6 @@
 	border: 1px solid var(--ij-border-control);
 }
 
-.empty {
-	display: flex; height: 55%; align-items: center; justify-content: center;
-	color: var(--dim); text-align: center;
-}
-.empty.small {
-	display: block; height: auto; padding: var(--ij-space-3) var(--ij-space-2);
-}
+/* Empty states come from system.css (.sys-empty; .empty is its alias). */
 
-/* Counter tiles (styles-widgets.ts): one-pixel separators, nothing doubled. */
-.stats-row {
-	display: flex; flex-wrap: wrap; margin-bottom: var(--ij-space-4);
-	border-top: 1px solid var(--ij-separator);
-	border-left: 1px solid var(--ij-separator);
-}
-.stat {
-	flex: 1 1 110px; /* design-exempt: tile flex-basis, from styles-widgets.ts */
-	background: var(--ij-bg-inset);
-	padding: var(--ij-space) var(--ij-space-2);
-	border-right: 1px solid var(--ij-separator);
-	border-bottom: 1px solid var(--ij-separator);
-}
-/* A tile with nowhere to go stays inert: no cursor, no hover fill. */
-.stat[data-open] { cursor: pointer; }
-.stat[data-open]:hover { background: var(--ij-hover); }
-.stat[data-open]:active { background: var(--ij-selection); }
-/* No colour here: .stat-v.ev is what paints a tile that leads somewhere. */
-.stat-v { font: 600 var(--ij-fs-9)/var(--ij-lh-tight) var(--ij-font-ui); }
-.stat-l {
-	font-size: var(--ij-fs-3); text-transform: uppercase; letter-spacing: .5px;
-	color: var(--ij-text-secondary);
-}
-.stat-h {
-	font-size: var(--ij-fs-3); color: var(--ij-text-secondary);
-	margin-top: var(--ij-space-1);
-}
+/* Counter tiles moved to the shared kit (kit/Tile.tsx + kit/tile.css). */

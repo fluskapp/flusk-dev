@@ -77,7 +77,9 @@ withLang("flusk flow run", () => {
 		expect(text()).toContain("completed · 3 step(s)");
 	});
 
-	it("meters what it spent instead of reporting every run as free", async () => {
+	// A full flow run — ~9s alone, and worker contention under the full suite
+	// can push it past the global 20s. The budget matches the work.
+	it("meters what it spent instead of reporting every run as free", { timeout: 60_000 }, async () => {
 		await gate(["true"]);
 		const { out, text } = capture();
 		const { chat } = await scripted(["the plan", "the change", "the report"]);
@@ -88,7 +90,9 @@ withLang("flusk flow run", () => {
 		expect(Number(cost)).toBeGreaterThan(0);
 	});
 
-	it("exits non-zero when the gate blocks the run", async () => {
+	// A full flow run whose gate fails — ~7s alone, and worker contention under
+	// the full suite can push it past the global 20s. The budget matches the work.
+	it("exits non-zero when the gate blocks the run", { timeout: 60_000 }, async () => {
 		await gate(["exit 3"]);
 		const { out, text } = capture();
 		const { chat } = await scripted(["the plan", "the change", "the report"]);
@@ -106,7 +110,9 @@ withLang("flusk flow run", () => {
 		expect(text()).toContain("blocked ·");
 	});
 
-	it("resumes a checkpointed run by id, replaying what already passed", async () => {
+	// Two full flow runs back to back — ~12s alone, and worker contention under
+	// the full suite pushed it past the global 20s. The budget matches the work.
+	it("resumes a checkpointed run by id, replaying what already passed", { timeout: 60_000 }, async () => {
 		await gate(["true"]);
 		const first = capture();
 		const { chat } = await scripted(["the plan", "the change", "the report"]);

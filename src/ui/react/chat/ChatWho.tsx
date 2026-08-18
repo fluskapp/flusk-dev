@@ -5,7 +5,7 @@
  * keeps the #chat-backend id — it is the combo the stylesheet dresses.
  */
 import { AT, repaint, WHO_KEY } from "./attach-store.js";
-import { whoOptionLabel } from "./attach-who.js";
+import { whoEmptyLabel, whoOptionLabel } from "./attach-who.js";
 
 export function ChatWho() {
 	const of = (kind: "agent" | "backend") => AT.answerers.filter((a) => a.kind === kind);
@@ -36,7 +36,9 @@ export function ChatWho() {
 			}}
 		>
 			{AT.answerers.length === 0 ? (
-				<option value="">{AT.whoErr !== "" ? AT.whoErr : "no answerer available"}</option>
+				// Not-yet-loaded is NOT "none exists" — the legacy rule ("A FAILED
+				// REQUEST IS NOT AN EMPTY LIST") extended to the loading state.
+				<option value="">{whoEmptyLabel(AT.whoLoaded, AT.whoErr)}</option>
 			) : (
 				<>
 					{group("Agents", of("agent"))}

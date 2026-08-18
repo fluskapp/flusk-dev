@@ -26,6 +26,9 @@ export interface AttachState {
 	answerers: Answerer[];
 	who: string;
 	whoErr: string;
+	/** True once a roster fetch has RESOLVED — an empty list before that is
+	 * "still loading", not "no backend" (a failed request is not an empty list). */
+	whoLoaded: boolean;
 	loading: boolean;
 	/** The file and caret last announced on screen — the whole of "on screen". */
 	screen: { file: string; line: number; col: number };
@@ -34,7 +37,7 @@ export interface AttachState {
 
 export const AT: AttachState = {
 	ctx: null, extras: [], notes: [], off: {}, answerers: [], who: "", whoErr: "",
-	loading: false, screen: { file: "", line: 0, col: 0 }, projects: null,
+	whoLoaded: false, loading: false, screen: { file: "", line: 0, col: 0 }, projects: null,
 };
 
 const subs = new Set<() => void>();

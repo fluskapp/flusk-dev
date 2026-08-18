@@ -27,11 +27,11 @@
 }
 .gg-act { font-size: var(--ij-fs-4); white-space: nowrap; }
 
-/* An unbuilt graph is a STATE, not a blank panel: it gets a heading, the
-   sentence saying what is missing, and the button that fixes it. */
-.gg-empty { padding: var(--ij-space-4) var(--ij-space-1); max-width: 62ch; }
-.gg-empty h3 { margin: 0 0 var(--ij-space-2); font-size: var(--ij-fs-7); font-weight: 600; color: var(--text); }
-.gg-empty p { margin: 0 0 var(--ij-space-2); font-size: var(--ij-fs-6); color: var(--dim); }
+/* An unbuilt graph is a STATE, not a blank panel: the system .sys-empty
+   (centered, dim, an action beside the sentence) carries it; only the
+   heading's weight and the note's measure are local. */
+.gg-empty-title { font-size: var(--ij-fs-7); font-weight: 600; color: var(--text); }
+.gg-empty-note { max-width: 62ch; }
 .gg-none { font-size: var(--ij-fs-5); color: var(--dim); padding: var(--ij-space-1) var(--ij-space-1) var(--ij-space-2); }
 /* Truncation is part of the answer; it must not read as another row. */
 .gg-note { font-size: var(--ij-fs-3); color: var(--dim); padding: var(--ij-space) var(--ij-space-1) 0; }

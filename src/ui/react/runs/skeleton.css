@@ -33,3 +33,8 @@
 .skel-num { flex: none; width: calc(var(--ij-space-4) * 2); }
 .skel-outline { display: flex; flex-direction: column; gap: var(--ij-space-2); padding: var(--ij-space-2); }
 .skel-outline .skel { height: var(--ij-fs-2); }
+/* /find before hydration: the query line at the control height (find.css
+   fields), then rows at the result tree's pitch. */
+.skel-find { display: flex; flex-direction: column; gap: var(--ij-space-2); padding: var(--ij-space-2) var(--ij-space-3); }
+.skel-find .skel-field { height: var(--ij-control-h); width: 100%; border-radius: var(--ij-radius); }
+.skel-find .skel { height: var(--ij-fs-2); }

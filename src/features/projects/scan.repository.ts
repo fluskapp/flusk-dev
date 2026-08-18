@@ -1,10 +1,16 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
-import type { AssistantMsg, ModelRef, RunEndReason } from "../run/run.types.js";
+import type { AssistantMsg, ModelRef } from "../run/run.types.js";
+import { replayTools } from "../run/replay-tools.js";
+import { runVerdict, type Verdict } from "../run/verdict.types.js";
 import type { StatsEntry } from "../session/entries.js";
 import { fluskHome } from "../../platform/paths/paths.js";
 import { SessionStore } from "../session/session.repository.js";
 import { createFileCache, type Stamp, stampOf } from "./scan-cache.repository.js";
+import { deriveStatus, lastGate, type SessionStatus, statusFromReason } from "./scan-derive.js";
+
+export { deriveStatus } from "./scan-derive.js";
+export type { SessionStatus } from "./scan-derive.js";
 
 /**
  * Transcripts a scan will parse, newest first. The dashboard polls this list
@@ -12,8 +18,6 @@ import { createFileCache, type Stamp, stampOf } from "./scan-cache.repository.js
  * of thousands must not be re-read to answer "what ran recently?".
  */
 const SESSION_LIMIT = 500;
-
-export type SessionStatus = "completed" | "error" | "aborted" | "stopped" | "running";
 
 export interface SessionSummary {
 	key: string; // "<repo-slug>/<file>.jsonl" — the handle the UI uses
@@ -26,46 +30,21 @@ export interface SessionSummary {
 	turns: number;
 	costUsd: number;
 	model: ModelRef;
+	/** Unified verdict (runVerdict over status + last gate entry). ABSENT when
+	 * the native Rust scanner answered — its SessionSummary predates verdict —
+	 * so consumers fall back to statusToVerdict(status). */
+	verdict?: Verdict;
+	/** Distinct write/edit paths replayed from message entries. Absent from
+	 * native-scanner rows, same caveat as verdict. */
+	filesTouched?: number;
 	/** Routing kind from the header, when the run recorded one. */
 	taskKind?: string;
 	/** Present when this session belongs to a subagent (links to its parent). */
 	parentSession?: string;
 }
 
-/** Newer files persist the RunEndReason in the stats entry; map it directly. */
-function statusFromReason(reason: RunEndReason): SessionStatus {
-	switch (reason) {
-		case "completed":
-			return "completed";
-		case "error":
-			return "error";
-		case "aborted":
-			return "aborted";
-		default:
-			return "stopped"; // budget/maxTurns/deadline
-	}
-}
-
 export function sessionsRoot(): string {
 	return join(fluskHome(), "sessions");
-}
-
-/** The session file doesn't persist RunEndReason; derive a display status. */
-export function deriveStatus(
-	hasStats: boolean,
-	lastAssistant: AssistantMsg | undefined,
-): SessionStatus {
-	if (!hasStats) return "running";
-	switch (lastAssistant?.stopReason) {
-		case "end":
-			return "completed";
-		case "error":
-			return "error";
-		case "aborted":
-			return "aborted";
-		default:
-			return "stopped"; // ended on toolUse: maxTurns/deadline/budget
-	}
 }
 
 /** Summaries per file identity: an unchanged transcript is never re-parsed. */
@@ -86,6 +65,13 @@ function summarize(path: string, key: string, stamp: Stamp): SessionSummary | nu
 				turns++;
 			}
 		}
+		const gate = lastGate(entries);
+		const status: SessionStatus =
+			gate?.outcome === "blocked"
+				? "blocked"
+				: stats?.reason !== undefined
+					? statusFromReason(stats.reason)
+					: deriveStatus(stats !== undefined, lastAssistant);
 		return {
 			key,
 			repoRoot: header.repoRoot,
@@ -93,13 +79,12 @@ function summarize(path: string, key: string, stamp: Stamp): SessionSummary | nu
 			sessionId: header.id,
 			createdAt: header.createdAt,
 			updatedAtMs: stamp.mtimeMs,
-			status:
-				stats?.reason !== undefined
-					? statusFromReason(stats.reason)
-					: deriveStatus(stats !== undefined, lastAssistant),
+			status,
 			turns: stats?.stats.turns ?? turns,
 			costUsd: stats?.stats.usage.costUsd ?? 0,
 			model: header.model,
+			verdict: runVerdict(status, gate),
+			filesTouched: replayTools(entries, header.repoRoot).filesTouched.length,
 			...(header.taskKind !== undefined ? { taskKind: header.taskKind } : {}),
 			...(header.parentSession !== undefined ? { parentSession: header.parentSession } : {}),
 		};

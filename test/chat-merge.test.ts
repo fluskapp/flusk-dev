@@ -47,6 +47,12 @@ it("chatBody carries `sent` over `content` and still drops err turns", () => {
 	expect(body.cwd).toBeUndefined();
 });
 
+it("conversationId rides only when present", () => {
+	const msgs: ChatMsg[] = [{ role: "user", content: "q", at: "10:00" }];
+	expect(chatBody("claude", msgs, "/repo", "20260817T100000-abc").conversationId).toBe("20260817T100000-abc");
+	expect(chatBody("claude", msgs, "/repo")).not.toHaveProperty("conversationId");
+});
+
 it("the fold threshold is the design's ~40 lines", () => {
 	expect(FOLD_LINES).toBe(40);
 });

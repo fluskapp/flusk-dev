@@ -1,0 +1,21 @@
+/* The Harness window (0): the loop diagram's SVG furniture and the goal
+   rows. Tokens only — the diagram's fills and strokes are the same semantic
+   vocabulary every other surface draws with. */
+
+#harness .anat-loop { overflow-x: auto; margin: 0 0 var(--ij-space-4); }
+.anat-box { fill: var(--panel); stroke: var(--border); }
+.anat-label { fill: var(--text); font: 600 var(--ij-fs-4)/1 var(--font-code); text-anchor: middle; }
+.anat-value { fill: var(--dim); font: var(--ij-fs-2)/1 var(--font-code); text-anchor: middle; }
+.anat-arrow { stroke: var(--dim); fill: none; }
+
+.anat-goal { margin: 0 0 var(--ij-space-2); }
+.anat-goal-head {
+	display: flex; gap: var(--ij-space); align-items: center;
+	min-height: var(--row); flex-wrap: wrap;
+}
+.anat-task {
+	display: flex; gap: var(--ij-space); align-items: center;
+	min-height: var(--row); flex-wrap: wrap;
+	margin-left: var(--ij-space-4);
+}
+.anat-task .chip.dim, .anat-task .mono.dim { color: var(--dim); }

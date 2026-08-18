@@ -4,7 +4,8 @@
  */
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useRef, useState } from "react";
-import { statusClass } from "./format.js";
+import type { Verdict } from "../../../features/run/verdict.types.js";
+import { statusClass, verdictClass } from "./format.js";
 import "./widgets.css";
 
 type Patch = Record<string, unknown>;
@@ -17,9 +18,12 @@ export function useOpenSearch() {
 }
 
 /** A project name that narrows to that project, without opening the row
- * it sits in — the stopPropagation is the point. */
+ * it sits in — the stopPropagation is the point. A row whose project is
+ * unknown (a flow run with no journal to join) prints the column's em-dash
+ * rather than an empty link that narrows to nothing. */
 export function ProjectCell({ name }: { name: string }) {
 	const navigate = useNavigate();
+	if (name === "") return <span className="off">—</span>;
 	return (
 		<span
 			className="ev"
@@ -74,6 +78,17 @@ export function FilterBar({
 /** Badge.*: a filled plate in the status colour (styles-transcript.ts). */
 export function Pill({ status }: { status?: string }) {
 	return <span className={`pill ${statusClass(status)}`}>{status ?? "unknown"}</span>;
+}
+
+/** Verdict-first: the pill's COLOUR is the verdict, its TEXT restates the raw
+ * state — one element answers "how did it go" and "what is it" at once. */
+export function VerdictPill({ verdict, status }: { verdict?: Verdict; status?: string }) {
+	return (
+		<span className={`sys-pill ${verdictClass(verdict)}`}>
+			{verdict === "live" ? <span className="sys-live" /> : null}
+			{status ?? verdict ?? "unknown"}
+		</span>
+	);
 }
 
 /** IntelliJ's group header: a small uppercase label on a separator. */

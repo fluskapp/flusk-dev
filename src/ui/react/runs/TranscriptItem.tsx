@@ -5,6 +5,7 @@
  * Thinking ships collapsed and dim: it is deliberation, not the log.
  */
 import type { ToolView, TranscriptItem } from "../../../features/projects/runs.functions.js";
+import { fmtCost } from "./format.js";
 import { Ic } from "../system/Icon.js";
 import { TOOL_ICON } from "../system/icons.js";
 
@@ -87,7 +88,7 @@ function Thinking({ text }: { text: string }) {
 	);
 }
 
-export function Item({ it }: { it: TranscriptItem }) {
+export function Item({ it, cum }: { it: TranscriptItem; cum?: number }) {
 	if (it.kind === "user") {
 		// A long task (a whole spec) folds to its first lines; the card keeps
 		// the reader oriented without owning the viewport.
@@ -129,6 +130,11 @@ export function Item({ it }: { it: TranscriptItem }) {
 				))}
 				{it.errorMessage !== undefined ? (
 					<div className="error-line">⚠ {it.errorMessage}</div>
+				) : null}
+				{it.usage !== undefined && cum !== undefined ? (
+					<div className="dim small">
+						{fmtCost(it.usage.costUsd)} · {fmtCost(cum)} total
+					</div>
 				) : null}
 			</div>
 		</div>

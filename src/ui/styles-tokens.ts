@@ -85,6 +85,7 @@ export const METRICS: ReadonlyArray<readonly [string, string, string]> = [
 	["tab-h", "40px", "TabbedPane.tabHeight"],
 	["tw-header-h", "26px", NO_METRIC],
 	["toolbar-h", "34px", NO_METRIC],
+	["rail-w", "40px", "~ the New UI tool-window stripe width"],
 	["status-h", "22px", NO_METRIC],
 	["space-1", "2px", "~ derived: half the spacing step"],
 	["space", "4px", "Tree.border 4,12,4,12 and List.border 4,0,4,0 vertical inset"],

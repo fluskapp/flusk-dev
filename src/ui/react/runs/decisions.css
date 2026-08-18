@@ -43,3 +43,11 @@
 .verdict.ok { background: var(--ok); }
 .verdict.warn { background: var(--warn); }
 .verdict.err { background: var(--err); }
+/* Gate attempt evidence: the failing command's tail, folded until asked for. */
+.dec-attempt > summary { cursor: pointer; font-size: var(--ij-fs-3); color: var(--dim); }
+.dec-attempt > summary code { color: var(--err); }
+.dec-evidence {
+	margin: var(--ij-space-1) 0 0; padding: var(--ij-space-1) var(--ij-space-2);
+	background: var(--code-bg); font: var(--ij-fs-3) var(--font-code);
+	white-space: pre-wrap; overflow-x: auto;
+}

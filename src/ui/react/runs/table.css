@@ -54,6 +54,9 @@
 .sev.high { background: var(--ij-status-error); }
 .attn-row td:first-child { width: var(--ij-row-h); }
 
+/* The verdict pill sits centred in its row like the old filled pill did. */
+.tbl td .sys-pill { vertical-align: middle; }
+
 a.ev, .ev { color: var(--ij-link); cursor: pointer; }
 a.ev:hover, .ev:hover { text-decoration: underline; }
 a.ev:focus-visible, .ev:focus-visible {

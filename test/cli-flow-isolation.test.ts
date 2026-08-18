@@ -92,7 +92,7 @@ withLang("flusk flow run isolates itself, as flusk run does", () => {
 		expect(text()).toMatch(/isolation: branch flusk\//);
 		expect(text()).toContain("verify: true");
 		expect(git("rev-parse", "--abbrev-ref", "HEAD").trim()).toMatch(/^flusk\//);
-	});
+	}, 60_000); // ~8s alone, but exceeds the 20s default under full-suite load
 
 	it("refuses a dirty tree rather than mixing the run into it", async () => {
 		await initRepo();

@@ -1,7 +1,8 @@
-import type { AssistantMsg, RunEndReason, RunStats } from "../run/run.types.js";
+import type { AssistantMsg, RunEndReason, RunStats, Usage } from "../run/run.types.js";
 import type { HeaderEntry } from "../session/entries.js";
+import { lastGate } from "../session/gate-fold.js";
 import { SessionStore } from "../session/session.repository.js";
-import { deriveStatus, type SessionStatus } from "./scan.repository.js";
+import { deriveStatus, type SessionStatus, statusFromReason } from "./scan-derive.js";
 
 export interface ToolView {
 	id: string;
@@ -19,6 +20,7 @@ export type TranscriptItem =
 			thinking: string;
 			stopReason: string;
 			errorMessage?: string;
+			usage?: Usage;
 			tools: ToolView[];
 	  }
 	| { kind: "compaction"; summary: string };
@@ -80,6 +82,7 @@ export function loadSessionDetail(path: string): SessionDetail {
 					thinking,
 					stopReason: m.stopReason,
 					...(m.errorMessage !== undefined ? { errorMessage: m.errorMessage } : {}),
+					...(m.usage !== undefined ? { usage: m.usage } : {}),
 					tools,
 				});
 			} else {
@@ -91,5 +94,14 @@ export function loadSessionDetail(path: string): SessionDetail {
 			}
 		}
 	}
-	return { header, status: deriveStatus(stats !== null, lastAssistant), stats, reason, items };
+	// The same fold the feed scan applies (D2): the last gate entry's blocked
+	// outcome wins, else the persisted reason, else the stopReason heuristic —
+	// so the detail header pill can never disagree with the feed row.
+	const status: SessionStatus =
+		lastGate(entries)?.outcome === "blocked"
+			? "blocked"
+			: reason !== null
+				? statusFromReason(reason)
+				: deriveStatus(stats !== null, lastAssistant);
+	return { header, status, stats, reason, items };
 }

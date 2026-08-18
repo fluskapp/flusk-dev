@@ -35,13 +35,19 @@ export function finalReport(agent: Agent): string {
  * transact, because one transact may not assert the same (subject, predicate)
  * twice.
  */
+export interface GateCheck {
+	outcome: "completed" | "blocked";
+	reportCheck: "ALLOW" | "WARN" | "BLOCK";
+	reasons: string[];
+}
+
 export async function claimCheck(
 	store: FactStore | null,
 	opts: GateOpts,
 	run: RunRecord,
 	results: VerifyCommandResult[],
 	report: string,
-): Promise<"completed" | "blocked"> {
+): Promise<GateCheck> {
 	const check = checkReportText(report, {
 		verify: results,
 		filesTouched: run.filesTouched,
@@ -69,10 +75,11 @@ export async function claimCheck(
 `);
 		for (const r of check.reasons) opts.out.write(`  - ${r}
 `);
-		return "blocked"; // exit 1; the run's branch keeps the code for review
+		// exit 1; the run's branch keeps the code for review
+		return { outcome: "blocked", reportCheck: check.verdict, reasons: check.reasons };
 	}
 	for (const r of check.reasons) opts.out.write(`verify: ${r}
 `);
-	return "completed";
+	return { outcome: "completed", reportCheck: check.verdict, reasons: check.reasons };
 }
 

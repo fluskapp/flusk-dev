@@ -19,8 +19,7 @@
 	display: flex; align-items: center; min-height: var(--ij-row-h);
 	padding: 0 var(--ij-space-2); color: var(--ij-text-secondary); font-size: var(--ij-fs-6);
 }
-.empty { display: flex; height: 55%; align-items: center; justify-content: center; color: var(--dim); text-align: center; }
-.empty.small { display: block; height: auto; padding: var(--ij-space-3) var(--ij-space-2); }
+/* Empty states come from system.css (.sys-empty; .empty is its alias). */
 
 .tbl { width: 100%; border-collapse: collapse; font-size: var(--ij-fs-6); }
 .tbl thead th {

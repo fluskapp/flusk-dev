@@ -14,6 +14,7 @@
 import { readdir } from "node:fs/promises";
 import { dirname } from "node:path";
 import type { FluskConfig } from "../../platform/config/types.js";
+import { ageStatus } from "../run/liveness.js";
 import { checkpointDir, readCheckpoint } from "./checkpoint-read.repository.js";
 import { lastAttempts } from "./nodes.js";
 import type { NodeKind } from "./types.js";
@@ -39,7 +40,9 @@ export interface FlowRunRow {
 	flow: string;
 	task: string;
 	at: string;
-	status: "done" | "failed" | "running";
+	/** "stalled": it claimed running, but nothing has been checkpointed since
+	 * the liveness window — a crash between nodes, not work in progress. */
+	status: "done" | "failed" | "running" | "stalled";
 	project: string;
 	costUsd: number;
 	/** The run's journal, when one was matched — the handle the Runs view opens. */
@@ -56,8 +59,21 @@ const OUTPUT_MAX = 4000;
 /** One owner for the checkpoint path: the runs root is its parent. */
 const runsRoot = (): string => dirname(checkpointDir("x"));
 
+/** A checkpointed run's status, with liveness verified: zero steps means the
+ * run is between its start and its first node — true only while it is young.
+ * Past the window nothing is driving it, and the row must stop pulsing. */
+function runStatus(steps: FlowRunStep[], at: string, nowMs: number): FlowRunRow["status"] {
+	// Last attempt per node, as record.ts scores a journal: the bounded retry
+	// is the runtime's designed happy path, and a recovered run is not failed.
+	if (steps.length > 0) return lastAttempts(steps).some((a) => !a.step.ok) ? "failed" : "done";
+	return ageStatus("running", Date.parse(at), nowMs) as FlowRunRow["status"];
+}
+
 /** One run by id, or null when nothing was checkpointed under that name. */
-export async function flowRun(runId: string): Promise<FlowRunRow | null> {
+export async function flowRun(
+	runId: string,
+	nowMs: number = Date.now(),
+): Promise<FlowRunRow | null> {
 	const lines = await readCheckpoint(runId);
 	const head = lines.find((l) => l.type === "run");
 	if (head === undefined || head.type !== "run") return null;
@@ -69,14 +85,7 @@ export async function flowRun(runId: string): Promise<FlowRunRow | null> {
 		flow: head.spec,
 		task: head.task,
 		at: head.at,
-		// Last attempt per node, as record.ts scores a journal: the bounded retry
-		// is the runtime's designed happy path, and a recovered run is not failed.
-		status:
-			steps.length === 0
-				? "running"
-				: lastAttempts(steps).some((a) => !a.step.ok)
-					? "failed"
-					: "done",
+		status: runStatus(steps, head.at, nowMs),
 		project: "",
 		costUsd: steps.reduce((sum, s) => sum + s.costUsd, 0),
 		steps,

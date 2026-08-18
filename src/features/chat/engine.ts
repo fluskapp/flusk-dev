@@ -51,13 +51,15 @@ async function* dispatch(
 		return;
 	}
 	if (be.config.kind === "cli") {
+		if (req.cwd === undefined) {
+			yield {
+				type: "error",
+				message: `${be.backend.id} needs a working directory — select a project in the Projects rail (⌘1) or attach code so chat knows which tree to run in`,
+			};
+			return;
+		}
 		yield* streamCli(
-			{
-				command: be.config.command ?? be.backend.id,
-				args: be.args,
-				prompt: renderPrompt(req.messages),
-				cwd: req.cwd,
-			},
+			{ command: be.config.command ?? be.backend.id, args: be.args, prompt: renderPrompt(req.messages), cwd: req.cwd },
 			signal,
 		);
 		return;

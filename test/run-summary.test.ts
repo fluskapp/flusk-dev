@@ -93,7 +93,7 @@ function fixture(): SessionEntry[] {
 
 it("assembleRunSummary counts tools by run-record's rules and cites the gate", () => {
 	const s = assembleRunSummary(fixture(), {
-		verifiedBy: ["npm test", "tsc --noEmit"], outcome: "success", reportCheck: "ALLOW",
+		verifiedBy: ["npm test", "tsc --noEmit"], reasons: [], outcome: "success", reportCheck: "ALLOW",
 	});
 	expect(s.filesTouched).toEqual(["/repo/a.ts"]); // write+edit of one file dedupes
 	expect(s.commandsRun).toEqual([
@@ -102,6 +102,10 @@ it("assembleRunSummary counts tools by run-record's rules and cites the gate", (
 	]);
 	expect(s.verified).toEqual(["npm test", "tsc --noEmit"]);
 	expect(s.reportCheck).toBe("ALLOW");
+	expect(s.verdict).toBe("ok");
+	expect(s.gateSource).toBe("facts");
+	expect(s.retries).toBeNull();
+	expect(s.compactions).toBe(0);
 	expect(s.conclusion).toBe(
 		"Completed in 4 turns for $0.02; touched 1 file; gate passed 2 commands; report check ALLOW.",
 	);
@@ -114,5 +118,8 @@ it("absent facts drop their clauses instead of inventing them", () => {
 	expect(s.turns).toBeNull();
 	expect(s.verified).toEqual([]);
 	expect(s.reportCheck).toBeNull();
+	expect(s.gateSource).toBe("memory-off");
+	expect(s.verdict).toBe("live"); // header-only: no stats yet, so the run reads as running
+	expect(s.reasons).toEqual([]);
 	expect(s.conclusion).toBe("No harness observations recorded yet.");
 });

@@ -64,6 +64,33 @@ export function GraphWindow({ initial }: { initial: Subject | null }) {
 				<GraphEmpty
 					title="Nothing selected"
 					note="The Graph panel follows the Documentation window. Open a source file — from the project tree, ⌘⇧O, or a Find in Files hit — and click any identifier in it."
+					action={
+						<>
+							<button
+								type="button"
+								className="sys-btn"
+								onClick={() =>
+									document.dispatchEvent(
+										new KeyboardEvent("keydown", { key: "o", metaKey: true, shiftKey: true }),
+									)
+								}
+							>
+								Go to file (⌘⇧O)
+							</button>{" "}
+							<button
+								type="button"
+								className="sys-btn"
+								onClick={() =>
+									void navigate({
+										to: ".",
+										search: (prev: Record<string, unknown>) => ({ ...prev, find: true }),
+									})
+								}
+							>
+								Find in Files (⌘4)
+							</button>
+						</>
+					}
 				/>
 			) : null}
 			{view.kind === "loading" ? (

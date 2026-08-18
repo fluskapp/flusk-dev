@@ -23,7 +23,8 @@ export { parseFrontmatter } from "./journal-frontmatter.js";
  * The cap is per directory, never global: one harness with 290 journals must
  * not be able to push every other harness's runs out of the result, which is
  * what a global newest-N slice does. Callers that need a bounded response
- * slice the sorted list themselves.
+ * slice the sorted list themselves. The cap bounds FEED slicing only —
+ * single-path lookup and true counts live in journal-lookup.repository.ts.
  */
 const JOURNAL_LIMIT = 400;
 
@@ -72,34 +73,42 @@ export function resolveJournalDirs(patterns: string[]): string[] {
 /** Parsed frontmatter per file identity: a poll re-reads only what changed. */
 const cache = createFileCache<JournalMeta>();
 
+/** The `.md` entries of one journal directory; a missing dir is empty. */
+export function journalFiles(dir: string): string[] {
+	try {
+		return readdirSync(dir).filter((f) => f.endsWith(".md"));
+	} catch {
+		return []; // a project without journals is normal, not an error
+	}
+}
+
 export function scanJournals(patterns: string[], perDirLimit = JOURNAL_LIMIT): Journal[] {
 	const out: Journal[] = [];
 	for (const dir of resolveJournalDirs(patterns)) {
-		let files: string[] = [];
-		try {
-			files = readdirSync(dir).filter((f) => f.endsWith(".md"));
-		} catch {
-			continue; // a project without journals is normal, not an error
-		}
 		const harnessRoot = resolve(dir, "..", "..");
-		const harness = basename(harnessRoot);
-		for (const f of files.sort().reverse().slice(0, perDirLimit)) {
-			const path = join(dir, f);
-			const stamp = stampOf(path);
-			if (stamp === null) continue;
-			const meta = cache.get(path, stamp, () => readMeta(path));
-			if (meta === null) continue;
-			out.push({
-				path,
-				harness,
-				harnessRoot,
-				mtimeMs: stamp.mtimeMs,
-				...meta,
-				date: meta.date || new Date(stamp.mtimeMs).toISOString(),
-			});
+		for (const f of journalFiles(dir).sort().reverse().slice(0, perDirLimit)) {
+			const j = journalFrom(join(dir, f), harnessRoot);
+			if (j !== null) out.push(j);
 		}
 	}
 	return out.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+/** One journal from its path — the shape scanJournals emits, shared with the
+ * single-path lookup so a capped-out journal still reads identically. */
+export function journalFrom(path: string, harnessRoot: string): Journal | null {
+	const stamp = stampOf(path);
+	if (stamp === null) return null;
+	const meta = cache.get(path, stamp, () => readMeta(path));
+	if (meta === null) return null;
+	return {
+		path,
+		harness: basename(harnessRoot),
+		harnessRoot,
+		mtimeMs: stamp.mtimeMs,
+		...meta,
+		date: meta.date || new Date(stamp.mtimeMs).toISOString(),
+	};
 }
 
 function readMeta(path: string): JournalMeta | null {

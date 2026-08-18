@@ -7,8 +7,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Type } from "typebox";
 import { Value } from "typebox/value";
-import { FindPanel, type FindPanelState } from "../ui/react/find/FindPanel.js";
 import { useOpenFile } from "../ui/react/files/open-file.js";
+import { FindPanel, type FindPanelState } from "../ui/react/find/FindPanel.js";
+import { SkelFind } from "../ui/react/runs/skeleton.js";
 
 const Search = Type.Object({
 	q: Type.Optional(Type.String()),
@@ -24,8 +25,20 @@ export const Route = createFileRoute("/find")({
 		const cleaned = Value.Convert(Search, input);
 		return Value.Check(Search, cleaned) ? cleaned : {};
 	},
+	// An ssr:false route ships its pendingComponent as the SSR/pre-hydration
+	// markup — a density-matched skeleton, never a blank editor pane
+	// (docs/design-system.md, Content rules).
+	pendingComponent: Pending,
 	component: Page,
 });
+
+function Pending() {
+	return (
+		<div id="findview" className="view">
+			<SkelFind />
+		</div>
+	);
+}
 
 function Page() {
 	const search = Route.useSearch() as {

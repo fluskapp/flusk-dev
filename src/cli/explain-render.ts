@@ -30,6 +30,26 @@ function line(d: Decision): string[] {
 				: `isolation  none — ${d.why}`,
 		];
 	}
+	if (d.kind === "turn") {
+		const tools = d.tools.length > 0 ? d.tools.join(", ") : "no tools";
+		const mark = d.checkpointed === true ? " · checkpointed" : "";
+		return [`turn       ${d.turn} · ${tools} · $${d.costUsd.toFixed(4)} · ${d.stop}${mark}`];
+	}
+	if (d.kind === "gate") {
+		const retries =
+			d.retries === 0 ? "clean first pass" : `${d.retries} retr${d.retries === 1 ? "y" : "ies"}`;
+		const check = d.reportCheck !== undefined ? ` · report ${d.reportCheck}` : "";
+		const rows = [`gate       ${d.outcome} · ${retries}${check}`];
+		for (const cmd of d.verified) rows.push(`             verified ${cmd}`);
+		for (const r of d.reasons ?? []) rows.push(`             because ${r}`);
+		for (const a of d.attempts ?? []) {
+			rows.push(
+				`             retry ${a.retry}: ${a.cmd} exited ${a.exitCode}${a.skipped ? " (skipped)" : ""}`,
+			);
+			for (const t of a.tail.split("\n")) rows.push(`               ${t}`);
+		}
+		return rows;
+	}
 	const head =
 		d.error !== undefined
 			? `context    FAILED (${d.error}) — the run proceeded with the base prompt alone`

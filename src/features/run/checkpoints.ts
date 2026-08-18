@@ -16,12 +16,16 @@ import { checkpoint } from "../safety/git-isolation.repository.js";
  */
 const MUTATING_TOOLS = new Set(["write", "edit", "bash", "task"]);
 
-export function checkpointMutatingTurns(events: EventBus, repoRoot: string): void {
+export function checkpointMutatingTurns(
+	events: EventBus,
+	repoRoot: string,
+	onCommit?: (turn: number) => void,
+): void {
 	events.on("turn:end", (e) => {
 		const mutated = e.toolResults.some((r) => !r.isError && MUTATING_TOOLS.has(r.name));
 		if (!mutated) return;
 		try {
-			checkpoint(repoRoot, e.turn);
+			if (checkpoint(repoRoot, e.turn)) onCommit?.(e.turn);
 		} catch {
 			// Non-fatal: a transient git failure (stale index.lock) must not abort
 			// the run; the next mutating turn or run end re-commits.

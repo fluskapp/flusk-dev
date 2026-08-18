@@ -19,6 +19,8 @@ export const RootSearchSchema = Type.Object({
 	find: Type.Optional(Type.Boolean()),
 	/** Documentation window (6). */
 	doc: Type.Optional(Type.Boolean()),
+	/** Run Configurations dialog: a config name, "new", or absent = closed. */
+	rc: Type.Optional(Type.String()),
 	/** Rail widths, px, clamped by the grips on write. */
 	sw: Type.Optional(Type.Number()),
 	cw: Type.Optional(Type.Number()),
@@ -29,6 +31,7 @@ export interface RootSearch {
 	chat?: boolean;
 	find?: boolean;
 	doc?: boolean;
+	rc?: string;
 	sw?: number;
 	cw?: number;
 }
@@ -40,7 +43,7 @@ export const ROOT_DEFAULTS = { side: true, chat: true, find: false, doc: false }
  * hand-edited URL degrades to the default workbench, never to an error page. */
 export function validateRootSearch(input: Record<string, unknown>): RootSearch {
 	const out: Record<string, unknown> = {};
-	for (const key of ["side", "chat", "find", "doc", "sw", "cw"]) {
+	for (const key of ["side", "chat", "find", "doc", "rc", "sw", "cw"]) {
 		if (key in input) out[key] = input[key];
 	}
 	const cleaned = Value.Convert(RootSearchSchema, out);

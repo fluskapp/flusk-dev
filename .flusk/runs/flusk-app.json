@@ -1,0 +1,8 @@
+{
+	"type": "task",
+	"task": "remove all pii and vault control... no need for that anymore",
+	"repo": "/Users/ashb/projects/flusk",
+	"tags": [
+		"refactor"
+	]
+}

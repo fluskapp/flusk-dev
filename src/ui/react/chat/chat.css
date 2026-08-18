@@ -11,11 +11,11 @@
 /* ToolWindow.Header: one band, the backend combo sitting in it as an action. */
 #chat .tw-head { height: var(--ij-tw-header-h); padding: 0 var(--ij-space-3); }
 .chat-head #chat-backend { margin-left: auto; }
-#chat-hide {
+#chat-hide, #chat-new {
 	padding: 0 var(--ij-space-2); font-size: var(--ij-fs-3); color: var(--dim);
 	border-radius: var(--ij-radius-sm);
 }
-#chat-hide:hover { background: var(--hover); color: var(--text); }
+#chat-hide:hover, #chat-new:hover { background: var(--hover); color: var(--text); }
 
 #chat-log {
 	flex: 1; min-height: 0; overflow-y: auto; outline: none; font-size: var(--ij-fs-6);
@@ -69,6 +69,50 @@
 @keyframes flusk-caret { 50% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .streaming::after { animation: none; } }
 
+/* The busy block (ChatStatus.tsx): tool activity lines over one state line.
+   The counting seconds are not motion, so reduced-motion needs nothing here. */
+#chat-status { padding: var(--ij-space-1) 0 var(--ij-space-2); }
+#chat-status .tool-line {
+	font: var(--ij-fs-2) var(--font-code); color: var(--dim);
+	white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#chat-status .state { font-size: var(--ij-fs-3); color: var(--dim); }
+#chat-status .state .sec { font-family: var(--font-code); }
+
+/* The reply's mechanics (ChatTurnRun.tsx): one dim collapsed line under the
+   turn; expanded, a code-face block — invocation, cwd, tool lines, stderr. */
+.turn-run { margin-top: var(--ij-space); }
+.turn-run-toggle {
+	display: flex; align-items: center; gap: var(--ij-space-1); max-width: 100%;
+	padding: 0; background: none; border: none; cursor: pointer;
+	font: var(--ij-fs-2) var(--font-code); color: var(--dim);
+	white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.turn-run-toggle:hover { color: var(--text); }
+/* The decisions.css twisty idiom: an inset ring, no layout shift. */
+.turn-run-toggle:focus-visible {
+	outline: var(--ij-focus-ring-w) solid var(--ij-focus-ring);
+	outline-offset: var(--ij-focus-ring-w);
+}
+.turn-run-toggle .chev { font-size: var(--ij-fs-1); color: var(--dim); }
+.turn-run-detail {
+	margin-top: var(--ij-space); padding: var(--ij-space) var(--ij-space-2);
+	background: var(--code-bg); border: 1px solid var(--border);
+}
+.turn-run-detail .run-cmd, .turn-run-detail .run-cwd {
+	display: block; font: var(--ij-fs-2)/1.5 var(--font-code); color: var(--text);
+	overflow-wrap: break-word; user-select: text;
+}
+.turn-run-detail .run-cwd { color: var(--dim); }
+.turn-run-detail .tool-line {
+	font: var(--ij-fs-2)/1.5 var(--font-code); color: var(--dim);
+	white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.turn-run-detail .run-stderr {
+	margin: var(--ij-space) 0 0; white-space: pre-wrap; overflow-wrap: break-word;
+	font: var(--ij-fs-2)/1.5 var(--font-code); color: var(--err);
+}
+
 #chat-compose {
 	padding: var(--ij-space-2) var(--ij-space-3); border-top: 1px solid var(--border);
 }
@@ -114,6 +158,7 @@
 	flex: 1; min-width: 0; font: var(--ij-fs-2) var(--font-code); color: var(--dim);
 	white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+#chat-cwd.warn { color: var(--warn); }
 #chat-note { flex: none; font-size: var(--ij-fs-3); color: var(--warn); }
 #chat-note:empty { display: none; }
 #chat-send, #chat-stop {

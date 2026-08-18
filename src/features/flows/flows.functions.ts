@@ -31,14 +31,19 @@ export const getFlowRuns = createServerFn()
 		return flowRuns(cfg(), data);
 	});
 
+/** One run, or the sentence saying why there is none: the route's error copy
+ * must name the reason, so a missing run is never collapsed to a bare null. */
+export type FlowRunReply = { run: FlowRunRow; reason?: never } | { run: null; reason: string };
+
 /**
  * One run with each step's prompt SOURCES recomposed the way the run had them.
- * Null when nothing was checkpointed under that id — the caller's empty state,
- * not an error.
+ * `run: null` carries the reason — the caller's honest banner, not an error.
  */
 export const getFlowRun = createServerFn()
 	.inputValidator((data: { runId: string }) => data)
-	.handler(async ({ data }): Promise<FlowRunRow | null> => {
+	.handler(async ({ data }): Promise<FlowRunReply> => {
 		const row = await flowRun(data.runId);
-		return row === null ? null : withSources(row, process.cwd());
+		return row === null
+			? { run: null, reason: "no checkpoint was written under that id" }
+			: { run: await withSources(row, process.cwd()) };
 	});

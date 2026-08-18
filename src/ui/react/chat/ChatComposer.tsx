@@ -7,7 +7,7 @@
  * everywhere.
  */
 import { useRef } from "react";
-import { allBlocks, cwdPath, preambleText } from "./attach-logic.js";
+import { allBlocks, preambleText } from "./attach-logic.js";
 
 /** Grows with the text up to the stylesheet's max-height cap (five control heights). */
 function autogrow(el: HTMLTextAreaElement): void {
@@ -23,12 +23,14 @@ export interface ComposerProps {
 	busy: boolean;
 	/** "no answerer available" and friends; empty when a send can go. */
 	note: string;
+	/** The effective working directory (chat-cwd.ts); "" = none selected. */
+	cwd: string;
 	/** Returns false when the message was refused, so the text survives. */
 	onSend: (text: string) => boolean;
 	onStop: () => void;
 }
 
-export function ChatComposer({ busy, note, onSend, onStop }: ComposerProps) {
+export function ChatComposer({ busy, note, cwd, onSend, onStop }: ComposerProps) {
 	const inputRef = useRef<HTMLTextAreaElement>(null);
 	const fire = (): void => {
 		const input = inputRef.current;
@@ -39,7 +41,6 @@ export function ChatComposer({ busy, note, onSend, onStop }: ComposerProps) {
 		input.value = "";
 		autogrow(input);
 	};
-	const cwd = cwdPath();
 	return (
 		<div id="chat-compose">
 			<textarea
@@ -62,8 +63,10 @@ export function ChatComposer({ busy, note, onSend, onStop }: ComposerProps) {
 				}}
 			/>
 			<div className="chat-actions">
-				<span id="chat-cwd" title="Working directory">
-					cwd: {cwd === "" ? "no project selected" : cwd}
+				{/* Sending stays allowed without a cwd: HTTP backends need none, and a
+				    CLI backend answers with the engine's error naming this remedy. */}
+				<span id="chat-cwd" className={cwd === "" ? "warn" : undefined} title="Working directory">
+					cwd: {cwd === "" ? "none — select a project (⌘1)" : cwd}
 				</span>
 				<span id="chat-note">{note}</span>
 				{/* Stop stands in for Send while a reply streams. */}

@@ -6,7 +6,21 @@
  */
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useSyncExternalStore } from "react";
+import { decodeRef, refKind } from "../runs/format.js";
 import { Ic } from "../system/Icon.js";
+
+/** A pathname may arrive with layered encoding (a stale pre-fix link was
+ * encoded by the caller AND the router): decode until stable so refKind and
+ * the leaf work on the real path, not %2F-joined text. */
+function decodeFully(s: string): string {
+	let cur = s;
+	for (let i = 0; i < 4; i += 1) {
+		const next = decodeRef(cur);
+		if (next === cur) return cur;
+		cur = next;
+	}
+	return cur;
+}
 
 export interface EditorTab {
 	href: string;
@@ -48,13 +62,24 @@ function write(tabs: EditorTab[]): void {
 }
 
 /** Route → tab shape; null for list routes (they are windows, not documents). */
-function tabOf(path: string): EditorTab | null {
-	const p = decodeURIComponent(path);
+export function tabOf(path: string): EditorTab | null {
+	const p = decodeFully(path);
 	if (/^\/runs\/./.test(path)) {
+		const ref = p.slice("/runs/".length);
+		const leaf = ref.split("/").pop() ?? ref;
+		// A journal keeps its file identity: the name minus the timestamp
+		// prefix and .md — a tab must carry which run it holds, not "base.md".
+		if (refKind(ref) === "journal" && leaf.endsWith(".md")) {
+			const title = leaf.replace(/\.md$/, "").replace(/^\d{4}(-\d{2}){5}-/, "");
+			return { href: path, icon: "run", title, backTo: "/runs" };
+		}
 		// A session file is "<iso-timestamp>-<shortid>.jsonl"; the id is the
 		// only part a human recognizes, so the tab says "run <id>".
-		const leaf = (p.split("/").pop() ?? p).replace(/\.jsonl$/, "");
-		const id = leaf.split("-").pop() ?? leaf;
+		const id =
+			leaf
+				.replace(/\.jsonl$/, "")
+				.split("-")
+				.pop() ?? leaf;
 		return { href: path, icon: "run", title: `run ${id}`, backTo: "/runs" };
 	}
 	if (/^\/read\/./.test(path)) {
@@ -95,8 +120,13 @@ export function EditorTabs() {
 			{tabs.map((t) => {
 				const active = t.href === pathname;
 				return (
-					<span key={t.href} className={`tab${active ? " on" : ""}`} role="tab" aria-selected={active}>
-						<Link to={t.href} className="tab-link" title={decodeURIComponent(t.href)}>
+					<span
+						key={t.href}
+						className={`tab${active ? " on" : ""}`}
+						role="tab"
+						aria-selected={active}
+					>
+						<Link to={t.href} className="tab-link" title={decodeFully(t.href)}>
 							<Ic name={t.icon} size={13} />
 							<span className="sys-ellipsis">{t.title}</span>
 						</Link>
@@ -106,10 +136,11 @@ export function EditorTabs() {
 							title="Close"
 							onClick={() => {
 								write(read().filter((x) => x.href !== t.href));
-								if (active) void navigate({ to: t.backTo, search: (prev: Record<string, unknown>) => prev });
+								if (active)
+									void navigate({ to: t.backTo, search: (prev: Record<string, unknown>) => prev });
 							}}
 						>
-							×
+							<Ic name="close" size={12} />
 						</button>
 					</span>
 				);

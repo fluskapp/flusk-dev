@@ -8,6 +8,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { DEFAULT_CONFIG } from "../src/platform/config/defaults.js";
 import type { FluskConfig } from "../src/platform/config/types.js";
+import { assistantToolCalls } from "../src/features/provider/fake.js";
 import type { RunEndReason } from "../src/features/run/run.types.js";
 import { Session } from "../src/features/session/session-file.repository.js";
 
@@ -54,6 +55,10 @@ export interface FakeSession {
 	reason?: RunEndReason;
 	/** No stats entry at all, which the scanner reports as "running". */
 	open?: boolean;
+	/** Appends a gate decision entry — the verification gate's judgment. */
+	gate?: "completed" | "blocked";
+	/** write-tool call/result pairs, one per path — makes filesTouched countable. */
+	files?: string[];
 	/** mtime in epoch seconds — the feed and lastActivity sort on it. */
 	atSec?: number;
 }
@@ -61,6 +66,12 @@ export interface FakeSession {
 export function session(s: FakeSession): string {
 	const sess = Session.create({ task: s.task, repoRoot: s.repoRoot, model: MODEL });
 	sess.appendMessage({ role: "user", content: s.task });
+	for (const [i, file_path] of (s.files ?? []).entries()) {
+		sess.appendMessage(assistantToolCalls([{ id: `f${i}`, name: "write", args: { file_path } }]));
+		sess.appendMessage({ role: "toolResult", callId: `f${i}`, name: "write", output: "wrote", isError: false });
+	}
+	if (s.gate !== undefined)
+		sess.appendDecision({ kind: "gate", outcome: s.gate, retries: 0, verified: [] });
 	if (s.open !== true) {
 		sess.appendStats(
 			{
@@ -89,7 +100,7 @@ export function tree(): Tree {
 	process.env.FLUSK_HOME = home;
 	const cfg: FluskConfig = {
 		...structuredClone(DEFAULT_CONFIG),
-		ui: { harnessDirs: [join(work, "*", "docs", "runs")], projectDirs: [join(work, "*")] },
+		ui: { harnessDirs: [join(work, "*", "docs", "runs")], projectDirs: [join(work, "*")], liveTailEvents: 400 },
 	};
 	return {
 		home,

@@ -16,6 +16,8 @@ export interface HeaderEntry {
 	parentSession?: string;
 	/** Routing kind chosen at run start (plan|code|review|summarize). */
 	taskKind?: string;
+	/** External harness id when a foreign adapter produced this session. */
+	harness?: string;
 }
 
 export interface MessageEntry {
@@ -92,6 +94,32 @@ export type Decision =
 			mode: string;
 			/** Repo-relative path of the spec file. */
 			path: string;
+	  }
+	| {
+			/** One loop turn, recorded at turn:end. */
+			kind: "turn";
+			turn: number;
+			/** Tool names called this turn, in order (empty = text-only turn). */
+			tools: string[];
+			costUsd: number;
+			/** stopReason of the turn's assistant message. */
+			stop: string;
+			/** True when this turn mutated and the per-turn checkpoint committed. */
+			checkpointed?: boolean;
+	  }
+	| {
+			/** The verification gate's judgment of this run, written when the gate finished. */
+			kind: "gate";
+			outcome: "completed" | "blocked";
+			/** Gate retries consumed (0 = clean first pass). */
+			retries: number;
+			/** Verify commands that passed on the final attempt. */
+			verified: string[];
+			/** Failing evidence that drove each retry, and the final block. */
+			attempts?: Array<{ retry: number; cmd: string; exitCode: number; tail: string; skipped: boolean }>;
+			/** Claim-check verdict and its reasons, when the check ran. */
+			reportCheck?: "ALLOW" | "WARN" | "BLOCK";
+			reasons?: string[];
 	  };
 
 export type SessionEntry = HeaderEntry | MessageEntry | CompactionEntry | StatsEntry | DecisionEntry;

@@ -4,6 +4,7 @@
  * the Flows window folded into Runs; it now speaks the runs vocabulary
  * (widgets, format, stages) instead of carrying its own.
  */
+import { Link } from "@tanstack/react-router";
 import type { FlowRunRow, FlowRunStep } from "../../../../features/flows/flows.functions.js";
 import { flowStages } from "../feed-row.js";
 import { fmtCost } from "../format.js";
@@ -44,24 +45,57 @@ function FlowStep({ s }: { s: FlowRunStep }) {
 	);
 }
 
-export function FlowRunDetail({ run, onBack }: { run: FlowRunRow; onBack: () => void }) {
+export function FlowRunDetail({ run }: { run: FlowRunRow }) {
 	return (
 		<>
 			<div className="head-row">
-				<h2>{run.task}</h2>
+				{/* One line, ellipsized: a long task is a heading, never a paragraph. */}
+				<h2 className="sys-ellipsis" title={run.task}>
+					{run.task}
+				</h2>
 				<Pill status={run.status} />
 				<span className="dim">
 					{run.flow} · {run.runId}
 				</span>
-				<span className="ev" data-flow-back="1" onClick={onBack}>
-					back to runs
-				</span>
+				{/* A real link back, not a click handler: ⌘-click, middle-click and
+				    the keyboard all reach it, and it drops ?flow= the way Escape does. */}
+				<Link
+					to="/runs"
+					search={(prev: Record<string, unknown>) => ({ ...prev, flow: undefined })}
+					className="ev"
+					data-flow-back="1"
+				>
+					‹ back to runs
+				</Link>
 			</div>
-			<StagePipeline rows={flowStages(run.steps)} />
+			{run.steps.length > 0 ? <StagePipeline rows={flowStages(run.steps)} /> : null}
 			<Sec title="Steps" count={run.steps.length}>
-				{run.steps.map((s, i) => (
-					<FlowStep key={`${s.nodeId}:${i}`} s={s} />
-				))}
+				{run.steps.length === 0 ? (
+					<div className="empty small">
+						No steps recorded — the flow exited before its first node.
+						<br />
+						{run.ref === undefined || run.ref === "" ? (
+							<>
+								Nothing but the start was checkpointed; <code>flusk flow run "{run.task}"</code>{" "}
+								runs it again.
+							</>
+						) : (
+							<>
+								The run journal is what says why —{" "}
+								<Link
+									to="/runs/$runId"
+									params={{ runId: run.ref }}
+									search={(prev: Record<string, unknown>) => prev}
+								>
+									open it
+								</Link>
+								.
+							</>
+						)}
+					</div>
+				) : (
+					run.steps.map((s, i) => <FlowStep key={`${s.nodeId}:${i}`} s={s} />)
+				)}
 			</Sec>
 		</>
 	);

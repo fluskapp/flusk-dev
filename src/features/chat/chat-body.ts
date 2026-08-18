@@ -40,11 +40,14 @@ export function readBody(req: IncomingMessage): Promise<string> {
 	});
 }
 
+/** Server-issued conversation ids: file basenames, so traversal is rejected. */
+const CONV_ID = /^[A-Za-z0-9_-]{1,80}$/;
+
 export function parseChatRequest(raw: unknown): ChatRequest {
 	if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
 		throw new Error("body must be a JSON object");
 	}
-	const { backendId, messages, cwd } = raw as Record<string, unknown>;
+	const { backendId, messages, cwd, conversationId } = raw as Record<string, unknown>;
 	if (typeof backendId !== "string" || backendId === "") throw new Error("backendId is required");
 	if (!Array.isArray(messages) || messages.length === 0) {
 		throw new Error("messages must be a non-empty array");
@@ -57,5 +60,13 @@ export function parseChatRequest(raw: unknown): ChatRequest {
 		return { role, content };
 	});
 	if (cwd !== undefined && typeof cwd !== "string") throw new Error("cwd must be a string");
-	return { backendId, messages: list, ...(typeof cwd === "string" ? { cwd } : {}) };
+	if (conversationId !== undefined && (typeof conversationId !== "string" || !CONV_ID.test(conversationId))) {
+		throw new Error("conversationId must be a server-issued id");
+	}
+	return {
+		backendId,
+		messages: list,
+		...(typeof cwd === "string" ? { cwd } : {}),
+		...(typeof conversationId === "string" ? { conversationId } : {}),
+	};
 }

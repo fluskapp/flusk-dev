@@ -17,6 +17,7 @@ import { createServerFn, createServerOnlyFn } from "@tanstack/react-start";
 import { resolve } from "node:path";
 import { loadConfig } from "../../platform/config/config.js";
 import { parseChatRequest, TOO_LARGE } from "./chat-body.js";
+import { persistedStream } from "./chat-persist.js";
 import { allowedCwds, liveChats } from "./chat.router.js";
 import { createChatEngine } from "./engine.js";
 import type { ChatBackend, ChatRequest } from "./types.js";
@@ -114,7 +115,7 @@ export const chatStreamResponse = createServerOnlyFn(async (request: Request): P
 	}
 	return sseStreamResponse(request, async (write, signal) => {
 		try {
-			for await (const chunk of createChatEngine(c).stream(req, signal)) {
+			for await (const chunk of persistedStream(req, createChatEngine(c).stream(req, signal))) {
 				write(chunk);
 				if (chunk.type === "done") break;
 			}

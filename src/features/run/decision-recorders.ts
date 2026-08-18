@@ -31,6 +31,26 @@ export function recordContextDecisions(events: EventBus, session: Session): () =
 	});
 }
 
+/** Every turn becomes an entry at turn:end: which tools ran, what it cost,
+ * how the model stopped — and whether the mutation checkpoint committed,
+ * which only the earlier-subscribed checkpoint listener can know. */
+export function recordTurnDecisions(
+	events: EventBus,
+	session: Session,
+	committed: ReadonlySet<number>,
+): () => void {
+	return events.on("turn:end", (e) => {
+		session.appendDecision({
+			kind: "turn",
+			turn: e.turn,
+			tools: e.toolResults.map((r) => r.name),
+			costUsd: e.message.usage.costUsd,
+			stop: e.message.stopReason,
+			...(committed.has(e.turn) ? { checkpointed: true } : {}),
+		});
+	});
+}
+
 /** Written before the first turn: "which model, chosen how, isolated where"
  * are the first questions a reviewer asks, so they are the first entries. */
 export function recordStartDecisions(

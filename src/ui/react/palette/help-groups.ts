@@ -15,6 +15,7 @@ const PALETTE_HELP_ROWS: HelpRow[] = [
 	["⌘J", "Palette: next / previous hit (⌘K)"],
 	["⌘⏎", "Palette: compose a prompt from the query"],
 	["⌘P", "Palette: scope to the selected project / all projects"],
+	["⌘K run", "Palette: “Run configuration…” / “Edit configurations…” — the toolbar runner's dialog"],
 ];
 
 export const HELP_GROUPS: HelpGroup[] = [

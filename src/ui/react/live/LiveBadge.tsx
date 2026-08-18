@@ -5,6 +5,7 @@
  * stream={…}>; a view with only a runId mounts <LiveBadgeFor> and the badge
  * owns its own subscription.
  */
+import { fmtCost } from "../runs/format.js";
 import type { RunStream } from "./live-stream.js";
 import { useRunEvents } from "./use-run-events.js";
 import "./live.css";
@@ -20,7 +21,10 @@ export function LiveBadge({ stream }: { stream: RunStream }) {
 	return (
 		<span className={`live-badge is-${stream.status}`} title={STATUS_WORD[stream.status]}>
 			<span className="live-dot" aria-hidden="true" />
-			<span className="live-turn">turn {stream.turns}</span>
+			<span className="live-turn">
+				turn {stream.turns}
+				{stream.costUsd > 0 ? ` · ${fmtCost(stream.costUsd)}` : ""}
+			</span>
 			{stream.last !== null ? <span className="live-last">{stream.last}</span> : null}
 			{stream.skipped > 0 ? (
 				<span className="live-skip">…skipped {stream.skipped} events</span>

@@ -3,9 +3,8 @@
 /* The workbench frame, the legacy styles-chrome vocabulary expressed once for
    the React shell: toolbar strip, numbered tool windows, one scrolling middle,
    status bar. Every value is a token; the frame heights are tokens because the
-   grips have to start below the toolbar and stop above the status bar. */
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--text); font: var(--ij-fs-5) var(--font-ui); }
+   grips have to start below the toolbar and stop above the status bar.
+   The base (box-sizing, body font/leading) is tokens.css's — one owner. */
 
 /* ONE keyboard-focus treatment for the whole workbench: the IntelliJ ring.
    :where keeps it at base specificity, so a tool window may still refine it. */
@@ -21,17 +20,23 @@ body { margin: 0; background: var(--bg); color: var(--text); font: var(--ij-fs-5
 		"rail side main chat" minmax(0, 1fr)
 		"rail find find find" auto
 		"st st st st" var(--ij-status-h)
-		/ var(--ij-toolbar-h) var(--tw-left, 268px) minmax(0, 1fr) var(--tw-right, 340px);
+		/ var(--ij-rail-w) var(--tw-left, 268px) minmax(0, 1fr) var(--tw-right, 340px);
 }
-#app[data-side="off"] { grid-template-columns: var(--ij-toolbar-h) 0 minmax(0, 1fr) var(--tw-right, 340px); }
-#app[data-chat="off"] { grid-template-columns: var(--ij-toolbar-h) var(--tw-left, 268px) minmax(0, 1fr) 0; }
-#app[data-side="off"][data-chat="off"] { grid-template-columns: var(--ij-toolbar-h) 0 minmax(0, 1fr) 0; }
+#app[data-side="off"] { grid-template-columns: var(--ij-rail-w) 0 minmax(0, 1fr) var(--tw-right, 340px); }
+#app[data-chat="off"] { grid-template-columns: var(--ij-rail-w) var(--tw-left, 268px) minmax(0, 1fr) 0; }
+#app[data-side="off"][data-chat="off"] { grid-template-columns: var(--ij-rail-w) 0 minmax(0, 1fr) 0; }
 
-/* The toolbar is a WINDOW HEADER strip: icon-density buttons, no tall targets. */
+/* The toolbar is a WINDOW HEADER strip: icon-density buttons, no tall targets.
+   In the desktop app it is also the TITLE BAR — the window drags by it
+   (hiddenInset in electron/main.mjs), while every control opts back out. */
 #toolbar {
 	grid-area: tb; display: flex; align-items: center; gap: var(--ij-space);
 	padding: 0 var(--ij-space-2); background: var(--panel); border-bottom: 1px solid var(--border);
+	-webkit-app-region: drag;
 }
+#toolbar a, #toolbar button, #toolbar select, #toolbar input { -webkit-app-region: no-drag; }
+/* Electron on macOS: the logo clears the traffic lights (x:10 + 3×~20px). */
+body.darwin #toolbar { padding-left: 76px; } /* design-exempt: macOS traffic-light inset */
 #toolbar .logo { font-weight: 700; padding: 0 var(--ij-space); }
 #toolbar a, #toolbar button {
 	display: inline-flex; align-items: center;
@@ -123,14 +128,22 @@ body.grip-drag { cursor: col-resize; user-select: none; }
 }
 .rail-group { display: flex; flex-direction: column; gap: var(--ij-space-1); align-items: center; }
 .rail-btn {
-	display: flex; align-items: center; justify-content: center;
-	width: 26px; height: 26px; /* design-exempt: the New UI rail button metric */
+	display: flex; align-items: center; justify-content: center; position: relative;
+	width: 32px; height: 32px; /* design-exempt: the New UI rail button metric */
 	border: none; border-radius: var(--ij-radius-sm); background: none;
 	color: var(--dim); cursor: pointer; font: var(--ij-fs-5) var(--font-ui);
 	text-decoration: none;
 }
 .rail-btn:hover { background: var(--hover); color: var(--text); }
 .rail-btn.on { background: var(--sel); color: var(--text); }
+/* The active tool window's accent bar, anchored to the window edge — the tab
+   underline's metric rotated onto the stripe, readable in peripheral vision. */
+.rail-btn.on::before {
+	content: ""; position: absolute; top: 0; bottom: 0;
+	left: calc((32px - var(--ij-rail-w)) / 2); /* design-exempt: from the button to the window edge */
+	width: 2px; /* design-exempt: EditorTabs.underlineHeight, same as .tab.on::after */
+	background: var(--accent);
+}
 
 /* --- toolbar chips (project / live) ----------------------------------- */
 .tb-chip {
@@ -140,8 +153,10 @@ body.grip-drag { cursor: col-resize; user-select: none; }
 	font: var(--ij-fs-3) var(--font-ui);
 }
 .tb-chip:hover { background: var(--hover); }
+/* The chip is a destination: on its own route it takes the rail's selection
+   fill, so the bar says where you are instead of only where you can go. */
+.tb-chip.on { background: var(--sel); }
 .tb-chip.live { color: var(--ok); }
-.tb-caret { color: var(--dim); font-size: var(--ij-fs-1); }
 #toolbar .logo { display: inline-flex; align-items: center; gap: var(--ij-space-1); }
 
 /* --- editor tabs ------------------------------------------------------- */

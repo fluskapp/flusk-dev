@@ -1,0 +1,117 @@
+/* Run Configurations — WebStorm's Edit Configurations dialog in the flusk
+   vocabulary: a popup card (panel surface, Component.borderColor frame like
+   the palette), a list column, a property-grid form, and the red-line /
+   amber-line footer. Every value is a token; controls are the .sys-* 22px
+   vocabulary; the one focus ring is chrome.css's. */
+
+.rc-overlay {
+	position: fixed; inset: 0; z-index: 12;
+	display: flex; align-items: center; justify-content: center;
+}
+.rc-card {
+	display: flex; flex-direction: column;
+	width: min(880px, 94vw); height: min(560px, 86vh); /* design-exempt: popup measure, the pal-card idiom */
+	background: var(--panel); border: 1px solid var(--ij-border-control); overflow: hidden;
+}
+.rc-card .mono { font-family: var(--font-code); }
+.rc-head {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	padding: var(--ij-space-1) var(--ij-space-2);
+	border-bottom: 1px solid var(--border);
+	font-size: var(--ij-fs-4); font-weight: 600;
+}
+.rc-body { display: grid; grid-template-columns: 220px minmax(0, 1fr); /* design-exempt: WebStorm's list column */ flex: 1; min-height: 0; }
+
+/* --- left column: Add New + grouped configs --------------------------- */
+.rc-list { border-right: 1px solid var(--border); overflow-y: auto; padding: var(--ij-space-1) 0; outline: none; }
+.rc-group {
+	display: flex; align-items: center; gap: var(--ij-space-1);
+	padding: var(--ij-space-2) var(--ij-space-2) var(--ij-space-1);
+	font-size: var(--ij-fs-2); font-weight: 600; letter-spacing: .5px;
+	text-transform: uppercase; color: var(--dim);
+}
+.rc-row {
+	display: flex; align-items: center; gap: var(--ij-space-1);
+	height: var(--row); padding: 0 var(--ij-space-2); cursor: pointer;
+	white-space: nowrap; border-left: var(--ij-space-1) solid transparent;
+}
+.rc-row:hover { background: var(--hover); }
+.rc-row.on { background: var(--sel); border-left-color: var(--accent); }
+/* The keyboard cursor is state, not focus — kit's inactive-selection idiom. */
+.rc-row.cur:not(.on) { background: var(--sel-inactive, var(--hover)); }
+.rc-sub { padding-left: var(--ij-space-3); color: var(--dim); }
+.rc-name { overflow: hidden; text-overflow: ellipsis; font-size: var(--ij-fs-3); }
+.rc-badge {
+	font-size: var(--ij-fs-1); color: var(--dim);
+	border: 1px solid var(--border); border-radius: var(--ij-radius-sm);
+	padding: 0 var(--ij-space-1);
+}
+.rc-skip { opacity: .5; cursor: default; }
+.rc-why { font-size: var(--ij-fs-2); color: var(--dim); overflow: hidden; text-overflow: ellipsis; }
+.rc-empty { padding: var(--ij-space-2); color: var(--dim); font-size: var(--ij-fs-3); cursor: pointer; }
+.rc-empty:hover { color: var(--text); }
+
+/* --- right column: the form as a property grid ------------------------ */
+.rc-form { overflow-y: auto; padding: var(--ij-space-3); display: grid; gap: var(--ij-space-2); align-content: start; }
+.rc-field { display: grid; grid-template-columns: 9ch minmax(0, 1fr); gap: var(--ij-space-2); align-items: center; }
+.rc-field > span:first-child { color: var(--dim); font-size: var(--ij-fs-3); text-align: right; }
+.rc-task { align-items: start; }
+.rc-in {
+	background: var(--bg); color: var(--text);
+	border: 1px solid var(--ij-border-control); border-radius: var(--ij-radius-sm);
+	font: var(--ij-fs-3) var(--font-ui); padding: var(--ij-space-1) var(--ij-space-2);
+	min-width: 0; width: 100%;
+}
+.rc-in::placeholder { color: var(--dim); }
+textarea.rc-in { resize: vertical; line-height: var(--ij-lh); }
+.rc-num { width: 8ch; }
+.rc-radios, .rc-checks, .rc-budgets { display: flex; flex-wrap: wrap; gap: var(--ij-space-3); align-items: center; }
+.rc-radio, .rc-check, .rc-budgets label {
+	display: inline-flex; align-items: center; gap: var(--ij-space-1);
+	font-size: var(--ij-fs-3); cursor: pointer; color: var(--text);
+}
+.rc-budgets label { color: var(--dim); }
+
+/* --- dry preview pane -------------------------------------------------- */
+.rc-dry { display: flex; flex-direction: column; min-height: 0; }
+.rc-dry-head { display: flex; align-items: center; padding: var(--ij-space-1) var(--ij-space-2); border-bottom: 1px solid var(--border); }
+.rc-pre {
+	flex: 1; margin: 0; padding: var(--ij-space-2) var(--ij-space-3);
+	background: var(--code-bg); color: var(--text);
+	font: var(--ij-fs-3) var(--font-code); line-height: var(--ij-lh);
+	white-space: pre-wrap; overflow: auto;
+}
+
+/* --- footer: actions plus the red / amber line ------------------------- */
+.rc-foot {
+	display: flex; align-items: center; gap: var(--ij-space-2);
+	padding: var(--ij-space-2); border-top: 1px solid var(--border);
+}
+.rc-issue { font-size: var(--ij-fs-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc-issue.error { color: var(--err); }
+.rc-issue.warn { color: var(--warn); }
+.rc-started { color: var(--ok); font: var(--ij-fs-3) var(--font-code); text-decoration: none; }
+.rc-started:hover { text-decoration: underline; }
+
+/* --- the toolbar runner widget ----------------------------------------- */
+.rc-runner { display: inline-flex; align-items: center; gap: var(--ij-space-1); }
+/* Loading skeleton: the widget's footprint before the scan lands (design
+   system's loading rule — density-matched, no spinner, no reflow). */
+.rc-ghost {
+	width: 22ch; /* design-exempt: matches .rc-widget-sel's measure */
+	justify-content: flex-start; color: var(--dim); cursor: default;
+	border: 1px solid var(--border); background: var(--panel);
+}
+.rc-widget-sel {
+	height: 22px; /* design-exempt: New UI control height */
+	max-width: 22ch; background: var(--panel); color: var(--text);
+	border: 1px solid var(--border); border-radius: var(--ij-radius-sm);
+	font-size: var(--ij-fs-3); padding: 0 var(--ij-space-1);
+}
+.rc-widget-sel:hover { border-color: var(--dim); }
+.rc-go { color: var(--ok); }
+.rc-go:hover { color: var(--ok); }
+.rc-stop { color: var(--err); }
+.rc-stop:hover, .rc-stop.armed { color: var(--err); background: color-mix(in srgb, var(--err) 15%, transparent); }
+.rc-live { font-family: var(--font-code); max-width: 18ch; overflow: hidden; text-overflow: ellipsis; }
+.rc-werr { color: var(--err); font-weight: 600; cursor: help; }
